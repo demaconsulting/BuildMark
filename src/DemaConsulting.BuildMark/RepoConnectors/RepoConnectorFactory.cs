@@ -68,12 +68,8 @@ public static class RepoConnectorFactory
                 CreateNoWindow = true
             };
 
-            using var process = Process.Start(startInfo);
-            if (process == null)
-            {
-                return false;
-            }
-
+            using var process = new Process { StartInfo = startInfo };
+            process.Start();
             var output = process.StandardOutput.ReadToEnd();
             process.WaitForExit();
 

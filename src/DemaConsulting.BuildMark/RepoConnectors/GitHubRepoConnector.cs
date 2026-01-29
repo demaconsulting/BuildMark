@@ -27,6 +27,50 @@ namespace DemaConsulting.BuildMark;
 /// </summary>
 public partial class GitHubRepoConnector : RepoConnectorBase
 {
+    private static readonly Dictionary<string, string> LabelTypeMap = new()
+    {
+        { "bug", "bug" },
+        { "defect", "bug" },
+        { "feature", "feature" },
+        { "enhancement", "feature" },
+        { "documentation", "documentation" },
+        { "performance", "performance" },
+        { "security", "security" }
+    };
+
+    /// <summary>
+    ///     Validates and sanitizes a tag name to prevent command injection.
+    /// </summary>
+    /// <param name="tag">Tag name to validate.</param>
+    /// <returns>Sanitized tag name.</returns>
+    /// <exception cref="ArgumentException">Thrown if tag name is invalid.</exception>
+    private static string ValidateTag(string tag)
+    {
+        if (!TagNameRegex().IsMatch(tag))
+        {
+            throw new ArgumentException($"Invalid tag name: {tag}", nameof(tag));
+        }
+
+        return tag;
+    }
+
+    /// <summary>
+    ///     Validates and sanitizes an issue or PR ID to prevent command injection.
+    /// </summary>
+    /// <param name="id">ID to validate.</param>
+    /// <param name="paramName">Parameter name for exception message.</param>
+    /// <returns>Sanitized ID.</returns>
+    /// <exception cref="ArgumentException">Thrown if ID is invalid.</exception>
+    private static string ValidateId(string id, string paramName)
+    {
+        if (!NumericIdRegex().IsMatch(id))
+        {
+            throw new ArgumentException($"Invalid ID: {id}", paramName);
+        }
+
+        return id;
+    }
+
     /// <summary>
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
@@ -55,20 +99,20 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
         else if (string.IsNullOrEmpty(fromTag))
         {
-            range = toTag!;
+            range = ValidateTag(toTag!);
         }
         else if (string.IsNullOrEmpty(toTag))
         {
-            range = $"{fromTag}..HEAD";
+            range = $"{ValidateTag(fromTag)}..HEAD";
         }
         else
         {
-            range = $"{fromTag}..{toTag}";
+            range = $"{ValidateTag(fromTag)}..{ValidateTag(toTag)}";
         }
 
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
         var pullRequests = new List<string>();
-        var regex = PullRequestRegex();
+        var regex = NumberReferenceRegex();
 
         foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
         {
@@ -89,9 +133,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of issue IDs.</returns>
     public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
-        var output = await RunCommandAsync("gh", $"pr view {pullRequestId} --json body --jq .body");
+        var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
+        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json body --jq .body");
         var issues = new List<string>();
-        var regex = IssueReferenceRegex();
+        var regex = NumberReferenceRegex();
 
         foreach (Match match in regex.Matches(output))
         {
@@ -108,7 +153,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue title.</returns>
     public override async Task<string> GetIssueTitleAsync(string issueId)
     {
-        return await RunCommandAsync("gh", $"issue view {issueId} --json title --jq .title");
+        var validatedId = ValidateId(issueId, nameof(issueId));
+        return await RunCommandAsync("gh", $"issue view {validatedId} --json title --jq .title");
     }
 
     /// <summary>
@@ -118,36 +164,20 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue type.</returns>
     public override async Task<string> GetIssueTypeAsync(string issueId)
     {
-        var output = await RunCommandAsync("gh", $"issue view {issueId} --json labels --jq '.labels[].name'");
+        var validatedId = ValidateId(issueId, nameof(issueId));
+        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq '.labels[].name'");
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         // Look for common type labels
         foreach (var label in labels)
         {
             var lowerLabel = label.ToLowerInvariant();
-            if (lowerLabel.Contains("bug") || lowerLabel.Contains("defect"))
+            foreach (var (key, value) in LabelTypeMap)
             {
-                return "bug";
-            }
-
-            if (lowerLabel.Contains("feature") || lowerLabel.Contains("enhancement"))
-            {
-                return "feature";
-            }
-
-            if (lowerLabel.Contains("documentation"))
-            {
-                return "documentation";
-            }
-
-            if (lowerLabel.Contains("performance"))
-            {
-                return "performance";
-            }
-
-            if (lowerLabel.Contains("security"))
-            {
-                return "security";
+                if (lowerLabel.Contains(key))
+                {
+                    return value;
+                }
             }
         }
 
@@ -161,21 +191,28 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Git hash.</returns>
     public override async Task<string> GetHashForTagAsync(string? tag)
     {
-        var refName = string.IsNullOrEmpty(tag) ? "HEAD" : tag;
+        var refName = string.IsNullOrEmpty(tag) ? "HEAD" : ValidateTag(tag);
         return await RunCommandAsync("git", $"rev-parse {refName}");
     }
 
     /// <summary>
-    ///     Regular expression to match pull request numbers in merge commit messages.
+    ///     Regular expression to match valid tag names (alphanumeric, dots, hyphens, underscores, slashes).
     /// </summary>
     /// <returns>Compiled regular expression.</returns>
-    [GeneratedRegex(@"#(\d+)", RegexOptions.Compiled)]
-    private static partial Regex PullRequestRegex();
+    [GeneratedRegex(@"^[a-zA-Z0-9._/-]+$", RegexOptions.Compiled)]
+    private static partial Regex TagNameRegex();
 
     /// <summary>
-    ///     Regular expression to match issue references in text.
+    ///     Regular expression to match numeric IDs.
+    /// </summary>
+    /// <returns>Compiled regular expression.</returns>
+    [GeneratedRegex(@"^\d+$", RegexOptions.Compiled)]
+    private static partial Regex NumericIdRegex();
+
+    /// <summary>
+    ///     Regular expression to match number references (#123).
     /// </summary>
     /// <returns>Compiled regular expression.</returns>
     [GeneratedRegex(@"#(\d+)", RegexOptions.Compiled)]
-    private static partial Regex IssueReferenceRegex();
+    private static partial Regex NumberReferenceRegex();
 }

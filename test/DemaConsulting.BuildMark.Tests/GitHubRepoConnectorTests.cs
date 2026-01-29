@@ -327,4 +327,79 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.AreEqual("current123hash456", hash);
     }
+
+    /// <summary>
+    ///     Test that GetPullRequestsBetweenTagsAsync throws for invalid tag names.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_ThrowsForInvalidTagName()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(
+            async () => await connector.GetPullRequestsBetweenTagsAsync("v1.0.0; rm -rf /", null));
+        Assert.Contains("Invalid tag name", ex.Message);
+    }
+
+    /// <summary>
+    ///     Test that GetIssuesForPullRequestAsync throws for invalid PR ID.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetIssuesForPullRequestAsync_ThrowsForInvalidPRId()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(
+            async () => await connector.GetIssuesForPullRequestAsync("10; cat /etc/passwd"));
+        Assert.Contains("Invalid ID", ex.Message);
+    }
+
+    /// <summary>
+    ///     Test that GetIssueTitleAsync throws for invalid issue ID.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetIssueTitleAsync_ThrowsForInvalidIssueId()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(
+            async () => await connector.GetIssueTitleAsync("123; whoami"));
+        Assert.Contains("Invalid ID", ex.Message);
+    }
+
+    /// <summary>
+    ///     Test that GetIssueTypeAsync throws for invalid issue ID.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetIssueTypeAsync_ThrowsForInvalidIssueId()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(
+            async () => await connector.GetIssueTypeAsync("456 && echo hacked"));
+        Assert.Contains("Invalid ID", ex.Message);
+    }
+
+    /// <summary>
+    ///     Test that GetHashForTagAsync throws for invalid tag name.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetHashForTagAsync_ThrowsForInvalidTagName()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+
+        // Act & Assert
+        var ex = await Assert.ThrowsAsync<ArgumentException>(
+            async () => await connector.GetHashForTagAsync("v1.0.0 | echo pwned"));
+        Assert.Contains("Invalid tag name", ex.Message);
+    }
 }
