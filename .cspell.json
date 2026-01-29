@@ -21,6 +21,7 @@
     "nuget",
     "nupkg",
     "opencover",
+    "reqstream",
     "snupkg",
     "trx",
     "yamllint"
