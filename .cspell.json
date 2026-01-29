@@ -1,0 +1,43 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "buildmark",
+    "BuildMark",
+    "copilot",
+    "cspell",
+    "csproj",
+    "Dema",
+    "demaconsulting",
+    "DEMACONSULTINGNUGETKEY",
+    "Dependabot",
+    "dependabot",
+    "dotnet",
+    "editorconfig",
+    "ibiqlik",
+    "markdownlint",
+    "mstest",
+    "ncipollo",
+    "nuget",
+    "nupkg",
+    "opencover",
+    "reqstream",
+    "snupkg",
+    "trx",
+    "yamllint"
+  ],
+  "ignorePaths": [
+    "node_modules",
+    ".git",
+    "bin",
+    "obj",
+    "*.nupkg",
+    "*.snupkg",
+    "*.dll",
+    "*.exe",
+    "*.trx",
+    "*.spdx.json",
+    "package-lock.json",
+    "yarn.lock"
+  ]
+}
