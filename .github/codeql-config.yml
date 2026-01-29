@@ -1,0 +1,10 @@
+---
+name: "CodeQL Configuration for BuildMark"
+
+# Paths to exclude from analysis
+paths-ignore:
+  - '**/bin/**'
+  - '**/obj/**'
+  - '**/TestResults/**'
+  - '**/*.Designer.cs'
+  - '**/*.generated.cs'

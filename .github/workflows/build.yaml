@@ -1,0 +1,206 @@
+---
+on:
+  workflow_call:
+    inputs:
+      version:
+        required: true
+        type: string
+    secrets:
+      SONAR_TOKEN:
+        required: true
+
+jobs:
+  quality-checks:
+    name: Quality Checks
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Run markdown linter
+        uses: DavidAnson/markdownlint-cli2-action@v22
+        with:
+          globs: '**/*.md'
+
+      - name: Run spell checker
+        uses: streetsidesoftware/cspell-action@v8
+        with:
+          files: '**/*.{md,cs}'
+
+      - name: Run YAML linter
+        uses: ibiqlik/action-yamllint@v3
+        with:
+          config_file: .yamllint.yaml
+
+  build:
+    name: Build ${{ matrix.os }}
+    needs: quality-checks
+    permissions:
+      contents: read
+      pull-requests: write
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Restore Dependencies
+        run: >
+          dotnet restore
+
+      - name: Build
+        run: >
+          dotnet build
+          --no-restore
+          --configuration Release
+          --property:Version=${{ inputs.version }}
+
+      - name: Test
+        run: >
+          dotnet test
+          --no-build
+          --configuration Release
+          --property:Version=${{ inputs.version }}
+          --collect "XPlat Code Coverage;Format=opencover"
+          --logger "trx;LogFilePrefix=${{ matrix.os }}"
+          --results-directory test-results
+
+      - name: Create Dotnet Tool
+        run: >
+          dotnet pack
+          --no-build
+          --no-restore
+          --property:PackageVersion=${{ inputs.version }}
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v6
+        with:
+          name: test-results-${{ matrix.os }}
+          path: test-results/*.trx
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v6
+        with:
+          name: artifacts-${{ matrix.os }}
+          path: |
+            src/DemaConsulting.BuildMark/bin/Release/*.nupkg
+            src/DemaConsulting.BuildMark/bin/Release/*.snupkg
+
+  codeql:
+    name: CodeQL Analysis
+    runs-on: ubuntu-latest
+    needs: quality-checks
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v4
+        with:
+          languages: csharp
+          queries: security-and-quality
+          config-file: ./.github/codeql-config.yml
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: |
+            8.x
+            9.x
+            10.x
+
+      - name: Restore Dependencies
+        run: >
+          dotnet restore
+
+      - name: Build
+        run: >
+          dotnet build
+          --no-restore
+          --configuration Release
+          --property:Version=${{ inputs.version }}
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v4
+        with:
+          category: "/language:csharp"
+          output: sarif-results
+          upload: false
+
+      - name: Upload CodeQL SARIF
+        uses: actions/upload-artifact@v6
+        with:
+          name: codeql-sarif
+          path: sarif-results/csharp.sarif
+
+  integration-test:
+    name: Integration Test ${{ matrix.os }} .NET ${{ matrix.dotnet-version }}
+    runs-on: ${{ matrix.os }}
+    needs: build
+    permissions:
+      contents: read
+
+    strategy:
+      matrix:
+        os: [windows-latest, ubuntu-latest]
+        dotnet-version: ['8.x', '9.x', '10.x']
+
+    steps:
+      - name: Download package
+        uses: actions/download-artifact@v7
+        with:
+          name: artifacts-${{ matrix.os }}
+          path: packages
+
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v5
+        with:
+          dotnet-version: ${{ matrix.dotnet-version }}
+
+      - name: Install tool from package
+        shell: bash
+        run: |
+          echo "Installing package version ${{ inputs.version }} from: packages/"
+          dotnet tool install --global \
+            --add-source packages \
+            --version ${{ inputs.version }} \
+            DemaConsulting.BuildMark
+
+      - name: Test version display
+        shell: bash
+        run: |
+          echo "Testing buildmark --version..."
+          buildmark --version || { echo "✗ Version command failed"; exit 1; }
+          echo "✓ Version command succeeded"
+
+      - name: Test help display
+        shell: bash
+        run: |
+          echo "Testing buildmark --help..."
+          buildmark --help || { echo "✗ Help command failed"; exit 1; }
+          echo "✓ Help command succeeded"
