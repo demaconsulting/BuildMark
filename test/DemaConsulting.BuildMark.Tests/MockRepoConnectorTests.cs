@@ -39,10 +39,12 @@ public class MockRepoConnectorTests
         var tags = await connector.GetTagHistoryAsync();
 
         // Assert
-        Assert.HasCount(3, tags);
+        Assert.HasCount(5, tags);
         Assert.AreEqual("v1.0.0", tags[0]);
         Assert.AreEqual("v1.1.0", tags[1]);
-        Assert.AreEqual("v2.0.0", tags[2]);
+        Assert.AreEqual("v2.0.0-beta.1", tags[2]);
+        Assert.AreEqual("v2.0.0-rc.1", tags[3]);
+        Assert.AreEqual("v2.0.0", tags[4]);
     }
 
     /// <summary>

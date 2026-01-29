@@ -50,7 +50,9 @@ public class MockRepoConnector : IRepoConnector
     {
         { "v1.0.0", "abc123def456" },
         { "v1.1.0", "def456ghi789" },
-        { "v2.0.0", "ghi789jkl012" }
+        { "v2.0.0-beta.1", "ghi789jkl012" },
+        { "v2.0.0-rc.1", "jkl012mno345" },
+        { "v2.0.0", "mno345pqr678" }
     };
 
     /// <summary>
@@ -59,7 +61,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of tags in chronological order.</returns>
     public Task<List<string>> GetTagHistoryAsync()
     {
-        return Task.FromResult(new List<string> { "v1.0.0", "v1.1.0", "v2.0.0" });
+        return Task.FromResult(new List<string> { "v1.0.0", "v1.1.0", "v2.0.0-beta.1", "v2.0.0-rc.1", "v2.0.0" });
     }
 
     /// <summary>

@@ -18,9 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Diagnostics;
-using System.Text;
-
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
@@ -34,50 +31,9 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
     /// <returns>Command output.</returns>
-    protected virtual async Task<string> RunCommandAsync(string command, string arguments)
+    protected virtual Task<string> RunCommandAsync(string command, string arguments)
     {
-        var startInfo = new ProcessStartInfo
-        {
-            FileName = command,
-            Arguments = arguments,
-            RedirectStandardOutput = true,
-            RedirectStandardError = true,
-            UseShellExecute = false,
-            CreateNoWindow = true
-        };
-
-        using var process = new Process { StartInfo = startInfo };
-        var output = new StringBuilder();
-        var error = new StringBuilder();
-
-        process.OutputDataReceived += (_, e) =>
-        {
-            if (e.Data != null)
-            {
-                output.AppendLine(e.Data);
-            }
-        };
-
-        process.ErrorDataReceived += (_, e) =>
-        {
-            if (e.Data != null)
-            {
-                error.AppendLine(e.Data);
-            }
-        };
-
-        process.Start();
-        process.BeginOutputReadLine();
-        process.BeginErrorReadLine();
-        await process.WaitForExitAsync();
-
-        if (process.ExitCode != 0)
-        {
-            throw new InvalidOperationException(
-                $"Command '{command} {arguments}' failed with exit code {process.ExitCode}: {error}");
-        }
-
-        return output.ToString().TrimEnd();
+        return ProcessRunner.RunAsync(command, arguments);
     }
 
     /// <summary>

@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Diagnostics;
-
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
@@ -56,28 +54,7 @@ public static class RepoConnectorFactory
     /// <returns>True if GitHub repository.</returns>
     private static bool IsGitHubRepository()
     {
-        try
-        {
-            var startInfo = new ProcessStartInfo
-            {
-                FileName = "git",
-                Arguments = "remote get-url origin",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-
-            using var process = new Process { StartInfo = startInfo };
-            process.Start();
-            var output = process.StandardOutput.ReadToEnd();
-            process.WaitForExit();
-
-            return output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
-        }
-        catch
-        {
-            return false;
-        }
+        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").Result;
+        return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 }
