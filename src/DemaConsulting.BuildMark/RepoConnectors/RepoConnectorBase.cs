@@ -1,0 +1,80 @@
+// Copyright (c) DEMA Consulting
+// 
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to deal
+// in the Software without restriction, including without limitation the rights
+// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+// copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+// 
+// The above copyright notice and this permission notice shall be included in all
+// copies or substantial portions of the Software.
+// 
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+namespace DemaConsulting.BuildMark;
+
+/// <summary>
+///     Base class for repository connectors with common functionality.
+/// </summary>
+public abstract class RepoConnectorBase : IRepoConnector
+{
+    /// <summary>
+    ///     Runs a command and returns its output.
+    /// </summary>
+    /// <param name="command">Command to run.</param>
+    /// <param name="arguments">Command arguments.</param>
+    /// <returns>Command output.</returns>
+    protected virtual Task<string> RunCommandAsync(string command, string arguments)
+    {
+        return ProcessRunner.RunAsync(command, arguments);
+    }
+
+    /// <summary>
+    ///     Gets the history of tags leading to the current branch.
+    /// </summary>
+    /// <returns>List of tags in chronological order.</returns>
+    public abstract Task<List<string>> GetTagHistoryAsync();
+
+    /// <summary>
+    ///     Gets the list of pull request IDs between two tags.
+    /// </summary>
+    /// <param name="fromTag">Starting tag (null for start of history).</param>
+    /// <param name="toTag">Ending tag (null for current state).</param>
+    /// <returns>List of pull request IDs.</returns>
+    public abstract Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag);
+
+    /// <summary>
+    ///     Gets the issue IDs associated with a pull request.
+    /// </summary>
+    /// <param name="pullRequestId">Pull request ID.</param>
+    /// <returns>List of issue IDs.</returns>
+    public abstract Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId);
+
+    /// <summary>
+    ///     Gets the title of an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue title.</returns>
+    public abstract Task<string> GetIssueTitleAsync(string issueId);
+
+    /// <summary>
+    ///     Gets the type of an issue (bug, feature, etc.).
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue type.</returns>
+    public abstract Task<string> GetIssueTypeAsync(string issueId);
+
+    /// <summary>
+    ///     Gets the git hash for a tag.
+    /// </summary>
+    /// <param name="tag">Tag name (null for current state).</param>
+    /// <returns>Git hash.</returns>
+    public abstract Task<string> GetHashForTagAsync(string? tag);
+}
