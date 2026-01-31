@@ -175,4 +175,34 @@ public class TagVersionTests
         Assert.AreEqual("1.2.3-beta", tagVersion.FullVersion);
         Assert.IsTrue(tagVersion.IsPreRelease);
     }
+
+    /// <summary>
+    ///     Test that TagVersion does not falsely detect rc in words like 'arch'.
+    /// </summary>
+    [TestMethod]
+    public void TagVersion_Constructor_DoesNotFalselyDetectRcInArch()
+    {
+        // Arrange & Act
+        var tagVersion = new TagVersion("v1.0.0.arch");
+
+        // Assert
+        Assert.AreEqual("v1.0.0.arch", tagVersion.OriginalTag);
+        Assert.AreEqual("1.0.0.arch", tagVersion.FullVersion);
+        Assert.IsFalse(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TagVersion correctly detects rc with number suffix.
+    /// </summary>
+    [TestMethod]
+    public void TagVersion_Constructor_CorrectlyDetectsRcWithNumber()
+    {
+        // Arrange & Act
+        var tagVersion = new TagVersion("v1.0.0-rc1");
+
+        // Assert
+        Assert.AreEqual("v1.0.0-rc1", tagVersion.OriginalTag);
+        Assert.AreEqual("1.0.0-rc1", tagVersion.FullVersion);
+        Assert.IsTrue(tagVersion.IsPreRelease);
+    }
 }

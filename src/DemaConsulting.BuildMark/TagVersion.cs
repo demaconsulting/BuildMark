@@ -89,14 +89,55 @@ public class TagVersion
     {
         var normalized = version.ToLowerInvariant();
 
-        // Check for pre-release indicators with word boundaries
+        // Check for pre-release indicators with proper boundaries
         // Common patterns: -alpha, -beta, -rc, .alpha, .beta, .rc, -pre
+        // Ensure 'rc' is followed by a boundary (dot, hyphen, or end of string)
         return normalized.Contains("-alpha") ||
                normalized.Contains("-beta") ||
-               normalized.Contains("-rc") ||
                normalized.Contains("-pre") ||
                normalized.Contains(".alpha") ||
                normalized.Contains(".beta") ||
-               normalized.Contains(".rc");
+               ContainsRcPrerelease(normalized);
+    }
+
+    /// <summary>
+    ///     Checks if the version contains 'rc' as a pre-release indicator with proper word boundaries.
+    /// </summary>
+    /// <param name="normalizedVersion">Normalized version string (lowercase).</param>
+    /// <returns>True if 'rc' is found as a pre-release indicator, false otherwise.</returns>
+    private static bool ContainsRcPrerelease(string normalizedVersion)
+    {
+        var rcIndex = normalizedVersion.IndexOf("rc", StringComparison.Ordinal);
+        while (rcIndex >= 0)
+        {
+            // Check if preceded by - or .
+            if (rcIndex > 0)
+            {
+                var prevChar = normalizedVersion[rcIndex - 1];
+                if (prevChar != '-' && prevChar != '.')
+                {
+                    // Not a valid rc boundary, look for next occurrence
+                    rcIndex = normalizedVersion.IndexOf("rc", rcIndex + 1, StringComparison.Ordinal);
+                    continue;
+                }
+            }
+
+            // Check if followed by end, -, or .
+            if (rcIndex + 2 < normalizedVersion.Length)
+            {
+                var nextChar = normalizedVersion[rcIndex + 2];
+                if (nextChar != '-' && nextChar != '.' && !char.IsDigit(nextChar))
+                {
+                    // Not a valid rc boundary, look for next occurrence
+                    rcIndex = normalizedVersion.IndexOf("rc", rcIndex + 1, StringComparison.Ordinal);
+                    continue;
+                }
+            }
+
+            // Valid rc pre-release indicator found
+            return true;
+        }
+
+        return false;
     }
 }
