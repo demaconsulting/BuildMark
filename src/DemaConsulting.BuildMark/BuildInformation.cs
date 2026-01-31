@@ -39,8 +39,8 @@ public record IssueInfo(string Id, string Title, string Url);
 /// <param name="BugIssues">Bugs fixed between versions.</param>
 /// <param name="KnownIssues">Known issues (unfixed or fixed but not in this build).</param>
 public record BuildInformation(
-    string? FromVersion,
-    string ToVersion,
+    Version? FromVersion,
+    Version ToVersion,
     string? FromHash,
     string ToHash,
     List<IssueInfo> ChangeIssues,
@@ -54,14 +54,14 @@ public record BuildInformation(
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, TagInfo? version = null)
+    public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, Version? version = null)
     {
         // Get tag history and current hash
         var tags = await connector.GetTagHistoryAsync();
         var currentHash = await connector.GetHashForTagAsync(null);
 
         // Determine the "To" version
-        TagInfo toTagInfo;
+        Version toTagInfo;
         string toHash;
 
         if (version != null)
@@ -74,7 +74,7 @@ public record BuildInformation(
         {
             // Check if current commit matches the most recent tag
             var latestTag = tags[^1];
-            var latestTagHash = await connector.GetHashForTagAsync(latestTag);
+            var latestTagHash = await connector.GetHashForTagAsync(latestTag.Tag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
@@ -96,7 +96,7 @@ public record BuildInformation(
         }
 
         // Determine the "From" version
-        TagInfo? fromTagInfo = null;
+        Version? fromTagInfo = null;
         string? fromHash = null;
 
         if (tags.Count > 0)
@@ -150,7 +150,7 @@ public record BuildInformation(
 
             if (fromTagInfo != null)
             {
-                fromHash = await connector.GetHashForTagAsync(fromTagInfo);
+                fromHash = await connector.GetHashForTagAsync(fromTagInfo.Tag);
             }
         }
 
@@ -212,8 +212,8 @@ public record BuildInformation(
         }
 
         return new BuildInformation(
-            fromTagInfo?.Tag,
-            toTagInfo.Tag,
+            fromTagInfo,
+            toTagInfo,
             fromHash?.Trim(),
             toHash.Trim(),
             changeIssues,
@@ -227,7 +227,7 @@ public record BuildInformation(
     /// <param name="tags">List of tags.</param>
     /// <param name="normalizedVersion">Normalized version to find.</param>
     /// <returns>Index of the tag, or -1 if not found.</returns>
-    private static int FindTagIndex(List<TagInfo> tags, string normalizedVersion)
+    private static int FindTagIndex(List<Version> tags, string normalizedVersion)
     {
         for (var i = 0; i < tags.Count; i++)
         {

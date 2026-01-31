@@ -21,19 +21,19 @@
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>
-///     Tests for the TagInfo class.
+///     Tests for the Version class.
 /// </summary>
 [TestClass]
 public class TagInfoTests
 {
     /// <summary>
-    ///     Test that TagInfo parses simple v-prefix version.
+    ///     Test that Version parses simple v-prefix version.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesSimpleVPrefix()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v1.2.3");
+        var tagVersion = Version.Create("v1.2.3");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -43,13 +43,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo parses ver-prefix version.
+    ///     Test that Version parses ver-prefix version.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesVerPrefix()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("ver-2.0.0");
+        var tagVersion = Version.Create("ver-2.0.0");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -59,13 +59,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo parses release_prefix version.
+    ///     Test that Version parses release_prefix version.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesReleaseUnderscorePrefix()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("release_3.1.4");
+        var tagVersion = Version.Create("release_3.1.4");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -75,13 +75,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo detects alpha pre-release.
+    ///     Test that Version detects alpha pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_DetectsAlphaPreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v2.0.0-alpha.1");
+        var tagVersion = Version.Create("v2.0.0-alpha.1");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -91,13 +91,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo detects beta pre-release.
+    ///     Test that Version detects beta pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_DetectsBetaPreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v2.0.0-beta.2");
+        var tagVersion = Version.Create("v2.0.0-beta.2");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -107,13 +107,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo detects rc pre-release.
+    ///     Test that Version detects rc pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_DetectsRcPreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v2.0.0-rc.1");
+        var tagVersion = Version.Create("v2.0.0-rc.1");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -123,13 +123,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo detects pre pre-release.
+    ///     Test that Version detects pre pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_DetectsPrePreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v2.0.0-pre");
+        var tagVersion = Version.Create("v2.0.0-pre");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -139,13 +139,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo handles no prefix.
+    ///     Test that Version handles no prefix.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_HandlesNoPrefix()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("1.0.0");
+        var tagVersion = Version.Create("1.0.0");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -155,13 +155,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo handles complex prefix.
+    ///     Test that Version handles complex prefix.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_HandlesComplexPrefix()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("my-awesome-release_1.2.3-beta");
+        var tagVersion = Version.Create("my-awesome-release_1.2.3-beta");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -171,13 +171,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo correctly parses build metadata with plus separator.
+    ///     Test that Version correctly parses build metadata with plus separator.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesBuildMetadata()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v1.0.0+arch");
+        var tagVersion = Version.Create("v1.0.0+arch");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -187,13 +187,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo accepts dot-separated pre-release and treats it as pre-release.
+    ///     Test that Version accepts dot-separated pre-release and treats it as pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_AcceptsDotSeparatedAsPreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v1.0.0.arch");
+        var tagVersion = Version.Create("v1.0.0.arch");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -203,13 +203,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo correctly parses complex version with prefix, pre-release, and metadata.
+    ///     Test that Version correctly parses complex version with prefix, pre-release, and metadata.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesComplexVersionWithMetadata()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("Rel_1.2.3.rc.4+build.5");
+        var tagVersion = Version.Create("Rel_1.2.3.rc.4+build.5");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -219,13 +219,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo correctly parses complex version with hyphen separator for pre-release.
+    ///     Test that Version correctly parses complex version with hyphen separator for pre-release.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesComplexVersionWithHyphenPreRelease()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("Rel_1.2.3-rc.4+build.5");
+        var tagVersion = Version.Create("Rel_1.2.3-rc.4+build.5");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -235,13 +235,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo correctly detects rc with number suffix.
+    ///     Test that Version correctly detects rc with number suffix.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_CorrectlyDetectsRcWithNumber()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v1.0.0-rc1");
+        var tagVersion = Version.Create("v1.0.0-rc1");
         Assert.IsNotNull(tagVersion);
 
         // Assert
@@ -251,13 +251,13 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo correctly parses pre-release with build metadata.
+    ///     Test that Version correctly parses pre-release with build metadata.
     /// </summary>
     [TestMethod]
     public void TagInfo_Constructor_ParsesPreReleaseWithBuildMetadata()
     {
         // Arrange & Act
-        var tagVersion = TagInfo.Create("v2.0.0-beta.1+linux.x64");
+        var tagVersion = Version.Create("v2.0.0-beta.1+linux.x64");
         Assert.IsNotNull(tagVersion);
 
         // Assert

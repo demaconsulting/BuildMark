@@ -29,15 +29,15 @@ public interface IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    Task<List<TagInfo>> GetTagHistoryAsync();
+    Task<List<Version>> GetTagHistoryAsync();
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two tags.
+    ///     Gets the list of pull request IDs between two versions.
     /// </summary>
-    /// <param name="fromTag">Starting tag (null for start of history).</param>
-    /// <param name="toTag">Ending tag (null for current state).</param>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag);
+    Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
     ///     Gets the issue IDs associated with a pull request.
@@ -63,9 +63,9 @@ public interface IRepoConnector
     /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag information (null for current state).</param>
+    /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
-    Task<string> GetHashForTagAsync(TagInfo? tag);
+    Task<string> GetHashForTagAsync(string? tag);
 
     /// <summary>
     ///     Gets the URL for an issue.

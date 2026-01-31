@@ -23,12 +23,15 @@ using System.Text.RegularExpressions;
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
-///     Represents a version tag with parsed semantic version information.
+///     Represents a version with parsed semantic version information.
 /// </summary>
 /// <param name="Tag">The tag name.</param>
-/// <param name="FullVersion">The full semantic version (major.minor.patch-prerelease) with leading non-version characters removed.</param>
+/// <param name="FullVersion">The full semantic version (major.minor.patch-prerelease+metadata) with leading non-version characters removed.</param>
+/// <param name="SemanticVersion">The core semantic version (major.minor.patch).</param>
+/// <param name="PreRelease">The pre-release identifier (e.g., rc.4, alpha.1), or empty string if not a pre-release.</param>
+/// <param name="Metadata">The build metadata (e.g., build.5, linux.x64), or empty string if no metadata.</param>
 /// <param name="IsPreRelease">Whether this is a pre-release version.</param>
-public partial record TagInfo(string Tag, string FullVersion, bool IsPreRelease)
+public partial record Version(string Tag, string FullVersion, string SemanticVersion, string PreRelease, string Metadata, bool IsPreRelease)
 {
     /// <summary>
     ///     Regex pattern for parsing version tags with optional prefix, pre-release, and build metadata.
@@ -43,11 +46,11 @@ public partial record TagInfo(string Tag, string FullVersion, bool IsPreRelease)
     private static partial Regex TagPattern();
 
     /// <summary>
-    ///     Creates a TagInfo from a tag string, or returns null if the tag doesn't match version format.
+    ///     Creates a Version from a tag string, or returns null if the tag doesn't match version format.
     /// </summary>
     /// <param name="tag">Tag name to parse.</param>
-    /// <returns>TagInfo instance if tag matches version format, null otherwise.</returns>
-    public static TagInfo? Create(string tag)
+    /// <returns>Version instance if tag matches version format, null otherwise.</returns>
+    public static Version? Create(string tag)
     {
         var match = TagPattern().Match(tag);
         if (!match.Success)
@@ -57,23 +60,27 @@ public partial record TagInfo(string Tag, string FullVersion, bool IsPreRelease)
 
         var version = match.Groups["version"].Value;
         var separator = match.Groups["separator"];
-        var preRelease = match.Groups["pre_release"];
-        var metadata = match.Groups["metadata"];
+        var preReleaseGroup = match.Groups["pre_release"];
+        var metadataGroup = match.Groups["metadata"];
         
         // Pre-release exists if separator is present and pre-release group has content
-        var hasPreRelease = separator.Success && preRelease.Success && !string.IsNullOrEmpty(preRelease.Value);
+        var hasPreRelease = separator.Success && preReleaseGroup.Success && !string.IsNullOrEmpty(preReleaseGroup.Value);
+        
+        // Extract pre-release and metadata strings
+        var preRelease = hasPreRelease ? preReleaseGroup.Value : string.Empty;
+        var metadata = metadataGroup.Success ? metadataGroup.Value : string.Empty;
         
         // Build full version: version + optional pre-release + optional build metadata
         var fullVersion = version;
         if (hasPreRelease)
         {
-            fullVersion += $"{separator.Value}{preRelease.Value}";
+            fullVersion += $"{separator.Value}{preRelease}";
         }
-        if (metadata.Success)
+        if (metadataGroup.Success)
         {
-            fullVersion += $"+{metadata.Value}";
+            fullVersion += $"+{metadata}";
         }
 
-        return new TagInfo(tag, fullVersion, hasPreRelease);
+        return new Version(tag, fullVersion, version, preRelease, metadata, hasPreRelease);
     }
 }

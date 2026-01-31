@@ -65,27 +65,27 @@ public class MockRepoConnector : IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public Task<List<TagInfo>> GetTagHistoryAsync()
+    public Task<List<Version>> GetTagHistoryAsync()
     {
         // Use dictionary keys to avoid duplication, filter out non-version tags
         var tagInfoList = _tagHashes.Keys
-            .Select(TagInfo.Create)
+            .Select(Version.Create)
             .Where(t => t != null)
-            .Cast<TagInfo>()
+            .Cast<Version>()
             .ToList();
         return Task.FromResult(tagInfoList);
     }
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two tags.
+    ///     Gets the list of pull request IDs between two versions.
     /// </summary>
-    /// <param name="fromTag">Starting tag (null for start of history).</param>
-    /// <param name="toTag">Ending tag (null for current state).</param>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag)
+    public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
-        var fromTagName = fromTag?.Tag;
-        var toTagName = toTag?.Tag;
+        var fromTagName = from?.Tag;
+        var toTagName = to?.Tag;
 
         // Deterministic mock data based on tag range
         if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
@@ -148,9 +148,9 @@ public class MockRepoConnector : IRepoConnector
     /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag information (null for current state).</param>
+    /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
-    public Task<string> GetHashForTagAsync(TagInfo? tag)
+    public Task<string> GetHashForTagAsync(string? tag)
     {
         if (tag == null)
         {
@@ -158,7 +158,7 @@ public class MockRepoConnector : IRepoConnector
         }
 
         return Task.FromResult(
-            _tagHashes.TryGetValue(tag.Tag, out var hash)
+            _tagHashes.TryGetValue(tag, out var hash)
                 ? hash
                 : "unknown000hash000");
     }

@@ -68,12 +68,12 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.1.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0")!);
 
         // Assert
-        Assert.AreEqual("v2.1.0", buildInfo.ToVersion);
+        Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
         Assert.AreEqual("current123hash456", buildInfo.ToHash);
-        Assert.AreEqual("2.0.0", buildInfo.FromVersion);
+        Assert.AreEqual("2.0.0", buildInfo.FromVersion?.Tag);
         Assert.AreEqual("mno345pqr678", buildInfo.FromHash);
     }
 
@@ -90,9 +90,9 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector);
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.ToVersion);
+        Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
         Assert.AreEqual("mno345pqr678", buildInfo.ToHash);
-        Assert.AreEqual("v1.1.0", buildInfo.FromVersion);
+        Assert.AreEqual("v1.1.0", buildInfo.FromVersion?.Tag);
     }
 
     /// <summary>
@@ -105,11 +105,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0-beta.1")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0-beta.1")!);
 
         // Assert
-        Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion);
-        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion);
+        Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
     }
 
     /// <summary>
@@ -122,11 +122,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
 
         // Assert
-        Assert.AreEqual("2.0.0", buildInfo.ToVersion);
-        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion);
+        Assert.AreEqual("2.0.0", buildInfo.ToVersion.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("ver-1.1.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0")!);
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -165,7 +165,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -184,12 +184,12 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v1.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0")!);
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
         Assert.IsNull(buildInfo.FromHash);
-        Assert.AreEqual("v1.0.0", buildInfo.ToVersion);
+        Assert.AreEqual("v1.0.0", buildInfo.ToVersion.Tag);
     }
 
     /// <summary>
@@ -197,12 +197,12 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
     {
-        public Task<List<TagInfo>> GetTagHistoryAsync() => Task.FromResult(new List<TagInfo>());
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
+        public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
-        public Task<string> GetHashForTagAsync(TagInfo? tag) => Task.FromResult("hash123");
+        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
         public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
@@ -212,13 +212,13 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<TagInfo>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<TagInfo> { TagInfo.Create("v1.0.0")! });
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
+        public Task<List<Version>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<Version> { Version.Create("v1.0.0")! });
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
-        public Task<string> GetHashForTagAsync(TagInfo? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
+        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
         public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
@@ -228,26 +228,26 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<TagInfo>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<TagInfo> 
+        public Task<List<Version>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<Version> 
             { 
-                TagInfo.Create("v1.0.0")!, 
-                TagInfo.Create("ver-1.1.0")!, 
-                TagInfo.Create("2.0.0")!
+                Version.Create("v1.0.0")!, 
+                Version.Create("ver-1.1.0")!, 
+                Version.Create("2.0.0")!
             });
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
 
-        public Task<string> GetHashForTagAsync(TagInfo? tag)
+        public Task<string> GetHashForTagAsync(string? tag)
         {
-            if (tag == null || tag.Tag == "v2.0.0")
+            if (tag == null || tag == "v2.0.0")
             {
                 return Task.FromResult("mno345pqr678");
             }
 
-            if (tag.Tag == "v1.1.0")
+            if (tag == "v1.1.0")
             {
                 return Task.FromResult("def456ghi789");
             }
