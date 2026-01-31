@@ -40,7 +40,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public abstract Task<List<string>> GetTagHistoryAsync();
+    public abstract Task<List<TagInformation>> GetTagHistoryAsync();
 
     /// <summary>
     ///     Gets the list of pull request IDs between two tags.

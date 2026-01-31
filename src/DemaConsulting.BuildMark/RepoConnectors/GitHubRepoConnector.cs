@@ -75,13 +75,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public override async Task<List<string>> GetTagHistoryAsync()
+    public override async Task<List<TagInformation>> GetTagHistoryAsync()
     {
         var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
-        return output
+        var tagNames = output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
+        return tagNames.Select(t => new TagInformation(t)).ToList();
     }
 
     /// <summary>

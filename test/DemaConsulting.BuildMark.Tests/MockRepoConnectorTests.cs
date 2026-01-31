@@ -40,11 +40,11 @@ public class MockRepoConnectorTests
 
         // Assert
         Assert.HasCount(5, tags);
-        Assert.AreEqual("v1.0.0", tags[0]);
-        Assert.AreEqual("v1.1.0", tags[1]);
-        Assert.AreEqual("v2.0.0-beta.1", tags[2]);
-        Assert.AreEqual("v2.0.0-rc.1", tags[3]);
-        Assert.AreEqual("v2.0.0", tags[4]);
+        Assert.AreEqual("v1.0.0", tags[0].OriginalTag);
+        Assert.AreEqual("v1.1.0", tags[1].OriginalTag);
+        Assert.AreEqual("v2.0.0-beta.1", tags[2].OriginalTag);
+        Assert.AreEqual("v2.0.0-rc.1", tags[3].OriginalTag);
+        Assert.AreEqual("v2.0.0", tags[4].OriginalTag);
     }
 
     /// <summary>

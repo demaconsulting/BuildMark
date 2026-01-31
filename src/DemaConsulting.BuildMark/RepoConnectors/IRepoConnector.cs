@@ -29,7 +29,7 @@ public interface IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    Task<List<string>> GetTagHistoryAsync();
+    Task<List<TagInformation>> GetTagHistoryAsync();
 
     /// <summary>
     ///     Gets the list of pull request IDs between two tags.

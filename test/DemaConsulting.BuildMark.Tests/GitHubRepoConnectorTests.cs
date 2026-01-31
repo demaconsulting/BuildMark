@@ -77,9 +77,9 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.HasCount(3, tags);
-        Assert.AreEqual("v1.0.0", tags[0]);
-        Assert.AreEqual("v1.1.0", tags[1]);
-        Assert.AreEqual("v2.0.0", tags[2]);
+        Assert.AreEqual("v1.0.0", tags[0].OriginalTag);
+        Assert.AreEqual("v1.1.0", tags[1].OriginalTag);
+        Assert.AreEqual("v2.0.0", tags[2].OriginalTag);
     }
 
     /// <summary>

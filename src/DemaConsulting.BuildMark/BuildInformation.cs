@@ -74,11 +74,11 @@ public record BuildInformation(
         {
             // Check if current commit matches the most recent tag
             var latestTag = tags[^1];
-            var latestTagHash = await connector.GetHashForTagAsync(latestTag);
+            var latestTagHash = await connector.GetHashForTagAsync(latestTag.OriginalTag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
-                toVersion = latestTag;
+                toVersion = latestTag.OriginalTag;
                 toHash = currentHash;
             }
             else
@@ -112,12 +112,12 @@ public record BuildInformation(
                 if (toIndex > 0)
                 {
                     // The to version exists in tag history, use the previous tag
-                    fromVersion = tags[toIndex - 1];
+                    fromVersion = tags[toIndex - 1].OriginalTag;
                 }
                 else if (toIndex == -1)
                 {
                     // The to version doesn't exist in tag history, use the most recent tag
-                    fromVersion = tags[^1];
+                    fromVersion = tags[^1].OriginalTag;
                 }
                 // If toIndex == 0, fromVersion stays null (first release)
             }
@@ -143,10 +143,9 @@ public record BuildInformation(
 
                 for (var i = startIndex; i >= 0; i--)
                 {
-                    var tagVersion = new TagInformation(tags[i]);
-                    if (!tagVersion.IsPreRelease)
+                    if (!tags[i].IsPreRelease)
                     {
-                        fromVersion = tags[i];
+                        fromVersion = tags[i].OriginalTag;
                         break;
                     }
                 }
@@ -231,12 +230,11 @@ public record BuildInformation(
     /// <param name="tags">List of tags.</param>
     /// <param name="normalizedVersion">Normalized version to find.</param>
     /// <returns>Index of the tag, or -1 if not found.</returns>
-    private static int FindTagIndex(List<string> tags, string normalizedVersion)
+    private static int FindTagIndex(List<TagInformation> tags, string normalizedVersion)
     {
         for (var i = 0; i < tags.Count; i++)
         {
-            var tagVersion = new TagInformation(tags[i]);
-            if (tagVersion.FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            if (tags[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
             {
                 return i;
             }

@@ -197,7 +197,7 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
     {
-        public Task<List<string>> GetTagHistoryAsync() => Task.FromResult(new List<string>());
+        public Task<List<TagInformation>> GetTagHistoryAsync() => Task.FromResult(new List<TagInformation>());
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -212,7 +212,8 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<string>> GetTagHistoryAsync() => Task.FromResult(new List<string> { "v1.0.0" });
+        public Task<List<TagInformation>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<TagInformation> { new TagInformation("v1.0.0") });
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -227,7 +228,13 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<string>> GetTagHistoryAsync() => Task.FromResult(new List<string> { "v1.0.0", "v1.1.0", "v2.0.0" });
+        public Task<List<TagInformation>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<TagInformation> 
+            { 
+                new TagInformation("v1.0.0"), 
+                new TagInformation("v1.1.0"), 
+                new TagInformation("v2.0.0") 
+            });
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
