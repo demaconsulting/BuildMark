@@ -29,14 +29,18 @@ public class MockRepoConnector : IRepoConnector
     {
         { "1", "Add feature X" },
         { "2", "Fix bug in Y" },
-        { "3", "Update documentation" }
+        { "3", "Update documentation" },
+        { "4", "Known bug A" },
+        { "5", "Known bug B" }
     };
 
     private readonly Dictionary<string, string> _issueTypes = new()
     {
         { "1", "feature" },
         { "2", "bug" },
-        { "3", "documentation" }
+        { "3", "documentation" },
+        { "4", "bug" },
+        { "5", "bug" }
     };
 
     private readonly Dictionary<string, List<string>> _pullRequestIssues = new()
@@ -49,41 +53,52 @@ public class MockRepoConnector : IRepoConnector
     private readonly Dictionary<string, string> _tagHashes = new()
     {
         { "v1.0.0", "abc123def456" },
-        { "v1.1.0", "def456ghi789" },
-        { "v2.0.0-beta.1", "ghi789jkl012" },
+        { "ver-1.1.0", "def456ghi789" },
+        { "release_2.0.0-beta.1", "ghi789jkl012" },
         { "v2.0.0-rc.1", "jkl012mno345" },
-        { "v2.0.0", "mno345pqr678" }
+        { "2.0.0", "mno345pqr678" }
     };
+
+    private readonly List<string> _openIssues = new() { "4", "5" };
 
     /// <summary>
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public Task<List<string>> GetTagHistoryAsync()
+    public Task<List<Version>> GetTagHistoryAsync()
     {
-        return Task.FromResult(new List<string> { "v1.0.0", "v1.1.0", "v2.0.0-beta.1", "v2.0.0-rc.1", "v2.0.0" });
+        // Use dictionary keys to avoid duplication, filter out non-version tags
+        var tagInfoList = _tagHashes.Keys
+            .Select(Version.Create)
+            .Where(t => t != null)
+            .Cast<Version>()
+            .ToList();
+        return Task.FromResult(tagInfoList);
     }
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two tags.
+    ///     Gets the list of pull request IDs between two versions.
     /// </summary>
-    /// <param name="fromTag">Starting tag (null for start of history).</param>
-    /// <param name="toTag">Ending tag (null for current state).</param>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag)
+    public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
+        var fromTagName = from?.Tag;
+        var toTagName = to?.Tag;
+
         // Deterministic mock data based on tag range
-        if (fromTag == "v1.0.0" && toTag == "v1.1.0")
+        if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
             return Task.FromResult(new List<string> { "10" });
         }
 
-        if (fromTag == "v1.1.0" && toTag == "v2.0.0")
+        if (fromTagName == "ver-1.1.0" && toTagName == "2.0.0")
         {
             return Task.FromResult(new List<string> { "11", "12" });
         }
 
-        if (string.IsNullOrEmpty(fromTag) && toTag == "v1.0.0")
+        if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
         {
             return Task.FromResult(new List<string> { "10" });
         }
@@ -137,7 +152,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>Git hash.</returns>
     public Task<string> GetHashForTagAsync(string? tag)
     {
-        if (string.IsNullOrEmpty(tag))
+        if (tag == null)
         {
             return Task.FromResult("current123hash456");
         }
@@ -146,5 +161,24 @@ public class MockRepoConnector : IRepoConnector
             _tagHashes.TryGetValue(tag, out var hash)
                 ? hash
                 : "unknown000hash000");
+    }
+
+    /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    public Task<string> GetIssueUrlAsync(string issueId)
+    {
+        return Task.FromResult($"https://github.com/example/repo/issues/{issueId}");
+    }
+
+    /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    public Task<List<string>> GetOpenIssuesAsync()
+    {
+        return Task.FromResult(_openIssues);
     }
 }

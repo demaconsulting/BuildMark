@@ -40,15 +40,15 @@ public abstract class RepoConnectorBase : IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public abstract Task<List<string>> GetTagHistoryAsync();
+    public abstract Task<List<Version>> GetTagHistoryAsync();
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two tags.
+    ///     Gets the list of pull request IDs between two versions.
     /// </summary>
-    /// <param name="fromTag">Starting tag (null for start of history).</param>
-    /// <param name="toTag">Ending tag (null for current state).</param>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    public abstract Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag);
+    public abstract Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
     ///     Gets the issue IDs associated with a pull request.
@@ -77,4 +77,17 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
     public abstract Task<string> GetHashForTagAsync(string? tag);
+
+    /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    public abstract Task<string> GetIssueUrlAsync(string issueId);
+
+    /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    public abstract Task<List<string>> GetOpenIssuesAsync();
 }

@@ -40,11 +40,11 @@ public class MockRepoConnectorTests
 
         // Assert
         Assert.HasCount(5, tags);
-        Assert.AreEqual("v1.0.0", tags[0]);
-        Assert.AreEqual("v1.1.0", tags[1]);
-        Assert.AreEqual("v2.0.0-beta.1", tags[2]);
-        Assert.AreEqual("v2.0.0-rc.1", tags[3]);
-        Assert.AreEqual("v2.0.0", tags[4]);
+        Assert.AreEqual("v1.0.0", tags[0].Tag);
+        Assert.AreEqual("ver-1.1.0", tags[1].Tag);
+        Assert.AreEqual("release_2.0.0-beta.1", tags[2].Tag);
+        Assert.AreEqual("v2.0.0-rc.1", tags[3].Tag);
+        Assert.AreEqual("2.0.0", tags[4].Tag);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.0.0", "v1.1.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(Version.Create("v1.0.0")!, Version.Create("ver-1.1.0")!);
 
         // Assert
         Assert.HasCount(1, prs);
@@ -74,7 +74,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.1.0", "v2.0.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(Version.Create("ver-1.1.0")!, Version.Create("2.0.0")!);
 
         // Assert
         Assert.HasCount(2, prs);
@@ -205,7 +205,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var hash = await connector.GetHashForTagAsync("v1.0.0");
+        var hash = await connector.GetHashForTagAsync(Version.Create("v1.0.0")!.Tag);
 
         // Assert
         Assert.AreEqual("abc123def456", hash);
@@ -237,9 +237,43 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var hash = await connector.GetHashForTagAsync("v999.0.0");
+        var hash = await connector.GetHashForTagAsync(Version.Create("v999.0.0")!.Tag);
 
         // Assert
         Assert.AreEqual("unknown000hash000", hash);
+    }
+
+    /// <summary>
+    ///     Test that GetIssueUrlAsync returns expected URL.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetIssueUrlAsync_ReturnsExpectedUrl()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+
+        // Act
+        var url = await connector.GetIssueUrlAsync("1");
+
+        // Assert
+        Assert.AreEqual("https://github.com/example/repo/issues/1", url);
+    }
+
+    /// <summary>
+    ///     Test that GetOpenIssuesAsync returns expected open issues.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetOpenIssuesAsync_ReturnsExpectedOpenIssues()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+
+        // Act
+        var openIssues = await connector.GetOpenIssuesAsync();
+
+        // Assert
+        Assert.HasCount(2, openIssues);
+        Assert.AreEqual("4", openIssues[0]);
+        Assert.AreEqual("5", openIssues[1]);
     }
 }
