@@ -67,8 +67,12 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of tags in chronological order.</returns>
     public Task<List<TagInfo>> GetTagHistoryAsync()
     {
-        // Use dictionary keys to avoid duplication
-        var tagInfoList = _tagHashes.Keys.Select(t => new TagInfo(t)).ToList();
+        // Use dictionary keys to avoid duplication, filter out non-version tags
+        var tagInfoList = _tagHashes.Keys
+            .Select(TagInfo.Create)
+            .Where(t => t != null)
+            .Cast<TagInfo>()
+            .ToList();
         return Task.FromResult(tagInfoList);
     }
 

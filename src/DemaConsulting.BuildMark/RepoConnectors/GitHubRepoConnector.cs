@@ -82,7 +82,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
-        return tagNames.Select(t => new TagInfo(t)).ToList();
+        // Filter out non-version tags
+        return tagNames
+            .Select(TagInfo.Create)
+            .Where(t => t != null)
+            .Cast<TagInfo>()
+            .ToList();
     }
 
     /// <summary>

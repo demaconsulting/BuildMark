@@ -33,7 +33,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesSimpleVPrefix()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v1.2.3");
+        var tagVersion = TagInfo.Create("v1.2.3");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.2.3", tagVersion.Tag);
@@ -48,7 +49,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesVerPrefix()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("ver-2.0.0");
+        var tagVersion = TagInfo.Create("ver-2.0.0");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("ver-2.0.0", tagVersion.Tag);
@@ -63,7 +65,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesReleaseUnderscorePrefix()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("release_3.1.4");
+        var tagVersion = TagInfo.Create("release_3.1.4");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("release_3.1.4", tagVersion.Tag);
@@ -78,7 +81,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsAlphaPreRelease()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v2.0.0-alpha.1");
+        var tagVersion = TagInfo.Create("v2.0.0-alpha.1");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-alpha.1", tagVersion.Tag);
@@ -93,7 +97,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsBetaPreRelease()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v2.0.0-beta.2");
+        var tagVersion = TagInfo.Create("v2.0.0-beta.2");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.2", tagVersion.Tag);
@@ -108,7 +113,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsRcPreRelease()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v2.0.0-rc.1");
+        var tagVersion = TagInfo.Create("v2.0.0-rc.1");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-rc.1", tagVersion.Tag);
@@ -123,7 +129,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsPrePreRelease()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v2.0.0-pre");
+        var tagVersion = TagInfo.Create("v2.0.0-pre");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-pre", tagVersion.Tag);
@@ -138,7 +145,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_HandlesNoPrefix()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("1.0.0");
+        var tagVersion = TagInfo.Create("1.0.0");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("1.0.0", tagVersion.Tag);
@@ -153,7 +161,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_HandlesComplexPrefix()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("my-awesome-release_1.2.3-beta");
+        var tagVersion = TagInfo.Create("my-awesome-release_1.2.3-beta");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("my-awesome-release_1.2.3-beta", tagVersion.Tag);
@@ -168,7 +177,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_DoesNotFalselyDetectRcInArch()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v1.0.0.arch");
+        var tagVersion = TagInfo.Create("v1.0.0.arch");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.0.0.arch", tagVersion.Tag);
@@ -183,7 +193,8 @@ public class TagInfoTests
     public void TagInfo_Constructor_CorrectlyDetectsRcWithNumber()
     {
         // Arrange & Act
-        var tagVersion = new TagInfo("v1.0.0-rc1");
+        var tagVersion = TagInfo.Create("v1.0.0-rc1");
+        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.0.0-rc1", tagVersion.Tag);

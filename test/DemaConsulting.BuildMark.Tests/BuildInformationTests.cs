@@ -68,7 +68,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.1.0"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.1.0")!);
 
         // Assert
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion);
@@ -105,7 +105,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0-beta.1"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0-beta.1")!);
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion);
@@ -122,7 +122,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0")!);
 
         // Assert
         Assert.AreEqual("2.0.0", buildInfo.ToVersion);
@@ -139,7 +139,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("ver-1.1.0"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("ver-1.1.0")!);
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -165,7 +165,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v2.0.0")!);
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -184,7 +184,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v1.0.0"));
+        var buildInfo = await BuildInformation.CreateAsync(connector, TagInfo.Create("v1.0.0")!);
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
@@ -213,7 +213,7 @@ public class BuildInformationTests
     private class MockRepoConnectorMismatch : IRepoConnector
     {
         public Task<List<TagInfo>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<TagInfo> { new TagInfo("v1.0.0") });
+            Task.FromResult(new List<TagInfo> { TagInfo.Create("v1.0.0")! });
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -231,9 +231,9 @@ public class BuildInformationTests
         public Task<List<TagInfo>> GetTagHistoryAsync() => 
             Task.FromResult(new List<TagInfo> 
             { 
-                new TagInfo("v1.0.0"), 
-                new TagInfo("ver-1.1.0"), 
-                new TagInfo("v2.0.0") 
+                TagInfo.Create("v1.0.0")!, 
+                TagInfo.Create("ver-1.1.0")!, 
+                TagInfo.Create("2.0.0")!
             });
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());

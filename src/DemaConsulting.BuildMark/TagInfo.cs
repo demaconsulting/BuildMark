@@ -18,77 +18,55 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Text.RegularExpressions;
+
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
 ///     Represents a version tag with parsed semantic version information.
 /// </summary>
-public class TagInfo
+/// <param name="Tag">The tag name.</param>
+/// <param name="FullVersion">The full semantic version (major.minor.patch-prerelease) with leading non-version characters removed.</param>
+/// <param name="IsPreRelease">Whether this is a pre-release version.</param>
+public partial record TagInfo(string Tag, string FullVersion, bool IsPreRelease)
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TagInfo"/> class.
+    ///     Regex pattern for parsing version tags with optional prefix and pre-release suffix.
     /// </summary>
-    /// <param name="tagName">Tag name.</param>
-    public TagInfo(string tagName)
+    /// <returns>Compiled regex for parsing tags.</returns>
+    [GeneratedRegex(@"^(?:[a-zA-Z_-]+)?(?<version>\d+\.\d+\.\d+)(?:-(?<pre_release>[a-zA-Z0-9.-]+))?(?:\.(?<metadata>[a-zA-Z0-9.-]+))?$")]
+    private static partial Regex TagPattern();
+
+    /// <summary>
+    ///     Creates a TagInfo from a tag string, or returns null if the tag doesn't match version format.
+    /// </summary>
+    /// <param name="tag">Tag name to parse.</param>
+    /// <returns>TagInfo instance if tag matches version format, null otherwise.</returns>
+    public static TagInfo? Create(string tag)
     {
-        Tag = tagName;
-        FullVersion = ParseVersion(tagName);
-        IsPreRelease = DetectPreRelease(FullVersion);
-    }
-
-    /// <summary>
-    ///     Gets the tag name.
-    /// </summary>
-    public string Tag { get; }
-
-    /// <summary>
-    ///     Gets the full semantic version (major.minor.patch-prerelease) with leading non-version characters removed.
-    /// </summary>
-    public string FullVersion { get; }
-
-    /// <summary>
-    ///     Gets a value indicating whether this is a pre-release version.
-    /// </summary>
-    public bool IsPreRelease { get; }
-
-    /// <summary>
-    ///     Parses a tag name and extracts the semantic version by removing leading non-numeric characters.
-    /// </summary>
-    /// <param name="tagName">Tag name to parse.</param>
-    /// <returns>Semantic version string.</returns>
-    private static string ParseVersion(string tagName)
-    {
-        // Remove any leading alphabetic characters, dashes, and underscores
-        // This supports various tag naming conventions like "v1.0.0", "ver-1.0.0", "release_1.0.0", etc.
-        var startIndex = 0;
-        while (startIndex < tagName.Length)
+        var match = TagPattern().Match(tag);
+        if (!match.Success)
         {
-            var c = tagName[startIndex];
-            if (char.IsDigit(c))
-            {
-                break;
-            }
-
-            if (c != '-' && c != '_' && !char.IsLetter(c))
-            {
-                break;
-            }
-
-            startIndex++;
+            return null;
         }
 
-        return startIndex < tagName.Length ? tagName[startIndex..] : tagName;
-    }
+        var version = match.Groups["version"].Value;
+        var preRelease = match.Groups["pre_release"];
+        var metadata = match.Groups["metadata"];
+        
+        // Build full version: version + optional pre-release + optional metadata
+        var fullVersion = version;
+        if (preRelease.Success)
+        {
+            fullVersion += $"-{preRelease.Value}";
+        }
+        if (metadata.Success)
+        {
+            fullVersion += $".{metadata.Value}";
+        }
+        
+        var isPreRelease = preRelease.Success;
 
-    /// <summary>
-    ///     Detects if a version string represents a pre-release.
-    /// </summary>
-    /// <param name="version">Version string to check.</param>
-    /// <returns>True if the version is a pre-release, false otherwise.</returns>
-    private static bool DetectPreRelease(string version)
-    {
-        // Check if the version contains a hyphen followed by any text
-        // This covers semantic versioning pre-release format (e.g., 1.0.0-alpha, 1.0.0-beta.1, 1.0.0-rc.1)
-        return version.Contains('-');
+        return new TagInfo(tag, fullVersion, isPreRelease);
     }
 }
