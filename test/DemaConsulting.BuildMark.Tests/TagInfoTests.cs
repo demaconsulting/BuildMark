@@ -171,10 +171,26 @@ public class TagInfoTests
     }
 
     /// <summary>
-    ///     Test that TagInfo does not falsely detect rc in words like 'arch'.
+    ///     Test that TagInfo correctly parses build metadata with plus separator.
     /// </summary>
     [TestMethod]
-    public void TagInfo_Constructor_DoesNotFalselyDetectRcInArch()
+    public void TagInfo_Constructor_ParsesBuildMetadata()
+    {
+        // Arrange & Act
+        var tagVersion = TagInfo.Create("v1.0.0+arch");
+        Assert.IsNotNull(tagVersion);
+
+        // Assert
+        Assert.AreEqual("v1.0.0+arch", tagVersion.Tag);
+        Assert.AreEqual("1.0.0+arch", tagVersion.FullVersion);
+        Assert.IsFalse(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TagInfo accepts dot-separated pre-release and treats it as pre-release.
+    /// </summary>
+    [TestMethod]
+    public void TagInfo_Constructor_AcceptsDotSeparatedAsPreRelease()
     {
         // Arrange & Act
         var tagVersion = TagInfo.Create("v1.0.0.arch");
@@ -183,7 +199,39 @@ public class TagInfoTests
         // Assert
         Assert.AreEqual("v1.0.0.arch", tagVersion.Tag);
         Assert.AreEqual("1.0.0.arch", tagVersion.FullVersion);
-        Assert.IsFalse(tagVersion.IsPreRelease);
+        Assert.IsTrue(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TagInfo correctly parses complex version with prefix, pre-release, and metadata.
+    /// </summary>
+    [TestMethod]
+    public void TagInfo_Constructor_ParsesComplexVersionWithMetadata()
+    {
+        // Arrange & Act
+        var tagVersion = TagInfo.Create("Rel_1.2.3.rc.4+build.5");
+        Assert.IsNotNull(tagVersion);
+
+        // Assert
+        Assert.AreEqual("Rel_1.2.3.rc.4+build.5", tagVersion.Tag);
+        Assert.AreEqual("1.2.3.rc.4+build.5", tagVersion.FullVersion);
+        Assert.IsTrue(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TagInfo correctly parses complex version with hyphen separator for pre-release.
+    /// </summary>
+    [TestMethod]
+    public void TagInfo_Constructor_ParsesComplexVersionWithHyphenPreRelease()
+    {
+        // Arrange & Act
+        var tagVersion = TagInfo.Create("Rel_1.2.3-rc.4+build.5");
+        Assert.IsNotNull(tagVersion);
+
+        // Assert
+        Assert.AreEqual("Rel_1.2.3-rc.4+build.5", tagVersion.Tag);
+        Assert.AreEqual("1.2.3-rc.4+build.5", tagVersion.FullVersion);
+        Assert.IsTrue(tagVersion.IsPreRelease);
     }
 
     /// <summary>
@@ -199,6 +247,22 @@ public class TagInfoTests
         // Assert
         Assert.AreEqual("v1.0.0-rc1", tagVersion.Tag);
         Assert.AreEqual("1.0.0-rc1", tagVersion.FullVersion);
+        Assert.IsTrue(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TagInfo correctly parses pre-release with build metadata.
+    /// </summary>
+    [TestMethod]
+    public void TagInfo_Constructor_ParsesPreReleaseWithBuildMetadata()
+    {
+        // Arrange & Act
+        var tagVersion = TagInfo.Create("v2.0.0-beta.1+linux.x64");
+        Assert.IsNotNull(tagVersion);
+
+        // Assert
+        Assert.AreEqual("v2.0.0-beta.1+linux.x64", tagVersion.Tag);
+        Assert.AreEqual("2.0.0-beta.1+linux.x64", tagVersion.FullVersion);
         Assert.IsTrue(tagVersion.IsPreRelease);
     }
 }
