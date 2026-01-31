@@ -73,4 +73,10 @@ public interface IRepoConnector
     /// <param name="issueId">Issue ID.</param>
     /// <returns>Issue URL.</returns>
     Task<string> GetIssueUrlAsync(string issueId);
+
+    /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    Task<List<string>> GetOpenIssuesAsync();
 }

@@ -29,14 +29,18 @@ public class MockRepoConnector : IRepoConnector
     {
         { "1", "Add feature X" },
         { "2", "Fix bug in Y" },
-        { "3", "Update documentation" }
+        { "3", "Update documentation" },
+        { "4", "Known bug A" },
+        { "5", "Known bug B" }
     };
 
     private readonly Dictionary<string, string> _issueTypes = new()
     {
         { "1", "feature" },
         { "2", "bug" },
-        { "3", "documentation" }
+        { "3", "documentation" },
+        { "4", "bug" },
+        { "5", "bug" }
     };
 
     private readonly Dictionary<string, List<string>> _pullRequestIssues = new()
@@ -54,6 +58,8 @@ public class MockRepoConnector : IRepoConnector
         { "v2.0.0-rc.1", "jkl012mno345" },
         { "v2.0.0", "mno345pqr678" }
     };
+
+    private readonly List<string> _openIssues = new() { "4", "5" };
 
     /// <summary>
     ///     Gets the history of tags leading to the current branch.
@@ -156,5 +162,14 @@ public class MockRepoConnector : IRepoConnector
     public Task<string> GetIssueUrlAsync(string issueId)
     {
         return Task.FromResult($"https://github.com/example/repo/issues/{issueId}");
+    }
+
+    /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    public Task<List<string>> GetOpenIssuesAsync()
+    {
+        return Task.FromResult(_openIssues);
     }
 }

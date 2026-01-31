@@ -84,4 +84,10 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="issueId">Issue ID.</param>
     /// <returns>Issue URL.</returns>
     public abstract Task<string> GetIssueUrlAsync(string issueId);
+
+    /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    public abstract Task<List<string>> GetOpenIssuesAsync();
 }

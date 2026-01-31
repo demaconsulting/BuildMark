@@ -148,7 +148,11 @@ public class BuildInformationTests
         Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.ChangeIssues[0].Url);
 
         Assert.IsEmpty(buildInfo.BugIssues);
-        Assert.IsEmpty(buildInfo.KnownIssues);
+
+        // Known issues should include open bugs (4 and 5)
+        Assert.HasCount(2, buildInfo.KnownIssues);
+        Assert.AreEqual("4", buildInfo.KnownIssues[0].Id);
+        Assert.AreEqual("5", buildInfo.KnownIssues[1].Id);
     }
 
     /// <summary>
@@ -200,6 +204,7 @@ public class BuildInformationTests
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
+        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
 
     /// <summary>
@@ -214,6 +219,7 @@ public class BuildInformationTests
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
+        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
 
     /// <summary>
@@ -243,5 +249,6 @@ public class BuildInformationTests
         }
 
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
+        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
 }

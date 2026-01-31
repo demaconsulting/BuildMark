@@ -207,6 +207,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets the list of open issue IDs.
+    /// </summary>
+    /// <returns>List of open issue IDs.</returns>
+    public override async Task<List<string>> GetOpenIssuesAsync()
+    {
+        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq '.[].number'");
+        return output
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(n => n.Trim())
+            .ToList();
+    }
+
+    /// <summary>
     ///     Regular expression to match valid tag names (alphanumeric, dots, hyphens, underscores, slashes).
     /// </summary>
     /// <returns>Compiled regular expression.</returns>

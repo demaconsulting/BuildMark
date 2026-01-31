@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Text.RegularExpressions;
-
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
@@ -97,8 +95,8 @@ public record BuildInformation(
                 "Please provide a version parameter.");
         }
 
-        // Determine if the "To" version is a pre-release
-        var isPreRelease = IsPreRelease(toVersion);
+        // Parse the "To" version using TagVersion
+        var toTagVersion = new TagVersion(toVersion);
 
         // Determine the "From" version
         string? fromVersion = null;
@@ -106,10 +104,9 @@ public record BuildInformation(
 
         if (tags.Count > 0)
         {
-            var normalizedToVersion = NormalizeVersion(toVersion);
-            var toIndex = FindTagIndex(tags, normalizedToVersion);
+            var toIndex = FindTagIndex(tags, toTagVersion.FullVersion);
 
-            if (isPreRelease)
+            if (toTagVersion.IsPreRelease)
             {
                 // For pre-release: use the previous tag (any type)
                 if (toIndex > 0)
@@ -143,10 +140,11 @@ public record BuildInformation(
                     // toIndex == 0, this is the first tag, no previous release
                     startIndex = -1;
                 }
-                
+
                 for (var i = startIndex; i >= 0; i--)
                 {
-                    if (!IsPreRelease(tags[i]))
+                    var tagVersion = new TagVersion(tags[i]);
+                    if (!tagVersion.IsPreRelease)
                     {
                         fromVersion = tags[i];
                         break;
@@ -196,9 +194,26 @@ public record BuildInformation(
             }
         }
 
-        // For known issues, we would need to query open bugs, but that's not in the current interface
-        // For now, return an empty list
+        // Get known issues (open bugs that are not already fixed in this build)
         var knownIssues = new List<IssueInfo>();
+        var openIssueIds = await connector.GetOpenIssuesAsync();
+
+        foreach (var issueId in openIssueIds)
+        {
+            // Skip if already included in fixed bugs
+            if (allIssues.Contains(issueId))
+            {
+                continue;
+            }
+
+            var type = await connector.GetIssueTypeAsync(issueId);
+            if (type == "bug")
+            {
+                var title = await connector.GetIssueTitleAsync(issueId);
+                var url = await connector.GetIssueUrlAsync(issueId);
+                knownIssues.Add(new IssueInfo(issueId, title, url));
+            }
+        }
 
         return new BuildInformation(
             fromVersion,
@@ -211,55 +226,6 @@ public record BuildInformation(
     }
 
     /// <summary>
-    ///     Determines if a version string represents a pre-release.
-    /// </summary>
-    /// <param name="version">Version string to check.</param>
-    /// <returns>True if the version is a pre-release, false otherwise.</returns>
-    private static bool IsPreRelease(string version)
-    {
-        var normalized = version.ToLowerInvariant();
-        
-        // Check for pre-release indicators with word boundaries
-        // Common patterns: -alpha, -beta, -rc, .alpha, .beta, .rc, -pre
-        return normalized.Contains("-alpha") ||
-               normalized.Contains("-beta") ||
-               normalized.Contains("-rc") ||
-               normalized.Contains("-pre") ||
-               normalized.Contains(".alpha") ||
-               normalized.Contains(".beta") ||
-               normalized.Contains(".rc");
-    }
-
-    /// <summary>
-    ///     Normalizes a version string by removing leading non-numeric characters (alphabetic, dashes, underscores).
-    /// </summary>
-    /// <param name="version">Version string to normalize.</param>
-    /// <returns>Normalized version string starting with the semantic version.</returns>
-    private static string NormalizeVersion(string version)
-    {
-        // Remove any leading alphabetic characters, dashes, and underscores
-        // This supports various tag naming conventions like "v1.0.0", "ver-1.0.0", "release_1.0.0", etc.
-        var startIndex = 0;
-        while (startIndex < version.Length)
-        {
-            var c = version[startIndex];
-            if (char.IsDigit(c))
-            {
-                break;
-            }
-
-            if (c != '-' && c != '_' && !char.IsLetter(c))
-            {
-                break;
-            }
-
-            startIndex++;
-        }
-
-        return startIndex < version.Length ? version[startIndex..] : version;
-    }
-
-    /// <summary>
     ///     Finds the index of a tag in the tag history by normalized version.
     /// </summary>
     /// <param name="tags">List of tags.</param>
@@ -269,7 +235,8 @@ public record BuildInformation(
     {
         for (var i = 0; i < tags.Count; i++)
         {
-            if (NormalizeVersion(tags[i]).Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            var tagVersion = new TagVersion(tags[i]);
+            if (tagVersion.FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
             {
                 return i;
             }

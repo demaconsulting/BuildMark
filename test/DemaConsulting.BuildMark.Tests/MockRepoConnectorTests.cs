@@ -258,4 +258,22 @@ public class MockRepoConnectorTests
         // Assert
         Assert.AreEqual("https://github.com/example/repo/issues/1", url);
     }
+
+    /// <summary>
+    ///     Test that GetOpenIssuesAsync returns expected open issues.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetOpenIssuesAsync_ReturnsExpectedOpenIssues()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+
+        // Act
+        var openIssues = await connector.GetOpenIssuesAsync();
+
+        // Assert
+        Assert.HasCount(2, openIssues);
+        Assert.AreEqual("4", openIssues[0]);
+        Assert.AreEqual("5", openIssues[1]);
+    }
 }
