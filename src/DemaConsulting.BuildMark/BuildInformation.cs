@@ -218,10 +218,16 @@ public record BuildInformation(
     private static bool IsPreRelease(string version)
     {
         var normalized = version.ToLowerInvariant();
-        return normalized.Contains("alpha") ||
-               normalized.Contains("beta") ||
-               normalized.Contains("rc") ||
-               normalized.Contains("-pre");
+        
+        // Check for pre-release indicators with word boundaries
+        // Common patterns: -alpha, -beta, -rc, .alpha, .beta, .rc, -pre
+        return normalized.Contains("-alpha") ||
+               normalized.Contains("-beta") ||
+               normalized.Contains("-rc") ||
+               normalized.Contains("-pre") ||
+               normalized.Contains(".alpha") ||
+               normalized.Contains(".beta") ||
+               normalized.Contains(".rc");
     }
 
     /// <summary>
@@ -250,7 +256,7 @@ public record BuildInformation(
             startIndex++;
         }
 
-        return startIndex < version.Length ? version.Substring(startIndex) : version;
+        return startIndex < version.Length ? version[startIndex..] : version;
     }
 
     /// <summary>
