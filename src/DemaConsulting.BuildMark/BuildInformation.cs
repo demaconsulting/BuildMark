@@ -95,8 +95,8 @@ public record BuildInformation(
                 "Please provide a version parameter.");
         }
 
-        // Parse the "To" version using TagVersion
-        var toTagVersion = new TagVersion(toVersion);
+        // Parse the "To" version using TagInformation
+        var toTagInformation = new TagInformation(toVersion);
 
         // Determine the "From" version
         string? fromVersion = null;
@@ -104,9 +104,9 @@ public record BuildInformation(
 
         if (tags.Count > 0)
         {
-            var toIndex = FindTagIndex(tags, toTagVersion.FullVersion);
+            var toIndex = FindTagIndex(tags, toTagInformation.FullVersion);
 
-            if (toTagVersion.IsPreRelease)
+            if (toTagInformation.IsPreRelease)
             {
                 // For pre-release: use the previous tag (any type)
                 if (toIndex > 0)
@@ -143,7 +143,7 @@ public record BuildInformation(
 
                 for (var i = startIndex; i >= 0; i--)
                 {
-                    var tagVersion = new TagVersion(tags[i]);
+                    var tagVersion = new TagInformation(tags[i]);
                     if (!tagVersion.IsPreRelease)
                     {
                         fromVersion = tags[i];
@@ -235,7 +235,7 @@ public record BuildInformation(
     {
         for (var i = 0; i < tags.Count; i++)
         {
-            var tagVersion = new TagVersion(tags[i]);
+            var tagVersion = new TagInformation(tags[i]);
             if (tagVersion.FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
             {
                 return i;

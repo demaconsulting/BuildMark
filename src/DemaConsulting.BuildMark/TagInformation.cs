@@ -23,13 +23,13 @@ namespace DemaConsulting.BuildMark;
 /// <summary>
 ///     Represents a version tag with parsed semantic version information.
 /// </summary>
-public class TagVersion
+public class TagInformation
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TagVersion"/> class.
+    ///     Initializes a new instance of the <see cref="TagInformation"/> class.
     /// </summary>
     /// <param name="tagName">Original tag name.</param>
-    public TagVersion(string tagName)
+    public TagInformation(string tagName)
     {
         OriginalTag = tagName;
         FullVersion = ParseVersion(tagName);
