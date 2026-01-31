@@ -196,6 +196,17 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    public override async Task<string> GetIssueUrlAsync(string issueId)
+    {
+        var validatedId = ValidateId(issueId, nameof(issueId));
+        return await RunCommandAsync("gh", $"issue view {validatedId} --json url --jq .url");
+    }
+
+    /// <summary>
     ///     Regular expression to match valid tag names (alphanumeric, dots, hyphens, underscores, slashes).
     /// </summary>
     /// <returns>Compiled regular expression.</returns>

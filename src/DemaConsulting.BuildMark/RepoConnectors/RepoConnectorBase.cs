@@ -77,4 +77,11 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
     public abstract Task<string> GetHashForTagAsync(string? tag);
+
+    /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    public abstract Task<string> GetIssueUrlAsync(string issueId);
 }

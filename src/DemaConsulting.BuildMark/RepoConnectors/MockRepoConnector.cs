@@ -147,4 +147,14 @@ public class MockRepoConnector : IRepoConnector
                 ? hash
                 : "unknown000hash000");
     }
+
+    /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    public Task<string> GetIssueUrlAsync(string issueId)
+    {
+        return Task.FromResult($"https://github.com/example/repo/issues/{issueId}");
+    }
 }

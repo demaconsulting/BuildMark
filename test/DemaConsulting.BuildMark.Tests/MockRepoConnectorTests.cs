@@ -242,4 +242,20 @@ public class MockRepoConnectorTests
         // Assert
         Assert.AreEqual("unknown000hash000", hash);
     }
+
+    /// <summary>
+    ///     Test that GetIssueUrlAsync returns expected URL.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetIssueUrlAsync_ReturnsExpectedUrl()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+
+        // Act
+        var url = await connector.GetIssueUrlAsync("1");
+
+        // Assert
+        Assert.AreEqual("https://github.com/example/repo/issues/1", url);
+    }
 }

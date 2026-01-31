@@ -66,4 +66,11 @@ public interface IRepoConnector
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
     Task<string> GetHashForTagAsync(string? tag);
+
+    /// <summary>
+    ///     Gets the URL for an issue.
+    /// </summary>
+    /// <param name="issueId">Issue ID.</param>
+    /// <returns>Issue URL.</returns>
+    Task<string> GetIssueUrlAsync(string issueId);
 }
