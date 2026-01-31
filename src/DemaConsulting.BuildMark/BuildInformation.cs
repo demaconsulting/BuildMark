@@ -54,31 +54,31 @@ public record BuildInformation(
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, string? version = null)
+    public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, TagInfo? version = null)
     {
         // Get tag history and current hash
         var tags = await connector.GetTagHistoryAsync();
         var currentHash = await connector.GetHashForTagAsync(null);
 
         // Determine the "To" version
-        string toVersion;
+        TagInfo toTagInfo;
         string toHash;
 
-        if (!string.IsNullOrEmpty(version))
+        if (version != null)
         {
             // Use the provided version
-            toVersion = version;
+            toTagInfo = version;
             toHash = currentHash;
         }
         else if (tags.Count > 0)
         {
             // Check if current commit matches the most recent tag
             var latestTag = tags[^1];
-            var latestTagHash = await connector.GetHashForTagAsync(latestTag.OriginalTag);
+            var latestTagHash = await connector.GetHashForTagAsync(latestTag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
-                toVersion = latestTag.OriginalTag;
+                toTagInfo = latestTag;
                 toHash = currentHash;
             }
             else
@@ -95,31 +95,28 @@ public record BuildInformation(
                 "Please provide a version parameter.");
         }
 
-        // Parse the "To" version using TagInformation
-        var toTagInformation = new TagInformation(toVersion);
-
         // Determine the "From" version
-        string? fromVersion = null;
+        TagInfo? fromTagInfo = null;
         string? fromHash = null;
 
         if (tags.Count > 0)
         {
-            var toIndex = FindTagIndex(tags, toTagInformation.FullVersion);
+            var toIndex = FindTagIndex(tags, toTagInfo.FullVersion);
 
-            if (toTagInformation.IsPreRelease)
+            if (toTagInfo.IsPreRelease)
             {
                 // For pre-release: use the previous tag (any type)
                 if (toIndex > 0)
                 {
                     // The to version exists in tag history, use the previous tag
-                    fromVersion = tags[toIndex - 1].OriginalTag;
+                    fromTagInfo = tags[toIndex - 1];
                 }
                 else if (toIndex == -1)
                 {
                     // The to version doesn't exist in tag history, use the most recent tag
-                    fromVersion = tags[^1].OriginalTag;
+                    fromTagInfo = tags[^1];
                 }
-                // If toIndex == 0, fromVersion stays null (first release)
+                // If toIndex == 0, fromTagInfo stays null (first release)
             }
             else
             {
@@ -145,20 +142,20 @@ public record BuildInformation(
                 {
                     if (!tags[i].IsPreRelease)
                     {
-                        fromVersion = tags[i].OriginalTag;
+                        fromTagInfo = tags[i];
                         break;
                     }
                 }
             }
 
-            if (fromVersion != null)
+            if (fromTagInfo != null)
             {
-                fromHash = await connector.GetHashForTagAsync(fromVersion);
+                fromHash = await connector.GetHashForTagAsync(fromTagInfo);
             }
         }
 
         // Get pull requests and issues between versions
-        var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromVersion, toVersion);
+        var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromTagInfo, toTagInfo);
 
         var allIssues = new HashSet<string>();
         var bugIssues = new List<IssueInfo>();
@@ -215,8 +212,8 @@ public record BuildInformation(
         }
 
         return new BuildInformation(
-            fromVersion,
-            toVersion,
+            fromTagInfo?.Tag,
+            toTagInfo.Tag,
             fromHash?.Trim(),
             toHash.Trim(),
             changeIssues,
@@ -230,7 +227,7 @@ public record BuildInformation(
     /// <param name="tags">List of tags.</param>
     /// <param name="normalizedVersion">Normalized version to find.</param>
     /// <returns>Index of the tag, or -1 if not found.</returns>
-    private static int FindTagIndex(List<TagInformation> tags, string normalizedVersion)
+    private static int FindTagIndex(List<TagInfo> tags, string normalizedVersion)
     {
         for (var i = 0; i < tags.Count; i++)
         {

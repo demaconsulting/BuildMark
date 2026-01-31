@@ -23,23 +23,23 @@ namespace DemaConsulting.BuildMark;
 /// <summary>
 ///     Represents a version tag with parsed semantic version information.
 /// </summary>
-public class TagInformation
+public class TagInfo
 {
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TagInformation"/> class.
+    ///     Initializes a new instance of the <see cref="TagInfo"/> class.
     /// </summary>
-    /// <param name="tagName">Original tag name.</param>
-    public TagInformation(string tagName)
+    /// <param name="tagName">Tag name.</param>
+    public TagInfo(string tagName)
     {
-        OriginalTag = tagName;
+        Tag = tagName;
         FullVersion = ParseVersion(tagName);
         IsPreRelease = DetectPreRelease(FullVersion);
     }
 
     /// <summary>
-    ///     Gets the original tag name.
+    ///     Gets the tag name.
     /// </summary>
-    public string OriginalTag { get; }
+    public string Tag { get; }
 
     /// <summary>
     ///     Gets the full semantic version (major.minor.patch-prerelease) with leading non-version characters removed.
@@ -87,57 +87,8 @@ public class TagInformation
     /// <returns>True if the version is a pre-release, false otherwise.</returns>
     private static bool DetectPreRelease(string version)
     {
-        var normalized = version.ToLowerInvariant();
-
-        // Check for pre-release indicators with proper boundaries
-        // Common patterns: -alpha, -beta, -rc, .alpha, .beta, .rc, -pre
-        // Ensure 'rc' is followed by a boundary (dot, hyphen, or end of string)
-        return normalized.Contains("-alpha") ||
-               normalized.Contains("-beta") ||
-               normalized.Contains("-pre") ||
-               normalized.Contains(".alpha") ||
-               normalized.Contains(".beta") ||
-               ContainsRcPrerelease(normalized);
-    }
-
-    /// <summary>
-    ///     Checks if the version contains 'rc' as a pre-release indicator with proper word boundaries.
-    /// </summary>
-    /// <param name="normalizedVersion">Normalized version string (lowercase).</param>
-    /// <returns>True if 'rc' is found as a pre-release indicator, false otherwise.</returns>
-    private static bool ContainsRcPrerelease(string normalizedVersion)
-    {
-        var rcIndex = normalizedVersion.IndexOf("rc", StringComparison.Ordinal);
-        while (rcIndex >= 0)
-        {
-            // Check if preceded by - or .
-            if (rcIndex > 0)
-            {
-                var prevChar = normalizedVersion[rcIndex - 1];
-                if (prevChar != '-' && prevChar != '.')
-                {
-                    // Not a valid rc boundary, look for next occurrence
-                    rcIndex = normalizedVersion.IndexOf("rc", rcIndex + 1, StringComparison.Ordinal);
-                    continue;
-                }
-            }
-
-            // Check if followed by end, -, or .
-            if (rcIndex + 2 < normalizedVersion.Length)
-            {
-                var nextChar = normalizedVersion[rcIndex + 2];
-                if (nextChar != '-' && nextChar != '.' && !char.IsDigit(nextChar))
-                {
-                    // Not a valid rc boundary, look for next occurrence
-                    rcIndex = normalizedVersion.IndexOf("rc", rcIndex + 1, StringComparison.Ordinal);
-                    continue;
-                }
-            }
-
-            // Valid rc pre-release indicator found
-            return true;
-        }
-
-        return false;
+        // Check if the version contains a hyphen followed by any text
+        // This covers semantic versioning pre-release format (e.g., 1.0.0-alpha, 1.0.0-beta.1, 1.0.0-rc.1)
+        return version.Contains('-');
     }
 }

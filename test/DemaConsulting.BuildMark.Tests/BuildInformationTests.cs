@@ -68,12 +68,12 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v2.1.0");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.1.0"));
 
         // Assert
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion);
         Assert.AreEqual("current123hash456", buildInfo.ToHash);
-        Assert.AreEqual("v2.0.0", buildInfo.FromVersion);
+        Assert.AreEqual("2.0.0", buildInfo.FromVersion);
         Assert.AreEqual("mno345pqr678", buildInfo.FromHash);
     }
 
@@ -105,11 +105,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v2.0.0-beta.1");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0-beta.1"));
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion);
-        Assert.AreEqual("v1.1.0", buildInfo.FromVersion);
+        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion);
     }
 
     /// <summary>
@@ -122,11 +122,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v2.0.0");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0"));
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.ToVersion);
-        Assert.AreEqual("v1.1.0", buildInfo.FromVersion);
+        Assert.AreEqual("2.0.0", buildInfo.ToVersion);
+        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion);
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v1.1.0");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("ver-1.1.0"));
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -165,7 +165,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v2.0.0");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v2.0.0"));
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -184,7 +184,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, "v1.0.0");
+        var buildInfo = await BuildInformation.CreateAsync(connector, new TagInfo("v1.0.0"));
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
@@ -197,12 +197,12 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
     {
-        public Task<List<TagInformation>> GetTagHistoryAsync() => Task.FromResult(new List<TagInformation>());
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
+        public Task<List<TagInfo>> GetTagHistoryAsync() => Task.FromResult(new List<TagInfo>());
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
-        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
+        public Task<string> GetHashForTagAsync(TagInfo? tag) => Task.FromResult("hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
         public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
@@ -212,13 +212,13 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<TagInformation>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<TagInformation> { new TagInformation("v1.0.0") });
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
+        public Task<List<TagInfo>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<TagInfo> { new TagInfo("v1.0.0") });
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
-        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
+        public Task<string> GetHashForTagAsync(TagInfo? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
         public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
     }
@@ -228,26 +228,26 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<TagInformation>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<TagInformation> 
+        public Task<List<TagInfo>> GetTagHistoryAsync() => 
+            Task.FromResult(new List<TagInfo> 
             { 
-                new TagInformation("v1.0.0"), 
-                new TagInformation("v1.1.0"), 
-                new TagInformation("v2.0.0") 
+                new TagInfo("v1.0.0"), 
+                new TagInfo("ver-1.1.0"), 
+                new TagInfo("v2.0.0") 
             });
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag) => Task.FromResult(new List<string>());
+        public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
 
-        public Task<string> GetHashForTagAsync(string? tag)
+        public Task<string> GetHashForTagAsync(TagInfo? tag)
         {
-            if (tag == "v2.0.0" || tag == null)
+            if (tag == null || tag.Tag == "v2.0.0")
             {
                 return Task.FromResult("mno345pqr678");
             }
 
-            if (tag == "v1.1.0")
+            if (tag.Tag == "v1.1.0")
             {
                 return Task.FromResult("def456ghi789");
             }

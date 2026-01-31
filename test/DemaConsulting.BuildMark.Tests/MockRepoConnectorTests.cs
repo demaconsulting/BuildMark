@@ -40,11 +40,11 @@ public class MockRepoConnectorTests
 
         // Assert
         Assert.HasCount(5, tags);
-        Assert.AreEqual("v1.0.0", tags[0].OriginalTag);
-        Assert.AreEqual("v1.1.0", tags[1].OriginalTag);
-        Assert.AreEqual("v2.0.0-beta.1", tags[2].OriginalTag);
-        Assert.AreEqual("v2.0.0-rc.1", tags[3].OriginalTag);
-        Assert.AreEqual("v2.0.0", tags[4].OriginalTag);
+        Assert.AreEqual("v1.0.0", tags[0].Tag);
+        Assert.AreEqual("ver-1.1.0", tags[1].Tag);
+        Assert.AreEqual("release_2.0.0-beta.1", tags[2].Tag);
+        Assert.AreEqual("v2.0.0-rc.1", tags[3].Tag);
+        Assert.AreEqual("2.0.0", tags[4].Tag);
     }
 
     /// <summary>
@@ -57,7 +57,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.0.0", "v1.1.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(new TagInfo("v1.0.0"), new TagInfo("ver-1.1.0"));
 
         // Assert
         Assert.HasCount(1, prs);
@@ -74,7 +74,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.1.0", "v2.0.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(new TagInfo("ver-1.1.0"), new TagInfo("2.0.0"));
 
         // Assert
         Assert.HasCount(2, prs);
@@ -205,7 +205,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var hash = await connector.GetHashForTagAsync("v1.0.0");
+        var hash = await connector.GetHashForTagAsync(new TagInfo("v1.0.0"));
 
         // Assert
         Assert.AreEqual("abc123def456", hash);
@@ -237,7 +237,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var hash = await connector.GetHashForTagAsync("v999.0.0");
+        var hash = await connector.GetHashForTagAsync(new TagInfo("v999.0.0"));
 
         // Assert
         Assert.AreEqual("unknown000hash000", hash);

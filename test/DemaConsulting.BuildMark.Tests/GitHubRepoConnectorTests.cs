@@ -77,9 +77,9 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.HasCount(3, tags);
-        Assert.AreEqual("v1.0.0", tags[0].OriginalTag);
-        Assert.AreEqual("v1.1.0", tags[1].OriginalTag);
-        Assert.AreEqual("v2.0.0", tags[2].OriginalTag);
+        Assert.AreEqual("v1.0.0", tags[0].Tag);
+        Assert.AreEqual("v1.1.0", tags[1].Tag);
+        Assert.AreEqual("v2.0.0", tags[2].Tag);
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #10 from feature/x\ndef456 Merge pull request #11 from bugfix/y");
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.0.0", "v2.0.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(new TagInfo("v1.0.0"), new TagInfo("v2.0.0"));
 
         // Assert
         Assert.HasCount(2, prs);
@@ -135,7 +135,7 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #10 from feature/x");
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, "v1.0.0");
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, new TagInfo("v1.0.0"));
 
         // Assert
         Assert.HasCount(1, prs);
@@ -156,7 +156,7 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #11 from feature/y");
 
         // Act
-        var prs = await connector.GetPullRequestsBetweenTagsAsync("v1.0.0", null);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(new TagInfo("v1.0.0"), null);
 
         // Assert
         Assert.HasCount(1, prs);
@@ -305,7 +305,7 @@ public class GitHubRepoConnectorTests
         connector.AddCommandResult("git", "rev-parse v1.0.0", "abc123def456789");
 
         // Act
-        var hash = await connector.GetHashForTagAsync("v1.0.0");
+        var hash = await connector.GetHashForTagAsync(new TagInfo("v1.0.0"));
 
         // Assert
         Assert.AreEqual("abc123def456789", hash);
@@ -339,7 +339,7 @@ public class GitHubRepoConnectorTests
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(
-            async () => await connector.GetPullRequestsBetweenTagsAsync("v1.0.0; rm -rf /", null));
+            async () => await connector.GetPullRequestsBetweenTagsAsync(new TagInfo("v1.0.0; rm -rf /"), null));
         Assert.Contains("Invalid tag name", ex.Message);
     }
 
@@ -399,7 +399,7 @@ public class GitHubRepoConnectorTests
 
         // Act & Assert
         var ex = await Assert.ThrowsAsync<ArgumentException>(
-            async () => await connector.GetHashForTagAsync("v1.0.0 | echo pwned"));
+            async () => await connector.GetHashForTagAsync(new TagInfo("v1.0.0 | echo pwned")));
         Assert.Contains("Invalid tag name", ex.Message);
     }
 }

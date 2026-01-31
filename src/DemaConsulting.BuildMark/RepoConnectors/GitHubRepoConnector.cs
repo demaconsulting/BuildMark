@@ -75,14 +75,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public override async Task<List<TagInformation>> GetTagHistoryAsync()
+    public override async Task<List<TagInfo>> GetTagHistoryAsync()
     {
         var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
         var tagNames = output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
-        return tagNames.Select(t => new TagInformation(t)).ToList();
+        return tagNames.Select(t => new TagInfo(t)).ToList();
     }
 
     /// <summary>
@@ -91,24 +91,24 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <param name="fromTag">Starting tag (null for start of history).</param>
     /// <param name="toTag">Ending tag (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag)
+    public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag)
     {
         string range;
-        if (string.IsNullOrEmpty(fromTag) && string.IsNullOrEmpty(toTag))
+        if (fromTag == null && toTag == null)
         {
             range = "HEAD";
         }
-        else if (string.IsNullOrEmpty(fromTag))
+        else if (fromTag == null)
         {
-            range = ValidateTag(toTag!);
+            range = ValidateTag(toTag!.Tag);
         }
-        else if (string.IsNullOrEmpty(toTag))
+        else if (toTag == null)
         {
-            range = $"{ValidateTag(fromTag)}..HEAD";
+            range = $"{ValidateTag(fromTag.Tag)}..HEAD";
         }
         else
         {
-            range = $"{ValidateTag(fromTag)}..{ValidateTag(toTag)}";
+            range = $"{ValidateTag(fromTag.Tag)}..{ValidateTag(toTag.Tag)}";
         }
 
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
@@ -188,11 +188,11 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
+    /// <param name="tag">Tag information (null for current state).</param>
     /// <returns>Git hash.</returns>
-    public override async Task<string> GetHashForTagAsync(string? tag)
+    public override async Task<string> GetHashForTagAsync(TagInfo? tag)
     {
-        var refName = string.IsNullOrEmpty(tag) ? "HEAD" : ValidateTag(tag);
+        var refName = tag == null ? "HEAD" : ValidateTag(tag.Tag);
         return await RunCommandAsync("git", $"rev-parse {refName}");
     }
 

@@ -53,10 +53,10 @@ public class MockRepoConnector : IRepoConnector
     private readonly Dictionary<string, string> _tagHashes = new()
     {
         { "v1.0.0", "abc123def456" },
-        { "v1.1.0", "def456ghi789" },
-        { "v2.0.0-beta.1", "ghi789jkl012" },
+        { "ver-1.1.0", "def456ghi789" },
+        { "release_2.0.0-beta.1", "ghi789jkl012" },
         { "v2.0.0-rc.1", "jkl012mno345" },
-        { "v2.0.0", "mno345pqr678" }
+        { "2.0.0", "mno345pqr678" }
     };
 
     private readonly List<string> _openIssues = new() { "4", "5" };
@@ -65,10 +65,10 @@ public class MockRepoConnector : IRepoConnector
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public Task<List<TagInformation>> GetTagHistoryAsync()
+    public Task<List<TagInfo>> GetTagHistoryAsync()
     {
-        var tagNames = new List<string> { "v1.0.0", "v1.1.0", "v2.0.0-beta.1", "v2.0.0-rc.1", "v2.0.0" };
-        var tagInfoList = tagNames.Select(t => new TagInformation(t)).ToList();
+        // Use dictionary keys to avoid duplication
+        var tagInfoList = _tagHashes.Keys.Select(t => new TagInfo(t)).ToList();
         return Task.FromResult(tagInfoList);
     }
 
@@ -78,20 +78,23 @@ public class MockRepoConnector : IRepoConnector
     /// <param name="fromTag">Starting tag (null for start of history).</param>
     /// <param name="toTag">Ending tag (null for current state).</param>
     /// <returns>List of pull request IDs.</returns>
-    public Task<List<string>> GetPullRequestsBetweenTagsAsync(string? fromTag, string? toTag)
+    public Task<List<string>> GetPullRequestsBetweenTagsAsync(TagInfo? fromTag, TagInfo? toTag)
     {
+        var fromTagName = fromTag?.Tag;
+        var toTagName = toTag?.Tag;
+
         // Deterministic mock data based on tag range
-        if (fromTag == "v1.0.0" && toTag == "v1.1.0")
+        if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
             return Task.FromResult(new List<string> { "10" });
         }
 
-        if (fromTag == "v1.1.0" && toTag == "v2.0.0")
+        if (fromTagName == "ver-1.1.0" && toTagName == "2.0.0")
         {
             return Task.FromResult(new List<string> { "11", "12" });
         }
 
-        if (string.IsNullOrEmpty(fromTag) && toTag == "v1.0.0")
+        if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
         {
             return Task.FromResult(new List<string> { "10" });
         }
@@ -141,17 +144,17 @@ public class MockRepoConnector : IRepoConnector
     /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
+    /// <param name="tag">Tag information (null for current state).</param>
     /// <returns>Git hash.</returns>
-    public Task<string> GetHashForTagAsync(string? tag)
+    public Task<string> GetHashForTagAsync(TagInfo? tag)
     {
-        if (string.IsNullOrEmpty(tag))
+        if (tag == null)
         {
             return Task.FromResult("current123hash456");
         }
 
         return Task.FromResult(
-            _tagHashes.TryGetValue(tag, out var hash)
+            _tagHashes.TryGetValue(tag.Tag, out var hash)
                 ? hash
                 : "unknown000hash000");
     }
