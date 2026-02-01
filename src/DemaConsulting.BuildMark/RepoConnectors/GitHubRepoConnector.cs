@@ -111,14 +111,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             range = $"{ValidateTag(from.Tag)}..HEAD";
         }
-        else if (from != null && to != null)
-        {
-            range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
-        }
         else
         {
-            // This should never happen, but is needed for null safety
-            throw new InvalidOperationException("Invalid combination of from and to versions");
+            // Both from and to are not null (verified by the preceding conditions)
+            if (from == null || to == null)
+            {
+                throw new InvalidOperationException("Unexpected null version");
+            }
+            range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
         }
 
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
