@@ -68,7 +68,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0")!);
+        var version = Version.Create("v2.1.0");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
@@ -105,7 +107,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0-beta.1")!);
+        var version = Version.Create("v2.0.0-beta.1");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion.Tag);
@@ -122,7 +126,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
+        var version = Version.Create("v2.0.0");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
@@ -139,7 +145,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0")!);
+        var version = Version.Create("ver-1.1.0");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -165,7 +173,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
+        var version = Version.Create("v2.0.0");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.HasCount(2, buildInfo.ChangeIssues);
@@ -184,7 +194,9 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0")!);
+        var version = Version.Create("v1.0.0");
+        Assert.IsNotNull(version);
+        var buildInfo = await BuildInformation.CreateAsync(connector, version);
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
@@ -212,8 +224,15 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<Version> { Version.Create("v1.0.0")! });
+        public Task<List<Version>> GetTagHistoryAsync()
+        {
+            var version = Version.Create("v1.0.0");
+            if (version == null)
+            {
+                throw new InvalidOperationException("Failed to create version");
+            }
+            return Task.FromResult(new List<Version> { version });
+        }
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -228,13 +247,17 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<Version> 
-            { 
-                Version.Create("v1.0.0")!, 
-                Version.Create("ver-1.1.0")!, 
-                Version.Create("v2.0.0")!
-            });
+        public Task<List<Version>> GetTagHistoryAsync()
+        {
+            var v1 = Version.Create("v1.0.0");
+            var v2 = Version.Create("ver-1.1.0");
+            var v3 = Version.Create("v2.0.0");
+            if (v1 == null || v2 == null || v3 == null)
+            {
+                throw new InvalidOperationException("Failed to create version");
+            }
+            return Task.FromResult(new List<Version> { v1, v2, v3 });
+        }
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");

@@ -103,17 +103,22 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             range = "HEAD";
         }
-        else if (from == null)
+        else if (from == null && to != null)
         {
-            range = ValidateTag(to!.Tag);
+            range = ValidateTag(to.Tag);
         }
-        else if (to == null)
+        else if (to == null && from != null)
         {
             range = $"{ValidateTag(from.Tag)}..HEAD";
         }
-        else
+        else if (from != null && to != null)
         {
             range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
+        }
+        else
+        {
+            // This should never happen, but is needed for null safety
+            throw new InvalidOperationException("Invalid combination of from and to versions");
         }
 
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
