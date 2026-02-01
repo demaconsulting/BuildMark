@@ -69,7 +69,7 @@ public class MockRepoConnector : IRepoConnector
     {
         // Use dictionary keys to avoid duplication, filter out non-version tags
         var tagInfoList = _tagHashes.Keys
-            .Select(Version.Create)
+            .Select(Version.TryCreate)
             .Where(t => t != null)
             .Cast<Version>()
             .ToList();

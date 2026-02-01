@@ -84,7 +84,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .ToList();
         // Filter out non-version tags
         return tagNames
-            .Select(Version.Create)
+            .Select(Version.TryCreate)
             .Where(t => t != null)
             .Cast<Version>()
             .ToList();
@@ -103,16 +103,21 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             range = "HEAD";
         }
-        else if (from == null)
+        else if (from == null && to != null)
         {
-            range = ValidateTag(to!.Tag);
+            range = ValidateTag(to.Tag);
         }
-        else if (to == null)
+        else if (to == null && from != null)
         {
             range = $"{ValidateTag(from.Tag)}..HEAD";
         }
         else
         {
+            // Both from and to are not null (verified by the preceding conditions)
+            if (from == null || to == null)
+            {
+                throw new InvalidOperationException("Unexpected null version");
+            }
             range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
         }
 

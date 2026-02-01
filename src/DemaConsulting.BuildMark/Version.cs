@@ -46,11 +46,11 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
     private static partial Regex TagPattern();
 
     /// <summary>
-    ///     Creates a Version from a tag string, or returns null if the tag doesn't match version format.
+    ///     Tries to create a Version from a tag string.
     /// </summary>
     /// <param name="tag">Tag name to parse.</param>
     /// <returns>Version instance if tag matches version format, null otherwise.</returns>
-    public static Version? Create(string tag)
+    public static Version? TryCreate(string tag)
     {
         var match = TagPattern().Match(tag);
         if (!match.Success)
@@ -82,5 +82,21 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
         }
 
         return new Version(tag, fullVersion, version, preRelease, metadata, hasPreRelease);
+    }
+
+    /// <summary>
+    ///     Creates a Version from a tag string.
+    /// </summary>
+    /// <param name="tag">Tag name to parse.</param>
+    /// <returns>Version instance.</returns>
+    /// <exception cref="ArgumentException">Thrown if tag doesn't match version format.</exception>
+    public static Version Create(string tag)
+    {
+        var version = TryCreate(tag);
+        if (version == null)
+        {
+            throw new ArgumentException($"Tag '{tag}' does not match version format", nameof(tag));
+        }
+        return version;
     }
 }

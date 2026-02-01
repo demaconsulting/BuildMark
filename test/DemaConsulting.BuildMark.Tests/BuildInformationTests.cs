@@ -68,7 +68,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0"));
 
         // Assert
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
@@ -105,7 +105,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0-beta.1")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0-beta.1"));
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion.Tag);
@@ -122,7 +122,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
 
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
@@ -139,7 +139,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
 
         // Assert
         Assert.HasCount(1, buildInfo.ChangeIssues);
@@ -165,7 +165,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
 
         // Assert
         Assert.HasCount(2, buildInfo.ChangeIssues);
@@ -184,7 +184,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0")!);
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0"));
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
@@ -212,8 +212,10 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<Version> { Version.Create("v1.0.0")! });
+        public Task<List<Version>> GetTagHistoryAsync()
+        {
+            return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
+        }
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -228,13 +230,15 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => 
-            Task.FromResult(new List<Version> 
+        public Task<List<Version>> GetTagHistoryAsync()
+        {
+            return Task.FromResult(new List<Version> 
             { 
-                Version.Create("v1.0.0")!, 
-                Version.Create("ver-1.1.0")!, 
-                Version.Create("v2.0.0")!
+                Version.Create("v1.0.0"), 
+                Version.Create("ver-1.1.0"), 
+                Version.Create("v2.0.0")
             });
+        }
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
