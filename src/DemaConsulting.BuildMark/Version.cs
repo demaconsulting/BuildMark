@@ -35,7 +35,7 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
 {
     /// <summary>
     ///     Regex pattern for parsing version tags with optional prefix, pre-release, and build metadata.
-    ///     Format: [prefix]major.minor.patch[.|-)prerelease][+buildmetadata]
+    ///     Format: [prefix]major.minor.patch[.|-)prerelease][+build-metadata]
     ///     Accepts both dot and hyphen as pre-release separators.
     ///     Examples: 
     ///     - Rel_1.2.3.rc.4+build.5 -> version: 1.2.3, prerelease: rc.4, metadata: build.5
