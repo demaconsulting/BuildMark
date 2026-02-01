@@ -57,11 +57,9 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var v1 = Version.Create("v1.0.0");
-        var v2 = Version.Create("ver-1.1.0");
-        Assert.IsNotNull(v1);
-        Assert.IsNotNull(v2);
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(v1, v2);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(
+            Version.Create("v1.0.0"), 
+            Version.Create("ver-1.1.0"));
 
         // Assert
         Assert.HasCount(1, prs);
@@ -78,11 +76,9 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var v1 = Version.Create("ver-1.1.0");
-        var v2 = Version.Create("2.0.0");
-        Assert.IsNotNull(v1);
-        Assert.IsNotNull(v2);
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(v1, v2);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(
+            Version.Create("ver-1.1.0"), 
+            Version.Create("2.0.0"));
 
         // Assert
         Assert.HasCount(2, prs);
@@ -213,9 +209,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var version = Version.Create("v1.0.0");
-        Assert.IsNotNull(version);
-        var hash = await connector.GetHashForTagAsync(version.Tag);
+        var hash = await connector.GetHashForTagAsync(Version.Create("v1.0.0").Tag);
 
         // Assert
         Assert.AreEqual("abc123def456", hash);
@@ -247,9 +241,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act
-        var version = Version.Create("v999.0.0");
-        Assert.IsNotNull(version);
-        var hash = await connector.GetHashForTagAsync(version.Tag);
+        var hash = await connector.GetHashForTagAsync(Version.Create("v999.0.0").Tag);
 
         // Assert
         Assert.AreEqual("unknown000hash000", hash);

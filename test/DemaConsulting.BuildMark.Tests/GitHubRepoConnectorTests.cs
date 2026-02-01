@@ -113,11 +113,9 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #10 from feature/x\ndef456 Merge pull request #11 from bugfix/y");
 
         // Act
-        var v1 = Version.Create("v1.0.0");
-        var v2 = Version.Create("v2.0.0");
-        Assert.IsNotNull(v1);
-        Assert.IsNotNull(v2);
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(v1, v2);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(
+            Version.Create("v1.0.0"), 
+            Version.Create("v2.0.0"));
 
         // Assert
         Assert.HasCount(2, prs);
@@ -139,9 +137,7 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #10 from feature/x");
 
         // Act
-        var version = Version.Create("v1.0.0");
-        Assert.IsNotNull(version);
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, version);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, Version.Create("v1.0.0"));
 
         // Assert
         Assert.HasCount(1, prs);
@@ -162,9 +158,7 @@ public class GitHubRepoConnectorTests
             "abc123 Merge pull request #11 from feature/y");
 
         // Act
-        var version = Version.Create("v1.0.0");
-        Assert.IsNotNull(version);
-        var prs = await connector.GetPullRequestsBetweenTagsAsync(version, null);
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(Version.Create("v1.0.0"), null);
 
         // Assert
         Assert.HasCount(1, prs);
@@ -313,9 +307,7 @@ public class GitHubRepoConnectorTests
         connector.AddCommandResult("git", "rev-parse v1.0.0", "abc123def456789");
 
         // Act
-        var version = Version.Create("v1.0.0");
-        Assert.IsNotNull(version);
-        var hash = await connector.GetHashForTagAsync(version.Tag);
+        var hash = await connector.GetHashForTagAsync(Version.Create("v1.0.0").Tag);
 
         // Assert
         Assert.AreEqual("abc123def456789", hash);

@@ -34,7 +34,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v1.2.3");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.2.3", tagVersion.Tag);
@@ -50,7 +49,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("ver-2.0.0");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("ver-2.0.0", tagVersion.Tag);
@@ -66,7 +64,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("release_3.1.4");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("release_3.1.4", tagVersion.Tag);
@@ -82,7 +79,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v2.0.0-alpha.1");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-alpha.1", tagVersion.Tag);
@@ -98,7 +94,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v2.0.0-beta.2");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.2", tagVersion.Tag);
@@ -114,7 +109,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v2.0.0-rc.1");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-rc.1", tagVersion.Tag);
@@ -130,7 +124,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v2.0.0-pre");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-pre", tagVersion.Tag);
@@ -146,7 +139,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("1.0.0");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("1.0.0", tagVersion.Tag);
@@ -162,7 +154,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("my-awesome-release_1.2.3-beta");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("my-awesome-release_1.2.3-beta", tagVersion.Tag);
@@ -178,7 +169,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v1.0.0+arch");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.0.0+arch", tagVersion.Tag);
@@ -194,7 +184,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v1.0.0.arch");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.0.0.arch", tagVersion.Tag);
@@ -210,7 +199,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("Rel_1.2.3.rc.4+build.5");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("Rel_1.2.3.rc.4+build.5", tagVersion.Tag);
@@ -226,7 +214,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("Rel_1.2.3-rc.4+build.5");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("Rel_1.2.3-rc.4+build.5", tagVersion.Tag);
@@ -242,7 +229,6 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v1.0.0-rc1");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v1.0.0-rc1", tagVersion.Tag);
@@ -258,11 +244,41 @@ public class TagInfoTests
     {
         // Arrange & Act
         var tagVersion = Version.Create("v2.0.0-beta.1+linux.x64");
-        Assert.IsNotNull(tagVersion);
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1+linux.x64", tagVersion.Tag);
         Assert.AreEqual("2.0.0-beta.1+linux.x64", tagVersion.FullVersion);
         Assert.IsTrue(tagVersion.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that TryCreate returns null for invalid tag.
+    /// </summary>
+    [TestMethod]
+    public void Version_TryCreate_ReturnsNullForInvalidTag()
+    {
+        // Arrange & Act
+        var tagVersion = Version.TryCreate("not-a-version");
+
+        // Assert
+        Assert.IsNull(tagVersion);
+    }
+
+    /// <summary>
+    ///     Test that Create throws ArgumentException for invalid tag.
+    /// </summary>
+    [TestMethod]
+    public void Version_Create_ThrowsForInvalidTag()
+    {
+        // Arrange, Act & Assert
+        try
+        {
+            _ = Version.Create("not-a-version");
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception
+        }
     }
 }

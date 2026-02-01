@@ -84,7 +84,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .ToList();
         // Filter out non-version tags
         return tagNames
-            .Select(Version.Create)
+            .Select(Version.TryCreate)
             .Where(t => t != null)
             .Cast<Version>()
             .ToList();
