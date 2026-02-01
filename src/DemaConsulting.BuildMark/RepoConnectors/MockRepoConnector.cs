@@ -67,12 +67,13 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of tags in chronological order.</returns>
     public Task<List<Version>> GetTagHistoryAsync()
     {
-        // Use dictionary keys to avoid duplication, filter out non-version tags
+        // Parse all mock tag names into Version objects
         var tagInfoList = _tagHashes.Keys
             .Select(Version.TryCreate)
             .Where(t => t != null)
             .Cast<Version>()
             .ToList();
+
         return Task.FromResult(tagInfoList);
     }
 
@@ -84,10 +85,11 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of pull request IDs.</returns>
     public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
+        // Extract tag names from version objects
         var fromTagName = from?.Tag;
         var toTagName = to?.Tag;
 
-        // Deterministic mock data based on tag range
+        // Return pull requests based on specific tag ranges
         if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
             return Task.FromResult(new List<string> { "10" });
@@ -103,6 +105,7 @@ public class MockRepoConnector : IRepoConnector
             return Task.FromResult(new List<string> { "10" });
         }
 
+        // Default case returns all pull requests
         return Task.FromResult(new List<string> { "10", "11", "12" });
     }
 
@@ -113,6 +116,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of issue IDs.</returns>
     public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
+        // Return issues for known pull requests
         return Task.FromResult(
             _pullRequestIssues.TryGetValue(pullRequestId, out var issues)
                 ? issues
@@ -126,6 +130,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>Issue title.</returns>
     public Task<string> GetIssueTitleAsync(string issueId)
     {
+        // Return title for known issues or default value
         return Task.FromResult(
             _issueTitles.TryGetValue(issueId, out var title)
                 ? title
@@ -139,6 +144,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>Issue type.</returns>
     public Task<string> GetIssueTypeAsync(string issueId)
     {
+        // Return type for known issues or default to "other"
         return Task.FromResult(
             _issueTypes.TryGetValue(issueId, out var type)
                 ? type
@@ -152,11 +158,13 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>Git hash.</returns>
     public Task<string> GetHashForTagAsync(string? tag)
     {
+        // Return current hash for null tag
         if (tag == null)
         {
             return Task.FromResult("current123hash456");
         }
 
+        // Return hash for known tags or default value
         return Task.FromResult(
             _tagHashes.TryGetValue(tag, out var hash)
                 ? hash
@@ -170,6 +178,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>Issue URL.</returns>
     public Task<string> GetIssueUrlAsync(string issueId)
     {
+        // Generate mock URL for issue
         return Task.FromResult($"https://github.com/example/repo/issues/{issueId}");
     }
 
@@ -179,6 +188,7 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of open issue IDs.</returns>
     public Task<List<string>> GetOpenIssuesAsync()
     {
+        // Return predefined list of open issues
         return Task.FromResult(_openIssues);
     }
 }

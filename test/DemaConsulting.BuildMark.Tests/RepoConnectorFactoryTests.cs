@@ -32,10 +32,10 @@ public class RepoConnectorFactoryTests
     [TestMethod]
     public void RepoConnectorFactory_Create_ReturnsConnector()
     {
-        // Act
+        // Create a repository connector
         var connector = RepoConnectorFactory.Create();
 
-        // Assert
+        // Verify connector is created successfully
         Assert.IsNotNull(connector);
         Assert.IsInstanceOfType<IRepoConnector>(connector);
     }
@@ -46,10 +46,10 @@ public class RepoConnectorFactoryTests
     [TestMethod]
     public void RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo()
     {
-        // Act
+        // Create connector for this repository
         var connector = RepoConnectorFactory.Create();
 
-        // Assert
+        // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
 }

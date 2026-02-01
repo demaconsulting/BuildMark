@@ -37,6 +37,7 @@ internal static class ProcessRunner
     /// <exception cref="InvalidOperationException">Thrown when command fails.</exception>
     public static async Task<string> RunAsync(string command, string arguments)
     {
+        // Configure process to capture output
         var startInfo = new ProcessStartInfo
         {
             FileName = command,
@@ -51,6 +52,7 @@ internal static class ProcessRunner
         var output = new StringBuilder();
         var error = new StringBuilder();
 
+        // Set up handlers to capture output and error streams
         process.OutputDataReceived += (_, e) =>
         {
             if (e.Data != null)
@@ -67,17 +69,20 @@ internal static class ProcessRunner
             }
         };
 
+        // Start process and begin reading streams
         process.Start();
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         await process.WaitForExitAsync();
 
+        // Throw exception if command failed
         if (process.ExitCode != 0)
         {
             throw new InvalidOperationException(
                 $"Command '{command} {arguments}' failed with exit code {process.ExitCode}: {error}");
         }
 
+        // Return captured output
         return output.ToString().TrimEnd();
     }
 
@@ -91,6 +96,7 @@ internal static class ProcessRunner
     {
         try
         {
+            // Configure process to capture output
             var startInfo = new ProcessStartInfo
             {
                 FileName = command,
@@ -101,15 +107,18 @@ internal static class ProcessRunner
                 CreateNoWindow = true
             };
 
+            // Execute process and capture output
             using var process = new Process { StartInfo = startInfo };
             process.Start();
             var output = await process.StandardOutput.ReadToEndAsync();
             await process.WaitForExitAsync();
 
+            // Return output only if command succeeded
             return process.ExitCode == 0 ? output : null;
         }
         catch
         {
+            // Return null on any error
             return null;
         }
     }

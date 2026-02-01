@@ -32,10 +32,10 @@ public class ProgramTests
     [TestMethod]
     public void Program_Version_ReturnsValidVersion()
     {
-        // Act
+        // Retrieve version string from Program
         var version = Program.Version;
 
-        // Assert
+        // Verify version is not null or empty
         Assert.IsNotNull(version);
         Assert.IsFalse(string.IsNullOrWhiteSpace(version));
     }

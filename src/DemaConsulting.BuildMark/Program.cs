@@ -34,7 +34,10 @@ internal static class Program
     {
         get
         {
+            // Get the assembly containing this program
             var assembly = typeof(Program).Assembly;
+
+            // Try to get version from assembly attributes, fallback to AssemblyVersion, or default to 0.0.0
             return assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion
                    ?? assembly.GetName().Version?.ToString()
                    ?? "0.0.0";
@@ -48,14 +51,14 @@ internal static class Program
     /// <returns>Exit code: 0 for success, non-zero for failure.</returns>
     private static int Main(string[] args)
     {
-        // Print version if --version is specified
+        // Handle version display request
         if (args.Length > 0 && args[0] == "--version")
         {
             Console.WriteLine($"BuildMark version {Version}");
             return 0;
         }
 
-        // Print help if --help is specified or no arguments
+        // Handle help display request or missing arguments
         if (args.Length == 0 || args[0] == "--help")
         {
             Console.WriteLine("BuildMark - Tool to generate Markdown Build Notes");
@@ -68,6 +71,7 @@ internal static class Program
             return 0;
         }
 
+        // Display placeholder message for unhandled arguments
         Console.WriteLine("Hello from BuildMark!");
         return 0;
     }

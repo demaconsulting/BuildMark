@@ -46,6 +46,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <exception cref="ArgumentException">Thrown if tag name is invalid.</exception>
     private static string ValidateTag(string tag)
     {
+        // Ensure tag name matches allowed pattern to prevent injection attacks
         if (!TagNameRegex().IsMatch(tag))
         {
             throw new ArgumentException($"Invalid tag name: {tag}", nameof(tag));
@@ -63,6 +64,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <exception cref="ArgumentException">Thrown if ID is invalid.</exception>
     private static string ValidateId(string id, string paramName)
     {
+        // Ensure ID is numeric to prevent injection attacks
         if (!NumericIdRegex().IsMatch(id))
         {
             throw new ArgumentException($"Invalid ID: {id}", paramName);
@@ -77,12 +79,16 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of tags in chronological order.</returns>
     public override async Task<List<Version>> GetTagHistoryAsync()
     {
+        // Get all tags merged into current branch, sorted by creation date
         var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
+
+        // Split output into individual tag names
         var tagNames = output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(t => t.Trim())
             .ToList();
-        // Filter out non-version tags
+
+        // Parse and filter to valid version tags only
         return tagNames
             .Select(Version.TryCreate)
             .Where(t => t != null)
@@ -98,22 +104,26 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of pull request IDs.</returns>
     public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
+        // Build git log range based on provided versions
         string range;
         if (from == null && to == null)
         {
+            // No versions specified, use all of HEAD
             range = "HEAD";
         }
         else if (from == null && to != null)
         {
+            // Only end version specified
             range = ValidateTag(to.Tag);
         }
         else if (to == null && from != null)
         {
+            // Only start version specified, range to HEAD
             range = $"{ValidateTag(from.Tag)}..HEAD";
         }
         else
         {
-            // Both from and to are not null (verified by the preceding conditions)
+            // Both versions specified
             if (from == null || to == null)
             {
                 throw new InvalidOperationException("Unexpected null version");
@@ -121,7 +131,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
         }
 
+        // Get merge commits in range
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
+
+        // Extract pull request numbers from merge commit messages
         var pullRequests = new List<string>();
         var regex = NumberReferenceRegex();
 
@@ -144,8 +157,11 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of issue IDs.</returns>
     public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
+        // Validate and fetch PR body
         var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
         var output = await RunCommandAsync("gh", $"pr view {validatedId} --json body --jq .body");
+
+        // Extract issue references from PR body
         var issues = new List<string>();
         var regex = NumberReferenceRegex();
 
@@ -164,6 +180,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue title.</returns>
     public override async Task<string> GetIssueTitleAsync(string issueId)
     {
+        // Validate and fetch issue title
         var validatedId = ValidateId(issueId, nameof(issueId));
         return await RunCommandAsync("gh", $"issue view {validatedId} --json title --jq .title");
     }
@@ -175,11 +192,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue type.</returns>
     public override async Task<string> GetIssueTypeAsync(string issueId)
     {
+        // Validate and fetch issue labels
         var validatedId = ValidateId(issueId, nameof(issueId));
         var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq '.labels[].name'");
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
-        // Look for common type labels
+        // Map labels to standardized issue types
         foreach (var label in labels)
         {
             var lowerLabel = label.ToLowerInvariant();
@@ -192,6 +210,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             }
         }
 
+        // Default type when no recognized label found
         return "other";
     }
 
@@ -202,6 +221,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Git hash.</returns>
     public override async Task<string> GetHashForTagAsync(string? tag)
     {
+        // Get commit hash for tag or HEAD
         var refName = tag == null ? "HEAD" : ValidateTag(tag);
         return await RunCommandAsync("git", $"rev-parse {refName}");
     }
@@ -213,6 +233,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue URL.</returns>
     public override async Task<string> GetIssueUrlAsync(string issueId)
     {
+        // Validate and fetch issue URL
         var validatedId = ValidateId(issueId, nameof(issueId));
         return await RunCommandAsync("gh", $"issue view {validatedId} --json url --jq .url");
     }
@@ -223,7 +244,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of open issue IDs.</returns>
     public override async Task<List<string>> GetOpenIssuesAsync()
     {
+        // Fetch all open issue numbers
         var output = await RunCommandAsync("gh", "issue list --state open --json number --jq '.[].number'");
+
+        // Parse output into list of issue IDs
         return output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(n => n.Trim())
