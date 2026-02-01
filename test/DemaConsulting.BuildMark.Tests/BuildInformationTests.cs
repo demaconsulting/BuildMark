@@ -92,7 +92,7 @@ public class BuildInformationTests
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
         Assert.AreEqual("mno345pqr678", buildInfo.ToHash);
-        Assert.AreEqual("v1.1.0", buildInfo.FromVersion?.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
 
         // Assert
-        Assert.AreEqual("2.0.0", buildInfo.ToVersion.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
         Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
     }
 
@@ -168,7 +168,7 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0")!);
 
         // Assert
-        Assert.HasCount(1, buildInfo.ChangeIssues);
+        Assert.HasCount(2, buildInfo.ChangeIssues);
         Assert.HasCount(1, buildInfo.BugIssues);
         Assert.AreEqual("2", buildInfo.BugIssues[0].Id);
         Assert.AreEqual("Fix bug in Y", buildInfo.BugIssues[0].Title);
@@ -233,7 +233,7 @@ public class BuildInformationTests
             { 
                 Version.Create("v1.0.0")!, 
                 Version.Create("ver-1.1.0")!, 
-                Version.Create("2.0.0")!
+                Version.Create("v2.0.0")!
             });
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
@@ -247,7 +247,7 @@ public class BuildInformationTests
                 return Task.FromResult("mno345pqr678");
             }
 
-            if (tag == "v1.1.0")
+            if (tag == "ver-1.1.0")
             {
                 return Task.FromResult("def456ghi789");
             }
