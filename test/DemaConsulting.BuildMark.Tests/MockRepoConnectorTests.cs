@@ -32,13 +32,11 @@ public class MockRepoConnectorTests
     [TestMethod]
     public async Task MockRepoConnector_GetTagHistoryAsync_ReturnsExpectedTags()
     {
-        // Arrange
+        // Get tag history from mock connector
         var connector = new MockRepoConnector();
-
-        // Act
         var tags = await connector.GetTagHistoryAsync();
 
-        // Assert
+        // Verify all expected tags are returned
         Assert.HasCount(5, tags);
         Assert.AreEqual("v1.0.0", tags[0].Tag);
         Assert.AreEqual("ver-1.1.0", tags[1].Tag);
@@ -53,15 +51,13 @@ public class MockRepoConnectorTests
     [TestMethod]
     public async Task MockRepoConnector_GetPullRequestsBetweenTagsAsync_ReturnsExpectedPRsForRange()
     {
-        // Arrange
+        // Get pull requests for specific version range
         var connector = new MockRepoConnector();
-
-        // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(
             Version.Create("v1.0.0"), 
             Version.Create("ver-1.1.0"));
 
-        // Assert
+        // Verify expected pull request is returned
         Assert.HasCount(1, prs);
         Assert.AreEqual("10", prs[0]);
     }

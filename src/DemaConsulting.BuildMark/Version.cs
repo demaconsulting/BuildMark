@@ -52,25 +52,27 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
     /// <returns>Version instance if tag matches version format, null otherwise.</returns>
     public static Version? TryCreate(string tag)
     {
+        // Attempt to match tag against version pattern
         var match = TagPattern().Match(tag);
         if (!match.Success)
         {
             return null;
         }
 
+        // Extract version components from regex match
         var version = match.Groups["version"].Value;
         var separator = match.Groups["separator"];
         var preReleaseGroup = match.Groups["pre_release"];
         var metadataGroup = match.Groups["metadata"];
         
-        // Pre-release exists if separator is present and pre-release group has content
+        // Determine if pre-release based on separator and content
         var hasPreRelease = separator.Success && preReleaseGroup.Success && !string.IsNullOrEmpty(preReleaseGroup.Value);
         
-        // Extract pre-release and metadata strings
+        // Get pre-release and metadata strings
         var preRelease = hasPreRelease ? preReleaseGroup.Value : string.Empty;
         var metadata = metadataGroup.Success ? metadataGroup.Value : string.Empty;
         
-        // Build full version: version + optional pre-release + optional build metadata
+        // Construct full version string from components
         var fullVersion = version;
         if (hasPreRelease)
         {
@@ -81,6 +83,7 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
             fullVersion += $"+{metadata}";
         }
 
+        // Create and return version record
         return new Version(tag, fullVersion, version, preRelease, metadata, hasPreRelease);
     }
 
@@ -92,11 +95,15 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
     /// <exception cref="ArgumentException">Thrown if tag doesn't match version format.</exception>
     public static Version Create(string tag)
     {
+        // Try to create version from tag
         var version = TryCreate(tag);
+
+        // Throw exception if tag format is invalid
         if (version == null)
         {
             throw new ArgumentException($"Tag '{tag}' does not match version format", nameof(tag));
         }
+
         return version;
     }
 }

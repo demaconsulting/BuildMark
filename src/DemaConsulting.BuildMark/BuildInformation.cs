@@ -56,33 +56,34 @@ public record BuildInformation(
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
     public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, Version? version = null)
     {
-        // Get tag history and current hash
+        // Retrieve tag history and current commit hash from the repository
         var tags = await connector.GetTagHistoryAsync();
         var currentHash = await connector.GetHashForTagAsync(null);
 
-        // Determine the "To" version
+        // Determine the target version and hash for build information
         Version toTagInfo;
         string toHash;
-
         if (version != null)
         {
-            // Use the provided version
+            // Use explicitly specified version as target
             toTagInfo = version;
             toHash = currentHash;
         }
         else if (tags.Count > 0)
         {
-            // Check if current commit matches the most recent tag
+            // Verify current commit matches latest tag when no version specified
             var latestTag = tags[^1];
             var latestTagHash = await connector.GetHashForTagAsync(latestTag.Tag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
+                // Current commit matches latest tag, use it as target
                 toTagInfo = latestTag;
                 toHash = currentHash;
             }
             else
             {
+                // Current commit doesn't match any tag, cannot determine version
                 throw new InvalidOperationException(
                     "Target version not specified and current commit does not match any tag. " +
                     "Please provide a version parameter.");
@@ -90,54 +91,56 @@ public record BuildInformation(
         }
         else
         {
+            // No tags in repository and no version provided
             throw new InvalidOperationException(
                 "No tags found in repository and no version specified. " +
                 "Please provide a version parameter.");
         }
 
-        // Determine the "From" version
+        // Determine the starting version for comparing changes
         Version? fromTagInfo = null;
         string? fromHash = null;
-
         if (tags.Count > 0)
         {
+            // Find the position of target version in tag history
             var toIndex = FindTagIndex(tags, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {
-                // For pre-release: use the previous tag (any type)
+                // Pre-release versions use the immediately previous tag as baseline
                 if (toIndex > 0)
                 {
-                    // The to version exists in tag history, use the previous tag
+                    // Target version exists in history, use previous tag
                     fromTagInfo = tags[toIndex - 1];
                 }
                 else if (toIndex == -1)
                 {
-                    // The to version doesn't exist in tag history, use the most recent tag
+                    // Target version not in history, use most recent tag as baseline
                     fromTagInfo = tags[^1];
                 }
-                // If toIndex == 0, fromTagInfo stays null (first release)
+                // If toIndex == 0, this is the first tag, no baseline
             }
             else
             {
-                // For release: use the previous release tag (skip pre-releases)
+                // Release versions skip pre-releases and use previous release as baseline
                 int startIndex;
                 if (toIndex > 0)
                 {
-                    // The to version exists in tag history
+                    // Target version exists in history, start search from previous position
                     startIndex = toIndex - 1;
                 }
                 else if (toIndex == -1)
                 {
-                    // The to version doesn't exist in tag history, use the most recent tag
+                    // Target version not in history, start from most recent tag
                     startIndex = tags.Count - 1;
                 }
                 else
                 {
-                    // toIndex == 0, this is the first tag, no previous release
+                    // Target is first tag, no previous release exists
                     startIndex = -1;
                 }
 
+                // Search backward for previous non-pre-release version
                 for (var i = startIndex; i >= 0; i--)
                 {
                     if (!tags[i].IsPreRelease)
@@ -148,37 +151,45 @@ public record BuildInformation(
                 }
             }
 
+            // Get commit hash for baseline version if one was found
             if (fromTagInfo != null)
             {
                 fromHash = await connector.GetHashForTagAsync(fromTagInfo.Tag);
             }
         }
 
-        // Get pull requests and issues between versions
+        // Collect all pull requests and their associated issues in version range
         var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromTagInfo, toTagInfo);
-
         var allIssues = new HashSet<string>();
         var bugIssues = new List<IssueInfo>();
         var changeIssues = new List<IssueInfo>();
 
+        // Process each pull request to extract and categorize issues
         foreach (var pr in pullRequests)
         {
+            // Get all issues referenced by this pull request
             var issueIds = await connector.GetIssuesForPullRequestAsync(pr);
+
             foreach (var issueId in issueIds)
             {
+                // Skip issues already processed
                 if (allIssues.Contains(issueId))
                 {
                     continue;
                 }
 
+                // Mark issue as processed
                 allIssues.Add(issueId);
 
+                // Fetch issue details
                 var title = await connector.GetIssueTitleAsync(issueId);
                 var url = await connector.GetIssueUrlAsync(issueId);
                 var type = await connector.GetIssueTypeAsync(issueId);
 
+                // Create issue record
                 var issueInfo = new IssueInfo(issueId, title, url);
 
+                // Categorize issue by type
                 if (type == "bug")
                 {
                     bugIssues.Add(issueInfo);
@@ -190,18 +201,18 @@ public record BuildInformation(
             }
         }
 
-        // Get known issues (open bugs that are not already fixed in this build)
+        // Collect known issues (open bugs not fixed in this build)
         var knownIssues = new List<IssueInfo>();
         var openIssueIds = await connector.GetOpenIssuesAsync();
-
         foreach (var issueId in openIssueIds)
         {
-            // Skip if already included in fixed bugs
+            // Skip issues already fixed in this build
             if (allIssues.Contains(issueId))
             {
                 continue;
             }
 
+            // Only include bugs in known issues list
             var type = await connector.GetIssueTypeAsync(issueId);
             if (type == "bug")
             {
@@ -211,6 +222,7 @@ public record BuildInformation(
             }
         }
 
+        // Create and return build information with all collected data
         return new BuildInformation(
             fromTagInfo,
             toTagInfo,
@@ -229,6 +241,7 @@ public record BuildInformation(
     /// <returns>Index of the tag, or -1 if not found.</returns>
     private static int FindTagIndex(List<Version> tags, string normalizedVersion)
     {
+        // Search for tag matching the normalized version
         for (var i = 0; i < tags.Count; i++)
         {
             if (tags[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
@@ -237,6 +250,7 @@ public record BuildInformation(
             }
         }
 
+        // Tag not found in history
         return -1;
     }
 }

@@ -31,20 +31,20 @@ public static class RepoConnectorFactory
     /// <returns>Repository connector instance.</returns>
     public static IRepoConnector Create()
     {
-        // Check for GitHub environment variables
+        // Check for GitHub Actions environment variables
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
             return new GitHubRepoConnector();
         }
 
-        // Check git remote for GitHub
+        // Check if git remote points to GitHub
         if (IsGitHubRepository())
         {
             return new GitHubRepoConnector();
         }
 
-        // Default to GitHub
+        // Default to GitHub connector
         return new GitHubRepoConnector();
     }
 
@@ -54,6 +54,7 @@ public static class RepoConnectorFactory
     /// <returns>True if GitHub repository.</returns>
     private static bool IsGitHubRepository()
     {
+        // Get git remote URL and check if it contains github.com
         var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").Result;
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }

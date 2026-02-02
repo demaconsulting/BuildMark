@@ -35,6 +35,7 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     /// <param name="result">Expected result.</param>
     public void AddCommandResult(string command, string arguments, string result)
     {
+        // Store command result for later retrieval
         _commandResults[$"{command} {arguments}"] = result;
     }
 
@@ -46,12 +47,14 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     /// <returns>Command output.</returns>
     protected override Task<string> RunCommandAsync(string command, string arguments)
     {
+        // Look up pre-configured result for command
         var key = $"{command} {arguments}";
         if (_commandResults.TryGetValue(key, out var result))
         {
             return Task.FromResult(result);
         }
 
+        // Throw if no result configured for command
         throw new InvalidOperationException($"No result configured for command: {key}");
     }
 }
@@ -68,14 +71,14 @@ public class GitHubRepoConnectorTests
     [TestMethod]
     public async Task GitHubRepoConnector_GetTagHistoryAsync_ReturnsExpectedTags()
     {
-        // Arrange
+        // Configure connector to return mock tags
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult("git", "tag --sort=creatordate --merged HEAD", "v1.0.0\nv1.1.0\nv2.0.0");
 
-        // Act
+        // Get tag history
         var tags = await connector.GetTagHistoryAsync();
 
-        // Assert
+        // Verify all tags are parsed correctly
         Assert.HasCount(3, tags);
         Assert.AreEqual("v1.0.0", tags[0].Tag);
         Assert.AreEqual("v1.1.0", tags[1].Tag);
@@ -336,12 +339,11 @@ public class GitHubRepoConnectorTests
     [TestMethod]
     public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_ThrowsForInvalidTagName()
     {
-        // Arrange
+        // Create connector and version with malicious tag name
         var connector = new TestableGitHubRepoConnector();
-        // Create a Version with an invalid tag name for testing validation
         var invalidVersion = new Version("v1.0.0; rm -rf /", "1.0.0", "1.0.0", string.Empty, string.Empty, false);
 
-        // Act & Assert
+        // Verify exception is thrown for invalid tag
         var ex = await Assert.ThrowsAsync<ArgumentException>(
             async () => await connector.GetPullRequestsBetweenTagsAsync(invalidVersion, null));
         Assert.Contains("Invalid tag name", ex.Message);

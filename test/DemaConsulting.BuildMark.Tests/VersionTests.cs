@@ -32,10 +32,10 @@ public class TagInfoTests
     [TestMethod]
     public void TagInfo_Constructor_ParsesSimpleVPrefix()
     {
-        // Arrange & Act
+        // Parse a simple version tag with v prefix
         var tagVersion = Version.Create("v1.2.3");
 
-        // Assert
+        // Verify tag and version are extracted correctly
         Assert.AreEqual("v1.2.3", tagVersion.Tag);
         Assert.AreEqual("1.2.3", tagVersion.FullVersion);
         Assert.IsFalse(tagVersion.IsPreRelease);
@@ -77,10 +77,10 @@ public class TagInfoTests
     [TestMethod]
     public void TagInfo_Constructor_DetectsAlphaPreRelease()
     {
-        // Arrange & Act
+        // Parse a version tag with alpha pre-release
         var tagVersion = Version.Create("v2.0.0-alpha.1");
 
-        // Assert
+        // Verify pre-release is detected correctly
         Assert.AreEqual("v2.0.0-alpha.1", tagVersion.Tag);
         Assert.AreEqual("2.0.0-alpha.1", tagVersion.FullVersion);
         Assert.IsTrue(tagVersion.IsPreRelease);
@@ -257,10 +257,10 @@ public class TagInfoTests
     [TestMethod]
     public void Version_TryCreate_ReturnsNullForInvalidTag()
     {
-        // Arrange & Act
+        // Attempt to parse an invalid tag
         var tagVersion = Version.TryCreate("not-a-version");
 
-        // Assert
+        // Verify null is returned for invalid format
         Assert.IsNull(tagVersion);
     }
 
@@ -270,15 +270,17 @@ public class TagInfoTests
     [TestMethod]
     public void Version_Create_ThrowsForInvalidTag()
     {
-        // Arrange, Act & Assert
         try
         {
+            // Attempt to create version from invalid tag
             _ = Version.Create("not-a-version");
+
+            // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");
         }
         catch (ArgumentException)
         {
-            // Expected exception
+            // Expected exception for invalid tag format
         }
     }
 }

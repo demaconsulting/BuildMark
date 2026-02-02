@@ -32,10 +32,10 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_CreateAsync_ThrowsWhenNoVersionAndNoTags()
     {
-        // Arrange
+        // Create connector with no tags
         var connector = new MockRepoConnectorEmpty();
 
-        // Act & Assert
+        // Verify exception is thrown when no version and no tags
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await BuildInformation.CreateAsync(connector));
 
@@ -64,13 +64,11 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_CreateAsync_WorksWithExplicitVersion()
     {
-        // Arrange
+        // Create build information with explicit version
         var connector = new MockRepoConnector();
-
-        // Act
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0"));
 
-        // Assert
+        // Verify version and hashes are set correctly
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
         Assert.AreEqual("current123hash456", buildInfo.ToHash);
         Assert.AreEqual("2.0.0", buildInfo.FromVersion?.Tag);
@@ -135,21 +133,20 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_CreateAsync_CollectsIssuesCorrectly()
     {
-        // Arrange
+        // Create build information for version with issues
         var connector = new MockRepoConnector();
-
-        // Act
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
 
-        // Assert
+        // Verify change issues are collected
         Assert.HasCount(1, buildInfo.ChangeIssues);
         Assert.AreEqual("1", buildInfo.ChangeIssues[0].Id);
         Assert.AreEqual("Add feature X", buildInfo.ChangeIssues[0].Title);
         Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.ChangeIssues[0].Url);
 
+        // Verify no bug issues for this version
         Assert.IsEmpty(buildInfo.BugIssues);
 
-        // Known issues should include open bugs (4 and 5)
+        // Verify known issues include open bugs
         Assert.HasCount(2, buildInfo.KnownIssues);
         Assert.AreEqual("4", buildInfo.KnownIssues[0].Id);
         Assert.AreEqual("5", buildInfo.KnownIssues[1].Id);
