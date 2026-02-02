@@ -80,6 +80,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<List<Version>> GetTagHistoryAsync()
     {
         // Get all tags merged into current branch, sorted by creation date
+        // Arguments: --sort=creatordate (chronological order), --merged HEAD (reachable from HEAD)
+        // Output format: one tag name per line
         var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
 
         // Split output into individual tag names
@@ -131,10 +133,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
         }
 
-        // Get merge commits in range
+        // Get merge commits in range using git log
+        // Arguments: --oneline (one line per commit), --merges (only merge commits)
+        // Output format: "<short-hash> Merge pull request #<number> from <branch>"
         var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
 
         // Extract pull request numbers from merge commit messages
+        // Each line is parsed for "#<number>" pattern to identify the PR
         var pullRequests = new List<string>();
         var regex = NumberReferenceRegex();
 
@@ -157,11 +162,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of issue IDs.</returns>
     public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
-        // Validate and fetch PR body
+        // Validate and fetch PR body using GitHub CLI
+        // Arguments: --json body (get body field), --jq .body (extract body value)
+        // Output: raw PR description text which may contain issue references
         var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
         var output = await RunCommandAsync("gh", $"pr view {validatedId} --json body --jq .body");
 
-        // Extract issue references from PR body
+        // Extract issue references (e.g., #123, #456) from PR body text
         var issues = new List<string>();
         var regex = NumberReferenceRegex();
 
@@ -180,7 +187,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue title.</returns>
     public override async Task<string> GetIssueTitleAsync(string issueId)
     {
-        // Validate and fetch issue title
+        // Validate and fetch issue title using GitHub CLI
+        // Arguments: --json title (get title field), --jq .title (extract title value)
+        // Output: issue title as plain text
         var validatedId = ValidateId(issueId, nameof(issueId));
         return await RunCommandAsync("gh", $"issue view {validatedId} --json title --jq .title");
     }
@@ -192,7 +201,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue type.</returns>
     public override async Task<string> GetIssueTypeAsync(string issueId)
     {
-        // Validate and fetch issue labels
+        // Validate and fetch issue labels using GitHub CLI
+        // Arguments: --json labels (get labels array), --jq '.labels[].name' (extract label names)
+        // Output: one label name per line
         var validatedId = ValidateId(issueId, nameof(issueId));
         var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq '.labels[].name'");
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
@@ -221,7 +232,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Git hash.</returns>
     public override async Task<string> GetHashForTagAsync(string? tag)
     {
-        // Get commit hash for tag or HEAD
+        // Get commit hash for tag or HEAD using git rev-parse
+        // Arguments: tag name or "HEAD" for current commit
+        // Output: full 40-character commit SHA
         var refName = tag == null ? "HEAD" : ValidateTag(tag);
         return await RunCommandAsync("git", $"rev-parse {refName}");
     }
@@ -233,7 +246,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Issue URL.</returns>
     public override async Task<string> GetIssueUrlAsync(string issueId)
     {
-        // Validate and fetch issue URL
+        // Validate and fetch issue URL using GitHub CLI
+        // Arguments: --json url (get url field), --jq .url (extract url value)
+        // Output: full HTTPS URL to the issue
         var validatedId = ValidateId(issueId, nameof(issueId));
         return await RunCommandAsync("gh", $"issue view {validatedId} --json url --jq .url");
     }
@@ -244,7 +259,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of open issue IDs.</returns>
     public override async Task<List<string>> GetOpenIssuesAsync()
     {
-        // Fetch all open issue numbers
+        // Fetch all open issue numbers using GitHub CLI
+        // Arguments: --state open (open issues only), --json number (get number field), --jq '.[].number' (extract numbers from array)
+        // Output: one issue number per line
         var output = await RunCommandAsync("gh", "issue list --state open --json number --jq '.[].number'");
 
         // Parse output into list of issue IDs

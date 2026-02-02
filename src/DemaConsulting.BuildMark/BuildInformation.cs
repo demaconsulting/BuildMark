@@ -63,7 +63,6 @@ public record BuildInformation(
         // Determine the target version and hash for build information
         Version toTagInfo;
         string toHash;
-
         if (version != null)
         {
             // Use explicitly specified version as target
@@ -101,7 +100,6 @@ public record BuildInformation(
         // Determine the starting version for comparing changes
         Version? fromTagInfo = null;
         string? fromHash = null;
-
         if (tags.Count > 0)
         {
             // Find the position of target version in tag history
@@ -162,7 +160,6 @@ public record BuildInformation(
 
         // Collect all pull requests and their associated issues in version range
         var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromTagInfo, toTagInfo);
-
         var allIssues = new HashSet<string>();
         var bugIssues = new List<IssueInfo>();
         var changeIssues = new List<IssueInfo>();
@@ -207,7 +204,6 @@ public record BuildInformation(
         // Collect known issues (open bugs not fixed in this build)
         var knownIssues = new List<IssueInfo>();
         var openIssueIds = await connector.GetOpenIssuesAsync();
-
         foreach (var issueId in openIssueIds)
         {
             // Skip issues already fixed in this build
