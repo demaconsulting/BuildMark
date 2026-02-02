@@ -234,6 +234,111 @@ public record BuildInformation(
     }
 
     /// <summary>
+    ///     Generates a Markdown build report from this build information.
+    /// </summary>
+    /// <param name="headingDepth">Root markdown heading depth (default 1).</param>
+    /// <param name="includeKnownIssues">Flag for whether to include known issues (default false).</param>
+    /// <returns>Markdown-formatted build report.</returns>
+    public string ToMarkdown(int headingDepth = 1, bool includeKnownIssues = false)
+    {
+        // Build heading prefix based on requested depth
+        var heading = new string('#', headingDepth);
+        var subHeading = new string('#', headingDepth + 1);
+
+        // Start building the markdown report
+        var markdown = new System.Text.StringBuilder();
+
+        // Add title section
+        markdown.AppendLine($"{heading} Build Report");
+        markdown.AppendLine();
+
+        // Add version information section
+        markdown.AppendLine($"{subHeading} Version Information");
+        markdown.AppendLine();
+        markdown.AppendLine("| Field | Value |");
+        markdown.AppendLine("|-------|-------|");
+        markdown.AppendLine($"| **Version** | {ToVersion.Tag} |");
+        markdown.AppendLine($"| **Commit Hash** | {ToHash} |");
+        if (FromVersion != null)
+        {
+            markdown.AppendLine($"| **Previous Version** | {FromVersion.Tag} |");
+            markdown.AppendLine($"| **Previous Commit Hash** | {FromHash} |");
+        }
+        else
+        {
+            markdown.AppendLine("| **Previous Version** | N/A |");
+            markdown.AppendLine("| **Previous Commit Hash** | N/A |");
+        }
+        markdown.AppendLine();
+
+        // Add changes section
+        markdown.AppendLine($"{subHeading} Changes");
+        markdown.AppendLine();
+        if (ChangeIssues.Count > 0)
+        {
+            markdown.AppendLine("| Issue | Title |");
+            markdown.AppendLine("|-------|-------|");
+            foreach (var issue in ChangeIssues)
+            {
+                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+            }
+        }
+        else
+        {
+            markdown.AppendLine("| Issue | Title |");
+            markdown.AppendLine("|-------|-------|");
+            markdown.AppendLine("| N/A | N/A |");
+        }
+        markdown.AppendLine();
+
+        // Add bugs fixed section
+        markdown.AppendLine($"{subHeading} Bugs Fixed");
+        markdown.AppendLine();
+        if (BugIssues.Count > 0)
+        {
+            markdown.AppendLine("| Issue | Title |");
+            markdown.AppendLine("|-------|-------|");
+            foreach (var issue in BugIssues)
+            {
+                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+            }
+        }
+        else
+        {
+            markdown.AppendLine("| Issue | Title |");
+            markdown.AppendLine("|-------|-------|");
+            markdown.AppendLine("| N/A | N/A |");
+        }
+        markdown.AppendLine();
+
+        // Add known issues section if requested
+        if (includeKnownIssues)
+        {
+            markdown.AppendLine($"{subHeading} Known Issues");
+            markdown.AppendLine();
+            if (KnownIssues.Count > 0)
+            {
+                markdown.AppendLine("| Issue | Title |");
+                markdown.AppendLine("|-------|-------|");
+                foreach (var issue in KnownIssues)
+                {
+                    markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+                }
+            }
+            else
+            {
+                markdown.AppendLine("| Issue | Title |");
+                markdown.AppendLine("|-------|-------|");
+                markdown.AppendLine("| N/A | N/A |");
+            }
+            markdown.AppendLine();
+        }
+
+        // Return the complete markdown report
+        return markdown.ToString();
+    }
+
+    /// <summary>
     ///     Finds the index of a tag in the tag history by normalized version.
     /// </summary>
     /// <param name="tags">List of tags.</param>
