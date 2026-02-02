@@ -274,10 +274,10 @@ public record BuildInformation(
         // Add changes section
         markdown.AppendLine($"{subHeading} Changes");
         markdown.AppendLine();
+        markdown.AppendLine("| Issue | Title |");
+        markdown.AppendLine("|-------|-------|");
         if (ChangeIssues.Count > 0)
         {
-            markdown.AppendLine("| Issue | Title |");
-            markdown.AppendLine("|-------|-------|");
             foreach (var issue in ChangeIssues)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
@@ -285,8 +285,6 @@ public record BuildInformation(
         }
         else
         {
-            markdown.AppendLine("| Issue | Title |");
-            markdown.AppendLine("|-------|-------|");
             markdown.AppendLine("| N/A | N/A |");
         }
         markdown.AppendLine();
@@ -294,10 +292,10 @@ public record BuildInformation(
         // Add bugs fixed section
         markdown.AppendLine($"{subHeading} Bugs Fixed");
         markdown.AppendLine();
+        markdown.AppendLine("| Issue | Title |");
+        markdown.AppendLine("|-------|-------|");
         if (BugIssues.Count > 0)
         {
-            markdown.AppendLine("| Issue | Title |");
-            markdown.AppendLine("|-------|-------|");
             foreach (var issue in BugIssues)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
@@ -305,8 +303,6 @@ public record BuildInformation(
         }
         else
         {
-            markdown.AppendLine("| Issue | Title |");
-            markdown.AppendLine("|-------|-------|");
             markdown.AppendLine("| N/A | N/A |");
         }
         markdown.AppendLine();
@@ -316,10 +312,10 @@ public record BuildInformation(
         {
             markdown.AppendLine($"{subHeading} Known Issues");
             markdown.AppendLine();
+            markdown.AppendLine("| Issue | Title |");
+            markdown.AppendLine("|-------|-------|");
             if (KnownIssues.Count > 0)
             {
-                markdown.AppendLine("| Issue | Title |");
-                markdown.AppendLine("|-------|-------|");
                 foreach (var issue in KnownIssues)
                 {
                     markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
@@ -327,8 +323,6 @@ public record BuildInformation(
             }
             else
             {
-                markdown.AppendLine("| Issue | Title |");
-                markdown.AppendLine("|-------|-------|");
                 markdown.AppendLine("| N/A | N/A |");
             }
             markdown.AppendLine();
