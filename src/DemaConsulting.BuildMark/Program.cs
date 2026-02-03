@@ -51,28 +51,60 @@ internal static class Program
     /// <returns>Exit code: 0 for success, non-zero for failure.</returns>
     private static int Main(string[] args)
     {
-        // Handle version display request
-        if (args.Length > 0 && args[0] == "--version")
+        try
         {
-            Console.WriteLine($"BuildMark version {Version}");
-            return 0;
-        }
+            // Create context from command-line arguments
+            using var context = Context.Create(args);
 
-        // Handle help display request or missing arguments
-        if (args.Length == 0 || args[0] == "--help")
+            // Handle version display request
+            if (context.Version)
+            {
+                context.WriteLine($"BuildMark version {Version}");
+                return context.ExitCode;
+            }
+
+            // Handle help display request
+            if (context.Help)
+            {
+                ShowHelp(context);
+                return context.ExitCode;
+            }
+
+            // Display placeholder message for unhandled arguments
+            context.WriteLine("Hello from BuildMark!");
+            return context.ExitCode;
+        }
+        catch (ArgumentException ex)
         {
-            Console.WriteLine("BuildMark - Tool to generate Markdown Build Notes");
-            Console.WriteLine();
-            Console.WriteLine("Usage: buildmark [options]");
-            Console.WriteLine();
-            Console.WriteLine("Options:");
-            Console.WriteLine("  --version    Display version information");
-            Console.WriteLine("  --help       Display this help message");
-            return 0;
+            Console.WriteLine($"Error: {ex.Message}");
+            return 1;
         }
+        catch (InvalidOperationException ex)
+        {
+            Console.WriteLine($"Error: {ex.Message}");
+            return 1;
+        }
+    }
 
-        // Display placeholder message for unhandled arguments
-        Console.WriteLine("Hello from BuildMark!");
-        return 0;
+    /// <summary>
+    ///     Shows the help message.
+    /// </summary>
+    /// <param name="context">Context for output.</param>
+    private static void ShowHelp(Context context)
+    {
+        context.WriteLine("BuildMark - Tool to generate Markdown Build Notes");
+        context.WriteLine("");
+        context.WriteLine("Usage: buildmark [options]");
+        context.WriteLine("");
+        context.WriteLine("Options:");
+        context.WriteLine("  -v, --version                Display version information");
+        context.WriteLine("  -?, -h, --help               Display this help message");
+        context.WriteLine("  --silent                     Suppress console output");
+        context.WriteLine("  --validate                   Run self-validation");
+        context.WriteLine("  --results <file>             Write validation results (TRX or JUnit format)");
+        context.WriteLine("  --log <file>                 Write output to log file");
+        context.WriteLine("  --build-version <version>    Specify the build version");
+        context.WriteLine("  --report <file>              Specify the report file name");
+        context.WriteLine("  --report-depth <depth>       Specify the report markdown depth (default: 1)");
     }
 }
