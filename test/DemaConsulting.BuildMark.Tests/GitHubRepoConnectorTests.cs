@@ -26,6 +26,7 @@ namespace DemaConsulting.BuildMark.Tests;
 internal class TestableGitHubRepoConnector : GitHubRepoConnector
 {
     private readonly Dictionary<string, string> _commandResults = new();
+    private readonly HashSet<string> _commandExceptions = new();
 
     /// <summary>
     ///     Adds a command result for testing.
@@ -40,6 +41,17 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     }
 
     /// <summary>
+    ///     Adds a command that should throw an exception for testing.
+    /// </summary>
+    /// <param name="command">Command name.</param>
+    /// <param name="arguments">Command arguments.</param>
+    public void AddCommandException(string command, string arguments)
+    {
+        // Store command that should throw
+        _commandExceptions.Add($"{command} {arguments}");
+    }
+
+    /// <summary>
     ///     Runs a command and returns its output.
     /// </summary>
     /// <param name="command">Command to run.</param>
@@ -49,6 +61,13 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     {
         // Look up pre-configured result for command
         var key = $"{command} {arguments}";
+        
+        // Check if this command should throw
+        if (_commandExceptions.Contains(key))
+        {
+            throw new InvalidOperationException($"Command failed: {key}");
+        }
+        
         if (_commandResults.TryGetValue(key, out var result))
         {
             return Task.FromResult(result);
@@ -110,6 +129,10 @@ public class GitHubRepoConnectorTests
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
+        
+        // Mock git rev-parse to indicate v2.0.0 tag exists
+        connector.AddCommandResult("git", "rev-parse --verify v2.0.0", "abc123def456");
+        
         connector.AddCommandResult(
             "git",
             "log --oneline --merges v1.0.0..v2.0.0",
@@ -134,6 +157,10 @@ public class GitHubRepoConnectorTests
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
+        
+        // Mock git rev-parse to indicate v1.0.0 tag exists
+        connector.AddCommandResult("git", "rev-parse --verify v1.0.0", "abc123def456");
+        
         connector.AddCommandResult(
             "git",
             "log --oneline --merges v1.0.0",
@@ -187,6 +214,34 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.HasCount(1, prs);
         Assert.AreEqual("12", prs[0]);
+    }
+
+    /// <summary>
+    ///     Test that GetPullRequestsBetweenTagsAsync uses HEAD when toTag doesn't exist.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_UsesHeadWhenToTagDoesNotExist()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+        
+        // Mock git rev-parse to indicate tag doesn't exist (throws exception)
+        connector.AddCommandException("git", "rev-parse --verify 0.0.0-run.50");
+        
+        // Mock git log with HEAD instead of non-existent tag
+        connector.AddCommandResult(
+            "git",
+            "log --oneline --merges v1.0.0..HEAD",
+            "abc123 Merge pull request #15 from feature/new");
+
+        // Act - using a version that doesn't exist as a tag
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(
+            Version.Create("v1.0.0"), 
+            Version.Create("0.0.0-run.50"));
+
+        // Assert
+        Assert.HasCount(1, prs);
+        Assert.AreEqual("15", prs[0]);
     }
 
     /// <summary>

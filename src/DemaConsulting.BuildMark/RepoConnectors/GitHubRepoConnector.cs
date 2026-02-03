@@ -99,6 +99,27 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Checks if a git tag exists in the repository.
+    /// </summary>
+    /// <param name="tag">Tag name to check.</param>
+    /// <returns>True if the tag exists, false otherwise.</returns>
+    private async Task<bool> TagExistsAsync(string tag)
+    {
+        try
+        {
+            // Try to resolve the tag to a commit hash
+            // If tag doesn't exist, git will fail with non-zero exit code
+            await RunCommandAsync("git", $"rev-parse --verify {ValidateTag(tag)}");
+            return true;
+        }
+        catch
+        {
+            // Tag doesn't exist or other error occurred
+            return false;
+        }
+    }
+
+    /// <summary>
     ///     Gets the list of pull request IDs between two versions.
     /// </summary>
     /// <param name="from">Starting version (null for start of history).</param>
@@ -116,7 +137,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         else if (from == null)
         {
             // Only end version specified (to is not null here)
-            range = ValidateTag(to!.Tag);
+            // Check if the tag exists; if not, use HEAD
+            var toTag = ValidateTag(to!.Tag);
+            var toExists = await TagExistsAsync(to.Tag);
+            range = toExists ? toTag : "HEAD";
         }
         else if (to == null)
         {
@@ -126,7 +150,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         else
         {
             // Both versions specified (both from and to are not null here)
-            range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
+            var fromTag = ValidateTag(from.Tag);
+            var toTag = ValidateTag(to.Tag);
+            
+            // Check if the 'to' tag exists; if not, use HEAD
+            var toExists = await TagExistsAsync(to.Tag);
+            var toRef = toExists ? toTag : "HEAD";
+            
+            range = $"{fromTag}..{toRef}";
         }
 
         // Get merge commits in range using git log
