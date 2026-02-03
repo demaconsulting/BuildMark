@@ -161,25 +161,62 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Get commits in range using git log
-        // Arguments: --oneline (one line per commit)
-        // Output format: "<short-hash> <commit message>"
-        // Parses both merge commits ("Merge pull request #<number>") and squash commits ("... (#<number>)")
-        var output = await RunCommandAsync("git", $"log --oneline {range}");
+        // Arguments: --format=%H (full commit hash)
+        // Output format: "<full-hash>" (one per line)
+        var commitHashesOutput = await RunCommandAsync("git", $"log --format=%H {range}");
+        
+        var commitHashes = commitHashesOutput
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(hash => hash.Trim())
+            .ToList();
 
-        // Extract pull request numbers from commit messages
-        // Each line is parsed for "#<number>" pattern to identify the PR
-        // This works for both traditional merge commits and squash/rebase commits
+        // First, try to find PR numbers in commit messages (fast path for squash merges)
+        var commitsOutput = await RunCommandAsync("git", $"log --oneline {range}");
         var regex = NumberReferenceRegex();
-
-        var pullRequests = output
+        
+        var pullRequestsFromMessages = commitsOutput
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line => regex.Match(line))
             .Where(match => match.Success)
             .Select(match => match.Groups[1].Value)
-            .Distinct() // Remove duplicates in case a PR number appears in multiple commits
+            .Distinct()
             .ToList();
 
-        return pullRequests;
+        // If we found PRs in commit messages, return them
+        if (pullRequestsFromMessages.Count > 0)
+        {
+            return pullRequestsFromMessages;
+        }
+
+        // No PRs found in commit messages - search GitHub API for PRs containing these commits
+        // This handles cases where commits don't have PR numbers in messages (e.g., during PR development)
+        var pullRequestsFromApi = new HashSet<string>();
+        
+        foreach (var commitHash in commitHashes)
+        {
+            try
+            {
+                // Search for PRs containing this commit using GitHub CLI
+                var prSearchOutput = await RunCommandAsync("gh", $"pr list --search {commitHash} --json number --jq .[].number");
+                var prNumbers = prSearchOutput
+                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+                    .Select(n => n.Trim())
+                    .Where(n => !string.IsNullOrEmpty(n));
+                
+                foreach (var prNumber in prNumbers)
+                {
+                    pullRequestsFromApi.Add(prNumber);
+                }
+            }
+            catch (InvalidOperationException)
+            {
+                // If gh command fails for a specific commit, continue with others
+                // This can happen if the commit isn't associated with any PR yet
+                continue;
+            }
+        }
+
+        return pullRequestsFromApi.ToList();
     }
 
     /// <summary>
