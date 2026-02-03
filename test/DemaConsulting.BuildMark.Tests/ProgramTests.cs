@@ -39,4 +39,95 @@ public class ProgramTests
         Assert.IsNotNull(version);
         Assert.IsFalse(string.IsNullOrWhiteSpace(version));
     }
+
+    /// <summary>
+    ///     Test that Run with version flag outputs version to console.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_VersionFlag_OutputsVersionToConsole()
+    {
+        // Create context with version flag
+        using var context = Context.Create(["-v"]);
+
+        // Capture console output
+        var originalOut = Console.Out;
+        using var writer = new StringWriter();
+        Console.SetOut(writer);
+
+        try
+        {
+            // Run program
+            Program.Run(context);
+
+            // Verify version is written to console
+            var output = writer.ToString();
+            Assert.Contains(Program.Version, output);
+        }
+        finally
+        {
+            // Restore console output
+            Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with help flag outputs help message.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_HelpFlag_OutputsHelpMessage()
+    {
+        // Create context with help flag and silent mode to capture output
+        using var context = Context.Create(["-h"]);
+
+        // Capture console output
+        var originalOut = Console.Out;
+        using var writer = new StringWriter();
+        Console.SetOut(writer);
+
+        try
+        {
+            // Run program
+            Program.Run(context);
+
+            // Verify help is written to console
+            var output = writer.ToString();
+            Assert.Contains("Usage: buildmark", output);
+            Assert.Contains("Options:", output);
+        }
+        finally
+        {
+            // Restore console output
+            Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with validate flag outputs validation message.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_ValidateFlag_OutputsValidationMessage()
+    {
+        // Create context with validate flag
+        using var context = Context.Create(["--validate"]);
+
+        // Capture console output
+        var originalOut = Console.Out;
+        using var writer = new StringWriter();
+        Console.SetOut(writer);
+
+        try
+        {
+            // Run program
+            Program.Run(context);
+
+            // Verify validation message is written to console
+            var output = writer.ToString();
+            Assert.Contains("Self-validation", output);
+        }
+        finally
+        {
+            // Restore console output
+            Console.SetOut(originalOut);
+        }
+    }
 }
