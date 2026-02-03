@@ -160,13 +160,15 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             range = $"{fromTag}..{toRef}";
         }
 
-        // Get merge commits in range using git log
-        // Arguments: --oneline (one line per commit), --merges (only merge commits)
-        // Output format: "<short-hash> Merge pull request #<number> from <branch>"
-        var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
+        // Get commits in range using git log
+        // Arguments: --oneline (one line per commit)
+        // Output format: "<short-hash> <commit message>"
+        // Parses both merge commits ("Merge pull request #<number>") and squash commits ("... (#<number>)")
+        var output = await RunCommandAsync("git", $"log --oneline {range}");
 
-        // Extract pull request numbers from merge commit messages
+        // Extract pull request numbers from commit messages
         // Each line is parsed for "#<number>" pattern to identify the PR
+        // This works for both traditional merge commits and squash/rebase commits
         var regex = NumberReferenceRegex();
 
         var pullRequests = output
@@ -174,6 +176,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .Select(line => regex.Match(line))
             .Where(match => match.Success)
             .Select(match => match.Groups[1].Value)
+            .Distinct() // Remove duplicates in case a PR number appears in multiple commits
             .ToList();
 
         return pullRequests;

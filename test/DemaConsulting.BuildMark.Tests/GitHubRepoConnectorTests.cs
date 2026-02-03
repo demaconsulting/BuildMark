@@ -135,7 +135,7 @@ public class GitHubRepoConnectorTests
         
         connector.AddCommandResult(
             "git",
-            "log --oneline --merges v1.0.0..v2.0.0",
+            "log --oneline v1.0.0..v2.0.0",
             "abc123 Merge pull request #10 from feature/x\ndef456 Merge pull request #11 from bugfix/y");
 
         // Act
@@ -163,7 +163,7 @@ public class GitHubRepoConnectorTests
         
         connector.AddCommandResult(
             "git",
-            "log --oneline --merges v1.0.0",
+            "log --oneline v1.0.0",
             "abc123 Merge pull request #10 from feature/x");
 
         // Act
@@ -184,7 +184,7 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult(
             "git",
-            "log --oneline --merges v1.0.0..HEAD",
+            "log --oneline v1.0.0..HEAD",
             "abc123 Merge pull request #11 from feature/y");
 
         // Act
@@ -205,7 +205,7 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult(
             "git",
-            "log --oneline --merges HEAD",
+            "log --oneline HEAD",
             "abc123 Merge pull request #12 from feature/z");
 
         // Act
@@ -231,7 +231,7 @@ public class GitHubRepoConnectorTests
         // Mock git log with HEAD instead of non-existent tag
         connector.AddCommandResult(
             "git",
-            "log --oneline --merges v1.0.0..HEAD",
+            "log --oneline v1.0.0..HEAD",
             "abc123 Merge pull request #15 from feature/new");
 
         // Act - using a version that doesn't exist as a tag
@@ -242,6 +242,31 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.HasCount(1, prs);
         Assert.AreEqual("15", prs[0]);
+    }
+
+    /// <summary>
+    ///     Test that GetPullRequestsBetweenTagsAsync handles squash merge commits.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_HandlesSquashMerges()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+        
+        // Mock git log with squash merge commits (PR number in parentheses)
+        connector.AddCommandResult(
+            "git",
+            "log --oneline HEAD",
+            "abc123 Fix bug with validation (#18)\ndef456 Add new feature (#19)\nghi789 Update documentation (#20)");
+
+        // Act
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
+
+        // Assert
+        Assert.HasCount(3, prs);
+        Assert.AreEqual("18", prs[0]);
+        Assert.AreEqual("19", prs[1]);
+        Assert.AreEqual("20", prs[2]);
     }
 
     /// <summary>
