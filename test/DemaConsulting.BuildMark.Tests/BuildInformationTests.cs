@@ -190,6 +190,158 @@ public class BuildInformationTests
     }
 
     /// <summary>
+    ///     Test that ToMarkdown generates correct markdown with default parameters.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert
+        Assert.Contains("# Build Report", markdown);
+        Assert.Contains("## Version Information", markdown);
+        Assert.Contains("## Changes", markdown);
+        Assert.Contains("## Bugs Fixed", markdown);
+        Assert.DoesNotContain("## Known Issues", markdown);
+        Assert.Contains("v2.0.0", markdown);
+        Assert.Contains("ver-1.1.0", markdown);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown includes known issues when requested.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
+
+        // Assert
+        Assert.Contains("## Known Issues", markdown);
+        Assert.Contains("Known bug A", markdown);
+        Assert.Contains("Known bug B", markdown);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown respects custom heading depth.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_RespectsCustomHeadingDepth()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown(headingDepth: 3);
+
+        // Assert
+        Assert.Contains("### Build Report", markdown);
+        Assert.Contains("#### Version Information", markdown);
+        Assert.Contains("#### Changes", markdown);
+        Assert.Contains("#### Bugs Fixed", markdown);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown displays N/A for empty changes table.
+    /// </summary>
+    [TestMethod]
+    public void BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges()
+    {
+        // Arrange - Create build info with no change issues
+        var buildInfo = new BuildInformation(
+            Version.Create("v1.0.0"),
+            Version.Create("v1.1.0"),
+            "abc123",
+            "def456",
+            new List<IssueInfo>(), // No changes
+            new List<IssueInfo> { new IssueInfo("2", "Bug fix", "https://example.com/2") },
+            new List<IssueInfo>());
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - Check that Changes section contains N/A
+        var changesSectionStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
+        var bugsSectionStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
+        var changesSection = markdown.Substring(changesSectionStart, bugsSectionStart - changesSectionStart);
+        Assert.Contains("| N/A | N/A |", changesSection);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown displays N/A for empty bugs table.
+    /// </summary>
+    [TestMethod]
+    public void BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs()
+    {
+        // Arrange - Create build info with no bug issues
+        var buildInfo = new BuildInformation(
+            Version.Create("v1.0.0"),
+            Version.Create("v1.1.0"),
+            "abc123",
+            "def456",
+            new List<IssueInfo> { new IssueInfo("1", "Feature", "https://example.com/1") },
+            new List<IssueInfo>(), // No bugs
+            new List<IssueInfo>());
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - Check that Bugs Fixed section contains N/A
+        var bugsSectionStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
+        var bugsSection = markdown.Substring(bugsSectionStart);
+        Assert.Contains("| N/A | N/A |", bugsSection);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown includes issue links in tables.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_IncludesIssueLinks()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert
+        Assert.Contains("[3](https://github.com/example/repo/issues/3)", markdown);
+        Assert.Contains("[2](https://github.com/example/repo/issues/2)", markdown);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown handles first release with N/A for previous version.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert
+        var versionInfoStart = markdown.IndexOf("## Version Information", StringComparison.Ordinal);
+        var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
+        var versionInfo = markdown.Substring(versionInfoStart, changesStart - versionInfoStart);
+        Assert.Contains("| **Previous Version** | N/A |", versionInfo);
+        Assert.Contains("| **Previous Commit Hash** | N/A |", versionInfo);
+    }
+
+    /// <summary>
     ///     Mock connector with no tags.
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
