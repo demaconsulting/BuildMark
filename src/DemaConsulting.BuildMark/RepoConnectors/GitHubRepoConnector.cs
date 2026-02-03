@@ -209,20 +209,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of issue IDs.</returns>
     public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
-        // Validate and fetch PR body using GitHub CLI
-        // Arguments: --json body (get body field), --jq .body (extract body value)
-        // Output: raw PR description text which may contain issue references
+        // Use GitHub API to get issues that are actually linked to close when PR merges
+        // This is more reliable than parsing PR body text which could contain any #numbers
+        // Arguments: --json closingIssuesReferences (get linked issues), --jq to extract numbers
+        // Output: issue numbers (one per line)
         var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
-        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json body --jq .body");
+        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json closingIssuesReferences --jq .closingIssuesReferences[].number");
 
-        // Extract issue references (e.g., #123, #456) from PR body text
-        var issues = new List<string>();
-        var regex = NumberReferenceRegex();
-
-        foreach (Match match in regex.Matches(output))
-        {
-            issues.Add(match.Groups[1].Value);
-        }
+        // Parse output to get issue numbers
+        var issues = output
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(n => n.Trim())
+            .Where(n => !string.IsNullOrEmpty(n))
+            .ToList();
 
         return issues;
     }
@@ -326,11 +325,4 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Compiled regular expression.</returns>
     [GeneratedRegex(@"^\d+$", RegexOptions.Compiled)]
     private static partial Regex NumericIdRegex();
-
-    /// <summary>
-    ///     Regular expression to match number references (#123).
-    /// </summary>
-    /// <returns>Compiled regular expression.</returns>
-    [GeneratedRegex(@"#(\d+)", RegexOptions.Compiled)]
-    private static partial Regex NumberReferenceRegex();
 }

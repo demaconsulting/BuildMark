@@ -370,8 +370,8 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult(
             "gh",
-            "pr view 10 --json body --jq .body",
-            "This PR fixes #123 and resolves #456");
+            "pr view 10 --json closingIssuesReferences --jq .closingIssuesReferences[].number",
+            "123\n456");
 
         // Act
         var issues = await connector.GetIssuesForPullRequestAsync("10");
@@ -392,8 +392,8 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult(
             "gh",
-            "pr view 10 --json body --jq .body",
-            "This PR has no issue references");
+            "pr view 10 --json closingIssuesReferences --jq .closingIssuesReferences[].number",
+            "");
 
         // Act
         var issues = await connector.GetIssuesForPullRequestAsync("10");
