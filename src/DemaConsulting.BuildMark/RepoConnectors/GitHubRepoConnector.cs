@@ -170,26 +170,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .Select(hash => hash.Trim())
             .ToList();
 
-        // First, try to find PR numbers in commit messages (fast path for squash merges)
-        var commitsOutput = await RunCommandAsync("git", $"log --oneline {range}");
-        var regex = NumberReferenceRegex();
-        
-        var pullRequestsFromMessages = commitsOutput
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => regex.Match(line))
-            .Where(match => match.Success)
-            .Select(match => match.Groups[1].Value)
-            .Distinct()
-            .ToList();
-
-        // If we found PRs in commit messages, return them
-        if (pullRequestsFromMessages.Count > 0)
-        {
-            return pullRequestsFromMessages;
-        }
-
-        // No PRs found in commit messages - search GitHub API for PRs containing these commits
-        // This handles cases where commits don't have PR numbers in messages (e.g., during PR development)
+        // Search GitHub API for PRs containing these commits
+        // This approach is secure because the API only returns PRs that actually contain the commits,
+        // unlike parsing commit messages which could reference unrelated PRs
         var pullRequestsFromApi = new HashSet<string>();
         
         foreach (var commitHash in commitHashes)

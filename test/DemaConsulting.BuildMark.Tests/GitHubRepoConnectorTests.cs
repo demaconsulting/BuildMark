@@ -139,11 +139,16 @@ public class GitHubRepoConnectorTests
             "log --format=%H v1.0.0..v2.0.0",
             "abc123def456\ndef456789abc");
         
-        // Mock git log for commit messages with PR numbers
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline v1.0.0..v2.0.0",
-            "abc123 Merge pull request #10 from feature/x\ndef456 Merge pull request #11 from bugfix/y");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "10");
+        
+        connector.AddCommandResult(
+            "gh",
+            "pr list --search def456789abc --json number --jq .[].number",
+            "11");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(
@@ -174,11 +179,11 @@ public class GitHubRepoConnectorTests
             "log --format=%H v1.0.0",
             "abc123def456");
         
-        // Mock git log for commit messages with PR numbers
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline v1.0.0",
-            "abc123 Merge pull request #10 from feature/x");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "10");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(null, Version.Create("v1.0.0"));
@@ -203,11 +208,11 @@ public class GitHubRepoConnectorTests
             "log --format=%H v1.0.0..HEAD",
             "abc123def456");
         
-        // Mock git log for commit messages with PR numbers
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline v1.0.0..HEAD",
-            "abc123 Merge pull request #11 from feature/y");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "11");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(Version.Create("v1.0.0"), null);
@@ -232,11 +237,11 @@ public class GitHubRepoConnectorTests
             "log --format=%H HEAD",
             "abc123def456");
         
-        // Mock git log for commit messages with PR numbers
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline HEAD",
-            "abc123 Merge pull request #12 from feature/z");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "12");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
@@ -264,11 +269,11 @@ public class GitHubRepoConnectorTests
             "log --format=%H v1.0.0..HEAD",
             "abc123def456");
         
-        // Mock git log with HEAD instead of non-existent tag
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline v1.0.0..HEAD",
-            "abc123 Merge pull request #15 from feature/new");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "15");
 
         // Act - using a version that doesn't exist as a tag
         var prs = await connector.GetPullRequestsBetweenTagsAsync(
@@ -281,10 +286,10 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that GetPullRequestsBetweenTagsAsync handles squash merge commits.
+    ///     Test that GetPullRequestsBetweenTagsAsync uses GitHub API to find PRs by commit hash.
     /// </summary>
     [TestMethod]
-    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_HandlesSquashMerges()
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_UsesGitHubApiToFindPRs()
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
@@ -295,11 +300,21 @@ public class GitHubRepoConnectorTests
             "log --format=%H HEAD",
             "abc123def456\ndef456789abc\n789abcdef123");
         
-        // Mock git log with squash merge commits (PR number in parentheses)
+        // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
-            "git",
-            "log --oneline HEAD",
-            "abc123 Fix bug with validation (#18)\ndef456 Add new feature (#19)\n789abc Update documentation (#20)");
+            "gh",
+            "pr list --search abc123def456 --json number --jq .[].number",
+            "18");
+        
+        connector.AddCommandResult(
+            "gh",
+            "pr list --search def456789abc --json number --jq .[].number",
+            "19");
+        
+        connector.AddCommandResult(
+            "gh",
+            "pr list --search 789abcdef123 --json number --jq .[].number",
+            "20");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
@@ -312,27 +327,21 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that GetPullRequestsBetweenTagsAsync uses GitHub API when no PR numbers in messages.
+    ///     Test that GetPullRequestsBetweenTagsAsync deduplicates PRs when multiple commits belong to same PR.
     /// </summary>
     [TestMethod]
-    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_UsesGitHubApiWhenNoPrNumbersInMessages()
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_DeduplicatesPRs()
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
         
-        // Mock git log for commit hashes (commits without PR numbers in messages)
+        // Mock git log for commit hashes (multiple commits from same PR)
         connector.AddCommandResult(
             "git",
             "log --format=%H HEAD",
             "5e541195f387259ee8d72d33b70579a0f7b6fde4\nc3eb81cd24b9d054a626a9785b16975f0808ecb2");
         
-        // Mock git log for commit messages (no PR numbers)
-        connector.AddCommandResult(
-            "git",
-            "log --oneline HEAD",
-            "5e54119 Fix spelling error in test mock commit hash\nc3eb81c Support squash merges by parsing all commits for PR references");
-        
-        // Mock GitHub CLI to search for PRs by commit hash
+        // Mock GitHub CLI to search for PRs by commit hash - both commits are from PR 20
         connector.AddCommandResult(
             "gh",
             "pr list --search 5e541195f387259ee8d72d33b70579a0f7b6fde4 --json number --jq .[].number",
