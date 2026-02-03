@@ -129,7 +129,9 @@ internal sealed class Context : IDisposable
         {
             _logWriter = new StreamWriter(logFile, append: false);
         }
-        // Generic catch is justified here to wrap any file system exception with context
+        // Generic catch is justified here to wrap any file system exception with context.
+        // Expected exceptions include IOException, UnauthorizedAccessException, ArgumentException,
+        // NotSupportedException, and other file system-related exceptions.
         catch (Exception ex)
         {
             throw new InvalidOperationException($"Failed to open log file '{logFile}': {ex.Message}", ex);
