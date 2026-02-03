@@ -462,7 +462,7 @@ public class ContextTests
         using var context = Context.Create([]);
 
         // Capture console output
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {
@@ -490,7 +490,7 @@ public class ContextTests
         using var context = Context.Create(["--silent"]);
 
         // Capture console output
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {
@@ -549,7 +549,7 @@ public class ContextTests
         using var context = Context.Create([]);
 
         // Capture console output
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {
@@ -577,7 +577,7 @@ public class ContextTests
         using var context = Context.Create(["--silent"]);
 
         // Capture console output
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {
@@ -639,7 +639,7 @@ public class ContextTests
         Assert.AreEqual(0, context.ExitCode);
 
         // Capture console output to avoid displaying error
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {
@@ -667,7 +667,7 @@ public class ContextTests
         using var context = Context.Create([]);
 
         // Capture console output to avoid displaying messages
-        var output = new StringWriter();
+        using var output = new StringWriter();
         var originalOut = Console.Out;
         try
         {

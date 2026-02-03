@@ -113,23 +113,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             // No versions specified, use all of HEAD
             range = "HEAD";
         }
-        else if (from == null && to != null)
+        else if (from == null)
         {
-            // Only end version specified
-            range = ValidateTag(to.Tag);
+            // Only end version specified (to is not null here)
+            range = ValidateTag(to!.Tag);
         }
-        else if (to == null && from != null)
+        else if (to == null)
         {
-            // Only start version specified, range to HEAD
+            // Only start version specified, range to HEAD (from is not null here)
             range = $"{ValidateTag(from.Tag)}..HEAD";
         }
         else
         {
-            // Both versions specified
-            if (from == null || to == null)
-            {
-                throw new InvalidOperationException("Unexpected null version");
-            }
+            // Both versions specified (both from and to are not null here)
             range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
         }
 
@@ -140,17 +136,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
         // Extract pull request numbers from merge commit messages
         // Each line is parsed for "#<number>" pattern to identify the PR
-        var pullRequests = new List<string>();
         var regex = NumberReferenceRegex();
 
-        foreach (var line in output.Split('\n', StringSplitOptions.RemoveEmptyEntries))
-        {
-            var match = regex.Match(line);
-            if (match.Success)
-            {
-                pullRequests.Add(match.Groups[1].Value);
-            }
-        }
+        var pullRequests = output
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => regex.Match(line))
+            .Where(match => match.Success)
+            .Select(match => match.Groups[1].Value)
+            .ToList();
 
         return pullRequests;
     }
@@ -209,20 +202,15 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         // Map labels to standardized issue types
-        foreach (var label in labels)
-        {
-            var lowerLabel = label.ToLowerInvariant();
-            foreach (var (key, value) in LabelTypeMap)
-            {
-                if (lowerLabel.Contains(key))
-                {
-                    return value;
-                }
-            }
-        }
+        var matchingType = labels
+            .Select(label => label.ToLowerInvariant())
+            .SelectMany(lowerLabel => LabelTypeMap
+                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Select(kvp => kvp.Value))
+            .FirstOrDefault();
 
-        // Default type when no recognized label found
-        return "other";
+        // Return matching type or default when no recognized label found
+        return matchingType ?? "other";
     }
 
     /// <summary>
