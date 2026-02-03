@@ -8,3 +8,22 @@ paths-ignore:
   - '**/TestResults/**'
   - '**/*.Designer.cs'
   - '**/*.generated.cs'
+
+# Query filters to exclude specific queries for certain paths
+query-filters:
+  # Exclude warnings in generated code
+  - exclude:
+      id: cs/useless-assignment-to-local
+    paths:
+      - '**/obj/**/generated/**/*.cs'
+  - exclude:
+      id: cs/nested-if-statements
+    paths:
+      - '**/obj/**/generated/**/*.cs'
+  # Exclude justified generic exception handlers
+  - exclude:
+      id: cs/catch-of-all-exceptions
+    paths:
+      - src/DemaConsulting.BuildMark/Context.cs
+      - src/DemaConsulting.BuildMark/Program.cs
+      - src/DemaConsulting.BuildMark/RepoConnectors/ProcessRunner.cs
