@@ -56,44 +56,83 @@ internal static class Program
             // Create context from command-line arguments
             using var context = Context.Create(args);
 
-            // Handle version display request
-            if (context.Version)
-            {
-                context.WriteLine($"BuildMark version {Version}");
-                return context.ExitCode;
-            }
+            // Run the program logic
+            Run(context);
 
-            // Handle help display request
-            if (context.Help)
-            {
-                ShowHelp(context);
-                return context.ExitCode;
-            }
-
-            // Display placeholder message for unhandled arguments
-            context.WriteLine("Hello from BuildMark!");
+            // Return the exit code from the context
             return context.ExitCode;
         }
         catch (ArgumentException ex)
         {
+            // Print expected argument exceptions and return error code
             Console.WriteLine($"Error: {ex.Message}");
             return 1;
         }
         catch (InvalidOperationException ex)
         {
+            // Print expected operation exceptions and return error code
             Console.WriteLine($"Error: {ex.Message}");
             return 1;
+        }
+        catch (Exception ex)
+        {
+            // Print unexpected exceptions and re-throw to generate event logs
+            Console.WriteLine($"Unexpected error: {ex.Message}");
+            throw;
         }
     }
 
     /// <summary>
-    ///     Shows the help message.
+    ///     Runs the program logic based on the provided context.
     /// </summary>
-    /// <param name="context">Context for output.</param>
-    private static void ShowHelp(Context context)
+    /// <param name="context">The context containing command line arguments and program state.</param>
+    public static void Run(Context context)
     {
-        context.WriteLine("BuildMark - Tool to generate Markdown Build Notes");
+        // Priority 1: Version query
+        if (context.Version)
+        {
+            Console.WriteLine(Version);
+            return;
+        }
+
+        // Print application banner
+        PrintBanner(context);
+
+        // Priority 2: Help
+        if (context.Help)
+        {
+            PrintHelp(context);
+            return;
+        }
+
+        // Priority 3: Self-Validation
+        if (context.Validate)
+        {
+            Validation.Run(context);
+            return;
+        }
+
+        // Priority 4: Build notes processing
+        ProcessBuildNotes(context);
+    }
+
+    /// <summary>
+    ///     Prints the application banner.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    private static void PrintBanner(Context context)
+    {
+        context.WriteLine($"BuildMark version {Version}");
+        context.WriteLine("Copyright (c) DEMA Consulting");
         context.WriteLine("");
+    }
+
+    /// <summary>
+    ///     Prints usage information.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    private static void PrintHelp(Context context)
+    {
         context.WriteLine("Usage: buildmark [options]");
         context.WriteLine("");
         context.WriteLine("Options:");
@@ -106,5 +145,72 @@ internal static class Program
         context.WriteLine("  --build-version <version>    Specify the build version");
         context.WriteLine("  --report <file>              Specify the report file name");
         context.WriteLine("  --report-depth <depth>       Specify the report markdown depth (default: 1)");
+    }
+
+    /// <summary>
+    ///     Processes build notes and generates markdown output.
+    /// </summary>
+    /// <param name="context">The context containing command line arguments and program state.</param>
+    private static void ProcessBuildNotes(Context context)
+    {
+        // Create repository connector
+        var connector = RepoConnectorFactory.Create();
+
+        // Parse build version if provided
+        DemaConsulting.BuildMark.Version? buildVersion = null;
+        if (context.BuildVersion != null)
+        {
+            try
+            {
+                buildVersion = DemaConsulting.BuildMark.Version.Create(context.BuildVersion);
+            }
+            catch (ArgumentException)
+            {
+                context.WriteError($"Error: Invalid build version format: {context.BuildVersion}");
+                return;
+            }
+        }
+
+        // Create build information
+        context.WriteLine("Generating build information...");
+        BuildInformation buildInfo;
+        try
+        {
+            buildInfo = BuildInformation.CreateAsync(connector, buildVersion).GetAwaiter().GetResult();
+        }
+        catch (InvalidOperationException ex)
+        {
+            context.WriteError($"Error: {ex.Message}");
+            return;
+        }
+
+        // Display build information summary
+        context.WriteLine($"Build Version: {buildInfo.ToVersion.Tag}");
+        context.WriteLine($"Commit Hash: {buildInfo.ToHash}");
+        if (buildInfo.FromVersion != null)
+        {
+            context.WriteLine($"Previous Version: {buildInfo.FromVersion.Tag}");
+            context.WriteLine($"Previous Commit Hash: {buildInfo.FromHash}");
+        }
+        context.WriteLine($"Changes: {buildInfo.ChangeIssues.Count}");
+        context.WriteLine($"Bugs Fixed: {buildInfo.BugIssues.Count}");
+        context.WriteLine($"Known Issues: {buildInfo.KnownIssues.Count}");
+
+        // Export markdown report if requested
+        if (context.ReportFile != null)
+        {
+            context.WriteLine($"Writing build report to {context.ReportFile}...");
+            try
+            {
+                var markdown = buildInfo.ToMarkdown(context.ReportDepth);
+                File.WriteAllText(context.ReportFile, markdown);
+                context.WriteLine("Build report generated successfully.");
+            }
+            // Generic catch is justified here as a top-level handler to log any error without crashing
+            catch (Exception ex)
+            {
+                context.WriteError($"Error: Failed to write report: {ex.Message}");
+            }
+        }
     }
 }
