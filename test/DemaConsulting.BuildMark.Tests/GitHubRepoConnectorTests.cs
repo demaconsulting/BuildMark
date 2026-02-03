@@ -311,7 +311,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
-        connector.AddCommandResult("gh", "issue view 123 --json labels --jq '.labels[].name'", "bug\npriority:high");
+        connector.AddCommandResult("gh", "issue view 123 --json labels --jq .labels[].name", "bug\npriority:high");
 
         // Act
         var type = await connector.GetIssueTypeAsync("123");
@@ -328,7 +328,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
-        connector.AddCommandResult("gh", "issue view 123 --json labels --jq '.labels[].name'", "enhancement");
+        connector.AddCommandResult("gh", "issue view 123 --json labels --jq .labels[].name", "enhancement");
 
         // Act
         var type = await connector.GetIssueTypeAsync("123");
@@ -345,7 +345,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
-        connector.AddCommandResult("gh", "issue view 123 --json labels --jq '.labels[].name'", "question");
+        connector.AddCommandResult("gh", "issue view 123 --json labels --jq .labels[].name", "question");
 
         // Act
         var type = await connector.GetIssueTypeAsync("123");

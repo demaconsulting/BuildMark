@@ -226,10 +226,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<string> GetIssueTypeAsync(string issueId)
     {
         // Validate and fetch issue labels using GitHub CLI
-        // Arguments: --json labels (get labels array), --jq '.labels[].name' (extract label names)
+        // Arguments: --json labels (get labels array), --jq .labels[].name (extract label names)
         // Output: one label name per line
         var validatedId = ValidateId(issueId, nameof(issueId));
-        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq '.labels[].name'");
+        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq .labels[].name");
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         // Map labels to standardized issue types
@@ -279,9 +279,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<List<string>> GetOpenIssuesAsync()
     {
         // Fetch all open issue numbers using GitHub CLI
-        // Arguments: --state open (open issues only), --json number (get number field), --jq '.[].number' (extract numbers from array)
+        // Arguments: --state open (open issues only), --json number (get number field), --jq .[].number (extract numbers from array)
         // Output: one issue number per line
-        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq '.[].number'");
+        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq .[].number");
 
         // Parse output into list of issue IDs
         return output
