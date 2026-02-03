@@ -257,7 +257,7 @@ public class GitHubRepoConnectorTests
         connector.AddCommandResult(
             "git",
             "log --oneline HEAD",
-            "abc123 Fix bug with validation (#18)\ndef456 Add new feature (#19)\nghi789 Update documentation (#20)");
+            "abc123 Fix bug with validation (#18)\ndef456 Add new feature (#19)\n789abc Update documentation (#20)");
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
