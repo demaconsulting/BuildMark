@@ -297,7 +297,7 @@ jobs:
           dotnet sonarmark
           --server https://sonarcloud.io
           --project-key demaconsulting_BuildMark
-          --branch ${{ github.ref_name }}
+          --branch ${{ github.head_ref || github.ref_name }}
           --token "$env:SONAR_TOKEN"
           --report docs/quality/sonar-quality.md
           --report-depth 1
