@@ -108,13 +108,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         try
         {
             // Try to resolve the tag to a commit hash
-            // If tag doesn't exist, git will fail with non-zero exit code
+            // If tag doesn't exist, RunCommandAsync will throw InvalidOperationException
             await RunCommandAsync("git", $"rev-parse --verify {ValidateTag(tag)}");
             return true;
         }
-        catch
+        catch (InvalidOperationException)
         {
-            // Tag doesn't exist or other error occurred
+            // Tag doesn't exist
             return false;
         }
     }
