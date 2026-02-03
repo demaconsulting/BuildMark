@@ -206,7 +206,8 @@ internal static class Program
                 File.WriteAllText(context.ReportFile, markdown);
                 context.WriteLine("Build report generated successfully.");
             }
-            // Generic catch is justified here as a top-level handler to log any error without crashing
+            // Generic catch is justified here to handle any file system exception gracefully
+            // and allow the program to continue execution rather than crashing
             catch (Exception ex)
             {
                 context.WriteError($"Error: Failed to write report: {ex.Message}");
