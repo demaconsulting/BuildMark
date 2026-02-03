@@ -261,6 +261,15 @@ jobs:
           name: artifacts-windows-latest
           path: packages
 
+      - name: Install BuildMark Tool
+        shell: bash
+        run: |
+          echo "Installing BuildMark version ${{ inputs.version }}"
+          dotnet tool install --global \
+            --add-source packages \
+            --version ${{ inputs.version }} \
+            DemaConsulting.BuildMark
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -313,15 +322,6 @@ jobs:
         run: |
           echo "=== SonarCloud Quality Report ==="
           cat docs/quality/sonar-quality.md
-
-      - name: Install BuildMark Tool
-        shell: bash
-        run: |
-          echo "Installing BuildMark version ${{ inputs.version }}"
-          dotnet tool install --global \
-            --add-source packages \
-            --version ${{ inputs.version }} \
-            DemaConsulting.BuildMark
 
       - name: Generate Build Notes with BuildMark
         shell: bash
