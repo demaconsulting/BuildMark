@@ -255,6 +255,12 @@ jobs:
       - name: Restore Tools
         run: dotnet tool restore
 
+      - name: Download BuildMark Package
+        uses: actions/download-artifact@v7
+        with:
+          name: artifacts-windows-latest
+          path: packages
+
       - name: Setup Node.js
         uses: actions/setup-node@v6
         with:
@@ -308,18 +314,12 @@ jobs:
           echo "=== SonarCloud Quality Report ==="
           cat docs/quality/sonar-quality.md
 
-      - name: Download BuildMark Package
-        uses: actions/download-artifact@v7
-        with:
-          name: artifacts-windows-latest
-          path: buildmark-package
-
       - name: Install BuildMark Tool
         shell: bash
         run: |
           echo "Installing BuildMark version ${{ inputs.version }}"
           dotnet tool install --global \
-            --add-source buildmark-package \
+            --add-source packages \
             --version ${{ inputs.version }} \
             DemaConsulting.BuildMark
 
@@ -344,6 +344,7 @@ jobs:
           --defaults docs/buildnotes/definition.yaml
           --metadata version="${{ inputs.version }}"
           --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
           --output docs/buildnotes/buildnotes.html
 
       - name: Convert Build Notes HTML to PDF with Weasyprint
@@ -359,6 +360,7 @@ jobs:
           --defaults docs/quality/definition.yaml
           --metadata version="${{ inputs.version }}"
           --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
           --output docs/quality/quality.html
 
       - name: Convert Code Quality HTML to PDF with Weasyprint

@@ -4,9 +4,9 @@ This document contains the build notes for the BuildMark project.
 
 ## Purpose
 
-This report serves as a comprehensive record of changes, bug fixes, and known issues
-for this release of BuildMark. It provides transparency about what has changed since
-the previous version and helps users understand the improvements and fixes included
+This report serves as a comprehensive record of changes and bug fixes for this
+release of BuildMark. It provides transparency about what has changed since the
+previous version and helps users understand the improvements and fixes included
 in this build.
 
 ## Scope
@@ -16,7 +16,6 @@ This build notes report covers:
 - Version information and commit details
 - Changes and new features implemented
 - Bugs fixed in this release
-- Known issues and limitations
 
 ## Generation Source
 
