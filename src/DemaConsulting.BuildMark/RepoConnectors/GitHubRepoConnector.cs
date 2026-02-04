@@ -99,6 +99,152 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets the list of changes between two versions.
+    /// </summary>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
+    /// <returns>List of changes with full information.</returns>
+    public override async Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    {
+        // Get commits using GitHub API
+        string commitHashesOutput;
+
+        if (from == null && to == null)
+        {
+            // No versions specified, get all commits using paginated API
+            commitHashesOutput = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate --jq .[].sha");
+        }
+        else if (from == null)
+        {
+            // Only end version specified - get commits up to 'to' tag/HEAD
+            var toExists = to != null && await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
+        }
+        else if (to == null)
+        {
+            // Only start version specified - compare from tag to HEAD
+            var fromTag = ValidateTag(from.Tag);
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha");
+        }
+        else
+        {
+            // Both versions specified - compare from tag to to tag/HEAD
+            var fromTag = ValidateTag(from.Tag);
+            var toExists = await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
+        }
+
+        // Batch fetch PR information with all details in one call
+        string prDataOutput;
+        try
+        {
+            // Fetch PRs with all required fields: number, title, url, and labels
+            prDataOutput = await RunCommandAsync(
+                "gh",
+                "pr list --state all --json number,title,url,labels,closingIssuesReferences --jq '.[] | @json'",
+                commitHashesOutput);
+        }
+        catch (InvalidOperationException)
+        {
+            // Fallback to empty result if batch query fails
+            return new List<ChangeData>();
+        }
+
+        // Parse PR data and extract changes
+        var changes = new List<ChangeData>();
+        var processedIssues = new HashSet<string>();
+
+        var prLines = prDataOutput
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrEmpty(line));
+
+        foreach (var prLine in prLines)
+        {
+            try
+            {
+                // Parse the JSON for this PR
+                var prData = System.Text.Json.JsonDocument.Parse(prLine);
+                var root = prData.RootElement;
+
+                var prNumber = root.GetProperty("number").GetInt32().ToString();
+                var prTitle = root.GetProperty("title").GetString() ?? $"PR #{prNumber}";
+                var prUrl = root.GetProperty("url").GetString() ?? string.Empty;
+
+                // Get closing issues if any
+                var hasIssues = false;
+                if (root.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    foreach (var issue in issuesElement.EnumerateArray())
+                    {
+                        if (issue.TryGetProperty("number", out var issueNumberElement))
+                        {
+                            var issueNumber = issueNumberElement.GetInt32().ToString();
+                            
+                            // Skip if already processed
+                            if (processedIssues.Contains(issueNumber))
+                            {
+                                continue;
+                            }
+                            processedIssues.Add(issueNumber);
+
+                            // Fetch issue details
+                            var issueTitle = await GetIssueTitleAsync(issueNumber);
+                            var issueUrl = await GetIssueUrlAsync(issueNumber);
+                            var issueType = await GetIssueTypeAsync(issueNumber);
+
+                            changes.Add(new ChangeData(issueNumber, issueTitle, issueUrl, issueType));
+                            hasIssues = true;
+                        }
+                    }
+                }
+
+                // If PR has no issues, treat the PR itself as a change
+                if (!hasIssues)
+                {
+                    // Determine type from PR labels
+                    var prType = "other";
+                    if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    {
+                        var labels = new List<string>();
+                        foreach (var label in labelsElement.EnumerateArray())
+                        {
+                            if (label.TryGetProperty("name", out var labelName))
+                            {
+                                labels.Add(labelName.GetString() ?? string.Empty);
+                            }
+                        }
+
+                        // Map labels to type
+                        var matchingType = labels
+                            .Select(label => label.ToLowerInvariant())
+                            .SelectMany(lowerLabel => LabelTypeMap
+                                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                                .Select(kvp => kvp.Value))
+                            .FirstOrDefault();
+
+                        if (matchingType != null)
+                        {
+                            prType = matchingType;
+                        }
+                    }
+
+                    changes.Add(new ChangeData($"#{prNumber}", prTitle, prUrl, prType));
+                }
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // Skip malformed JSON
+                continue;
+            }
+        }
+
+        return changes;
+    }
+
+    /// <summary>
     ///     Checks if a git tag exists in the repository.
     /// </summary>
     /// <param name="tag">Tag name to check.</param>

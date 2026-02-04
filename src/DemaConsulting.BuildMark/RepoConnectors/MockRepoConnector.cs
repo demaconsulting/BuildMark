@@ -78,6 +78,48 @@ public class MockRepoConnector : IRepoConnector
     }
 
     /// <summary>
+    ///     Gets the list of changes between two versions.
+    /// </summary>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
+    /// <returns>List of changes with full information.</returns>
+    public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    {
+        // Get the PRs in the range
+        var prs = GetPullRequestsBetweenTagsAsync(from, to).Result;
+        var changes = new List<ChangeData>();
+
+        foreach (var pr in prs)
+        {
+            // Get issues for this PR
+            var issues = GetIssuesForPullRequestAsync(pr).Result;
+
+            if (issues.Count > 0)
+            {
+                // PR has associated issues - add them as changes
+                foreach (var issueId in issues)
+                {
+                    var title = GetIssueTitleAsync(issueId).Result;
+                    var url = GetIssueUrlAsync(issueId).Result;
+                    var type = GetIssueTypeAsync(issueId).Result;
+                    changes.Add(new ChangeData(issueId, title, url, type));
+                }
+            }
+            else
+            {
+                // PR has no issues - treat the PR itself as a change
+                changes.Add(new ChangeData(
+                    $"#{pr}",
+                    $"PR #{pr}",
+                    $"https://github.com/example/repo/pull/{pr}",
+                    "other"));
+            }
+        }
+
+        return Task.FromResult(changes);
+    }
+
+    /// <summary>
     ///     Gets the list of pull request IDs between two versions.
     /// </summary>
     /// <param name="from">Starting version (null for start of history).</param>

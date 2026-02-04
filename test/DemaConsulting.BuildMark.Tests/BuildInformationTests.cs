@@ -263,9 +263,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<IssueInfo>(), // No changes
-            new List<IssueInfo> { new IssueInfo("2", "Bug fix", "https://example.com/2") },
-            new List<IssueInfo>());
+            new List<ChangeInfo>(), // No changes
+            new List<ChangeInfo> { new ChangeInfo("2", "Bug fix", "https://example.com/2") },
+            new List<ChangeInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -289,9 +289,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<IssueInfo> { new IssueInfo("1", "Feature", "https://example.com/1") },
-            new List<IssueInfo>(), // No bugs
-            new List<IssueInfo>());
+            new List<ChangeInfo> { new ChangeInfo("1", "Feature", "https://example.com/1") },
+            new List<ChangeInfo>(), // No bugs
+            new List<ChangeInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -347,6 +347,7 @@ public class BuildInformationTests
     private class MockRepoConnectorEmpty : IRepoConnector
     {
         public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
+        public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeData>());
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -365,6 +366,7 @@ public class BuildInformationTests
         {
             return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
         }
+        public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeData>());
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
@@ -388,6 +390,7 @@ public class BuildInformationTests
                 Version.Create("v2.0.0")
             });
         }
+        public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeData>());
         public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
         public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
         public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");

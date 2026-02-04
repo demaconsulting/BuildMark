@@ -44,6 +44,14 @@ public abstract class RepoConnectorBase : IRepoConnector
     public abstract Task<List<Version>> GetTagHistoryAsync();
 
     /// <summary>
+    ///     Gets the list of changes between two versions.
+    /// </summary>
+    /// <param name="from">Starting version (null for start of history).</param>
+    /// <param name="to">Ending version (null for current state).</param>
+    /// <returns>List of changes with full information.</returns>
+    public abstract Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to);
+
+    /// <summary>
     ///     Gets the list of pull request IDs between two versions.
     /// </summary>
     /// <param name="from">Starting version (null for start of history).</param>

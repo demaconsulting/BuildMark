@@ -21,12 +21,21 @@
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
-///     Represents information about an issue.
+///     Represents information about a change (issue or PR).
 /// </summary>
-/// <param name="Id">Issue ID.</param>
-/// <param name="Title">Issue title.</param>
-/// <param name="Url">Issue URL.</param>
-public record IssueInfo(string Id, string Title, string Url);
+/// <param name="Id">Change ID.</param>
+/// <param name="Title">Change title.</param>
+/// <param name="Url">Change URL.</param>
+public record ChangeInfo(string Id, string Title, string Url);
+
+/// <summary>
+///     Represents detailed change data including type information.
+/// </summary>
+/// <param name="Id">Change ID.</param>
+/// <param name="Title">Change title.</param>
+/// <param name="Url">Change URL.</param>
+/// <param name="Type">Change type (bug, feature, etc.).</param>
+public record ChangeData(string Id, string Title, string Url, string Type);
 
 /// <summary>
 ///     Represents build information for a release.
@@ -43,9 +52,9 @@ public record BuildInformation(
     Version ToVersion,
     string? FromHash,
     string ToHash,
-    List<IssueInfo> ChangeIssues,
-    List<IssueInfo> BugIssues,
-    List<IssueInfo> KnownIssues)
+    List<ChangeInfo> ChangeIssues,
+    List<ChangeInfo> BugIssues,
+    List<ChangeInfo> KnownIssues)
 {
     /// <summary>
     ///     Creates a BuildInformation record from a repository connector.
@@ -158,56 +167,42 @@ public record BuildInformation(
             }
         }
 
-        // Collect all pull requests and their associated issues in version range
-        var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromTagInfo, toTagInfo);
-        var allIssues = new HashSet<string>();
-        var bugIssues = new List<IssueInfo>();
-        var changeIssues = new List<IssueInfo>();
+        // Collect all changes (issues and PRs) in version range
+        var changes = await connector.GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
+        var allChangeIds = new HashSet<string>();
+        var bugIssues = new List<ChangeInfo>();
+        var changeIssues = new List<ChangeInfo>();
 
-        // Process each pull request to extract and categorize issues
-        foreach (var pr in pullRequests)
+        // Process and categorize each change
+        foreach (var change in changes)
         {
-            // Get all issues referenced by this pull request
-            var issueIds = await connector.GetIssuesForPullRequestAsync(pr);
-
-            foreach (var issueId in issueIds)
+            // Skip changes already processed
+            if (allChangeIds.Contains(change.Id))
             {
-                // Skip issues already processed
-                if (allIssues.Contains(issueId))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                // Mark issue as processed
-                allIssues.Add(issueId);
+            // Mark change as processed
+            allChangeIds.Add(change.Id);
 
-                // Fetch issue details
-                var title = await connector.GetIssueTitleAsync(issueId);
-                var url = await connector.GetIssueUrlAsync(issueId);
-                var type = await connector.GetIssueTypeAsync(issueId);
-
-                // Create issue record
-                var issueInfo = new IssueInfo(issueId, title, url);
-
-                // Categorize issue by type
-                if (type == "bug")
-                {
-                    bugIssues.Add(issueInfo);
-                }
-                else
-                {
-                    changeIssues.Add(issueInfo);
-                }
+            // Categorize change by type
+            if (change.Type == "bug")
+            {
+                bugIssues.Add(new ChangeInfo(change.Id, change.Title, change.Url));
+            }
+            else
+            {
+                changeIssues.Add(new ChangeInfo(change.Id, change.Title, change.Url));
             }
         }
 
         // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = new List<IssueInfo>();
+        var knownIssues = new List<ChangeInfo>();
         var openIssueIds = await connector.GetOpenIssuesAsync();
         foreach (var issueId in openIssueIds)
         {
             // Skip issues already fixed in this build
-            if (allIssues.Contains(issueId))
+            if (allChangeIds.Contains(issueId))
             {
                 continue;
             }
@@ -218,7 +213,7 @@ public record BuildInformation(
             {
                 var title = await connector.GetIssueTitleAsync(issueId);
                 var url = await connector.GetIssueUrlAsync(issueId);
-                knownIssues.Add(new IssueInfo(issueId, title, url));
+                knownIssues.Add(new ChangeInfo(issueId, title, url));
             }
         }
 
