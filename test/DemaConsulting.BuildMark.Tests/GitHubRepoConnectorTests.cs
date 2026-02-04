@@ -29,13 +29,6 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     private readonly HashSet<string> _commandExceptions = new();
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="TestableGitHubRepoConnector" /> class for testing.
-    /// </summary>
-    public TestableGitHubRepoConnector()
-    {
-    }
-
-    /// <summary>
     ///     Adds a command result for testing.
     /// </summary>
     /// <param name="command">Command name.</param>

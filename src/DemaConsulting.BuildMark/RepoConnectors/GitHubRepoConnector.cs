@@ -116,9 +116,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of changes with full information.</returns>
     public override async Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
-        // Note: We fetch all PRs and issues regardless of the version range
-        // This is a simplified approach compared to filtering by commits
-        // The gh CLI doesn't have a direct way to filter PRs by commit range either
+        // Note: Currently fetches all PRs and issues regardless of version range.
+        // Version filtering would require mapping commits to PRs, which is complex.
+        // The from/to parameters are preserved for future enhancement.
 
         // Batch fetch PR information with all details in one call
         List<PullRequest> allPullRequests;
@@ -150,9 +150,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 page++;
             }
         }
-        catch (Exception)
+        catch (RateLimitExceededException)
         {
-            // Fallback to empty result if batch query fails
+            // API rate limit exceeded - return empty result
+            return new List<ItemInfo>();
+        }
+        catch (ApiException ex) when (ex.StatusCode == System.Net.HttpStatusCode.NotFound)
+        {
+            // Repository not found or not accessible - return empty result
+            return new List<ItemInfo>();
+        }
+        catch (ApiException)
+        {
+            // Other API errors - return empty result
             return new List<ItemInfo>();
         }
 
@@ -247,7 +257,16 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     issuePage++;
                 }
             }
-            catch (Exception)
+            catch (RateLimitExceededException)
+            {
+                // If rate limit exceeded, create fallback entries
+                foreach (var issueNumber in issueNumbers)
+                {
+                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : issueNumber;
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber.ToString(), $"Issue #{issueNumber}", string.Empty, "other", index);
+                }
+            }
+            catch (ApiException)
             {
                 // If we can't fetch issue list, create fallback entries
                 foreach (var issueNumber in issueNumbers)
@@ -356,9 +375,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 page++;
             }
         }
-        catch (Exception)
+        catch (RateLimitExceededException)
         {
-            // Return empty list if query fails
+            // Return empty list if rate limit exceeded
+            return new List<ItemInfo>();
+        }
+        catch (ApiException)
+        {
+            // Return empty list if API query fails
             return new List<ItemInfo>();
         }
 
