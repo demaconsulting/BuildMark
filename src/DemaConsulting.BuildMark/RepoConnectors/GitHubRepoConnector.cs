@@ -155,8 +155,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
         // Parse PR data and extract changes
         var changes = new List<ItemInfo>();
-        var processedIssues = new HashSet<string>();
+        var issueNumbers = new HashSet<string>();
+        var prData = new List<(string number, string title, string url, List<string> issueNums)>();
 
+        // First pass: collect issue numbers and PR data
         foreach (var prElement in prArray)
         {
             try
@@ -165,8 +167,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 var prTitle = prElement.GetProperty("title").GetString() ?? $"PR #{prNumber}";
                 var prUrl = prElement.GetProperty("url").GetString() ?? string.Empty;
 
-                // Get closing issues if any
-                var hasIssues = false;
+                var prIssues = new List<string>();
                 if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var issue in issuesElement.EnumerateArray())
@@ -174,61 +175,45 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                         if (issue.TryGetProperty("number", out var issueNumberElement))
                         {
                             var issueNumber = issueNumberElement.GetInt32().ToString();
-                            
-                            // Skip if already processed
-                            if (processedIssues.Contains(issueNumber))
-                            {
-                                continue;
-                            }
-                            processedIssues.Add(issueNumber);
-
-                            // Extract issue details from the JSON
-                            var issueTitle = issue.TryGetProperty("title", out var titleElem) ? 
-                                titleElem.GetString() ?? $"Issue #{issueNumber}" : 
-                                $"Issue #{issueNumber}";
-                            var issueUrl = issue.TryGetProperty("url", out var urlElem) ? 
-                                urlElem.GetString() ?? string.Empty : 
-                                string.Empty;
-
-                            // Determine type from issue labels
-                            var issueType = "other";
-                            if (issue.TryGetProperty("labels", out var issueLabelsElement) && issueLabelsElement.ValueKind == JsonValueKind.Array)
-                            {
-                                var labels = new List<string>();
-                                foreach (var label in issueLabelsElement.EnumerateArray())
-                                {
-                                    if (label.TryGetProperty("name", out var labelName))
-                                    {
-                                        labels.Add(labelName.GetString() ?? string.Empty);
-                                    }
-                                }
-
-                                // Map labels to type
-                                var matchingType = labels
-                                    .Select(label => label.ToLowerInvariant())
-                                    .SelectMany(lowerLabel => LabelTypeMap
-                                        .Where(kvp => lowerLabel.Contains(kvp.Key))
-                                        .Select(kvp => kvp.Value))
-                                    .FirstOrDefault();
-
-                                if (matchingType != null)
-                                {
-                                    issueType = matchingType;
-                                }
-                            }
-
-                            changes.Add(new ItemInfo(issueNumber, issueTitle, issueUrl, issueType));
-                            hasIssues = true;
+                            issueNumbers.Add(issueNumber);
+                            prIssues.Add(issueNumber);
                         }
                     }
                 }
 
-                // If PR has no issues, treat the PR itself as a change
-                if (!hasIssues)
+                prData.Add((prNumber, prTitle, prUrl, prIssues));
+            }
+            catch (JsonException)
+            {
+                // Skip malformed JSON
+            }
+        }
+
+        // Second pass: batch fetch all issue details using issue list
+        var issueDetailsMap = new Dictionary<string, ItemInfo>();
+        if (issueNumbers.Count > 0)
+        {
+            try
+            {
+                var issuesOutput = await RunCommandAsync("gh", "issue list --state all --limit 1000 --json number,title,url,labels");
+                var issuesDoc = JsonDocument.Parse(issuesOutput);
+                
+                foreach (var issueElement in issuesDoc.RootElement.EnumerateArray())
                 {
-                    // Determine type from PR labels
-                    var prType = "other";
-                    if (prElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
+                    var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
+                    
+                    // Only process issues that are referenced by PRs
+                    if (!issueNumbers.Contains(issueNumber))
+                    {
+                        continue;
+                    }
+
+                    var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
+                    var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
+
+                    // Determine type from labels
+                    var issueType = "other";
+                    if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
                     {
                         var labels = new List<string>();
                         foreach (var label in labelsElement.EnumerateArray())
@@ -249,16 +234,74 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
                         if (matchingType != null)
                         {
-                            prType = matchingType;
+                            issueType = matchingType;
                         }
                     }
 
-                    changes.Add(new ItemInfo($"#{prNumber}", prTitle, prUrl, prType));
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType);
                 }
             }
-            catch (JsonException)
+            catch (Exception)
             {
-                // Skip malformed JSON
+                // If we can't fetch issue list, create fallback entries
+                foreach (var issueNumber in issueNumbers)
+                {
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other");
+                }
+            }
+        }
+
+        // Third pass: add issues to changes list (avoiding duplicates)
+        var addedIssues = new HashSet<string>();
+        foreach (var (issueNumber, itemInfo) in issueDetailsMap)
+        {
+            if (!addedIssues.Contains(issueNumber))
+            {
+                changes.Add(itemInfo);
+                addedIssues.Add(issueNumber);
+            }
+        }
+
+        // Fourth pass: add PRs without issues
+        foreach (var (prNumber, prTitle, prUrl, prIssues) in prData)
+        {
+            if (prIssues.Count == 0)
+            {
+                // PR has no issues - need to get labels from the pr list data
+                // Find the PR element again to get its labels
+                var prType = "other";
+                var prElement = prArray.FirstOrDefault(pe => 
+                    pe.TryGetProperty("number", out var numProp) && 
+                    numProp.GetInt32().ToString() == prNumber);
+
+                if (prElement.ValueKind != JsonValueKind.Undefined && 
+                    prElement.TryGetProperty("labels", out var labelsElement) && 
+                    labelsElement.ValueKind == JsonValueKind.Array)
+                {
+                    var labels = new List<string>();
+                    foreach (var label in labelsElement.EnumerateArray())
+                    {
+                        if (label.TryGetProperty("name", out var labelName))
+                        {
+                            labels.Add(labelName.GetString() ?? string.Empty);
+                        }
+                    }
+
+                    // Map labels to type
+                    var matchingType = labels
+                        .Select(label => label.ToLowerInvariant())
+                        .SelectMany(lowerLabel => LabelTypeMap
+                            .Where(kvp => lowerLabel.Contains(kvp.Key))
+                            .Select(kvp => kvp.Value))
+                        .FirstOrDefault();
+
+                    if (matchingType != null)
+                    {
+                        prType = matchingType;
+                    }
+                }
+
+                changes.Add(new ItemInfo($"#{prNumber}", prTitle, prUrl, prType));
             }
         }
 
