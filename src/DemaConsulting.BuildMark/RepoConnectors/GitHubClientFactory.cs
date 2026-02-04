@@ -32,15 +32,33 @@ internal static partial class GitHubClientFactory
     ///     Creates a GitHub client from the current repository.
     /// </summary>
     /// <param name="token">Optional authentication token. If not provided, will try GH_TOKEN environment variable or 'gh auth token' command.</param>
-    /// <returns>GitHub client, owner, and repository name.</returns>
+    /// <returns>GitHub client, owner, repository name, branch name, and current commit SHA.</returns>
     /// <exception cref="InvalidOperationException">Thrown when repository information cannot be determined.</exception>
-    public static async Task<(GitHubClient client, string owner, string repo)> CreateFromRepositoryAsync(string? token = null)
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Execute git remote get-url to extract repository URL</item>
+    /// <item>Parse URL to extract GitHub host, owner, and repo name (supports SSH and HTTPS formats)</item>
+    /// <item>Execute git rev-parse to get current branch name and commit SHA</item>
+    /// <item>Get authentication token from parameter, GH_TOKEN env var, or gh auth token command</item>
+    /// <item>Construct appropriate API base URI (api.github.com for GitHub, {host}/api/v3 for Enterprise)</item>
+    /// <item>Create and return authenticated GitHubClient with all repository context</item>
+    /// </list>
+    /// Supports both GitHub.com and GitHub Enterprise Server.
+    /// </remarks>
+    public static async Task<(GitHubClient client, string owner, string repo, string branch, string commitSha)> CreateFromRepositoryAsync(string? token = null)
     {
         // Get git remote URL
         var remoteUrl = await ProcessRunner.RunAsync("git", "remote get-url origin");
         
         // Parse owner and repo from URL
         var (baseUri, owner, repo) = ParseGitHubUrl(remoteUrl);
+        
+        // Get current branch name
+        var branch = await ProcessRunner.RunAsync("git", "rev-parse --abbrev-ref HEAD");
+        
+        // Get current commit SHA
+        var commitSha = await ProcessRunner.RunAsync("git", "rev-parse HEAD");
         
         // Get authentication token
         var authToken = token ?? await GetAuthenticationTokenAsync();
@@ -51,7 +69,7 @@ internal static partial class GitHubClientFactory
             Credentials = new Credentials(authToken)
         };
         
-        return (client, owner, repo);
+        return (client, owner, repo, branch, commitSha);
     }
 
     /// <summary>

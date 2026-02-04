@@ -42,6 +42,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     private readonly GitHubClient _client;
     private readonly string _owner;
     private readonly string _repo;
+    private readonly string _branch;
+    private readonly string _commitSha;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GitHubRepoConnector" /> class.
@@ -49,11 +51,15 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <param name="client">GitHub API client.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
-    public GitHubRepoConnector(GitHubClient client, string owner, string repo)
+    /// <param name="branch">Current branch name.</param>
+    /// <param name="commitSha">Current commit SHA.</param>
+    public GitHubRepoConnector(GitHubClient client, string owner, string repo, string branch, string commitSha)
     {
         _client = client;
         _owner = owner;
         _repo = repo;
+        _branch = branch;
+        _commitSha = commitSha;
     }
 
     /// <summary>
@@ -64,6 +70,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         _client = null!;
         _owner = string.Empty;
         _repo = string.Empty;
+        _branch = string.Empty;
+        _commitSha = string.Empty;
     }
 
     /// <summary>
@@ -87,24 +95,106 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Fetch all commits on the current branch using Octokit Repository.Commit.GetAll API</item>
+    /// <item>Stop collecting commits when reaching the current commit SHA (to handle shallow checkouts)</item>
+    /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
+    /// <item>Filter tags to only those whose commit is in the branch history</item>
+    /// <item>For each valid tag, get the tag date (annotated tag date or commit date)</item>
+    /// <item>Sort tags by date and return as Version objects</item>
+    /// </list>
+    /// This approach works with shallow checkouts unlike git commands.
+    /// </remarks>
     public override async Task<List<Version>> GetTagHistoryAsync()
     {
-        // Get all tags merged into current branch, sorted by creation date
-        // Arguments: --sort=creatordate (chronological order), --merged HEAD (reachable from HEAD)
-        // Output format: one tag name per line
-        var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
-
-        // Split output into individual tag names
-        var tagNames = output
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(t => t.Trim())
-            .ToList();
-
-        // Parse and filter to valid version tags only
-        return tagNames
-            .Select(Version.TryCreate)
-            .Where(t => t != null)
-            .Cast<Version>()
+        // Get all commits on the current branch up to the current commit
+        var commitRequest = new CommitRequest
+        {
+            Sha = _branch
+        };
+        
+        var commitOptions = new ApiOptions
+        {
+            PageSize = 100,
+            PageCount = 1
+        };
+        
+        // Fetch all commits on the branch
+        var branchCommits = new HashSet<string>();
+        var page = 1;
+        var foundCurrentCommit = false;
+        
+        while (!foundCurrentCommit)
+        {
+            commitOptions.StartPage = page;
+            var commits = await _client.Repository.Commit.GetAll(_owner, _repo, commitRequest, commitOptions);
+            if (commits.Count == 0)
+            {
+                break;
+            }
+            
+            // Add commit SHAs and check if we've reached the current commit
+            #pragma warning disable S3267 // Cannot simplify with Select due to early termination logic
+            foreach (var commit in commits)
+            {
+                branchCommits.Add(commit.Sha);
+                
+                // Stop when we reach the current commit (don't include commits after it)
+                if (commit.Sha == _commitSha)
+                {
+                    foundCurrentCommit = true;
+                    break;
+                }
+            }
+            #pragma warning restore S3267
+            
+            page++;
+        }
+        
+        // Get all tags from the repository
+        var allTags = await _client.Repository.GetAllTags(_owner, _repo);
+        
+        // Filter tags that are on commits in the branch history
+        var tagsOnBranch = new List<(Version version, DateTimeOffset date)>();
+        
+        foreach (var tag in allTags)
+        {
+            // Check if this tag's commit is in the branch history
+            if (!branchCommits.Contains(tag.Commit.Sha))
+            {
+                continue;
+            }
+            
+            // Try to parse as a version
+            var version = Version.TryCreate(tag.Name);
+            if (version == null)
+            {
+                continue;
+            }
+            
+            // For annotated tags, try to get the tag object for the date
+            DateTimeOffset tagDate;
+            try
+            {
+                var tagObject = await _client.Git.Tag.Get(_owner, _repo, tag.Commit.Sha);
+                tagDate = tagObject.Tagger.Date;
+            }
+            catch
+            {
+                // Fall back to commit date if we can't get the tag object
+                var commit = await _client.Repository.Commit.Get(_owner, _repo, tag.Commit.Sha);
+                tagDate = commit.Commit.Author.Date;
+            }
+            
+            tagsOnBranch.Add((version, tagDate));
+        }
+        
+        // Sort by date and return versions
+        return tagsOnBranch
+            .OrderBy(t => t.date)
+            .Select(t => t.version)
             .ToList();
     }
 
@@ -114,11 +204,50 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Determine commit range based on from/to parameters using Octokit Compare or Commit APIs</item>
+    /// <item>Fetch all pull requests from repository (paginated)</item>
+    /// <item>Filter PRs to only those with commits in the determined range</item>
+    /// <item>Extract issue numbers from PR bodies using closing keyword regex (closes #123, fixes #456, etc.)</item>
+    /// <item>Batch fetch all referenced issues with their labels and metadata</item>
+    /// <item>Map issue types from labels (bug, feature, documentation, etc.)</item>
+    /// <item>Return combined list of issues and PRs without issues, ordered by number</item>
+    /// </list>
+    /// Server-side filtering is used where possible (Compare API for commit ranges) to minimize data transfer.
+    /// </remarks>
     public override async Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
-        // Note: Currently fetches all PRs and issues regardless of version range.
-        // Version filtering would require mapping commits to PRs, which is complex.
-        // The from/to parameters are preserved for future enhancement.
+        // Get commits in the range using GitHub API
+        HashSet<string> commitShas;
+
+        if (from == null && to == null)
+        {
+            // No versions specified, get all commits using paginated API
+            commitShas = await GetAllCommitsAsync(null);
+        }
+        else if (from == null)
+        {
+            // Only end version specified - get commits up to 'to' tag/HEAD
+            var toExists = to != null && await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to!.Tag) : _commitSha;
+            commitShas = await GetAllCommitsAsync(toRef);
+        }
+        else if (to == null)
+        {
+            // Only start version specified - compare from tag to current commit
+            var fromTag = ValidateTag(from.Tag);
+            commitShas = await GetCompareCommitsAsync(fromTag, _commitSha);
+        }
+        else
+        {
+            // Both versions specified - compare from tag to to tag/HEAD
+            var fromTag = ValidateTag(from.Tag);
+            var toExists = await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to.Tag) : _commitSha;
+            commitShas = await GetCompareCommitsAsync(fromTag, toRef);
+        }
 
         // Batch fetch PR information with all details in one call
         List<PullRequest> allPullRequests;
@@ -166,13 +295,36 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             return new List<ItemInfo>();
         }
 
+        // Filter PRs to only those with commits in the range
+        var relevantPrs = new List<PullRequest>();
+        foreach (var pr in allPullRequests)
+        {
+            // Check if this PR has any commits in the range
+            // We need to get the commits for this PR
+            try
+            {
+                var prCommits = await _client.PullRequest.Commits(_owner, _repo, pr.Number);
+                var hasRelevantCommit = prCommits.Any(c => commitShas.Contains(c.Sha));
+                
+                if (hasRelevantCommit)
+                {
+                    relevantPrs.Add(pr);
+                }
+            }
+            catch
+            {
+                // If we can't get PR commits, skip this PR
+                continue;
+            }
+        }
+
         // Parse PR data and extract changes
         var changes = new List<ItemInfo>();
         var issueNumbers = new HashSet<int>();
         var prData = new List<(int number, string title, string url, List<int> issueNumbers, IReadOnlyList<Label> labels)>();
 
         // First pass: collect issue numbers and PR data
-        foreach (var pr in allPullRequests)
+        foreach (var pr in relevantPrs)
         {
             var prIssues = new List<int>();
             
@@ -313,6 +465,15 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Validate tag name if provided to prevent command injection</item>
+    /// <item>Execute git rev-parse command with tag name or HEAD</item>
+    /// <item>Return the 40-character commit SHA</item>
+    /// </list>
+    /// Uses local git command as this is a quick operation that doesn't require API calls.
+    /// </remarks>
     public override async Task<string> GetHashForTagAsync(string? tag)
     {
         // Get commit hash for tag or HEAD using git rev-parse
@@ -326,6 +487,18 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Query repository for open issues using Octokit API with server-side filtering (State=Open)</item>
+    /// <item>Paginate through all results (100 per page)</item>
+    /// <item>Filter out pull requests (they appear in issues list but have PullRequest property)</item>
+    /// <item>Extract issue number, title, and URL from each issue</item>
+    /// <item>Determine issue type from labels (bug, feature, documentation, etc.)</item>
+    /// <item>Return list of ItemInfo objects with all metadata</item>
+    /// </list>
+    /// Uses server-side State filter to minimize data transfer.
+    /// </remarks>
     public override async Task<List<ItemInfo>> GetOpenIssuesAsync()
     {
         // Fetch all open issues with full details in a single batch call
@@ -387,6 +560,113 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
 
         return openIssues;
+    }
+
+    /// <summary>
+    ///     Gets all commits for the repository or up to a specific ref.
+    /// </summary>
+    /// <param name="sha">Optional SHA or ref to get commits up to.</param>
+    /// <returns>Set of commit SHAs.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Create commit request with optional SHA filter for server-side filtering</item>
+    /// <item>Paginate through all commits (100 per page) using Octokit API</item>
+    /// <item>Collect all commit SHAs into a HashSet for fast lookups</item>
+    /// <item>Return complete set of commit SHAs in the range</item>
+    /// </list>
+    /// </remarks>
+    private async Task<HashSet<string>> GetAllCommitsAsync(string? sha)
+    {
+        var commitShas = new HashSet<string>();
+        var request = new CommitRequest();
+        if (sha != null)
+        {
+            request.Sha = sha;
+        }
+        
+        var options = new ApiOptions
+        {
+            PageSize = 100,
+            PageCount = 1
+        };
+        
+        // Fetch all pages of commits
+        var page = 1;
+        while (true)
+        {
+            options.StartPage = page;
+            var commits = await _client.Repository.Commit.GetAll(_owner, _repo, request, options);
+            if (commits.Count == 0)
+            {
+                break;
+            }
+            
+            foreach (var commit in commits)
+            {
+                commitShas.Add(commit.Sha);
+            }
+            
+            page++;
+        }
+        
+        return commitShas;
+    }
+
+    /// <summary>
+    ///     Gets commits between two refs using compare API.
+    /// </summary>
+    /// <param name="fromRef">Starting ref.</param>
+    /// <param name="toRef">Ending ref.</param>
+    /// <returns>Set of commit SHAs.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Call Octokit Compare API with from and to refs for server-side filtering</item>
+    /// <item>Extract commit SHAs from comparison result</item>
+    /// <item>Return as HashSet for fast lookups when filtering PRs</item>
+    /// </list>
+    /// Uses server-side Compare API to minimize data transfer - much more efficient than fetching all commits.
+    /// </remarks>
+    private async Task<HashSet<string>> GetCompareCommitsAsync(string fromRef, string toRef)
+    {
+        var comparison = await _client.Repository.Commit.Compare(_owner, _repo, fromRef, toRef);
+        var commitShas = new HashSet<string>();
+        
+        foreach (var commit in comparison.Commits)
+        {
+            commitShas.Add(commit.Sha);
+        }
+        
+        return commitShas;
+    }
+
+    /// <summary>
+    ///     Checks if a git tag exists in the repository.
+    /// </summary>
+    /// <param name="tag">Tag name to check.</param>
+    /// <returns>True if the tag exists, false otherwise.</returns>
+    /// <remarks>
+    /// Workflow:
+    /// <list type="number">
+    /// <item>Attempt to get the tag reference using Octokit Git.Reference.Get API</item>
+    /// <item>If successful, tag exists - return true</item>
+    /// <item>If NotFoundException is thrown, tag doesn't exist - return false</item>
+    /// </list>
+    /// </remarks>
+    private async Task<bool> TagExistsAsync(string tag)
+    {
+        try
+        {
+            // Try to get the tag reference
+            await _client.Git.Reference.Get(_owner, _repo, $"tags/{tag}");
+            return true;
+        }
+        catch (NotFoundException)
+        {
+            // Tag doesn't exist
+            return false;
+        }
     }
 
     /// <summary>

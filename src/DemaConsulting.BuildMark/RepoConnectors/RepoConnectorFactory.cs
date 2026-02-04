@@ -36,20 +36,20 @@ public static class RepoConnectorFactory
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
-            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
-            return new GitHubRepoConnector(client, owner, repo);
+            var (client, owner, repo, branch, commitSha) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
+            return new GitHubRepoConnector(client, owner, repo, branch, commitSha);
         }
 
         // Check if git remote points to GitHub
         if (await IsGitHubRepositoryAsync())
         {
-            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
-            return new GitHubRepoConnector(client, owner, repo);
+            var (client, owner, repo, branch, commitSha) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
+            return new GitHubRepoConnector(client, owner, repo, branch, commitSha);
         }
 
         // Default to GitHub connector
-        var (defaultClient, defaultOwner, defaultRepo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
-        return new GitHubRepoConnector(defaultClient, defaultOwner, defaultRepo);
+        var (defaultClient, defaultOwner, defaultRepo, defaultBranch, defaultCommitSha) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
+        return new GitHubRepoConnector(defaultClient, defaultOwner, defaultRepo, defaultBranch, defaultCommitSha);
     }
 
     /// <summary>
