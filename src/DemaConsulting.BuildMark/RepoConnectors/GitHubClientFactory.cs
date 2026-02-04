@@ -31,9 +31,10 @@ internal static partial class GitHubClientFactory
     /// <summary>
     ///     Creates a GitHub client from the current repository.
     /// </summary>
+    /// <param name="token">Optional authentication token. If not provided, will try GH_TOKEN environment variable or 'gh auth token' command.</param>
     /// <returns>GitHub client, owner, and repository name.</returns>
     /// <exception cref="InvalidOperationException">Thrown when repository information cannot be determined.</exception>
-    public static async Task<(GitHubClient client, string owner, string repo)> CreateFromRepositoryAsync()
+    public static async Task<(GitHubClient client, string owner, string repo)> CreateFromRepositoryAsync(string? token = null)
     {
         // Get git remote URL
         var remoteUrl = await ProcessRunner.RunAsync("git", "remote get-url origin");
@@ -42,12 +43,12 @@ internal static partial class GitHubClientFactory
         var (baseUri, owner, repo) = ParseGitHubUrl(remoteUrl);
         
         // Get authentication token
-        var token = await GetAuthenticationTokenAsync();
+        var authToken = token ?? await GetAuthenticationTokenAsync();
         
         // Create GitHub client
         var client = new GitHubClient(new ProductHeaderValue("BuildMark"), baseUri)
         {
-            Credentials = new Credentials(token)
+            Credentials = new Credentials(authToken)
         };
         
         return (client, owner, repo);

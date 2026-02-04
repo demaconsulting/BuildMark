@@ -26,35 +26,14 @@ namespace DemaConsulting.BuildMark.Tests;
 [TestClass]
 public class RepoConnectorFactoryTests
 {
-    private string? _originalGhToken;
-
-    /// <summary>
-    ///     Test initialization - set a dummy GH_TOKEN for testing.
-    /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
-    {
-        _originalGhToken = Environment.GetEnvironmentVariable("GH_TOKEN");
-        Environment.SetEnvironmentVariable("GH_TOKEN", "dummy_token_for_testing");
-    }
-
-    /// <summary>
-    ///     Test cleanup - restore original GH_TOKEN.
-    /// </summary>
-    [TestCleanup]
-    public void TestCleanup()
-    {
-        Environment.SetEnvironmentVariable("GH_TOKEN", _originalGhToken);
-    }
-
     /// <summary>
     ///     Test that CreateAsync returns a connector instance.
     /// </summary>
     [TestMethod]
     public async Task RepoConnectorFactory_CreateAsync_ReturnsConnector()
     {
-        // Create a repository connector
-        var connector = await RepoConnectorFactory.CreateAsync();
+        // Create a repository connector with a dummy token
+        var connector = await RepoConnectorFactory.CreateAsync("dummy_token_for_testing");
 
         // Verify connector is created successfully
         Assert.IsNotNull(connector);
@@ -67,8 +46,8 @@ public class RepoConnectorFactoryTests
     [TestMethod]
     public async Task RepoConnectorFactory_CreateAsync_ReturnsGitHubConnectorForThisRepo()
     {
-        // Create connector for this repository
-        var connector = await RepoConnectorFactory.CreateAsync();
+        // Create connector for this repository with a dummy token
+        var connector = await RepoConnectorFactory.CreateAsync("dummy_token_for_testing");
 
         // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);

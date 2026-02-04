@@ -143,6 +143,7 @@ internal static class Program
         context.WriteLine("  --results <file>             Write validation results (TRX or JUnit format)");
         context.WriteLine("  --log <file>                 Write output to log file");
         context.WriteLine("  --build-version <version>    Specify the build version");
+        context.WriteLine("  --repo-token <token>         Specify repository authentication token");
         context.WriteLine("  --report <file>              Specify the report file name");
         context.WriteLine("  --report-depth <depth>       Specify the report markdown depth (default: 1)");
     }
@@ -154,7 +155,7 @@ internal static class Program
     private static void ProcessBuildNotes(Context context)
     {
         // Create repository connector
-        var connector = RepoConnectorFactory.CreateAsync().GetAwaiter().GetResult();
+        var connector = RepoConnectorFactory.CreateAsync(context.RepoToken).GetAwaiter().GetResult();
 
         // Parse build version if provided
         DemaConsulting.BuildMark.Version? buildVersion = null;

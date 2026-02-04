@@ -28,26 +28,27 @@ public static class RepoConnectorFactory
     /// <summary>
     ///     Creates a repository connector based on the current environment.
     /// </summary>
+    /// <param name="repoToken">Optional repository authentication token.</param>
     /// <returns>Repository connector instance.</returns>
-    public static async Task<IRepoConnector> CreateAsync()
+    public static async Task<IRepoConnector> CreateAsync(string? repoToken = null)
     {
         // Check for GitHub Actions environment variables
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
-            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
             return new GitHubRepoConnector(client, owner, repo);
         }
 
         // Check if git remote points to GitHub
         if (await IsGitHubRepositoryAsync())
         {
-            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
             return new GitHubRepoConnector(client, owner, repo);
         }
 
         // Default to GitHub connector
-        var (defaultClient, defaultOwner, defaultRepo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+        var (defaultClient, defaultOwner, defaultRepo) = await GitHubClientFactory.CreateFromRepositoryAsync(repoToken);
         return new GitHubRepoConnector(defaultClient, defaultOwner, defaultRepo);
     }
 

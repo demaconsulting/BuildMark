@@ -71,6 +71,11 @@ internal sealed class Context : IDisposable
     public int ReportDepth { get; private init; } = 1;
 
     /// <summary>
+    ///     Gets the repository authentication token.
+    /// </summary>
+    public string? RepoToken { get; private init; }
+
+    /// <summary>
     ///     Gets the validation results file path.
     /// </summary>
     public string? ResultsFile { get; private init; }
@@ -107,6 +112,7 @@ internal sealed class Context : IDisposable
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
             ReportDepth = parser.ReportDepth,
+            RepoToken = parser.RepoToken,
             ResultsFile = parser.ResultsFile
         };
 
@@ -179,6 +185,11 @@ internal sealed class Context : IDisposable
         public int ReportDepth { get; private set; } = 1;
 
         /// <summary>
+        ///     Gets the repository authentication token.
+        /// </summary>
+        public string? RepoToken { get; private set; }
+
+        /// <summary>
         ///     Gets the log file path.
         /// </summary>
         public string? LogFile { get; private set; }
@@ -246,6 +257,10 @@ internal sealed class Context : IDisposable
 
                 case "--build-version":
                     BuildVersion = GetRequiredStringArgument(arg, args, index, "a version argument");
+                    return index + 1;
+
+                case "--repo-token":
+                    RepoToken = GetRequiredStringArgument(arg, args, index, "a token argument");
                     return index + 1;
 
                 case "--results":
