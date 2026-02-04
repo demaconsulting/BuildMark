@@ -98,8 +98,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <remarks>
     /// Workflow:
     /// <list type="number">
-    /// <item>Fetch all commits on the current branch using Octokit Repository.Commit.GetAll API</item>
-    /// <item>Stop collecting commits when reaching the current commit SHA (to handle shallow checkouts)</item>
+    /// <item>Fetch all commits on the current branch using Octokit Repository.Commit.GetAll API (newest to oldest)</item>
+    /// <item>Start collecting commits once we reach the current commit SHA</item>
+    /// <item>Continue collecting all older commits (the history) until pagination completes</item>
     /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
     /// <item>Filter tags to only those whose commit is in the branch history</item>
     /// <item>For each valid tag, get the tag date (annotated tag date or commit date)</item>
@@ -126,7 +127,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var page = 1;
         var foundCurrentCommit = false;
         
-        while (!foundCurrentCommit)
+        while (true)
         {
             commitOptions.StartPage = page;
             var commits = await _client.Repository.Commit.GetAll(_owner, _repo, commitRequest, commitOptions);
@@ -135,17 +136,20 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 break;
             }
             
-            // Add commit SHAs and check if we've reached the current commit
+            // Add commit SHAs and track if we've seen the current commit
             #pragma warning disable S3267 // Cannot simplify with Select due to early termination logic
             foreach (var commit in commits)
             {
-                branchCommits.Add(commit.Sha);
-                
-                // Stop when we reach the current commit (don't include commits after it)
+                // Once we find the current commit, start including commits in history
                 if (commit.Sha == _commitSha)
                 {
                     foundCurrentCommit = true;
-                    break;
+                }
+                
+                // Include this commit and all older commits (after finding current commit)
+                if (foundCurrentCommit)
+                {
+                    branchCommits.Add(commit.Sha);
                 }
             }
             #pragma warning restore S3267
