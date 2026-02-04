@@ -94,20 +94,23 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         if (from == null && to == null)
         {
             // No versions specified, get all commits using paginated API
-            commitHashesOutput = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate --jq .[].sha");
+            var output = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate");
+            commitHashesOutput = ExtractShasFromCommitsJson(output);
         }
         else if (from == null)
         {
             // Only end version specified - get commits up to 'to' tag/HEAD
             var toExists = to != null && await TagExistsAsync(to.Tag);
             var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
+            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate");
+            commitHashesOutput = ExtractShasFromCommitsJson(output);
         }
         else if (to == null)
         {
             // Only start version specified - compare from tag to HEAD
             var fromTag = ValidateTag(from.Tag);
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha");
+            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD");
+            commitHashesOutput = ExtractShasFromCompareJson(output);
         }
         else
         {
@@ -115,7 +118,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             var fromTag = ValidateTag(from.Tag);
             var toExists = await TagExistsAsync(to.Tag);
             var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
+            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef}");
+            commitHashesOutput = ExtractShasFromCompareJson(output);
         }
 
         // Batch fetch PR information with all details in one call
@@ -123,9 +127,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         try
         {
             // Fetch PRs with all required fields: number, title, url, labels, and closing issues with their details
+            // Note: Not using --jq to avoid shell quoting issues on Windows
             prDataOutput = await RunCommandAsync(
                 "gh",
-                "pr list --state all --json number,title,url,labels,closingIssuesReferences --jq '.[] | .closingIssuesReferences |= map({number, title, url, labels}) | @json'",
+                "pr list --state all --json number,title,url,labels,closingIssuesReferences",
                 commitHashesOutput);
         }
         catch (InvalidOperationException)
@@ -134,30 +139,34 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             return new List<ItemInfo>();
         }
 
+        // Parse the JSON array output
+        List<System.Text.Json.JsonElement> prArray;
+        try
+        {
+            var jsonDoc = System.Text.Json.JsonDocument.Parse(prDataOutput);
+            prArray = jsonDoc.RootElement.EnumerateArray().ToList();
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            // Fallback to empty result if JSON parsing fails
+            return new List<ItemInfo>();
+        }
+
         // Parse PR data and extract changes
         var changes = new List<ItemInfo>();
         var processedIssues = new HashSet<string>();
 
-        var prLines = prDataOutput
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim())
-            .Where(line => !string.IsNullOrEmpty(line));
-
-        foreach (var prLine in prLines)
+        foreach (var prElement in prArray)
         {
             try
             {
-                // Parse the JSON for this PR
-                var prData = System.Text.Json.JsonDocument.Parse(prLine);
-                var root = prData.RootElement;
-
-                var prNumber = root.GetProperty("number").GetInt32().ToString();
-                var prTitle = root.GetProperty("title").GetString() ?? $"PR #{prNumber}";
-                var prUrl = root.GetProperty("url").GetString() ?? string.Empty;
+                var prNumber = prElement.GetProperty("number").GetInt32().ToString();
+                var prTitle = prElement.GetProperty("title").GetString() ?? $"PR #{prNumber}";
+                var prUrl = prElement.GetProperty("url").GetString() ?? string.Empty;
 
                 // Get closing issues if any
                 var hasIssues = false;
-                if (root.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                 {
                     foreach (var issue in issuesElement.EnumerateArray())
                     {
@@ -218,7 +227,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 {
                     // Determine type from PR labels
                     var prType = "other";
-                    if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    if (prElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                     {
                         var labels = new List<string>();
                         foreach (var label in labelsElement.EnumerateArray())
@@ -249,7 +258,6 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             catch (System.Text.Json.JsonException)
             {
                 // Skip malformed JSON
-                continue;
             }
         }
 
@@ -299,30 +307,35 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     {
         // Fetch all open issues with full details in a single batch call
         // Arguments: --state open (open issues only), --json to get all required fields
-        // Output: JSON array with issue details
-        var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels --jq '.[] | @json'");
+        // Note: Not using --jq to avoid shell quoting issues on Windows
+        var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels");
+
+        // Parse the JSON array output
+        List<System.Text.Json.JsonElement> issueArray;
+        try
+        {
+            var jsonDoc = System.Text.Json.JsonDocument.Parse(output);
+            issueArray = jsonDoc.RootElement.EnumerateArray().ToList();
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            // Return empty list if JSON parsing fails
+            return new List<ItemInfo>();
+        }
 
         var openIssues = new List<ItemInfo>();
-        var lines = output
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => line.Trim())
-            .Where(line => !string.IsNullOrEmpty(line));
 
-        foreach (var line in lines)
+        foreach (var issueElement in issueArray)
         {
             try
             {
-                // Parse the JSON for this issue
-                var issueData = System.Text.Json.JsonDocument.Parse(line);
-                var root = issueData.RootElement;
-
-                var issueNumber = root.GetProperty("number").GetInt32().ToString();
-                var issueTitle = root.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
-                var issueUrl = root.GetProperty("url").GetString() ?? string.Empty;
+                var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
+                var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
+                var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
 
                 // Determine type from labels
                 var issueType = "other";
-                if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
                 {
                     var labels = new List<string>();
                     foreach (var label in labelsElement.EnumerateArray())
@@ -356,6 +369,73 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
 
         return openIssues;
+    }
+
+    /// <summary>
+    ///     Extracts SHA values from a commits API JSON response.
+    /// </summary>
+    /// <param name="json">JSON response from commits API.</param>
+    /// <returns>Newline-separated SHA values.</returns>
+    private static string ExtractShasFromCommitsJson(string json)
+    {
+        try
+        {
+            var doc = System.Text.Json.JsonDocument.Parse(json);
+            var shas = new List<string>();
+            
+            foreach (var commit in doc.RootElement.EnumerateArray())
+            {
+                if (commit.TryGetProperty("sha", out var shaElement))
+                {
+                    var sha = shaElement.GetString();
+                    if (!string.IsNullOrEmpty(sha))
+                    {
+                        shas.Add(sha);
+                    }
+                }
+            }
+            
+            return string.Join('\n', shas);
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return string.Empty;
+        }
+    }
+
+    /// <summary>
+    ///     Extracts SHA values from a compare API JSON response.
+    /// </summary>
+    /// <param name="json">JSON response from compare API.</param>
+    /// <returns>Newline-separated SHA values.</returns>
+    private static string ExtractShasFromCompareJson(string json)
+    {
+        try
+        {
+            var doc = System.Text.Json.JsonDocument.Parse(json);
+            var shas = new List<string>();
+            
+            if (doc.RootElement.TryGetProperty("commits", out var commitsElement))
+            {
+                foreach (var commit in commitsElement.EnumerateArray())
+                {
+                    if (commit.TryGetProperty("sha", out var shaElement))
+                    {
+                        var sha = shaElement.GetString();
+                        if (!string.IsNullOrEmpty(sha))
+                        {
+                            shas.Add(sha);
+                        }
+                    }
+                }
+            }
+            
+            return string.Join('\n', shas);
+        }
+        catch (System.Text.Json.JsonException)
+        {
+            return string.Empty;
+        }
     }
 
     /// <summary>
