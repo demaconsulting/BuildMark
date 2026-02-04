@@ -127,13 +127,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of pull request IDs.</returns>
     public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
-        // Temporary debug output
-        Console.WriteLine($"[DEBUG] GetPullRequestsBetweenTagsAsync called with from={from?.Tag ?? "null"}, to={to?.Tag ?? "null"}");
-        
         // Get commits using GitHub API instead of git log
         // This approach doesn't require fetch-depth: 0 in CI and works with shallow clones
         string commitHashesOutput;
-        
+
         if (from == null && to == null)
         {
             // No versions specified, get all commits using paginated API
@@ -145,7 +142,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             // Check if the tag exists; if not, use HEAD
             var toExists = to != null && await TagExistsAsync(to.Tag);
             var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
-            
+
             // Get all commits up to toRef
             commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
         }
@@ -161,12 +158,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             var fromTag = ValidateTag(from.Tag);
             var toExists = await TagExistsAsync(to.Tag);
             var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
-            
+
             commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
         }
-        
-        // Temporary debug output
-        Console.WriteLine($"[DEBUG] Commit hashes output length: {commitHashesOutput.Length}");
 
         // Pipe commit hashes to gh pr list to batch search for PRs
         // This is much faster than querying each commit individually
@@ -177,21 +171,18 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             // Search for PRs by piping commit hashes to gh pr list
             prSearchOutput = await RunCommandAsync("gh", "pr list --state all --json number --jq .[].number", commitHashesOutput);
         }
-        catch (InvalidOperationException ex)
+        catch (InvalidOperationException)
         {
             // Fallback to empty result if batch query fails
-            Console.WriteLine($"[DEBUG] Batch PR search failed: {ex.Message}");
             prSearchOutput = string.Empty;
         }
-        
+
         var pullRequestsFromApi = prSearchOutput
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(n => n.Trim())
             .Where(n => !string.IsNullOrEmpty(n))
             .Distinct()
             .ToList();
-        
-        Console.WriteLine($"[DEBUG] Total unique PRs found: {pullRequestsFromApi.Count}");
 
         return pullRequestsFromApi;
     }

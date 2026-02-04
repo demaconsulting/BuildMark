@@ -73,14 +73,14 @@ internal static class ProcessRunner
 
         // Start process and begin reading streams
         process.Start();
-        
+
         // Write to stdin if provided
         if (standardInput != null)
         {
             await process.StandardInput.WriteAsync(standardInput);
             process.StandardInput.Close();
         }
-        
+
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         await process.WaitForExitAsync();

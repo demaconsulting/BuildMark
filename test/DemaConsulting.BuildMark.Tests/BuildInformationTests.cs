@@ -381,10 +381,10 @@ public class BuildInformationTests
     {
         public Task<List<Version>> GetTagHistoryAsync()
         {
-            return Task.FromResult(new List<Version> 
-            { 
-                Version.Create("v1.0.0"), 
-                Version.Create("ver-1.1.0"), 
+            return Task.FromResult(new List<Version>
+            {
+                Version.Create("v1.0.0"),
+                Version.Create("ver-1.1.0"),
                 Version.Create("v2.0.0")
             });
         }
