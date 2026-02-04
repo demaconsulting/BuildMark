@@ -86,23 +86,44 @@ public class MockRepoConnector : IRepoConnector
     /// <returns>List of changes with full information.</returns>
     public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
-        // Get the PRs in the range
-        var prs = GetPullRequestsBetweenTagsAsync(from, to).Result;
-        var changes = new List<ChangeData>();
+        // Extract tag names from version objects
+        var fromTagName = from?.Tag;
+        var toTagName = to?.Tag;
 
+        // Get PRs based on tag range
+        List<string> prs;
+        if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
+        {
+            prs = new List<string> { "10", "13" }; // Include PR without issues
+        }
+        else if (fromTagName == "ver-1.1.0" && (toTagName == "2.0.0" || toTagName == "v2.0.0"))
+        {
+            prs = new List<string> { "11", "12" };
+        }
+        else if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
+        {
+            prs = new List<string> { "10" };
+        }
+        else
+        {
+            prs = new List<string> { "10", "11", "12", "13" };
+        }
+
+        // Build changes from PRs
+        var changes = new List<ChangeData>();
         foreach (var pr in prs)
         {
             // Get issues for this PR
-            var issues = GetIssuesForPullRequestAsync(pr).Result;
+            var issues = _pullRequestIssues.TryGetValue(pr, out var prIssues) ? prIssues : new List<string>();
 
             if (issues.Count > 0)
             {
                 // PR has associated issues - add them as changes
                 foreach (var issueId in issues)
                 {
-                    var title = GetIssueTitleAsync(issueId).Result;
-                    var url = GetIssueUrlAsync(issueId).Result;
-                    var type = GetIssueTypeAsync(issueId).Result;
+                    var title = _issueTitles.TryGetValue(issueId, out var issueTitle) ? issueTitle : $"Issue {issueId}";
+                    var url = $"https://github.com/example/repo/issues/{issueId}";
+                    var type = _issueTypes.TryGetValue(issueId, out var issueType) ? issueType : "other";
                     changes.Add(new ChangeData(issueId, title, url, type));
                 }
             }
@@ -118,80 +139,6 @@ public class MockRepoConnector : IRepoConnector
         }
 
         return Task.FromResult(changes);
-    }
-
-    /// <summary>
-    ///     Gets the list of pull request IDs between two versions.
-    /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of pull request IDs.</returns>
-    public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
-    {
-        // Extract tag names from version objects
-        var fromTagName = from?.Tag;
-        var toTagName = to?.Tag;
-
-        // Return pull requests based on specific tag ranges
-        if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
-        {
-            return Task.FromResult(new List<string> { "10", "13" }); // Include PR without issues
-        }
-
-        if (fromTagName == "ver-1.1.0" && (toTagName == "2.0.0" || toTagName == "v2.0.0"))
-        {
-            return Task.FromResult(new List<string> { "11", "12" });
-        }
-
-        if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
-        {
-            return Task.FromResult(new List<string> { "10" });
-        }
-
-        // Default case returns all pull requests
-        return Task.FromResult(new List<string> { "10", "11", "12", "13" });
-    }
-
-    /// <summary>
-    ///     Gets the issue IDs associated with a pull request.
-    /// </summary>
-    /// <param name="pullRequestId">Pull request ID.</param>
-    /// <returns>List of issue IDs.</returns>
-    public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
-    {
-        // Return issues for known pull requests
-        return Task.FromResult(
-            _pullRequestIssues.TryGetValue(pullRequestId, out var issues)
-                ? issues
-                : new List<string>());
-    }
-
-    /// <summary>
-    ///     Gets the title of an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue title.</returns>
-    public Task<string> GetIssueTitleAsync(string issueId)
-    {
-        // Return title for known issues or default value
-        return Task.FromResult(
-            _issueTitles.TryGetValue(issueId, out var title)
-                ? title
-                : $"Issue {issueId}");
-    }
-
-    /// <summary>
-    ///     Gets the type of an issue (bug, feature, etc.).
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue type.</returns>
-    public Task<string> GetIssueTypeAsync(string issueId)
-    {
-        // Return type for known issues or default to "other"
-        return Task.FromResult(
-            _issueTypes.TryGetValue(issueId, out var type)
-                ? type
-                : "other");
     }
 
     /// <summary>
@@ -215,17 +162,6 @@ public class MockRepoConnector : IRepoConnector
     }
 
     /// <summary>
-    ///     Gets the URL for an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue URL.</returns>
-    public Task<string> GetIssueUrlAsync(string issueId)
-    {
-        // Generate mock URL for issue
-        return Task.FromResult($"https://github.com/example/repo/issues/{issueId}");
-    }
-
-    /// <summary>
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
@@ -235,9 +171,9 @@ public class MockRepoConnector : IRepoConnector
         var openIssuesData = _openIssues
             .Select(issueId => new ChangeData(
                 issueId,
-                GetIssueTitleAsync(issueId).Result,
-                GetIssueUrlAsync(issueId).Result,
-                GetIssueTypeAsync(issueId).Result))
+                _issueTitles.TryGetValue(issueId, out var title) ? title : $"Issue {issueId}",
+                $"https://github.com/example/repo/issues/{issueId}",
+                _issueTypes.TryGetValue(issueId, out var type) ? type : "other"))
             .ToList();
         return Task.FromResult(openIssuesData);
     }

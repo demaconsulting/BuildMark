@@ -52,47 +52,11 @@ public abstract class RepoConnectorBase : IRepoConnector
     public abstract Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two versions.
-    /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of pull request IDs.</returns>
-    public abstract Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to);
-
-    /// <summary>
-    ///     Gets the issue IDs associated with a pull request.
-    /// </summary>
-    /// <param name="pullRequestId">Pull request ID.</param>
-    /// <returns>List of issue IDs.</returns>
-    public abstract Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId);
-
-    /// <summary>
-    ///     Gets the title of an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue title.</returns>
-    public abstract Task<string> GetIssueTitleAsync(string issueId);
-
-    /// <summary>
-    ///     Gets the type of an issue (bug, feature, etc.).
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue type.</returns>
-    public abstract Task<string> GetIssueTypeAsync(string issueId);
-
-    /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
     public abstract Task<string> GetHashForTagAsync(string? tag);
-
-    /// <summary>
-    ///     Gets the URL for an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue URL.</returns>
-    public abstract Task<string> GetIssueUrlAsync(string issueId);
 
     /// <summary>
     ///     Gets the list of open issues with their details.

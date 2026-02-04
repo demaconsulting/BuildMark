@@ -56,24 +56,6 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Validates and sanitizes an issue or PR ID to prevent command injection.
-    /// </summary>
-    /// <param name="id">ID to validate.</param>
-    /// <param name="paramName">Parameter name for exception message.</param>
-    /// <returns>Sanitized ID.</returns>
-    /// <exception cref="ArgumentException">Thrown if ID is invalid.</exception>
-    private static string ValidateId(string id, string paramName)
-    {
-        // Ensure ID is numeric to prevent injection attacks
-        if (!NumericIdRegex().IsMatch(id))
-        {
-            throw new ArgumentException($"Invalid ID: {id}", paramName);
-        }
-
-        return id;
-    }
-
-    /// <summary>
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
@@ -140,10 +122,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         string prDataOutput;
         try
         {
-            // Fetch PRs with all required fields: number, title, url, and labels
+            // Fetch PRs with all required fields: number, title, url, labels, and closing issues with their details
             prDataOutput = await RunCommandAsync(
                 "gh",
-                "pr list --state all --json number,title,url,labels,closingIssuesReferences --jq '.[] | @json'",
+                "pr list --state all --json number,title,url,labels,closingIssuesReferences --jq '.[] | .closingIssuesReferences |= map({number, title, url, labels}) | @json'",
                 commitHashesOutput);
         }
         catch (InvalidOperationException)
@@ -190,10 +172,40 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                             }
                             processedIssues.Add(issueNumber);
 
-                            // Fetch issue details
-                            var issueTitle = await GetIssueTitleAsync(issueNumber);
-                            var issueUrl = await GetIssueUrlAsync(issueNumber);
-                            var issueType = await GetIssueTypeAsync(issueNumber);
+                            // Extract issue details from the JSON
+                            var issueTitle = issue.TryGetProperty("title", out var titleElem) ? 
+                                titleElem.GetString() ?? $"Issue #{issueNumber}" : 
+                                $"Issue #{issueNumber}";
+                            var issueUrl = issue.TryGetProperty("url", out var urlElem) ? 
+                                urlElem.GetString() ?? string.Empty : 
+                                string.Empty;
+
+                            // Determine type from issue labels
+                            var issueType = "other";
+                            if (issue.TryGetProperty("labels", out var issueLabelsElement) && issueLabelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            {
+                                var labels = new List<string>();
+                                foreach (var label in issueLabelsElement.EnumerateArray())
+                                {
+                                    if (label.TryGetProperty("name", out var labelName))
+                                    {
+                                        labels.Add(labelName.GetString() ?? string.Empty);
+                                    }
+                                }
+
+                                // Map labels to type
+                                var matchingType = labels
+                                    .Select(label => label.ToLowerInvariant())
+                                    .SelectMany(lowerLabel => LabelTypeMap
+                                        .Where(kvp => lowerLabel.Contains(kvp.Key))
+                                        .Select(kvp => kvp.Value))
+                                    .FirstOrDefault();
+
+                                if (matchingType != null)
+                                {
+                                    issueType = matchingType;
+                                }
+                            }
 
                             changes.Add(new ChangeData(issueNumber, issueTitle, issueUrl, issueType));
                             hasIssues = true;
@@ -266,138 +278,6 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Gets the list of pull request IDs between two versions.
-    /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of pull request IDs.</returns>
-    public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
-    {
-        // Get commits using GitHub API instead of git log
-        // This approach doesn't require fetch-depth: 0 in CI and works with shallow clones
-        string commitHashesOutput;
-
-        if (from == null && to == null)
-        {
-            // No versions specified, get all commits using paginated API
-            commitHashesOutput = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate --jq .[].sha");
-        }
-        else if (from == null)
-        {
-            // Only end version specified - get commits up to 'to' tag/HEAD
-            // Check if the tag exists; if not, use HEAD
-            var toExists = to != null && await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
-
-            // Get all commits up to toRef
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
-        }
-        else if (to == null)
-        {
-            // Only start version specified - compare from tag to HEAD
-            var fromTag = ValidateTag(from.Tag);
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha");
-        }
-        else
-        {
-            // Both versions specified - compare from tag to to tag/HEAD
-            var fromTag = ValidateTag(from.Tag);
-            var toExists = await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
-
-            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
-        }
-
-        // Pipe commit hashes to gh pr list to batch search for PRs
-        // This is much faster than querying each commit individually
-        // The commit hashes from the first command are piped as stdin to the second command
-        string prSearchOutput;
-        try
-        {
-            // Search for PRs by piping commit hashes to gh pr list
-            prSearchOutput = await RunCommandAsync("gh", "pr list --state all --json number --jq .[].number", commitHashesOutput);
-        }
-        catch (InvalidOperationException)
-        {
-            // Fallback to empty result if batch query fails
-            prSearchOutput = string.Empty;
-        }
-
-        var pullRequestsFromApi = prSearchOutput
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(n => n.Trim())
-            .Where(n => !string.IsNullOrEmpty(n))
-            .Distinct()
-            .ToList();
-
-        return pullRequestsFromApi;
-    }
-
-    /// <summary>
-    ///     Gets the issue IDs associated with a pull request.
-    /// </summary>
-    /// <param name="pullRequestId">Pull request ID.</param>
-    /// <returns>List of issue IDs.</returns>
-    public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
-    {
-        // Use GitHub API to get issues that are actually linked to close when PR merges
-        // This is more reliable than parsing PR body text which could contain any #numbers
-        // Arguments: --json closingIssuesReferences (get linked issues), --jq to extract numbers
-        // Output: issue numbers (one per line)
-        var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
-        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json closingIssuesReferences --jq .closingIssuesReferences[].number");
-
-        // Parse output to get issue numbers
-        var issues = output
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(n => n.Trim())
-            .Where(n => !string.IsNullOrEmpty(n))
-            .ToList();
-
-        return issues;
-    }
-
-    /// <summary>
-    ///     Gets the title of an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue title.</returns>
-    public override async Task<string> GetIssueTitleAsync(string issueId)
-    {
-        // Validate and fetch issue title using GitHub CLI
-        // Arguments: --json title (get title field), --jq .title (extract title value)
-        // Output: issue title as plain text
-        var validatedId = ValidateId(issueId, nameof(issueId));
-        return await RunCommandAsync("gh", $"issue view {validatedId} --json title --jq .title");
-    }
-
-    /// <summary>
-    ///     Gets the type of an issue (bug, feature, etc.).
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue type.</returns>
-    public override async Task<string> GetIssueTypeAsync(string issueId)
-    {
-        // Validate and fetch issue labels using GitHub CLI
-        // Arguments: --json labels (get labels array), --jq .labels[].name (extract label names)
-        // Output: one label name per line
-        var validatedId = ValidateId(issueId, nameof(issueId));
-        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq .labels[].name");
-        var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
-
-        // Map labels to standardized issue types
-        var matchingType = labels
-            .Select(label => label.ToLowerInvariant())
-            .SelectMany(lowerLabel => LabelTypeMap
-                .Where(kvp => lowerLabel.Contains(kvp.Key))
-                .Select(kvp => kvp.Value))
-            .FirstOrDefault();
-
-        // Return matching type or default when no recognized label found
-        return matchingType ?? "other";
-    }
-
-    /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
     /// <param name="tag">Tag name (null for current state).</param>
@@ -409,20 +289,6 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Output: full 40-character commit SHA
         var refName = tag == null ? "HEAD" : ValidateTag(tag);
         return await RunCommandAsync("git", $"rev-parse {refName}");
-    }
-
-    /// <summary>
-    ///     Gets the URL for an issue.
-    /// </summary>
-    /// <param name="issueId">Issue ID.</param>
-    /// <returns>Issue URL.</returns>
-    public override async Task<string> GetIssueUrlAsync(string issueId)
-    {
-        // Validate and fetch issue URL using GitHub CLI
-        // Arguments: --json url (get url field), --jq .url (extract url value)
-        // Output: full HTTPS URL to the issue
-        var validatedId = ValidateId(issueId, nameof(issueId));
-        return await RunCommandAsync("gh", $"issue view {validatedId} --json url --jq .url");
     }
 
     /// <summary>
@@ -498,11 +364,4 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Compiled regular expression.</returns>
     [GeneratedRegex(@"^[a-zA-Z0-9._/-]+$", RegexOptions.Compiled)]
     private static partial Regex TagNameRegex();
-
-    /// <summary>
-    ///     Regular expression to match numeric IDs.
-    /// </summary>
-    /// <returns>Compiled regular expression.</returns>
-    [GeneratedRegex(@"^\d+$", RegexOptions.Compiled)]
-    private static partial Regex NumericIdRegex();
 }
