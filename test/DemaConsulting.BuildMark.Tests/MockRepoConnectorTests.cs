@@ -67,16 +67,29 @@ public class MockRepoConnectorTests
     ///     Test that GetHashForTagAsync returns current hash for null tag.
     /// </summary>
     [TestMethod]
-    public async Task MockRepoConnector_GetHashForTagAsync_ReturnsCurrentHashForNullTag()
+    public async Task MockRepoConnector_GetCurrentHashAsync_ReturnsCurrentHash()
     {
         // Arrange
         var connector = new MockRepoConnector();
 
         // Act
-        var hash = await connector.GetHashForTagAsync(null);
+        var hash = await connector.GetCurrentHashAsync();
 
         // Assert
         Assert.AreEqual("current123hash456", hash);
+    }
+
+    /// <summary>
+    ///     Test that GetHashForTagAsync throws for null tag.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetHashForTagAsync_ThrowsForNullTag()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+
+        // Act & Assert
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await connector.GetHashForTagAsync(null));
     }
 
     /// <summary>

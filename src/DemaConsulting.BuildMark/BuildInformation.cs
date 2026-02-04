@@ -49,8 +49,8 @@ public record BuildInformation(
     public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, Version? version = null)
     {
         // Retrieve release history and current commit hash from the repository
-        var tags = await connector.GetReleaseHistoryAsync();
-        var currentHash = await connector.GetHashForTagAsync(null);
+        var releases = await connector.GetReleaseHistoryAsync();
+        var currentHash = await connector.GetCurrentHashAsync();
 
         // Determine the target version and hash for build information
         Version toTagInfo;
@@ -61,15 +61,15 @@ public record BuildInformation(
             toTagInfo = version;
             toHash = currentHash;
         }
-        else if (tags.Count > 0)
+        else if (releases.Count > 0)
         {
-            // Verify current commit matches latest tag when no version specified
-            var latestTag = tags[^1];
+            // Verify current commit matches latest release when no version specified
+            var latestTag = releases[^1];
             var latestTagHash = await connector.GetHashForTagAsync(latestTag.Tag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
-                // Current commit matches latest tag, use it as target
+                // Current commit matches latest release, use it as target
                 toTagInfo = latestTag;
                 toHash = currentHash;
             }
@@ -92,10 +92,10 @@ public record BuildInformation(
         // Determine the starting version for comparing changes
         Version? fromTagInfo = null;
         string? fromHash = null;
-        if (tags.Count > 0)
+        if (releases.Count > 0)
         {
-            // Find the position of target version in tag history
-            var toIndex = FindTagIndex(tags, toTagInfo.FullVersion);
+            // Find the position of target version in release history
+            var toIndex = FindTagIndex(releases, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {
@@ -103,12 +103,12 @@ public record BuildInformation(
                 if (toIndex > 0)
                 {
                     // Target version exists in history, use previous tag
-                    fromTagInfo = tags[toIndex - 1];
+                    fromTagInfo = releases[toIndex - 1];
                 }
                 else if (toIndex == -1)
                 {
                     // Target version not in history, use most recent tag as baseline
-                    fromTagInfo = tags[^1];
+                    fromTagInfo = releases[^1];
                 }
                 // If toIndex == 0, this is the first tag, no baseline
             }
@@ -124,7 +124,7 @@ public record BuildInformation(
                 else if (toIndex == -1)
                 {
                     // Target version not in history, start from most recent tag
-                    startIndex = tags.Count - 1;
+                    startIndex = releases.Count - 1;
                 }
                 else
                 {
@@ -135,9 +135,9 @@ public record BuildInformation(
                 // Search backward for previous non-pre-release version
                 for (var i = startIndex; i >= 0; i--)
                 {
-                    if (!tags[i].IsPreRelease)
+                    if (!releases[i].IsPreRelease)
                     {
-                        fromTagInfo = tags[i];
+                        fromTagInfo = releases[i];
                         break;
                     }
                 }

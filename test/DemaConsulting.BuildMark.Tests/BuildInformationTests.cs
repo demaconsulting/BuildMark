@@ -377,6 +377,7 @@ public class BuildInformationTests
     {
         public Task<List<Version>> GetReleaseHistoryAsync() => Task.FromResult(new List<Version>());
         public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
+        public Task<string> GetCurrentHashAsync() => Task.FromResult("hash123");
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
@@ -391,7 +392,8 @@ public class BuildInformationTests
             return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
         }
         public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
-        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
+        public Task<string> GetCurrentHashAsync() => Task.FromResult("different123");
+        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
@@ -411,9 +413,11 @@ public class BuildInformationTests
         }
         public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
 
+        public Task<string> GetCurrentHashAsync() => Task.FromResult("mno345pqr678");
+
         public Task<string> GetHashForTagAsync(string? tag)
         {
-            if (tag == null || tag == "v2.0.0")
+            if (tag == "v2.0.0")
             {
                 return Task.FromResult("mno345pqr678");
             }

@@ -103,9 +103,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <item>Continue collecting all older commits (the history) until pagination completes</item>
     /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
     /// <item>Filter tags to only those whose commit is in the branch history to build branchTags set</item>
-    /// <item>Fetch all releases using Octokit Repository.Release.GetAll API</item>
-    /// <item>Filter releases to only those whose tag is in the branchTags set</item>
-    /// <item>Sort releases by published date and return as Version objects</item>
+    /// <item>Fetch all releases using Octokit Repository.Release.GetAll API (already in correct order)</item>
+    /// <item>Filter releases to only those whose tag is in the branchTags set and return as Version objects</item>
     /// </list>
     /// This approach focuses on releases (which are tagged) rather than just tags.
     /// </remarks>
@@ -166,34 +165,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .ToHashSet();
         
         // Get all releases and filter by branch tags
+        // Releases are already in correct order from GetAll, just filter and return
         var allReleases = await _client.Repository.Release.GetAll(_owner, _repo);
-        var releasesOnBranch = new List<(Version version, DateTimeOffset date)>();
-        
-        foreach (var release in allReleases)
-        {
-            // Check if this release's tag is in the branch tags
-            if (!branchTags.Contains(release.TagName))
-            {
-                continue;
-            }
-            
-            // Try to parse as a version
-            var version = Version.TryCreate(release.TagName);
-            if (version == null)
-            {
-                continue;
-            }
-            
-            // Use the release published date, or created date as fallback
-            var releaseDate = release.PublishedAt ?? release.CreatedAt;
-            
-            releasesOnBranch.Add((version, releaseDate));
-        }
-        
-        // Sort by date and return versions
-        return releasesOnBranch
-            .OrderBy(r => r.date)
-            .Select(r => r.version)
+        return allReleases
+            .Where(r => branchTags.Contains(r.TagName))
+            .Select(r => Version.TryCreate(r.TagName))
+            .Where(v => v != null)
+            .Cast<Version>()
             .ToList();
     }
 
@@ -460,26 +438,50 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets the current commit hash.
+    /// </summary>
+    /// <returns>Current commit hash.</returns>
+    /// <remarks>
+    /// For GitHubRepoConnector, the current commit hash is already known at construction time,
+    /// so this method simply returns the cached value without making any API calls.
+    /// </remarks>
+    public override Task<string> GetCurrentHashAsync()
+    {
+        return Task.FromResult(_commitSha);
+    }
+
+    /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
+    /// <param name="tag">Tag name.</param>
     /// <returns>Git hash.</returns>
     /// <remarks>
     /// Workflow:
     /// <list type="number">
-    /// <item>Validate tag name if provided to prevent command injection</item>
-    /// <item>Execute git rev-parse command with tag name or HEAD</item>
-    /// <item>Return the 40-character commit SHA</item>
+    /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
+    /// <item>Find the tag matching the provided tag name</item>
+    /// <item>Return the commit SHA for that tag</item>
     /// </list>
-    /// Uses local git command as this is a quick operation that doesn't require API calls.
+    /// Uses Octokit API for consistent type-safe access to GitHub data.
     /// </remarks>
     public override async Task<string> GetHashForTagAsync(string? tag)
     {
-        // Get commit hash for tag or HEAD using git rev-parse
-        // Arguments: tag name or "HEAD" for current commit
-        // Output: full 40-character commit SHA
-        var refName = tag == null ? "HEAD" : ValidateTag(tag);
-        return await RunCommandAsync("git", $"rev-parse {refName}");
+        if (tag == null)
+        {
+            throw new ArgumentNullException(nameof(tag));
+        }
+
+        // Get all tags from the repository
+        var allTags = await _client.Repository.GetAllTags(_owner, _repo);
+        
+        // Find the tag matching the provided name
+        var matchingTag = allTags.FirstOrDefault(t => t.Name == tag);
+        if (matchingTag == null)
+        {
+            throw new InvalidOperationException($"Tag '{tag}' not found in repository");
+        }
+        
+        return matchingTag.Commit.Sha;
     }
 
     /// <summary>

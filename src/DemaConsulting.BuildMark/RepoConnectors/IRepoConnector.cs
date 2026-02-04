@@ -40,6 +40,12 @@ public interface IRepoConnector
     Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
+    ///     Gets the current commit hash.
+    /// </summary>
+    /// <returns>Current commit hash.</returns>
+    Task<string> GetCurrentHashAsync();
+
+    /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
     /// <param name="tag">Tag name (null for current state).</param>

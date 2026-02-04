@@ -144,16 +144,24 @@ public class MockRepoConnector : IRepoConnector
     }
 
     /// <summary>
+    ///     Gets the current commit hash.
+    /// </summary>
+    /// <returns>Current commit hash.</returns>
+    public Task<string> GetCurrentHashAsync()
+    {
+        return Task.FromResult("current123hash456");
+    }
+
+    /// <summary>
     ///     Gets the git hash for a tag.
     /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
+    /// <param name="tag">Tag name.</param>
     /// <returns>Git hash.</returns>
     public Task<string> GetHashForTagAsync(string? tag)
     {
-        // Return current hash for null tag
         if (tag == null)
         {
-            return Task.FromResult("current123hash456");
+            throw new ArgumentNullException(nameof(tag));
         }
 
         // Return hash for known tags or default value
