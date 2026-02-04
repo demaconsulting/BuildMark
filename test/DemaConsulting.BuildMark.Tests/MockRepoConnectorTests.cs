@@ -261,7 +261,7 @@ public class MockRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that GetOpenIssuesAsync returns expected open issues.
+    ///     Test that GetOpenIssuesAsync returns expected open issues with details.
     /// </summary>
     [TestMethod]
     public async Task MockRepoConnector_GetOpenIssuesAsync_ReturnsExpectedOpenIssues()
@@ -274,8 +274,12 @@ public class MockRepoConnectorTests
 
         // Assert
         Assert.HasCount(2, openIssues);
-        Assert.AreEqual("4", openIssues[0]);
-        Assert.AreEqual("5", openIssues[1]);
+        Assert.AreEqual("4", openIssues[0].Id);
+        Assert.AreEqual("Known bug A", openIssues[0].Title);
+        Assert.AreEqual("bug", openIssues[0].Type);
+        Assert.AreEqual("5", openIssues[1].Id);
+        Assert.AreEqual("Known bug B", openIssues[1].Title);
+        Assert.AreEqual("bug", openIssues[1].Type);
     }
 
     /// <summary>

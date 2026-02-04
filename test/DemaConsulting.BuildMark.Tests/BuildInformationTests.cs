@@ -357,7 +357,7 @@ public class BuildInformationTests
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ChangeData>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeData>());
     }
 
     /// <summary>
@@ -376,7 +376,7 @@ public class BuildInformationTests
         public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ChangeData>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeData>());
     }
 
     /// <summary>
@@ -415,6 +415,6 @@ public class BuildInformationTests
         }
 
         public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ChangeData>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeData>());
     }
 }

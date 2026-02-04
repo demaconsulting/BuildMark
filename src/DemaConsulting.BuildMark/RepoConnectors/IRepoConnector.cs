@@ -83,8 +83,8 @@ public interface IRepoConnector
     Task<string> GetIssueUrlAsync(string issueId);
 
     /// <summary>
-    ///     Gets the list of open issue IDs.
+    ///     Gets the list of open issues with their details.
     /// </summary>
-    /// <returns>List of open issue IDs.</returns>
-    Task<List<string>> GetOpenIssuesAsync();
+    /// <returns>List of open issues with full information.</returns>
+    Task<List<ChangeData>> GetOpenIssuesAsync();
 }

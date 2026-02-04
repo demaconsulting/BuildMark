@@ -226,12 +226,19 @@ public class MockRepoConnector : IRepoConnector
     }
 
     /// <summary>
-    ///     Gets the list of open issue IDs.
+    ///     Gets the list of open issues with their details.
     /// </summary>
-    /// <returns>List of open issue IDs.</returns>
-    public Task<List<string>> GetOpenIssuesAsync()
+    /// <returns>List of open issues with full information.</returns>
+    public Task<List<ChangeData>> GetOpenIssuesAsync()
     {
-        // Return predefined list of open issues
-        return Task.FromResult(_openIssues);
+        // Return predefined list of open issues with full details
+        var openIssuesData = _openIssues
+            .Select(issueId => new ChangeData(
+                issueId,
+                GetIssueTitleAsync(issueId).Result,
+                GetIssueUrlAsync(issueId).Result,
+                GetIssueTypeAsync(issueId).Result))
+            .ToList();
+        return Task.FromResult(openIssuesData);
     }
 }

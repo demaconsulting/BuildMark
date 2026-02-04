@@ -198,22 +198,19 @@ public record BuildInformation(
 
         // Collect known issues (open bugs not fixed in this build)
         var knownIssues = new List<ChangeInfo>();
-        var openIssueIds = await connector.GetOpenIssuesAsync();
-        foreach (var issueId in openIssueIds)
+        var openIssues = await connector.GetOpenIssuesAsync();
+        foreach (var issue in openIssues)
         {
             // Skip issues already fixed in this build
-            if (allChangeIds.Contains(issueId))
+            if (allChangeIds.Contains(issue.Id))
             {
                 continue;
             }
 
             // Only include bugs in known issues list
-            var type = await connector.GetIssueTypeAsync(issueId);
-            if (type == "bug")
+            if (issue.Type == "bug")
             {
-                var title = await connector.GetIssueTitleAsync(issueId);
-                var url = await connector.GetIssueUrlAsync(issueId);
-                knownIssues.Add(new ChangeInfo(issueId, title, url));
+                knownIssues.Add(new ChangeInfo(issue.Id, issue.Title, issue.Url));
             }
         }
 

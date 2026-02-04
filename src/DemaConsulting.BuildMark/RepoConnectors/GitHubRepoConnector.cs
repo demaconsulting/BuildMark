@@ -426,21 +426,70 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Gets the list of open issue IDs.
+    ///     Gets the list of open issues with their details.
     /// </summary>
-    /// <returns>List of open issue IDs.</returns>
-    public override async Task<List<string>> GetOpenIssuesAsync()
+    /// <returns>List of open issues with full information.</returns>
+    public override async Task<List<ChangeData>> GetOpenIssuesAsync()
     {
-        // Fetch all open issue numbers using GitHub CLI
-        // Arguments: --state open (open issues only), --json number (get number field), --jq .[].number (extract numbers from array)
-        // Output: one issue number per line
-        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq .[].number");
+        // Fetch all open issues with full details in a single batch call
+        // Arguments: --state open (open issues only), --json to get all required fields
+        // Output: JSON array with issue details
+        var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels --jq '.[] | @json'");
 
-        // Parse output into list of issue IDs
-        return output
+        var openIssues = new List<ChangeData>();
+        var lines = output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(n => n.Trim())
-            .ToList();
+            .Select(line => line.Trim())
+            .Where(line => !string.IsNullOrEmpty(line));
+
+        foreach (var line in lines)
+        {
+            try
+            {
+                // Parse the JSON for this issue
+                var issueData = System.Text.Json.JsonDocument.Parse(line);
+                var root = issueData.RootElement;
+
+                var issueNumber = root.GetProperty("number").GetInt32().ToString();
+                var issueTitle = root.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
+                var issueUrl = root.GetProperty("url").GetString() ?? string.Empty;
+
+                // Determine type from labels
+                var issueType = "other";
+                if (root.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                {
+                    var labels = new List<string>();
+                    foreach (var label in labelsElement.EnumerateArray())
+                    {
+                        if (label.TryGetProperty("name", out var labelName))
+                        {
+                            labels.Add(labelName.GetString() ?? string.Empty);
+                        }
+                    }
+
+                    // Map labels to type
+                    var matchingType = labels
+                        .Select(label => label.ToLowerInvariant())
+                        .SelectMany(lowerLabel => LabelTypeMap
+                            .Where(kvp => lowerLabel.Contains(kvp.Key))
+                            .Select(kvp => kvp.Value))
+                        .FirstOrDefault();
+
+                    if (matchingType != null)
+                    {
+                        issueType = matchingType;
+                    }
+                }
+
+                openIssues.Add(new ChangeData(issueNumber, issueTitle, issueUrl, issueType));
+            }
+            catch (System.Text.Json.JsonException)
+            {
+                // Skip malformed JSON
+            }
+        }
+
+        return openIssues;
     }
 
     /// <summary>
