@@ -159,7 +159,7 @@ public class BuildInformationTests
     ///     Test that CreateAsync orders changes by Index (PR number).
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_OrdersChangesChronologically()
+    public async Task BuildInformation_CreateAsync_OrdersChangesByIndex()
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();

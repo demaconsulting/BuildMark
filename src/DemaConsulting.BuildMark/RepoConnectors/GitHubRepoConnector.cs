@@ -189,6 +189,21 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             }
         }
 
+        // Build a map from issue number to PR number for Index assignment
+        var issueToPrMap = new Dictionary<string, int>();
+        foreach (var (prNumber, _, _, prIssues) in prData)
+        {
+            var prNumberInt = int.Parse(prNumber);
+            foreach (var issueNumber in prIssues)
+            {
+                // Use the first PR that references this issue (smallest PR number)
+                if (!issueToPrMap.ContainsKey(issueNumber) || prNumberInt < issueToPrMap[issueNumber])
+                {
+                    issueToPrMap[issueNumber] = prNumberInt;
+                }
+            }
+        }
+
         // Second pass: batch fetch all issue details using issue list
         var issueDetailsMap = new Dictionary<string, ItemInfo>();
         if (issueNumbers.Count > 0)
@@ -238,7 +253,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                         }
                     }
 
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, int.Parse(issueNumber));
+                    // Use PR number as Index for ordering
+                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, index);
                 }
             }
             catch (Exception)
@@ -246,7 +263,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 // If we can't fetch issue list, create fallback entries
                 foreach (var issueNumber in issueNumbers)
                 {
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other", int.Parse(issueNumber));
+                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other", index);
                 }
             }
         }
