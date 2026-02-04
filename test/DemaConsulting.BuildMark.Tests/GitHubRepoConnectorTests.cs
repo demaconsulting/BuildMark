@@ -142,12 +142,12 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "10");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search def456789abc --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search def456789abc",
             "11");
 
         // Act
@@ -182,7 +182,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "10");
 
         // Act
@@ -211,7 +211,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "11");
 
         // Act
@@ -240,7 +240,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "12");
 
         // Act
@@ -272,7 +272,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "15");
 
         // Act - using a version that doesn't exist as a tag
@@ -303,17 +303,17 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search abc123def456",
             "18");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search def456789abc --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search def456789abc",
             "19");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search 789abcdef123 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search 789abcdef123",
             "20");
 
         // Act
@@ -344,12 +344,12 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash - both commits are from PR 20
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search 5e541195f387259ee8d72d33b70579a0f7b6fde4 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search 5e541195f387259ee8d72d33b70579a0f7b6fde4",
             "20");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --state all --search c3eb81cd24b9d054a626a9785b16975f0808ecb2 --json number --jq .[].number",
+            "pr list --state all --json number --jq .[].number --search c3eb81cd24b9d054a626a9785b16975f0808ecb2",
             "20");
 
         // Act
@@ -358,6 +358,36 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.HasCount(1, prs); // Should have deduplicated PR 20
         Assert.AreEqual("20", prs[0]);
+    }
+
+    /// <summary>
+    ///     Test that GetPullRequestsBetweenTagsAsync handles commits that are in multiple PRs.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetPullRequestsBetweenTagsAsync_HandlesCommitInMultiplePRs()
+    {
+        // Arrange
+        var connector = new TestableGitHubRepoConnector();
+        
+        // Mock git log for a single commit hash
+        connector.AddCommandResult(
+            "git",
+            "log --format=%H HEAD",
+            "91545652f4eeabfef6d7189ac4a3a859166655dc");
+        
+        // Mock GitHub CLI to return multiple PRs for the single commit (e.g., commit in main that's in multiple PRs)
+        connector.AddCommandResult(
+            "gh",
+            "pr list --state all --json number --jq .[].number --search 91545652f4eeabfef6d7189ac4a3a859166655dc",
+            "16\n20");
+
+        // Act
+        var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
+
+        // Assert
+        Assert.HasCount(2, prs); // Should find both PR 16 and PR 20
+        Assert.Contains("16", prs);
+        Assert.Contains("20", prs);
     }
 
     /// <summary>

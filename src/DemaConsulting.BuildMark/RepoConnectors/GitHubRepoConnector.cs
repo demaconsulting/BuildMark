@@ -180,7 +180,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             try
             {
                 // Search for PRs containing this commit using GitHub CLI
-                var prSearchOutput = await RunCommandAsync("gh", $"pr list --state all --search {commitHash} --json number --jq .[].number");
+                // Note: parameter order matters - --search must come before --json/--jq
+                var prSearchOutput = await RunCommandAsync("gh", $"pr list --state all --json number --jq .[].number --search {commitHash}");
                 var prNumbers = prSearchOutput
                     .Split('\n', StringSplitOptions.RemoveEmptyEntries)
                     .Select(n => n.Trim())
