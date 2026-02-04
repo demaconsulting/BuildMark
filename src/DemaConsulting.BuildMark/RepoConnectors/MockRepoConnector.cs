@@ -65,17 +65,19 @@ public class MockRepoConnector : IRepoConnector
     /// <summary>
     ///     Gets the history of releases leading to the current branch.
     /// </summary>
-    /// <returns>List of release versions in chronological order.</returns>
+    /// <returns>List of release versions ordered newest first (matching Octokit API behavior).</returns>
     public Task<List<Version>> GetReleaseHistoryAsync()
     {
-        // Parse all mock tag names into Version objects
-        var tagInfoList = _tagHashes.Keys
-            .Select(Version.TryCreate)
-            .Where(t => t != null)
-            .Cast<Version>()
-            .ToList();
-
-        return Task.FromResult(tagInfoList);
+        // Return hardcoded list in newest-first order to match Octokit API behavior
+        // Tags from _tagHashes: v1.0.0, ver-1.1.0, release_2.0.0-beta.1, v2.0.0-rc.1, 2.0.0
+        return Task.FromResult(new List<Version>
+        {
+            Version.Create("2.0.0"),              // Newest release
+            Version.Create("v2.0.0-rc.1"),        // Pre-release before 2.0.0
+            Version.Create("release_2.0.0-beta.1"), // Earlier pre-release
+            Version.Create("ver-1.1.0"),          // Previous release
+            Version.Create("v1.0.0")              // Oldest release
+        });
     }
 
     /// <summary>

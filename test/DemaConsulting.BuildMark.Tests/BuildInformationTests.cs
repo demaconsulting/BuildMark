@@ -404,11 +404,12 @@ public class BuildInformationTests
     {
         public Task<List<Version>> GetReleaseHistoryAsync()
         {
+            // Releases are ordered newest first to match Octokit API behavior
             return Task.FromResult(new List<Version>
             {
-                Version.Create("v1.0.0"),
+                Version.Create("v2.0.0"),
                 Version.Create("ver-1.1.0"),
-                Version.Create("v2.0.0")
+                Version.Create("v1.0.0")
             });
         }
         public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());

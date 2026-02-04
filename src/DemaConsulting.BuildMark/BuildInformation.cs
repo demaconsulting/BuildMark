@@ -64,7 +64,8 @@ public record BuildInformation(
         else if (releases.Count > 0)
         {
             // Verify current commit matches latest release when no version specified
-            var latestTag = releases[^1];
+            // Releases are ordered newest first, so index 0 is the most recent
+            var latestTag = releases[0];
             var latestTagHash = await connector.GetHashForTagAsync(latestTag.Tag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
@@ -100,40 +101,42 @@ public record BuildInformation(
             if (toTagInfo.IsPreRelease)
             {
                 // Pre-release versions use the immediately previous tag as baseline
+                // Releases are ordered newest first (index 0 = most recent)
                 if (toIndex > 0)
                 {
-                    // Target version exists in history, use previous tag
-                    fromTagInfo = releases[toIndex - 1];
+                    // Target version exists in history, use next older tag (higher index)
+                    fromTagInfo = releases[toIndex + 1];
                 }
                 else if (toIndex == -1)
                 {
                     // Target version not in history, use most recent tag as baseline
-                    fromTagInfo = releases[^1];
+                    fromTagInfo = releases[0];
                 }
-                // If toIndex == 0, this is the first tag, no baseline
+                // If toIndex == 0, this is the most recent tag, no baseline
             }
             else
             {
                 // Release versions skip pre-releases and use previous release as baseline
+                // Releases are ordered newest first (index 0 = most recent)
                 int startIndex;
-                if (toIndex > 0)
+                if (toIndex >= 0)
                 {
-                    // Target version exists in history, start search from previous position
-                    startIndex = toIndex - 1;
+                    // Target version exists in history, start search from next older position
+                    startIndex = toIndex + 1;
                 }
                 else if (toIndex == -1)
                 {
                     // Target version not in history, start from most recent tag
-                    startIndex = releases.Count - 1;
+                    startIndex = 0;
                 }
                 else
                 {
-                    // Target is first tag, no previous release exists
+                    // Should not reach here
                     startIndex = -1;
                 }
 
-                // Search backward for previous non-pre-release version
-                for (var i = startIndex; i >= 0; i--)
+                // Search forward (increasing index = older releases) for previous non-pre-release version
+                for (var i = startIndex; i < releases.Count; i++)
                 {
                     if (!releases[i].IsPreRelease)
                     {

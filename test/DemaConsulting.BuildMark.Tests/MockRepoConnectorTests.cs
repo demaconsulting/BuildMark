@@ -27,7 +27,7 @@ namespace DemaConsulting.BuildMark.Tests;
 public class MockRepoConnectorTests
 {
     /// <summary>
-    ///     Test that GetReleaseHistoryAsync returns expected releases.
+    ///     Test that GetReleaseHistoryAsync returns expected releases in newest-first order.
     /// </summary>
     [TestMethod]
     public async Task MockRepoConnector_GetReleaseHistoryAsync_ReturnsExpectedReleases()
@@ -36,13 +36,13 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
         var tags = await connector.GetReleaseHistoryAsync();
 
-        // Verify all expected releases are returned
+        // Verify all expected releases are returned in newest-first order (matching Octokit API)
         Assert.HasCount(5, tags);
-        Assert.AreEqual("v1.0.0", tags[0].Tag);
-        Assert.AreEqual("ver-1.1.0", tags[1].Tag);
+        Assert.AreEqual("2.0.0", tags[0].Tag);
+        Assert.AreEqual("v2.0.0-rc.1", tags[1].Tag);
         Assert.AreEqual("release_2.0.0-beta.1", tags[2].Tag);
-        Assert.AreEqual("v2.0.0-rc.1", tags[3].Tag);
-        Assert.AreEqual("2.0.0", tags[4].Tag);
+        Assert.AreEqual("ver-1.1.0", tags[3].Tag);
+        Assert.AreEqual("v1.0.0", tags[4].Tag);
     }
 
 

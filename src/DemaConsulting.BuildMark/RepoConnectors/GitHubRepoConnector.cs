@@ -107,6 +107,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <item>Filter releases to only those whose tag is in the branchTags set and return as Version objects</item>
     /// </list>
     /// This approach focuses on releases (which are tagged) rather than just tags.
+    /// The returned list is ordered newest first to match Octokit's Repository.Release.GetAll behavior.
     /// </remarks>
     public override async Task<List<Version>> GetReleaseHistoryAsync()
     {
