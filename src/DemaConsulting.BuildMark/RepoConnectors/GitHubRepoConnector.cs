@@ -101,12 +101,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <item>Fetch all commits on the current branch using Octokit Repository.Commit.GetAll API (newest to oldest)</item>
     /// <item>Start collecting commits once we reach the current commit SHA</item>
     /// <item>Continue collecting all older commits (the history) until pagination completes</item>
-    /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
+    /// <item>Fetch all tag references using Octokit Git.Reference.GetAll API with "tags" prefix</item>
     /// <item>Filter tags to only those whose commit is in the branch history</item>
     /// <item>For each valid tag, get the tag date (annotated tag date or commit date)</item>
     /// <item>Sort tags by date and return as Version objects</item>
     /// </list>
-    /// This approach works with shallow checkouts unlike git commands.
+    /// This approach works with shallow checkouts unlike git commands and uses Git References API for reliable tag discovery.
     /// </remarks>
     public override async Task<List<Version>> GetTagHistoryAsync()
     {
@@ -157,38 +157,75 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             page++;
         }
         
-        // Get all tags from the repository
-        var allTags = await _client.Repository.GetAllTags(_owner, _repo);
+        // Get all tag references from the repository using Git References API
+        var allTagRefs = await _client.Git.Reference.GetAll(_owner, _repo);
         
-        // Filter tags that are on commits in the branch history
+        // Filter to only tag references and tags on commits in the branch history
         var tagsOnBranch = new List<(Version version, DateTimeOffset date)>();
         
-        foreach (var tag in allTags)
+        foreach (var tagRef in allTagRefs)
         {
-            // Check if this tag's commit is in the branch history
-            if (!branchCommits.Contains(tag.Commit.Sha))
+            // Only process tag references (refs/tags/*)
+            if (!tagRef.Ref.StartsWith("refs/tags/", StringComparison.Ordinal))
             {
                 continue;
             }
             
+            // Extract tag name from ref (refs/tags/v1.0.0 -> v1.0.0)
+            var tagName = tagRef.Ref.Substring("refs/tags/".Length);
+            
             // Try to parse as a version
-            var version = Version.TryCreate(tag.Name);
+            var version = Version.TryCreate(tagName);
             if (version == null)
             {
                 continue;
             }
             
-            // For annotated tags, try to get the tag object for the date
+            // Get the commit SHA from the tag reference
+            var commitSha = tagRef.Object.Sha;
+            
+            // For annotated tags, we need to dereference to get the actual commit
+            if (tagRef.Object.Type == TaggedType.Tag)
+            {
+                try
+                {
+                    var tagObject = await _client.Git.Tag.Get(_owner, _repo, tagRef.Object.Sha);
+                    commitSha = tagObject.Object.Sha;
+                }
+                catch
+                {
+                    // If we can't dereference, skip this tag
+                    continue;
+                }
+            }
+            
+            // Check if this tag's commit is in the branch history
+            if (!branchCommits.Contains(commitSha))
+            {
+                continue;
+            }
+            
+            // Get the tag date
             DateTimeOffset tagDate;
             try
             {
-                var tagObject = await _client.Git.Tag.Get(_owner, _repo, tag.Commit.Sha);
-                tagDate = tagObject.Tagger.Date;
+                // If this is an annotated tag, get the tagger date
+                if (tagRef.Object.Type == TaggedType.Tag)
+                {
+                    var tagObject = await _client.Git.Tag.Get(_owner, _repo, tagRef.Object.Sha);
+                    tagDate = tagObject.Tagger.Date;
+                }
+                else
+                {
+                    // Lightweight tag - get commit date
+                    var commit = await _client.Repository.Commit.Get(_owner, _repo, commitSha);
+                    tagDate = commit.Commit.Author.Date;
+                }
             }
             catch
             {
                 // Fall back to commit date if we can't get the tag object
-                var commit = await _client.Repository.Commit.Get(_owner, _repo, tag.Commit.Sha);
+                var commit = await _client.Repository.Commit.Get(_owner, _repo, commitSha);
                 tagDate = commit.Commit.Author.Date;
             }
             
