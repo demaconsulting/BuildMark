@@ -127,6 +127,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of pull request IDs.</returns>
     public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
+        // Temporary debug output
+        Console.WriteLine($"[DEBUG] GetPullRequestsBetweenTagsAsync called with from={from?.Tag ?? "null"}, to={to?.Tag ?? "null"}");
+        
         // Build git log range based on provided versions
         string range;
         if (from == null && to == null)
@@ -169,6 +172,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(hash => hash.Trim())
             .ToList();
+        
+        // Temporary debug output to diagnose CI issues
+        Console.WriteLine($"[DEBUG] Git range: {range}");
+        Console.WriteLine($"[DEBUG] Found {commitHashes.Count} commits in range");
 
         // Search GitHub API for PRs containing these commits
         // This approach is secure because the API only returns PRs that actually contain the commits,
@@ -190,15 +197,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 foreach (var prNumber in prNumbers)
                 {
                     pullRequestsFromApi.Add(prNumber);
+                    Console.WriteLine($"[DEBUG] Commit {commitHash.Substring(0, 8)} -> PR #{prNumber}");
                 }
             }
-            catch (InvalidOperationException)
+            catch (InvalidOperationException ex)
             {
                 // If gh command fails for a specific commit, continue with others
                 // This can happen if the commit isn't associated with any PR yet
+                Console.WriteLine($"[DEBUG] No PRs found for commit {commitHash.Substring(0, 8)}: {ex.Message}");
                 continue;
             }
         }
+        
+        Console.WriteLine($"[DEBUG] Total unique PRs found: {pullRequestsFromApi.Count}");
 
         return pullRequestsFromApi.ToList();
     }
