@@ -84,7 +84,7 @@ public class MockRepoConnector : IRepoConnector
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    public Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    public Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
         // Extract tag names from version objects
         var fromTagName = from?.Tag;
@@ -110,7 +110,7 @@ public class MockRepoConnector : IRepoConnector
         }
 
         // Build changes from PRs
-        var changes = new List<ChangeData>();
+        var changes = new List<ChangeInfo>();
         foreach (var pr in prs)
         {
             // Get issues for this PR
@@ -124,13 +124,13 @@ public class MockRepoConnector : IRepoConnector
                     var title = _issueTitles.TryGetValue(issueId, out var issueTitle) ? issueTitle : $"Issue {issueId}";
                     var url = $"https://github.com/example/repo/issues/{issueId}";
                     var type = _issueTypes.TryGetValue(issueId, out var issueType) ? issueType : "other";
-                    changes.Add(new ChangeData(issueId, title, url, type));
+                    changes.Add(new ChangeInfo(issueId, title, url, type));
                 }
             }
             else
             {
                 // PR has no issues - treat the PR itself as a change
-                changes.Add(new ChangeData(
+                changes.Add(new ChangeInfo(
                     $"#{pr}",
                     $"PR #{pr}",
                     $"https://github.com/example/repo/pull/{pr}",
@@ -165,11 +165,11 @@ public class MockRepoConnector : IRepoConnector
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
-    public Task<List<ChangeData>> GetOpenIssuesAsync()
+    public Task<List<ChangeInfo>> GetOpenIssuesAsync()
     {
         // Return predefined list of open issues with full details
         var openIssuesData = _openIssues
-            .Select(issueId => new ChangeData(
+            .Select(issueId => new ChangeInfo(
                 issueId,
                 _issueTitles.TryGetValue(issueId, out var title) ? title : $"Issue {issueId}",
                 $"https://github.com/example/repo/issues/{issueId}",

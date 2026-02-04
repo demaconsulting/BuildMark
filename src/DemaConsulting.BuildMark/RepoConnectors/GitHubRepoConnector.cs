@@ -86,7 +86,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    public override async Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    public override async Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
         // Get commits using GitHub API
         string commitHashesOutput;
@@ -131,11 +131,11 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         catch (InvalidOperationException)
         {
             // Fallback to empty result if batch query fails
-            return new List<ChangeData>();
+            return new List<ChangeInfo>();
         }
 
         // Parse PR data and extract changes
-        var changes = new List<ChangeData>();
+        var changes = new List<ChangeInfo>();
         var processedIssues = new HashSet<string>();
 
         var prLines = prDataOutput
@@ -207,7 +207,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                                 }
                             }
 
-                            changes.Add(new ChangeData(issueNumber, issueTitle, issueUrl, issueType));
+                            changes.Add(new ChangeInfo(issueNumber, issueTitle, issueUrl, issueType));
                             hasIssues = true;
                         }
                     }
@@ -243,7 +243,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                         }
                     }
 
-                    changes.Add(new ChangeData($"#{prNumber}", prTitle, prUrl, prType));
+                    changes.Add(new ChangeInfo($"#{prNumber}", prTitle, prUrl, prType));
                 }
             }
             catch (System.Text.Json.JsonException)
@@ -295,14 +295,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
-    public override async Task<List<ChangeData>> GetOpenIssuesAsync()
+    public override async Task<List<ChangeInfo>> GetOpenIssuesAsync()
     {
         // Fetch all open issues with full details in a single batch call
         // Arguments: --state open (open issues only), --json to get all required fields
         // Output: JSON array with issue details
         var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels --jq '.[] | @json'");
 
-        var openIssues = new List<ChangeData>();
+        var openIssues = new List<ChangeInfo>();
         var lines = output
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
             .Select(line => line.Trim())
@@ -347,7 +347,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     }
                 }
 
-                openIssues.Add(new ChangeData(issueNumber, issueTitle, issueUrl, issueType));
+                openIssues.Add(new ChangeInfo(issueNumber, issueTitle, issueUrl, issueType));
             }
             catch (System.Text.Json.JsonException)
             {

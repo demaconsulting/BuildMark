@@ -37,7 +37,7 @@ public interface IRepoConnector
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    Task<List<ChangeData>> GetChangesBetweenTagsAsync(Version? from, Version? to);
+    Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
     ///     Gets the git hash for a tag.
@@ -50,5 +50,5 @@ public interface IRepoConnector
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
-    Task<List<ChangeData>> GetOpenIssuesAsync();
+    Task<List<ChangeInfo>> GetOpenIssuesAsync();
 }

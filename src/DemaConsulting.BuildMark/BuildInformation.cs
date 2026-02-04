@@ -26,16 +26,8 @@ namespace DemaConsulting.BuildMark;
 /// <param name="Id">Change ID.</param>
 /// <param name="Title">Change title.</param>
 /// <param name="Url">Change URL.</param>
-public record ChangeInfo(string Id, string Title, string Url);
-
-/// <summary>
-///     Represents detailed change data including type information.
-/// </summary>
-/// <param name="Id">Change ID.</param>
-/// <param name="Title">Change title.</param>
-/// <param name="Url">Change URL.</param>
 /// <param name="Type">Change type (bug, feature, etc.).</param>
-public record ChangeData(string Id, string Title, string Url, string Type);
+public record ChangeInfo(string Id, string Title, string Url, string Type);
 
 /// <summary>
 ///     Represents build information for a release.
@@ -188,11 +180,11 @@ public record BuildInformation(
             // Categorize change by type
             if (change.Type == "bug")
             {
-                bugs.Add(new ChangeInfo(change.Id, change.Title, change.Url));
+                bugs.Add(change);
             }
             else
             {
-                nonBugChanges.Add(new ChangeInfo(change.Id, change.Title, change.Url));
+                nonBugChanges.Add(change);
             }
         }
 
@@ -210,7 +202,7 @@ public record BuildInformation(
             // Only include bugs in known issues list
             if (issue.Type == "bug")
             {
-                knownIssues.Add(new ChangeInfo(issue.Id, issue.Title, issue.Url));
+                knownIssues.Add(issue);
             }
         }
 
