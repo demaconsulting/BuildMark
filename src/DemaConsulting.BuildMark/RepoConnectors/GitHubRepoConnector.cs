@@ -18,8 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Text.Json;
 using System.Text.RegularExpressions;
+using Octokit;
 
 namespace DemaConsulting.BuildMark;
 
@@ -38,6 +38,33 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         { "performance", "performance" },
         { "security", "security" }
     };
+
+    private readonly GitHubClient _client;
+    private readonly string _owner;
+    private readonly string _repo;
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GitHubRepoConnector" /> class.
+    /// </summary>
+    /// <param name="client">GitHub API client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    public GitHubRepoConnector(GitHubClient client, string owner, string repo)
+    {
+        _client = client;
+        _owner = owner;
+        _repo = repo;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GitHubRepoConnector" /> class for testing.
+    /// </summary>
+    protected GitHubRepoConnector()
+    {
+        _client = null!;
+        _owner = string.Empty;
+        _repo = string.Empty;
+    }
 
     /// <summary>
     ///     Validates and sanitizes a tag name to prevent command injection.
@@ -89,173 +116,135 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of changes with full information.</returns>
     public override async Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
-        // Get commits using GitHub API
-        string commitHashesOutput;
-
-        if (from == null && to == null)
-        {
-            // No versions specified, get all commits using paginated API
-            var output = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate");
-            commitHashesOutput = ExtractShasFromCommitsJson(output);
-        }
-        else if (from == null)
-        {
-            // Only end version specified - get commits up to 'to' tag/HEAD
-            var toExists = to != null && await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate");
-            commitHashesOutput = ExtractShasFromCommitsJson(output);
-        }
-        else if (to == null)
-        {
-            // Only start version specified - compare from tag to HEAD
-            var fromTag = ValidateTag(from.Tag);
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD");
-            commitHashesOutput = ExtractShasFromCompareJson(output);
-        }
-        else
-        {
-            // Both versions specified - compare from tag to to tag/HEAD
-            var fromTag = ValidateTag(from.Tag);
-            var toExists = await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef}");
-            commitHashesOutput = ExtractShasFromCompareJson(output);
-        }
+        // Note: We fetch all PRs and issues regardless of the version range
+        // This is a simplified approach compared to filtering by commits
+        // The gh CLI doesn't have a direct way to filter PRs by commit range either
 
         // Batch fetch PR information with all details in one call
-        string prDataOutput;
+        List<PullRequest> allPullRequests;
         try
         {
-            // Fetch PRs with all required fields: number, title, url, labels, and closing issues with their details
-            // Note: Not using --jq to avoid shell quoting issues on Windows
-            prDataOutput = await RunCommandAsync(
-                "gh",
-                "pr list --state all --json number,title,url,labels,closingIssuesReferences",
-                commitHashesOutput);
+            // Fetch all PRs (open and closed)
+            var request = new PullRequestRequest
+            {
+                State = ItemStateFilter.All
+            };
+            allPullRequests = new List<PullRequest>();
+            var options = new ApiOptions
+            {
+                PageSize = 100,
+                PageCount = 1
+            };
+            
+            // Fetch all pages of PRs
+            var page = 1;
+            while (true)
+            {
+                options.StartPage = page;
+                var prs = await _client.PullRequest.GetAllForRepository(_owner, _repo, request, options);
+                if (prs.Count == 0)
+                {
+                    break;
+                }
+                allPullRequests.AddRange(prs);
+                page++;
+            }
         }
-        catch (InvalidOperationException)
+        catch (Exception)
         {
             // Fallback to empty result if batch query fails
             return new List<ItemInfo>();
         }
 
-        // Parse the JSON array output
-        List<JsonElement> prArray;
-        try
-        {
-            var jsonDoc = JsonDocument.Parse(prDataOutput);
-            prArray = jsonDoc.RootElement.EnumerateArray().ToList();
-        }
-        catch (JsonException)
-        {
-            // Fallback to empty result if JSON parsing fails
-            return new List<ItemInfo>();
-        }
-
         // Parse PR data and extract changes
         var changes = new List<ItemInfo>();
-        var issueNumbers = new HashSet<string>();
-        var prData = new List<(string number, string title, string url, List<string> issueNumbers)>();
+        var issueNumbers = new HashSet<int>();
+        var prData = new List<(int number, string title, string url, List<int> issueNumbers, IReadOnlyList<Label> labels)>();
 
         // First pass: collect issue numbers and PR data
-        foreach (var prElement in prArray)
+        foreach (var pr in allPullRequests)
         {
-            try
+            var prIssues = new List<int>();
+            
+            // Extract issue numbers from PR body using closing keywords
+            if (!string.IsNullOrEmpty(pr.Body))
             {
-                var prNumber = prElement.GetProperty("number").GetInt32().ToString();
-                var prTitle = prElement.GetProperty("title").GetString() ?? $"PR #{prNumber}";
-                var prUrl = prElement.GetProperty("url").GetString() ?? string.Empty;
-
-                var prIssues = new List<string>();
-                if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == JsonValueKind.Array)
+                var issueMatches = ClosingIssueRegex().Matches(pr.Body);
+                foreach (Match match in issueMatches)
                 {
-                    foreach (var issue in issuesElement.EnumerateArray())
+                    if (int.TryParse(match.Groups[1].Value, out var issueNum))
                     {
-                        if (issue.TryGetProperty("number", out var issueNumberElement))
-                        {
-                            var issueNumber = issueNumberElement.GetInt32().ToString();
-                            issueNumbers.Add(issueNumber);
-                            prIssues.Add(issueNumber);
-                        }
+                        issueNumbers.Add(issueNum);
+                        prIssues.Add(issueNum);
                     }
                 }
+            }
 
-                prData.Add((prNumber, prTitle, prUrl, prIssues));
-            }
-            catch (JsonException)
-            {
-                // Skip malformed JSON
-            }
+            prData.Add((pr.Number, pr.Title, pr.HtmlUrl, prIssues, pr.Labels));
         }
 
         // Build a map from issue number to PR number for Index assignment
-        var issueToPrMap = new Dictionary<string, int>();
-        foreach (var (prNumber, _, _, prIssues) in prData)
+        var issueToPrMap = new Dictionary<int, int>();
+        foreach (var (prNumber, _, _, prIssues, _) in prData)
         {
-            var prNumberInt = int.Parse(prNumber);
             foreach (var issueNumber in prIssues)
             {
                 // Use the first PR that references this issue (smallest PR number)
-                if (!issueToPrMap.ContainsKey(issueNumber) || prNumberInt < issueToPrMap[issueNumber])
+                if (!issueToPrMap.ContainsKey(issueNumber) || prNumber < issueToPrMap[issueNumber])
                 {
-                    issueToPrMap[issueNumber] = prNumberInt;
+                    issueToPrMap[issueNumber] = prNumber;
                 }
             }
         }
 
         // Second pass: batch fetch all issue details using issue list
-        var issueDetailsMap = new Dictionary<string, ItemInfo>();
+        var issueDetailsMap = new Dictionary<int, ItemInfo>();
         if (issueNumbers.Count > 0)
         {
             try
             {
-                var issuesOutput = await RunCommandAsync("gh", "issue list --state all --limit 1000 --json number,title,url,labels");
-                var issuesDoc = JsonDocument.Parse(issuesOutput);
-
-                foreach (var issueElement in issuesDoc.RootElement.EnumerateArray())
+                var issueRequest = new RepositoryIssueRequest
                 {
-                    var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
-
-                    // Only process issues that are referenced by PRs
-                    if (!issueNumbers.Contains(issueNumber))
+                    State = ItemStateFilter.All
+                };
+                var issueOptions = new ApiOptions
+                {
+                    PageSize = 100,
+                    PageCount = 1
+                };
+                
+                // Fetch all pages of issues
+                var issuePage = 1;
+                while (true)
+                {
+                    issueOptions.StartPage = issuePage;
+                    var issues = await _client.Issue.GetAllForRepository(_owner, _repo, issueRequest, issueOptions);
+                    if (issues.Count == 0)
                     {
-                        continue;
+                        break;
                     }
-
-                    var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
-                    var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
-
-                    // Determine type from labels
-                    var issueType = "other";
-                    if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
+                    
+                    foreach (var issue in issues)
                     {
-                        var labels = new List<string>();
-                        foreach (var label in labelsElement.EnumerateArray())
+                        // Only process issues that are referenced by PRs and are not PRs themselves
+                        if (!issueNumbers.Contains(issue.Number) || issue.PullRequest != null)
                         {
-                            if (label.TryGetProperty("name", out var labelName))
-                            {
-                                labels.Add(labelName.GetString() ?? string.Empty);
-                            }
+                            continue;
                         }
 
-                        // Map labels to type
-                        var matchingType = labels
-                            .Select(label => label.ToLowerInvariant())
-                            .SelectMany(lowerLabel => LabelTypeMap
-                                .Where(kvp => lowerLabel.Contains(kvp.Key))
-                                .Select(kvp => kvp.Value))
-                            .FirstOrDefault();
+                        var issueNumber = issue.Number;
+                        var issueTitle = issue.Title;
+                        var issueUrl = issue.HtmlUrl;
 
-                        if (matchingType != null)
-                        {
-                            issueType = matchingType;
-                        }
+                        // Determine type from labels
+                        var issueType = DetermineTypeFromLabels(issue.Labels);
+
+                        // Use PR number as Index for ordering
+                        var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : issueNumber;
+                        issueDetailsMap[issueNumber] = new ItemInfo(issueNumber.ToString(), issueTitle, issueUrl, issueType, index);
                     }
-
-                    // Use PR number as Index for ordering
-                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, index);
+                    
+                    issuePage++;
                 }
             }
             catch (Exception)
@@ -263,14 +252,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 // If we can't fetch issue list, create fallback entries
                 foreach (var issueNumber in issueNumbers)
                 {
-                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other", index);
+                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : issueNumber;
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber.ToString(), $"Issue #{issueNumber}", string.Empty, "other", index);
                 }
             }
         }
 
         // Third pass: add issues to changes list (avoiding duplicates)
-        var addedIssues = new HashSet<string>();
+        var addedIssues = new HashSet<int>();
         foreach (var (issueNumber, itemInfo) in issueDetailsMap)
         {
             if (!addedIssues.Contains(issueNumber))
@@ -281,75 +270,23 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Fourth pass: add PRs without issues
-        foreach (var (prNumber, prTitle, prUrl, prIssues) in prData)
+        foreach (var (prNumber, prTitle, prUrl, prIssues, labels) in prData)
         {
             if (prIssues.Count == 0)
             {
-                // PR has no issues - need to get labels from the pr list data
-                // Find the PR element again to get its labels
-                var prType = "other";
-                var prElement = prArray.FirstOrDefault(pe =>
-                    pe.TryGetProperty("number", out var numProp) &&
-                    numProp.GetInt32().ToString() == prNumber);
-
-                if (prElement.ValueKind != JsonValueKind.Undefined &&
-                    prElement.TryGetProperty("labels", out var labelsElement) &&
-                    labelsElement.ValueKind == JsonValueKind.Array)
-                {
-                    var labels = new List<string>();
-                    foreach (var label in labelsElement.EnumerateArray())
-                    {
-                        if (label.TryGetProperty("name", out var labelName))
-                        {
-                            labels.Add(labelName.GetString() ?? string.Empty);
-                        }
-                    }
-
-                    // Map labels to type
-                    var matchingType = labels
-                        .Select(label => label.ToLowerInvariant())
-                        .SelectMany(lowerLabel => LabelTypeMap
-                            .Where(kvp => lowerLabel.Contains(kvp.Key))
-                            .Select(kvp => kvp.Value))
-                        .FirstOrDefault();
-
-                    if (matchingType != null)
-                    {
-                        prType = matchingType;
-                    }
-                }
+                // PR has no issues - determine type from labels
+                var prType = DetermineTypeFromLabels(labels);
 
                 changes.Add(new ItemInfo(
                     $"#{prNumber}",
                     prTitle,
                     prUrl,
                     prType,
-                    int.Parse(prNumber)));
+                    prNumber));
             }
         }
 
         return changes;
-    }
-
-    /// <summary>
-    ///     Checks if a git tag exists in the repository.
-    /// </summary>
-    /// <param name="tag">Tag name to check.</param>
-    /// <returns>True if the tag exists, false otherwise.</returns>
-    private async Task<bool> TagExistsAsync(string tag)
-    {
-        try
-        {
-            // Try to resolve the tag to a commit hash
-            // If tag doesn't exist, RunCommandAsync will throw InvalidOperationException
-            await RunCommandAsync("git", $"rev-parse --verify {ValidateTag(tag)}");
-            return true;
-        }
-        catch (InvalidOperationException)
-        {
-            // Tag doesn't exist
-            return false;
-        }
     }
 
     /// <summary>
@@ -373,137 +310,86 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<List<ItemInfo>> GetOpenIssuesAsync()
     {
         // Fetch all open issues with full details in a single batch call
-        // Arguments: --state open (open issues only), --json to get all required fields
-        // Note: Not using --jq to avoid shell quoting issues on Windows
-        var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels");
-
-        // Parse the JSON array output
-        List<JsonElement> issueArray;
-        try
+        var issueRequest = new RepositoryIssueRequest
         {
-            var jsonDoc = JsonDocument.Parse(output);
-            issueArray = jsonDoc.RootElement.EnumerateArray().ToList();
-        }
-        catch (JsonException)
+            State = ItemStateFilter.Open
+        };
+        var issueOptions = new ApiOptions
         {
-            // Return empty list if JSON parsing fails
-            return new List<ItemInfo>();
-        }
+            PageSize = 100,
+            PageCount = 1
+        };
 
         var openIssues = new List<ItemInfo>();
 
-        foreach (var issueElement in issueArray)
+        try
         {
-            try
+            // Fetch all pages of open issues
+            var page = 1;
+            while (true)
             {
-                var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
-                var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
-                var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
-
-                // Determine type from labels
-                var issueType = "other";
-                if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
+                issueOptions.StartPage = page;
+                var issues = await _client.Issue.GetAllForRepository(_owner, _repo, issueRequest, issueOptions);
+                if (issues.Count == 0)
                 {
-                    var labels = new List<string>();
-                    foreach (var label in labelsElement.EnumerateArray())
-                    {
-                        if (label.TryGetProperty("name", out var labelName))
-                        {
-                            labels.Add(labelName.GetString() ?? string.Empty);
-                        }
-                    }
-
-                    // Map labels to type
-                    var matchingType = labels
-                        .Select(label => label.ToLowerInvariant())
-                        .SelectMany(lowerLabel => LabelTypeMap
-                            .Where(kvp => lowerLabel.Contains(kvp.Key))
-                            .Select(kvp => kvp.Value))
-                        .FirstOrDefault();
-
-                    if (matchingType != null)
-                    {
-                        issueType = matchingType;
-                    }
+                    break;
                 }
 
-                openIssues.Add(new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, int.Parse(issueNumber)));
+                foreach (var issue in issues)
+                {
+                    // Skip pull requests (they also appear in issues list)
+                    if (issue.PullRequest != null)
+                    {
+                        continue;
+                    }
+
+                    var issueNumber = issue.Number;
+                    var issueTitle = issue.Title;
+                    var issueUrl = issue.HtmlUrl;
+
+                    // Determine type from labels
+                    var issueType = DetermineTypeFromLabels(issue.Labels);
+
+                    openIssues.Add(new ItemInfo(issueNumber.ToString(), issueTitle, issueUrl, issueType, issueNumber));
+                }
+
+                page++;
             }
-            catch (System.Text.Json.JsonException)
-            {
-                // Skip malformed JSON
-            }
+        }
+        catch (Exception)
+        {
+            // Return empty list if query fails
+            return new List<ItemInfo>();
         }
 
         return openIssues;
     }
 
     /// <summary>
-    ///     Extracts SHA values from a commits API JSON response.
+    ///     Determines the type from a list of labels.
     /// </summary>
-    /// <param name="json">JSON response from commits API.</param>
-    /// <returns>Newline-separated SHA values.</returns>
-    private static string ExtractShasFromCommitsJson(string json)
+    /// <param name="labels">Labels to check.</param>
+    /// <returns>Type string.</returns>
+    private static string DetermineTypeFromLabels(IReadOnlyList<Label> labels)
     {
-        try
-        {
-            var doc = JsonDocument.Parse(json);
-            var shas = new List<string>();
-
-            foreach (var commit in doc.RootElement.EnumerateArray())
-            {
-                if (commit.TryGetProperty("sha", out var shaElement))
-                {
-                    var sha = shaElement.GetString();
-                    if (!string.IsNullOrEmpty(sha))
-                    {
-                        shas.Add(sha);
-                    }
-                }
-            }
-
-            return string.Join('\n', shas);
-        }
-        catch (JsonException)
-        {
-            return string.Empty;
-        }
+        var labelNames = labels.Select(l => l.Name.ToLowerInvariant()).ToList();
+        
+        // Map labels to type
+        var matchingType = labelNames
+            .SelectMany(lowerLabel => LabelTypeMap
+                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Select(kvp => kvp.Value))
+            .FirstOrDefault();
+        
+        return matchingType ?? "other";
     }
 
     /// <summary>
-    ///     Extracts SHA values from a compare API JSON response.
+    ///     Regular expression to match closing issue keywords in PR bodies.
     /// </summary>
-    /// <param name="json">JSON response from compare API.</param>
-    /// <returns>Newline-separated SHA values.</returns>
-    private static string ExtractShasFromCompareJson(string json)
-    {
-        try
-        {
-            var doc = JsonDocument.Parse(json);
-            var shas = new List<string>();
-
-            if (doc.RootElement.TryGetProperty("commits", out var commitsElement))
-            {
-                foreach (var commit in commitsElement.EnumerateArray())
-                {
-                    if (commit.TryGetProperty("sha", out var shaElement))
-                    {
-                        var sha = shaElement.GetString();
-                        if (!string.IsNullOrEmpty(sha))
-                        {
-                            shas.Add(sha);
-                        }
-                    }
-                }
-            }
-
-            return string.Join('\n', shas);
-        }
-        catch (JsonException)
-        {
-            return string.Empty;
-        }
-    }
+    /// <returns>Compiled regular expression.</returns>
+    [GeneratedRegex(@"(?:close[sd]?|fix(?:e[sd])?|resolve[sd]?)\s+#(\d+)", RegexOptions.Compiled | RegexOptions.IgnoreCase)]
+    private static partial Regex ClosingIssueRegex();
 
     /// <summary>
     ///     Regular expression to match valid tag names (alphanumeric, dots, hyphens, underscores, slashes).

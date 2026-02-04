@@ -27,13 +27,13 @@ namespace DemaConsulting.BuildMark.Tests;
 public class RepoConnectorFactoryTests
 {
     /// <summary>
-    ///     Test that Create returns a connector instance.
+    ///     Test that CreateAsync returns a connector instance.
     /// </summary>
     [TestMethod]
-    public void RepoConnectorFactory_Create_ReturnsConnector()
+    public async Task RepoConnectorFactory_CreateAsync_ReturnsConnector()
     {
         // Create a repository connector
-        var connector = RepoConnectorFactory.Create();
+        var connector = await RepoConnectorFactory.CreateAsync();
 
         // Verify connector is created successfully
         Assert.IsNotNull(connector);
@@ -41,13 +41,13 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
-    ///     Test that Create returns GitHubRepoConnector for this repository.
+    ///     Test that CreateAsync returns GitHubRepoConnector for this repository.
     /// </summary>
     [TestMethod]
-    public void RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo()
+    public async Task RepoConnectorFactory_CreateAsync_ReturnsGitHubConnectorForThisRepo()
     {
         // Create connector for this repository
-        var connector = RepoConnectorFactory.Create();
+        var connector = await RepoConnectorFactory.CreateAsync();
 
         // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);

@@ -29,33 +29,36 @@ public static class RepoConnectorFactory
     ///     Creates a repository connector based on the current environment.
     /// </summary>
     /// <returns>Repository connector instance.</returns>
-    public static IRepoConnector Create()
+    public static async Task<IRepoConnector> CreateAsync()
     {
         // Check for GitHub Actions environment variables
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
-            return new GitHubRepoConnector();
+            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+            return new GitHubRepoConnector(client, owner, repo);
         }
 
         // Check if git remote points to GitHub
-        if (IsGitHubRepository())
+        if (await IsGitHubRepositoryAsync())
         {
-            return new GitHubRepoConnector();
+            var (client, owner, repo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+            return new GitHubRepoConnector(client, owner, repo);
         }
 
         // Default to GitHub connector
-        return new GitHubRepoConnector();
+        var (defaultClient, defaultOwner, defaultRepo) = await GitHubClientFactory.CreateFromRepositoryAsync();
+        return new GitHubRepoConnector(defaultClient, defaultOwner, defaultRepo);
     }
 
     /// <summary>
     ///     Checks if the current repository is a GitHub repository.
     /// </summary>
     /// <returns>True if GitHub repository.</returns>
-    private static bool IsGitHubRepository()
+    private static async Task<bool> IsGitHubRepositoryAsync()
     {
         // Get git remote URL and check if it contains github.com
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").Result;
+        var output = await ProcessRunner.TryRunAsync("git", "remote get-url origin");
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 }

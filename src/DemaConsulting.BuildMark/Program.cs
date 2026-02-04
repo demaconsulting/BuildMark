@@ -154,7 +154,7 @@ internal static class Program
     private static void ProcessBuildNotes(Context context)
     {
         // Create repository connector
-        var connector = RepoConnectorFactory.Create();
+        var connector = RepoConnectorFactory.CreateAsync().GetAwaiter().GetResult();
 
         // Parse build version if provided
         DemaConsulting.BuildMark.Version? buildVersion = null;
