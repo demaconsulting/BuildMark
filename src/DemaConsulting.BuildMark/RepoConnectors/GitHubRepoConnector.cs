@@ -156,7 +156,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Parse PR data and extract changes
         var changes = new List<ItemInfo>();
         var issueNumbers = new HashSet<string>();
-        var prData = new List<(string number, string title, string url, List<string> issueNums)>();
+        var prData = new List<(string number, string title, string url, List<string> issueNumbers)>();
 
         // First pass: collect issue numbers and PR data
         foreach (var prElement in prArray)
@@ -197,11 +197,11 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             {
                 var issuesOutput = await RunCommandAsync("gh", "issue list --state all --limit 1000 --json number,title,url,labels");
                 var issuesDoc = JsonDocument.Parse(issuesOutput);
-                
+
                 foreach (var issueElement in issuesDoc.RootElement.EnumerateArray())
                 {
                     var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
-                    
+
                     // Only process issues that are referenced by PRs
                     if (!issueNumbers.Contains(issueNumber))
                     {
@@ -270,12 +270,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 // PR has no issues - need to get labels from the pr list data
                 // Find the PR element again to get its labels
                 var prType = "other";
-                var prElement = prArray.FirstOrDefault(pe => 
-                    pe.TryGetProperty("number", out var numProp) && 
+                var prElement = prArray.FirstOrDefault(pe =>
+                    pe.TryGetProperty("number", out var numProp) &&
                     numProp.GetInt32().ToString() == prNumber);
 
-                if (prElement.ValueKind != JsonValueKind.Undefined && 
-                    prElement.TryGetProperty("labels", out var labelsElement) && 
+                if (prElement.ValueKind != JsonValueKind.Undefined &&
+                    prElement.TryGetProperty("labels", out var labelsElement) &&
                     labelsElement.ValueKind == JsonValueKind.Array)
                 {
                     var labels = new List<string>();
@@ -426,7 +426,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             var doc = JsonDocument.Parse(json);
             var shas = new List<string>();
-            
+
             foreach (var commit in doc.RootElement.EnumerateArray())
             {
                 if (commit.TryGetProperty("sha", out var shaElement))
@@ -438,7 +438,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     }
                 }
             }
-            
+
             return string.Join('\n', shas);
         }
         catch (JsonException)
@@ -458,7 +458,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             var doc = JsonDocument.Parse(json);
             var shas = new List<string>();
-            
+
             if (doc.RootElement.TryGetProperty("commits", out var commitsElement))
             {
                 foreach (var commit in commitsElement.EnumerateArray())
@@ -473,7 +473,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     }
                 }
             }
-            
+
             return string.Join('\n', shas);
         }
         catch (JsonException)

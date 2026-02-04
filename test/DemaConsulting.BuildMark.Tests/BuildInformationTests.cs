@@ -142,7 +142,7 @@ public class BuildInformationTests
         Assert.AreEqual("1", buildInfo.Changes[0].Id);
         Assert.AreEqual("Add feature X", buildInfo.Changes[0].Title);
         Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
-        
+
         // Second change should be PR #13 (without issues)
         Assert.AreEqual("#13", buildInfo.Changes[1].Id);
 

@@ -133,12 +133,12 @@ public class MockRepoConnectorTests
 
         // Assert - Should have both issue #1 (from PR #10) and PR #13 (without issues)
         Assert.HasCount(2, changes);
-        
+
         // First change should be issue #1
         Assert.AreEqual("1", changes[0].Id);
         Assert.AreEqual("Add feature X", changes[0].Title);
         Assert.AreEqual("feature", changes[0].Type);
-        
+
         // Second change should be PR #13
         Assert.AreEqual("#13", changes[1].Id);
         Assert.AreEqual("PR #13", changes[1].Title);
