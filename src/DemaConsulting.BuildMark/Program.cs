@@ -192,8 +192,8 @@ internal static class Program
             context.WriteLine($"Previous Version: {buildInfo.FromVersion.Tag}");
             context.WriteLine($"Previous Commit Hash: {buildInfo.FromHash}");
         }
-        context.WriteLine($"Changes: {buildInfo.ChangeIssues.Count}");
-        context.WriteLine($"Bugs Fixed: {buildInfo.BugIssues.Count}");
+        context.WriteLine($"Changes: {buildInfo.Changes.Count}");
+        context.WriteLine($"Bugs Fixed: {buildInfo.Bugs.Count}");
         context.WriteLine($"Known Issues: {buildInfo.KnownIssues.Count}");
 
         // Export markdown report if requested

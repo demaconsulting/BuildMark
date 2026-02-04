@@ -44,16 +44,16 @@ public record ChangeData(string Id, string Title, string Url, string Type);
 /// <param name="ToVersion">Ending version.</param>
 /// <param name="FromHash">Starting git hash (null if from beginning of history).</param>
 /// <param name="ToHash">Ending git hash.</param>
-/// <param name="ChangeIssues">Non-bug changes performed between versions.</param>
-/// <param name="BugIssues">Bugs fixed between versions.</param>
+/// <param name="Changes">Non-bug changes performed between versions.</param>
+/// <param name="Bugs">Bugs fixed between versions.</param>
 /// <param name="KnownIssues">Known issues (unfixed or fixed but not in this build).</param>
 public record BuildInformation(
     Version? FromVersion,
     Version ToVersion,
     string? FromHash,
     string ToHash,
-    List<ChangeInfo> ChangeIssues,
-    List<ChangeInfo> BugIssues,
+    List<ChangeInfo> Changes,
+    List<ChangeInfo> Bugs,
     List<ChangeInfo> KnownIssues)
 {
     /// <summary>
@@ -170,8 +170,8 @@ public record BuildInformation(
         // Collect all changes (issues and PRs) in version range
         var changes = await connector.GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
         var allChangeIds = new HashSet<string>();
-        var bugIssues = new List<ChangeInfo>();
-        var changeIssues = new List<ChangeInfo>();
+        var bugs = new List<ChangeInfo>();
+        var nonBugChanges = new List<ChangeInfo>();
 
         // Process and categorize each change
         foreach (var change in changes)
@@ -188,11 +188,11 @@ public record BuildInformation(
             // Categorize change by type
             if (change.Type == "bug")
             {
-                bugIssues.Add(new ChangeInfo(change.Id, change.Title, change.Url));
+                bugs.Add(new ChangeInfo(change.Id, change.Title, change.Url));
             }
             else
             {
-                changeIssues.Add(new ChangeInfo(change.Id, change.Title, change.Url));
+                nonBugChanges.Add(new ChangeInfo(change.Id, change.Title, change.Url));
             }
         }
 
@@ -223,8 +223,8 @@ public record BuildInformation(
             toTagInfo,
             fromHash?.Trim(),
             toHash.Trim(),
-            changeIssues,
-            bugIssues,
+            nonBugChanges,
+            bugs,
             knownIssues);
     }
 
@@ -271,9 +271,9 @@ public record BuildInformation(
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
-        if (ChangeIssues.Count > 0)
+        if (Changes.Count > 0)
         {
-            foreach (var issue in ChangeIssues)
+            foreach (var issue in Changes)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
             }
@@ -289,9 +289,9 @@ public record BuildInformation(
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
-        if (BugIssues.Count > 0)
+        if (Bugs.Count > 0)
         {
-            foreach (var issue in BugIssues)
+            foreach (var issue in Bugs)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
             }

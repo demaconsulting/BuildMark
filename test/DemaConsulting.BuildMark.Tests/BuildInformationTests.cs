@@ -138,13 +138,13 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
 
         // Verify change issues are collected
-        Assert.HasCount(1, buildInfo.ChangeIssues);
-        Assert.AreEqual("1", buildInfo.ChangeIssues[0].Id);
-        Assert.AreEqual("Add feature X", buildInfo.ChangeIssues[0].Title);
-        Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.ChangeIssues[0].Url);
+        Assert.HasCount(1, buildInfo.Changes);
+        Assert.AreEqual("1", buildInfo.Changes[0].Id);
+        Assert.AreEqual("Add feature X", buildInfo.Changes[0].Title);
+        Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
 
         // Verify no bug issues for this version
-        Assert.IsEmpty(buildInfo.BugIssues);
+        Assert.IsEmpty(buildInfo.Bugs);
 
         // Verify known issues include open bugs
         Assert.HasCount(2, buildInfo.KnownIssues);
@@ -165,10 +165,10 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
 
         // Assert
-        Assert.HasCount(2, buildInfo.ChangeIssues);
-        Assert.HasCount(1, buildInfo.BugIssues);
-        Assert.AreEqual("2", buildInfo.BugIssues[0].Id);
-        Assert.AreEqual("Fix bug in Y", buildInfo.BugIssues[0].Title);
+        Assert.HasCount(2, buildInfo.Changes);
+        Assert.HasCount(1, buildInfo.Bugs);
+        Assert.AreEqual("2", buildInfo.Bugs[0].Id);
+        Assert.AreEqual("Fix bug in Y", buildInfo.Bugs[0].Title);
     }
 
     /// <summary>
