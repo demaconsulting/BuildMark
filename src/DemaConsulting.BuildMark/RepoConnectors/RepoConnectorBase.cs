@@ -49,7 +49,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    public abstract Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
+    public abstract Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
 
     /// <summary>
     ///     Gets the git hash for a tag.
@@ -62,5 +62,5 @@ public abstract class RepoConnectorBase : IRepoConnector
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
-    public abstract Task<List<ChangeInfo>> GetOpenIssuesAsync();
+    public abstract Task<List<ItemInfo>> GetOpenIssuesAsync();
 }

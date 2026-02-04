@@ -266,9 +266,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<ChangeInfo>(), // No changes
-            new List<ChangeInfo> { new ChangeInfo("2", "Bug fix", "https://example.com/2", "bug") },
-            new List<ChangeInfo>());
+            new List<ItemInfo>(), // No changes
+            new List<ItemInfo> { new ItemInfo("2", "Bug fix", "https://example.com/2", "bug") },
+            new List<ItemInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -292,9 +292,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<ChangeInfo> { new ChangeInfo("1", "Feature", "https://example.com/1", "feature") },
-            new List<ChangeInfo>(), // No bugs
-            new List<ChangeInfo>());
+            new List<ItemInfo> { new ItemInfo("1", "Feature", "https://example.com/1", "feature") },
+            new List<ItemInfo>(), // No bugs
+            new List<ItemInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -350,9 +350,9 @@ public class BuildInformationTests
     private class MockRepoConnectorEmpty : IRepoConnector
     {
         public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
-        public Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
-        public Task<List<ChangeInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
     /// <summary>
@@ -364,9 +364,9 @@ public class BuildInformationTests
         {
             return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
         }
-        public Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
-        public Task<List<ChangeInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
     /// <summary>
@@ -383,7 +383,7 @@ public class BuildInformationTests
                 Version.Create("v2.0.0")
             });
         }
-        public Task<List<ChangeInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
 
         public Task<string> GetHashForTagAsync(string? tag)
         {
@@ -400,6 +400,6 @@ public class BuildInformationTests
             return Task.FromResult("abc123def456");
         }
 
-        public Task<List<ChangeInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ChangeInfo>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 }

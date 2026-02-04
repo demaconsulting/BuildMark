@@ -21,13 +21,13 @@
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
-///     Represents information about a change (issue or PR).
+///     Represents an item in the build notes (change, bug, or known issue).
 /// </summary>
-/// <param name="Id">Change ID.</param>
-/// <param name="Title">Change title.</param>
-/// <param name="Url">Change URL.</param>
-/// <param name="Type">Change type (bug, feature, etc.).</param>
-public record ChangeInfo(string Id, string Title, string Url, string Type);
+/// <param name="Id">Item ID.</param>
+/// <param name="Title">Item title.</param>
+/// <param name="Url">Item URL.</param>
+/// <param name="Type">Item type (bug, feature, etc.).</param>
+public record ItemInfo(string Id, string Title, string Url, string Type);
 
 /// <summary>
 ///     Represents build information for a release.
@@ -44,9 +44,9 @@ public record BuildInformation(
     Version ToVersion,
     string? FromHash,
     string ToHash,
-    List<ChangeInfo> Changes,
-    List<ChangeInfo> Bugs,
-    List<ChangeInfo> KnownIssues)
+    List<ItemInfo> Changes,
+    List<ItemInfo> Bugs,
+    List<ItemInfo> KnownIssues)
 {
     /// <summary>
     ///     Creates a BuildInformation record from a repository connector.
@@ -162,8 +162,8 @@ public record BuildInformation(
         // Collect all changes (issues and PRs) in version range
         var changes = await connector.GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
         var allChangeIds = new HashSet<string>();
-        var bugs = new List<ChangeInfo>();
-        var nonBugChanges = new List<ChangeInfo>();
+        var bugs = new List<ItemInfo>();
+        var nonBugChanges = new List<ItemInfo>();
 
         // Process and categorize each change
         foreach (var change in changes)
@@ -189,7 +189,7 @@ public record BuildInformation(
         }
 
         // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = new List<ChangeInfo>();
+        var knownIssues = new List<ItemInfo>();
         var openIssues = await connector.GetOpenIssuesAsync();
         foreach (var issue in openIssues)
         {
