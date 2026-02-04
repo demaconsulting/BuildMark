@@ -26,10 +26,10 @@ namespace DemaConsulting.BuildMark;
 public interface IRepoConnector
 {
     /// <summary>
-    ///     Gets the history of tags leading to the current branch.
+    ///     Gets the history of releases leading to the current branch.
     /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
-    Task<List<Version>> GetTagHistoryAsync();
+    /// <returns>List of release versions in chronological order.</returns>
+    Task<List<Version>> GetReleaseHistoryAsync();
 
     /// <summary>
     ///     Gets the list of changes between two versions.

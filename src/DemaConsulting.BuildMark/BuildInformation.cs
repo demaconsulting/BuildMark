@@ -48,8 +48,8 @@ public record BuildInformation(
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
     public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, Version? version = null)
     {
-        // Retrieve tag history and current commit hash from the repository
-        var tags = await connector.GetTagHistoryAsync();
+        // Retrieve release history and current commit hash from the repository
+        var tags = await connector.GetReleaseHistoryAsync();
         var currentHash = await connector.GetHashForTagAsync(null);
 
         // Determine the target version and hash for build information

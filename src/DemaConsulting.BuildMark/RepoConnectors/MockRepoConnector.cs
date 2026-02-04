@@ -63,10 +63,10 @@ public class MockRepoConnector : IRepoConnector
     private readonly List<string> _openIssues = new() { "4", "5" };
 
     /// <summary>
-    ///     Gets the history of tags leading to the current branch.
+    ///     Gets the history of releases leading to the current branch.
     /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
-    public Task<List<Version>> GetTagHistoryAsync()
+    /// <returns>List of release versions in chronological order.</returns>
+    public Task<List<Version>> GetReleaseHistoryAsync()
     {
         // Parse all mock tag names into Version objects
         var tagInfoList = _tagHashes.Keys

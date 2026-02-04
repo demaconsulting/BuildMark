@@ -27,16 +27,16 @@ namespace DemaConsulting.BuildMark.Tests;
 public class MockRepoConnectorTests
 {
     /// <summary>
-    ///     Test that GetTagHistoryAsync returns expected tags.
+    ///     Test that GetReleaseHistoryAsync returns expected releases.
     /// </summary>
     [TestMethod]
-    public async Task MockRepoConnector_GetTagHistoryAsync_ReturnsExpectedTags()
+    public async Task MockRepoConnector_GetReleaseHistoryAsync_ReturnsExpectedReleases()
     {
-        // Get tag history from mock connector
+        // Get release history from mock connector
         var connector = new MockRepoConnector();
-        var tags = await connector.GetTagHistoryAsync();
+        var tags = await connector.GetReleaseHistoryAsync();
 
-        // Verify all expected tags are returned
+        // Verify all expected releases are returned
         Assert.HasCount(5, tags);
         Assert.AreEqual("v1.0.0", tags[0].Tag);
         Assert.AreEqual("ver-1.1.0", tags[1].Tag);

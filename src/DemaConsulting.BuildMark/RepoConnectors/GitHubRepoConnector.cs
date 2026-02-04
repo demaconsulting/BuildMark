@@ -92,9 +92,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Gets the history of tags leading to the current branch.
+    ///     Gets the history of releases leading to the current branch.
     /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
+    /// <returns>List of release versions in chronological order.</returns>
     /// <remarks>
     /// Workflow:
     /// <list type="number">
@@ -102,13 +102,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <item>Start collecting commits once we reach the current commit SHA</item>
     /// <item>Continue collecting all older commits (the history) until pagination completes</item>
     /// <item>Fetch all repository tags using Octokit Repository.GetAllTags API</item>
-    /// <item>Filter tags to only those whose commit is in the branch history</item>
-    /// <item>For each valid tag, try to get annotated tag date via Git.Tag.Get, fall back to commit date if not available</item>
-    /// <item>Sort tags by date and return as Version objects</item>
+    /// <item>Filter tags to only those whose commit is in the branch history to build branchTags set</item>
+    /// <item>Fetch all releases using Octokit Repository.Release.GetAll API</item>
+    /// <item>Filter releases to only those whose tag is in the branchTags set</item>
+    /// <item>Sort releases by published date and return as Version objects</item>
     /// </list>
-    /// This approach works with shallow checkouts unlike git commands.
+    /// This approach focuses on releases (which are tagged) rather than just tags.
     /// </remarks>
-    public override async Task<List<Version>> GetTagHistoryAsync()
+    public override async Task<List<Version>> GetReleaseHistoryAsync()
     {
         // Get all commits on the current branch up to the current commit
         var commitRequest = new CommitRequest
@@ -157,57 +158,42 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             page++;
         }
         
-        // Get all tags from the repository
+        // Get all tags from the repository and filter to branch tags
         var allTags = await _client.Repository.GetAllTags(_owner, _repo);
+        var branchTags = allTags
+            .Where(tag => branchCommits.Contains(tag.Commit.Sha))
+            .Select(tag => tag.Name)
+            .ToHashSet();
         
-        // Filter tags that are on commits in the branch history
-        var tagsOnBranch = new List<(Version version, DateTimeOffset date)>();
+        // Get all releases and filter by branch tags
+        var allReleases = await _client.Repository.Release.GetAll(_owner, _repo);
+        var releasesOnBranch = new List<(Version version, DateTimeOffset date)>();
         
-        foreach (var tag in allTags)
+        foreach (var release in allReleases)
         {
+            // Check if this release's tag is in the branch tags
+            if (!branchTags.Contains(release.TagName))
+            {
+                continue;
+            }
+            
             // Try to parse as a version
-            var version = Version.TryCreate(tag.Name);
+            var version = Version.TryCreate(release.TagName);
             if (version == null)
             {
                 continue;
             }
             
-            // Check if this tag's commit is in the branch history
-            if (!branchCommits.Contains(tag.Commit.Sha))
-            {
-                continue;
-            }
+            // Use the release published date, or created date as fallback
+            var releaseDate = release.PublishedAt ?? release.CreatedAt;
             
-            // Get the tag date - try Git.Tag.Get first for annotated tags, fall back to commit date
-            DateTimeOffset tagDate;
-            try
-            {
-                // Try to get the annotated tag object
-                var tagObject = await _client.Git.Tag.Get(_owner, _repo, tag.Commit.Sha);
-                tagDate = tagObject.Tagger.Date;
-            }
-            catch
-            {
-                // Fall back to commit date if tag object doesn't exist or doesn't have a date
-                try
-                {
-                    var commit = await _client.Repository.Commit.Get(_owner, _repo, tag.Commit.Sha);
-                    tagDate = commit.Commit.Author.Date;
-                }
-                catch
-                {
-                    // If we can't get either, skip this tag
-                    continue;
-                }
-            }
-            
-            tagsOnBranch.Add((version, tagDate));
+            releasesOnBranch.Add((version, releaseDate));
         }
         
         // Sort by date and return versions
-        return tagsOnBranch
-            .OrderBy(t => t.date)
-            .Select(t => t.version)
+        return releasesOnBranch
+            .OrderBy(r => r.date)
+            .Select(r => r.version)
             .ToList();
     }
 

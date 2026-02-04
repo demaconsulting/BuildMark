@@ -89,18 +89,18 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
 public class GitHubRepoConnectorTests
 {
     /// <summary>
-    ///     Test that GetTagHistoryAsync returns expected tags.
+    ///     Test that GetReleaseHistoryAsync returns expected releases.
     /// </summary>
     [TestMethod]
-    [Ignore("GetTagHistoryAsync now uses Octokit API which requires complex mocking. Functionality tested via integration tests.")]
-    public async Task GitHubRepoConnector_GetTagHistoryAsync_ReturnsExpectedTags()
+    [Ignore("GetReleaseHistoryAsync now uses Octokit API which requires complex mocking. Functionality tested via integration tests.")]
+    public async Task GitHubRepoConnector_GetReleaseHistoryAsync_ReturnsExpectedReleases()
     {
         // Configure connector to return mock tags
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult("git", "tag --sort=creatordate --merged HEAD", "v1.0.0\nv1.1.0\nv2.0.0");
 
         // Get tag history
-        var tags = await connector.GetTagHistoryAsync();
+        var tags = await connector.GetReleaseHistoryAsync();
 
         // Verify all tags are parsed correctly
         Assert.HasCount(3, tags);
@@ -110,25 +110,25 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that GetTagHistoryAsync returns empty list when no tags.
+    ///     Test that GetReleaseHistoryAsync returns empty list when no releases.
     /// </summary>
     [TestMethod]
-    [Ignore("GetTagHistoryAsync now uses Octokit API which requires complex mocking. Functionality tested via integration tests.")]
-    public async Task GitHubRepoConnector_GetTagHistoryAsync_ReturnsEmptyListWhenNoTags()
+    [Ignore("GetReleaseHistoryAsync now uses Octokit API which requires complex mocking. Functionality tested via integration tests.")]
+    public async Task GitHubRepoConnector_GetReleaseHistoryAsync_ReturnsEmptyListWhenNoReleases()
     {
         // Arrange
         var connector = new TestableGitHubRepoConnector();
         connector.AddCommandResult("git", "tag --sort=creatordate --merged HEAD", "");
 
         // Act
-        var tags = await connector.GetTagHistoryAsync();
+        var tags = await connector.GetReleaseHistoryAsync();
 
         // Assert
         Assert.IsEmpty(tags);
     }
 
     /// <summary>
-    ///     Test that GetTagHistoryAsync returns empty list when no tags.
+    ///     Test that GetReleaseHistoryAsync returns empty list when no releases.
     /// </summary>
     [TestMethod]
     public async Task GitHubRepoConnector_GetHashForTagAsync_ReturnsExpectedHash()

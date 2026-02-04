@@ -375,7 +375,7 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
+        public Task<List<Version>> GetReleaseHistoryAsync() => Task.FromResult(new List<Version>());
         public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
         public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
@@ -386,7 +386,7 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync()
+        public Task<List<Version>> GetReleaseHistoryAsync()
         {
             return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
         }
@@ -400,7 +400,7 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync()
+        public Task<List<Version>> GetReleaseHistoryAsync()
         {
             return Task.FromResult(new List<Version>
             {
