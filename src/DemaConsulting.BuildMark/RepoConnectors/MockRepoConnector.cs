@@ -47,7 +47,8 @@ public class MockRepoConnector : IRepoConnector
     {
         { "10", new List<string> { "1" } },
         { "11", new List<string> { "2" } },
-        { "12", new List<string> { "3" } }
+        { "12", new List<string> { "3" } },
+        { "13", new List<string>() } // PR with no issues
     };
 
     private readonly Dictionary<string, string> _tagHashes = new()
@@ -134,10 +135,10 @@ public class MockRepoConnector : IRepoConnector
         // Return pull requests based on specific tag ranges
         if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
-            return Task.FromResult(new List<string> { "10" });
+            return Task.FromResult(new List<string> { "10", "13" }); // Include PR without issues
         }
 
-        if (fromTagName == "ver-1.1.0" && toTagName == "2.0.0")
+        if (fromTagName == "ver-1.1.0" && (toTagName == "2.0.0" || toTagName == "v2.0.0"))
         {
             return Task.FromResult(new List<string> { "11", "12" });
         }
@@ -148,7 +149,7 @@ public class MockRepoConnector : IRepoConnector
         }
 
         // Default case returns all pull requests
-        return Task.FromResult(new List<string> { "10", "11", "12" });
+        return Task.FromResult(new List<string> { "10", "11", "12", "13" });
     }
 
     /// <summary>

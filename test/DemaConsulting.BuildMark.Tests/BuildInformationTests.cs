@@ -137,11 +137,14 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
 
-        // Verify change issues are collected
-        Assert.HasCount(1, buildInfo.Changes);
+        // Verify change issues are collected (including PR without issues)
+        Assert.HasCount(2, buildInfo.Changes);
         Assert.AreEqual("1", buildInfo.Changes[0].Id);
         Assert.AreEqual("Add feature X", buildInfo.Changes[0].Title);
         Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
+        
+        // Second change should be PR #13 (without issues)
+        Assert.AreEqual("#13", buildInfo.Changes[1].Id);
 
         // Verify no bug issues for this version
         Assert.IsEmpty(buildInfo.Bugs);
@@ -165,7 +168,7 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
 
         // Assert
-        Assert.HasCount(2, buildInfo.Changes);
+        Assert.HasCount(1, buildInfo.Changes);
         Assert.HasCount(1, buildInfo.Bugs);
         Assert.AreEqual("2", buildInfo.Bugs[0].Id);
         Assert.AreEqual("Fix bug in Y", buildInfo.Bugs[0].Title);

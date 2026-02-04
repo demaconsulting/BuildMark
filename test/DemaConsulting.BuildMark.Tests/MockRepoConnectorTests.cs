@@ -57,9 +57,10 @@ public class MockRepoConnectorTests
             Version.Create("v1.0.0"),
             Version.Create("ver-1.1.0"));
 
-        // Verify expected pull request is returned
-        Assert.HasCount(1, prs);
+        // Verify expected pull requests are returned (including PR without issues)
+        Assert.HasCount(2, prs);
         Assert.AreEqual("10", prs[0]);
+        Assert.AreEqual("13", prs[1]);
     }
 
     /// <summary>
@@ -95,7 +96,7 @@ public class MockRepoConnectorTests
         var prs = await connector.GetPullRequestsBetweenTagsAsync(null, null);
 
         // Assert
-        Assert.HasCount(3, prs);
+        Assert.HasCount(4, prs);
     }
 
     /// <summary>
@@ -275,5 +276,34 @@ public class MockRepoConnectorTests
         Assert.HasCount(2, openIssues);
         Assert.AreEqual("4", openIssues[0]);
         Assert.AreEqual("5", openIssues[1]);
+    }
+
+    /// <summary>
+    ///     Test that GetChangesBetweenTagsAsync returns changes including PRs without issues.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetChangesBetweenTagsAsync_IncludesPRsWithoutIssues()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var fromVersion = Version.Create("v1.0.0");
+        var toVersion = Version.Create("ver-1.1.0");
+
+        // Act
+        var changes = await connector.GetChangesBetweenTagsAsync(fromVersion, toVersion);
+
+        // Assert - Should have both issue #1 (from PR #10) and PR #13 (without issues)
+        Assert.HasCount(2, changes);
+        
+        // First change should be issue #1
+        Assert.AreEqual("1", changes[0].Id);
+        Assert.AreEqual("Add feature X", changes[0].Title);
+        Assert.AreEqual("feature", changes[0].Type);
+        
+        // Second change should be PR #13
+        Assert.AreEqual("#13", changes[1].Id);
+        Assert.AreEqual("PR #13", changes[1].Title);
+        Assert.Contains("pull/13", changes[1].Url);
+        Assert.AreEqual("other", changes[1].Type);
     }
 }
