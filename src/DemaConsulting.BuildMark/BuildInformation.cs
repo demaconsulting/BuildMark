@@ -21,15 +21,6 @@
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
-///     Represents an item in the build notes (change, bug, or known issue).
-/// </summary>
-/// <param name="Id">Item ID.</param>
-/// <param name="Title">Item title.</param>
-/// <param name="Url">Item URL.</param>
-/// <param name="Type">Item type (bug, feature, etc.).</param>
-public record ItemInfo(string Id, string Title, string Url, string Type);
-
-/// <summary>
 ///     Represents build information for a release.
 /// </summary>
 /// <param name="FromVersion">Starting version (null if from beginning of history).</param>
