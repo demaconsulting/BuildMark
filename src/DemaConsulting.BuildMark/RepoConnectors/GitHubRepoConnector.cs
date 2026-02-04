@@ -130,88 +130,71 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Temporary debug output
         Console.WriteLine($"[DEBUG] GetPullRequestsBetweenTagsAsync called with from={from?.Tag ?? "null"}, to={to?.Tag ?? "null"}");
         
-        // Build git log range based on provided versions
-        string range;
+        // Build GitHub API command to get commits
+        // Use GitHub API instead of git log to avoid needing fetch-depth: 0 in CI
+        string ghApiCommand;
+        
         if (from == null && to == null)
         {
-            // No versions specified, use all of HEAD
-            range = "HEAD";
+            // No versions specified, get all commits using paginated API
+            ghApiCommand = "gh api repos/:owner/:repo/commits --paginate --jq .[].sha";
         }
         else if (from == null)
         {
-            // Only end version specified (to is not null here)
+            // Only end version specified - get commits up to 'to' tag/HEAD
             // Check if the tag exists; if not, use HEAD
-            var toTag = ValidateTag(to!.Tag);
-            var toExists = await TagExistsAsync(to.Tag);
-            range = toExists ? toTag : "HEAD";
+            var toExists = to != null && await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
+            
+            // Get all commits up to toRef
+            ghApiCommand = $"gh api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha";
         }
         else if (to == null)
         {
-            // Only start version specified, range to HEAD (from is not null here)
-            range = $"{ValidateTag(from.Tag)}..HEAD";
+            // Only start version specified - compare from tag to HEAD
+            var fromTag = ValidateTag(from.Tag);
+            ghApiCommand = $"gh api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha";
         }
         else
         {
-            // Both versions specified (both from and to are not null here)
+            // Both versions specified - compare from tag to to tag/HEAD
             var fromTag = ValidateTag(from.Tag);
-            var toTag = ValidateTag(to.Tag);
-            
-            // Check if the 'to' tag exists; if not, use HEAD
             var toExists = await TagExistsAsync(to.Tag);
-            var toRef = toExists ? toTag : "HEAD";
+            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
             
-            range = $"{fromTag}..{toRef}";
+            ghApiCommand = $"gh api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha";
         }
-
-        // Get commits in range using git log
-        // Arguments: --format=%H (full commit hash)
-        // Output format: "<full-hash>" (one per line)
-        var commitHashesOutput = await RunCommandAsync("git", $"log --format=%H {range}");
         
-        var commitHashes = commitHashesOutput
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(hash => hash.Trim())
-            .ToList();
+        // Pipe commit hashes to gh pr list to batch search for PRs
+        // This is much faster than querying each commit individually
+        // Format: gh api ... | gh pr list --state all --json number --jq .[].number
+        var pipelineCommand = $"{ghApiCommand} | gh pr list --state all --json number --jq .[].number";
         
-        // Temporary debug output to diagnose CI issues
-        Console.WriteLine($"[DEBUG] Git range: {range}");
-        Console.WriteLine($"[DEBUG] Found {commitHashes.Count} commits in range");
-
-        // Search GitHub API for PRs containing these commits
-        // This approach is secure because the API only returns PRs that actually contain the commits,
-        // unlike parsing commit messages which could reference unrelated PRs
-        var pullRequestsFromApi = new HashSet<string>();
+        Console.WriteLine($"[DEBUG] Running pipeline: {pipelineCommand}");
         
-        foreach (var commitHash in commitHashes)
+        string prSearchOutput;
+        try
         {
-            try
-            {
-                // Search for PRs containing this commit using GitHub CLI
-                // Note: parameter order matters - --search must come before --json/--jq
-                var prSearchOutput = await RunCommandAsync("gh", $"pr list --state all --json number --jq .[].number --search {commitHash}");
-                var prNumbers = prSearchOutput
-                    .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-                    .Select(n => n.Trim())
-                    .Where(n => !string.IsNullOrEmpty(n));
-                
-                foreach (var prNumber in prNumbers)
-                {
-                    pullRequestsFromApi.Add(prNumber);
-                    Console.WriteLine($"[DEBUG] Commit {commitHash.Substring(0, 8)} -> PR #{prNumber}");
-                }
-            }
-            catch (InvalidOperationException ex)
-            {
-                // If gh command fails for a specific commit, continue with others
-                // This can happen if the commit isn't associated with any PR yet
-                Console.WriteLine($"[DEBUG] No PRs found for commit {commitHash.Substring(0, 8)}: {ex.Message}");
-                continue;
-            }
+            // Run the piped command through bash/sh
+            prSearchOutput = await RunCommandAsync("sh", $"-c \"{pipelineCommand}\"");
         }
+        catch (InvalidOperationException ex)
+        {
+            // Fallback to empty result if batch query fails
+            Console.WriteLine($"[DEBUG] Pipeline failed: {ex.Message}");
+            prSearchOutput = string.Empty;
+        }
+        
+        var pullRequestsFromApi = prSearchOutput
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(n => n.Trim())
+            .Where(n => !string.IsNullOrEmpty(n))
+            .Distinct()
+            .ToList();
         
         Console.WriteLine($"[DEBUG] Total unique PRs found: {pullRequestsFromApi.Count}");
 
-        return pullRequestsFromApi.ToList();
+        return pullRequestsFromApi;
     }
 
     /// <summary>
