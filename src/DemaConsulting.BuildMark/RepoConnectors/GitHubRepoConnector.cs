@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Text.Json;
 using System.Text.RegularExpressions;
 
 namespace DemaConsulting.BuildMark;
@@ -140,13 +141,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Parse the JSON array output
-        List<System.Text.Json.JsonElement> prArray;
+        List<JsonElement> prArray;
         try
         {
-            var jsonDoc = System.Text.Json.JsonDocument.Parse(prDataOutput);
+            var jsonDoc = JsonDocument.Parse(prDataOutput);
             prArray = jsonDoc.RootElement.EnumerateArray().ToList();
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             // Fallback to empty result if JSON parsing fails
             return new List<ItemInfo>();
@@ -166,7 +167,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
                 // Get closing issues if any
                 var hasIssues = false;
-                if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == JsonValueKind.Array)
                 {
                     foreach (var issue in issuesElement.EnumerateArray())
                     {
@@ -191,7 +192,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
                             // Determine type from issue labels
                             var issueType = "other";
-                            if (issue.TryGetProperty("labels", out var issueLabelsElement) && issueLabelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                            if (issue.TryGetProperty("labels", out var issueLabelsElement) && issueLabelsElement.ValueKind == JsonValueKind.Array)
                             {
                                 var labels = new List<string>();
                                 foreach (var label in issueLabelsElement.EnumerateArray())
@@ -227,7 +228,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 {
                     // Determine type from PR labels
                     var prType = "other";
-                    if (prElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                    if (prElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
                     {
                         var labels = new List<string>();
                         foreach (var label in labelsElement.EnumerateArray())
@@ -255,7 +256,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     changes.Add(new ItemInfo($"#{prNumber}", prTitle, prUrl, prType));
                 }
             }
-            catch (System.Text.Json.JsonException)
+            catch (JsonException)
             {
                 // Skip malformed JSON
             }
@@ -311,13 +312,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels");
 
         // Parse the JSON array output
-        List<System.Text.Json.JsonElement> issueArray;
+        List<JsonElement> issueArray;
         try
         {
-            var jsonDoc = System.Text.Json.JsonDocument.Parse(output);
+            var jsonDoc = JsonDocument.Parse(output);
             issueArray = jsonDoc.RootElement.EnumerateArray().ToList();
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             // Return empty list if JSON parsing fails
             return new List<ItemInfo>();
@@ -335,7 +336,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
                 // Determine type from labels
                 var issueType = "other";
-                if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == System.Text.Json.JsonValueKind.Array)
+                if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
                 {
                     var labels = new List<string>();
                     foreach (var label in labelsElement.EnumerateArray())
@@ -380,7 +381,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     {
         try
         {
-            var doc = System.Text.Json.JsonDocument.Parse(json);
+            var doc = JsonDocument.Parse(json);
             var shas = new List<string>();
             
             foreach (var commit in doc.RootElement.EnumerateArray())
@@ -397,7 +398,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             
             return string.Join('\n', shas);
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             return string.Empty;
         }
@@ -412,7 +413,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     {
         try
         {
-            var doc = System.Text.Json.JsonDocument.Parse(json);
+            var doc = JsonDocument.Parse(json);
             var shas = new List<string>();
             
             if (doc.RootElement.TryGetProperty("commits", out var commitsElement))
@@ -432,7 +433,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             
             return string.Join('\n', shas);
         }
-        catch (System.Text.Json.JsonException)
+        catch (JsonException)
         {
             return string.Empty;
         }
