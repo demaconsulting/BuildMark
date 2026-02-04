@@ -142,12 +142,12 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "10");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --search def456789abc --json number --jq .[].number",
+            "pr list --state all --search def456789abc --json number --jq .[].number",
             "11");
 
         // Act
@@ -182,7 +182,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "10");
 
         // Act
@@ -211,7 +211,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "11");
 
         // Act
@@ -240,7 +240,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "12");
 
         // Act
@@ -272,7 +272,7 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "15");
 
         // Act - using a version that doesn't exist as a tag
@@ -303,17 +303,17 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash
         connector.AddCommandResult(
             "gh",
-            "pr list --search abc123def456 --json number --jq .[].number",
+            "pr list --state all --search abc123def456 --json number --jq .[].number",
             "18");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --search def456789abc --json number --jq .[].number",
+            "pr list --state all --search def456789abc --json number --jq .[].number",
             "19");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --search 789abcdef123 --json number --jq .[].number",
+            "pr list --state all --search 789abcdef123 --json number --jq .[].number",
             "20");
 
         // Act
@@ -344,12 +344,12 @@ public class GitHubRepoConnectorTests
         // Mock GitHub CLI to search for PRs by commit hash - both commits are from PR 20
         connector.AddCommandResult(
             "gh",
-            "pr list --search 5e541195f387259ee8d72d33b70579a0f7b6fde4 --json number --jq .[].number",
+            "pr list --state all --search 5e541195f387259ee8d72d33b70579a0f7b6fde4 --json number --jq .[].number",
             "20");
         
         connector.AddCommandResult(
             "gh",
-            "pr list --search c3eb81cd24b9d054a626a9785b16975f0808ecb2 --json number --jq .[].number",
+            "pr list --state all --search c3eb81cd24b9d054a626a9785b16975f0808ecb2 --json number --jq .[].number",
             "20");
 
         // Act
