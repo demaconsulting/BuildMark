@@ -26,6 +26,27 @@ namespace DemaConsulting.BuildMark.Tests;
 [TestClass]
 public class RepoConnectorFactoryTests
 {
+    private string? _originalGhToken;
+
+    /// <summary>
+    ///     Test initialization - set a dummy GH_TOKEN for testing.
+    /// </summary>
+    [TestInitialize]
+    public void TestInitialize()
+    {
+        _originalGhToken = Environment.GetEnvironmentVariable("GH_TOKEN");
+        Environment.SetEnvironmentVariable("GH_TOKEN", "dummy_token_for_testing");
+    }
+
+    /// <summary>
+    ///     Test cleanup - restore original GH_TOKEN.
+    /// </summary>
+    [TestCleanup]
+    public void TestCleanup()
+    {
+        Environment.SetEnvironmentVariable("GH_TOKEN", _originalGhToken);
+    }
+
     /// <summary>
     ///     Test that CreateAsync returns a connector instance.
     /// </summary>
