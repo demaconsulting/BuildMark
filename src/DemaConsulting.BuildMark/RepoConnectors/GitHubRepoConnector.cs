@@ -187,7 +187,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <list type="number">
     /// <item>Determine commit range based on from/to parameters using Octokit Compare or Commit APIs</item>
     /// <item>Fetch all pull requests from repository (paginated)</item>
-    /// <item>Filter PRs to only those with commits in the determined range</item>
+    /// <item>Filter PRs to only those with commits in the determined range by:
+    ///   <list type="bullet">
+    ///   <item>First checking if PR's MergeCommitSha is in range (handles squash merges)</item>
+    ///   <item>Then checking if any individual PR commits are in range (handles normal merges)</item>
+    ///   </list>
+    /// </item>
     /// <item>Extract issue numbers from PR bodies using closing keyword regex (closes #123, fixes #456, etc.)</item>
     /// <item>Batch fetch all referenced issues with their labels and metadata</item>
     /// <item>Map issue types from labels (bug, feature, documentation, etc.)</item>
@@ -277,10 +282,16 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var relevantPrs = new List<PullRequest>();
         foreach (var pr in allPullRequests)
         {
-            // Check if this PR has any commits in the range
-            // We need to get the commits for this PR
             try
             {
+                // Check if the PR's merge commit is in the range (handles squash merges)
+                if (!string.IsNullOrEmpty(pr.MergeCommitSha) && commitShas.Contains(pr.MergeCommitSha))
+                {
+                    relevantPrs.Add(pr);
+                    continue;
+                }
+                
+                // Check if this PR has any individual commits in the range (handles normal merges)
                 var prCommits = await _client.PullRequest.Commits(_owner, _repo, pr.Number);
                 var hasRelevantCommit = prCommits.Any(c => commitShas.Contains(c.Sha));
                 
