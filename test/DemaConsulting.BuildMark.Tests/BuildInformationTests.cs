@@ -137,14 +137,17 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
 
-        // Verify change issues are collected
-        Assert.HasCount(1, buildInfo.ChangeIssues);
-        Assert.AreEqual("1", buildInfo.ChangeIssues[0].Id);
-        Assert.AreEqual("Add feature X", buildInfo.ChangeIssues[0].Title);
-        Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.ChangeIssues[0].Url);
+        // Verify change issues are collected (including PR without issues)
+        Assert.HasCount(2, buildInfo.Changes);
+        Assert.AreEqual("1", buildInfo.Changes[0].Id);
+        Assert.AreEqual("Add feature X", buildInfo.Changes[0].Title);
+        Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
+
+        // Second change should be PR #13 (without issues)
+        Assert.AreEqual("#13", buildInfo.Changes[1].Id);
 
         // Verify no bug issues for this version
-        Assert.IsEmpty(buildInfo.BugIssues);
+        Assert.IsEmpty(buildInfo.Bugs);
 
         // Verify known issues include open bugs
         Assert.HasCount(2, buildInfo.KnownIssues);
@@ -165,10 +168,10 @@ public class BuildInformationTests
         var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
 
         // Assert
-        Assert.HasCount(2, buildInfo.ChangeIssues);
-        Assert.HasCount(1, buildInfo.BugIssues);
-        Assert.AreEqual("2", buildInfo.BugIssues[0].Id);
-        Assert.AreEqual("Fix bug in Y", buildInfo.BugIssues[0].Title);
+        Assert.HasCount(1, buildInfo.Changes);
+        Assert.HasCount(1, buildInfo.Bugs);
+        Assert.AreEqual("2", buildInfo.Bugs[0].Id);
+        Assert.AreEqual("Fix bug in Y", buildInfo.Bugs[0].Title);
     }
 
     /// <summary>
@@ -263,9 +266,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<IssueInfo>(), // No changes
-            new List<IssueInfo> { new IssueInfo("2", "Bug fix", "https://example.com/2") },
-            new List<IssueInfo>());
+            new List<ItemInfo>(), // No changes
+            new List<ItemInfo> { new ItemInfo("2", "Bug fix", "https://example.com/2", "bug") },
+            new List<ItemInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -289,9 +292,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<IssueInfo> { new IssueInfo("1", "Feature", "https://example.com/1") },
-            new List<IssueInfo>(), // No bugs
-            new List<IssueInfo>());
+            new List<ItemInfo> { new ItemInfo("1", "Feature", "https://example.com/1", "feature") },
+            new List<ItemInfo>(), // No bugs
+            new List<ItemInfo>());
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -347,13 +350,9 @@ public class BuildInformationTests
     private class MockRepoConnectorEmpty : IRepoConnector
     {
         public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
-        public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
-        public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
-        public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
-        public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
     /// <summary>
@@ -365,13 +364,9 @@ public class BuildInformationTests
         {
             return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
         }
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
-        public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
-        public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
-        public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
         public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
-        public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
     /// <summary>
@@ -388,10 +383,7 @@ public class BuildInformationTests
                 Version.Create("v2.0.0")
             });
         }
-        public Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<string>());
-        public Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId) => Task.FromResult(new List<string>());
-        public Task<string> GetIssueTitleAsync(string issueId) => Task.FromResult("Title");
-        public Task<string> GetIssueTypeAsync(string issueId) => Task.FromResult("other");
+        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
 
         public Task<string> GetHashForTagAsync(string? tag)
         {
@@ -408,7 +400,6 @@ public class BuildInformationTests
             return Task.FromResult("abc123def456");
         }
 
-        public Task<string> GetIssueUrlAsync(string issueId) => Task.FromResult($"https://example.com/{issueId}");
-        public Task<List<string>> GetOpenIssuesAsync() => Task.FromResult(new List<string>());
+        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 }

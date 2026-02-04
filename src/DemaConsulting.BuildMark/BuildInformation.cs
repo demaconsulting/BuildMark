@@ -21,31 +21,23 @@
 namespace DemaConsulting.BuildMark;
 
 /// <summary>
-///     Represents information about an issue.
-/// </summary>
-/// <param name="Id">Issue ID.</param>
-/// <param name="Title">Issue title.</param>
-/// <param name="Url">Issue URL.</param>
-public record IssueInfo(string Id, string Title, string Url);
-
-/// <summary>
 ///     Represents build information for a release.
 /// </summary>
 /// <param name="FromVersion">Starting version (null if from beginning of history).</param>
 /// <param name="ToVersion">Ending version.</param>
 /// <param name="FromHash">Starting git hash (null if from beginning of history).</param>
 /// <param name="ToHash">Ending git hash.</param>
-/// <param name="ChangeIssues">Non-bug changes performed between versions.</param>
-/// <param name="BugIssues">Bugs fixed between versions.</param>
+/// <param name="Changes">Non-bug changes performed between versions.</param>
+/// <param name="Bugs">Bugs fixed between versions.</param>
 /// <param name="KnownIssues">Known issues (unfixed or fixed but not in this build).</param>
 public record BuildInformation(
     Version? FromVersion,
     Version ToVersion,
     string? FromHash,
     string ToHash,
-    List<IssueInfo> ChangeIssues,
-    List<IssueInfo> BugIssues,
-    List<IssueInfo> KnownIssues)
+    List<ItemInfo> Changes,
+    List<ItemInfo> Bugs,
+    List<ItemInfo> KnownIssues)
 {
     /// <summary>
     ///     Creates a BuildInformation record from a repository connector.
@@ -158,67 +150,50 @@ public record BuildInformation(
             }
         }
 
-        // Collect all pull requests and their associated issues in version range
-        var pullRequests = await connector.GetPullRequestsBetweenTagsAsync(fromTagInfo, toTagInfo);
-        var allIssues = new HashSet<string>();
-        var bugIssues = new List<IssueInfo>();
-        var changeIssues = new List<IssueInfo>();
+        // Collect all changes (issues and PRs) in version range
+        var changes = await connector.GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
+        var allChangeIds = new HashSet<string>();
+        var bugs = new List<ItemInfo>();
+        var nonBugChanges = new List<ItemInfo>();
 
-        // Process each pull request to extract and categorize issues
-        foreach (var pr in pullRequests)
+        // Process and categorize each change
+        foreach (var change in changes)
         {
-            // Get all issues referenced by this pull request
-            var issueIds = await connector.GetIssuesForPullRequestAsync(pr);
-
-            foreach (var issueId in issueIds)
+            // Skip changes already processed
+            if (allChangeIds.Contains(change.Id))
             {
-                // Skip issues already processed
-                if (allIssues.Contains(issueId))
-                {
-                    continue;
-                }
+                continue;
+            }
 
-                // Mark issue as processed
-                allIssues.Add(issueId);
+            // Mark change as processed
+            allChangeIds.Add(change.Id);
 
-                // Fetch issue details
-                var title = await connector.GetIssueTitleAsync(issueId);
-                var url = await connector.GetIssueUrlAsync(issueId);
-                var type = await connector.GetIssueTypeAsync(issueId);
-
-                // Create issue record
-                var issueInfo = new IssueInfo(issueId, title, url);
-
-                // Categorize issue by type
-                if (type == "bug")
-                {
-                    bugIssues.Add(issueInfo);
-                }
-                else
-                {
-                    changeIssues.Add(issueInfo);
-                }
+            // Categorize change by type
+            if (change.Type == "bug")
+            {
+                bugs.Add(change);
+            }
+            else
+            {
+                nonBugChanges.Add(change);
             }
         }
 
         // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = new List<IssueInfo>();
-        var openIssueIds = await connector.GetOpenIssuesAsync();
-        foreach (var issueId in openIssueIds)
+        var knownIssues = new List<ItemInfo>();
+        var openIssues = await connector.GetOpenIssuesAsync();
+        foreach (var issue in openIssues)
         {
             // Skip issues already fixed in this build
-            if (allIssues.Contains(issueId))
+            if (allChangeIds.Contains(issue.Id))
             {
                 continue;
             }
 
             // Only include bugs in known issues list
-            var type = await connector.GetIssueTypeAsync(issueId);
-            if (type == "bug")
+            if (issue.Type == "bug")
             {
-                var title = await connector.GetIssueTitleAsync(issueId);
-                var url = await connector.GetIssueUrlAsync(issueId);
-                knownIssues.Add(new IssueInfo(issueId, title, url));
+                knownIssues.Add(issue);
             }
         }
 
@@ -228,8 +203,8 @@ public record BuildInformation(
             toTagInfo,
             fromHash?.Trim(),
             toHash.Trim(),
-            changeIssues,
-            bugIssues,
+            nonBugChanges,
+            bugs,
             knownIssues);
     }
 
@@ -276,9 +251,9 @@ public record BuildInformation(
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
-        if (ChangeIssues.Count > 0)
+        if (Changes.Count > 0)
         {
-            foreach (var issue in ChangeIssues)
+            foreach (var issue in Changes)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
             }
@@ -294,9 +269,9 @@ public record BuildInformation(
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
-        if (BugIssues.Count > 0)
+        if (Bugs.Count > 0)
         {
-            foreach (var issue in BugIssues)
+            foreach (var issue in Bugs)
             {
                 markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
             }
