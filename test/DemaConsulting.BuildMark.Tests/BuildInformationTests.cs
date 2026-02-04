@@ -156,6 +156,32 @@ public class BuildInformationTests
     }
 
     /// <summary>
+    ///     Test that CreateAsync orders changes by Index (PR number).
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_CreateAsync_OrdersChangesByIndex()
+    {
+        // Create build information for version with issues
+        var connector = new MockRepoConnector();
+        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
+
+        // Verify changes are ordered by Index (PR number)
+        // Issue #1 from PR #10 should come before PR #13
+        Assert.HasCount(2, buildInfo.Changes);
+        Assert.AreEqual("1", buildInfo.Changes[0].Id);
+        Assert.AreEqual(10, buildInfo.Changes[0].Index);
+        Assert.AreEqual("#13", buildInfo.Changes[1].Id);
+        Assert.AreEqual(13, buildInfo.Changes[1].Index);
+        
+        // Verify Index values are in ascending order
+        for (var i = 0; i < buildInfo.Changes.Count - 1; i++)
+        {
+            Assert.IsLessThanOrEqualTo(buildInfo.Changes[i + 1].Index, buildInfo.Changes[i].Index, 
+                $"Changes should be ordered by Index. Found {buildInfo.Changes[i].Index} before {buildInfo.Changes[i + 1].Index}");
+        }
+    }
+
+    /// <summary>
     ///     Test that CreateAsync separates bug and change issues.
     /// </summary>
     [TestMethod]

@@ -197,6 +197,11 @@ public record BuildInformation(
             }
         }
 
+        // Sort all lists by Index to ensure chronological order
+        nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
+        bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
+        knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
+
         // Create and return build information with all collected data
         return new BuildInformation(
             fromTagInfo,

@@ -119,12 +119,13 @@ public class MockRepoConnector : IRepoConnector
             if (issues.Count > 0)
             {
                 // PR has associated issues - add them as changes
+                // Use PR number as index for chronological ordering
                 foreach (var issueId in issues)
                 {
                     var title = _issueTitles.TryGetValue(issueId, out var issueTitle) ? issueTitle : $"Issue {issueId}";
                     var url = $"https://github.com/example/repo/issues/{issueId}";
                     var type = _issueTypes.TryGetValue(issueId, out var issueType) ? issueType : "other";
-                    changes.Add(new ItemInfo(issueId, title, url, type));
+                    changes.Add(new ItemInfo(issueId, title, url, type, int.Parse(pr)));
                 }
             }
             else
@@ -134,7 +135,8 @@ public class MockRepoConnector : IRepoConnector
                     $"#{pr}",
                     $"PR #{pr}",
                     $"https://github.com/example/repo/pull/{pr}",
-                    "other"));
+                    "other",
+                    int.Parse(pr)));
             }
         }
 
@@ -173,7 +175,8 @@ public class MockRepoConnector : IRepoConnector
                 issueId,
                 _issueTitles.TryGetValue(issueId, out var title) ? title : $"Issue {issueId}",
                 $"https://github.com/example/repo/issues/{issueId}",
-                _issueTypes.TryGetValue(issueId, out var type) ? type : "other"))
+                _issueTypes.TryGetValue(issueId, out var type) ? type : "other",
+                int.Parse(issueId)))
             .ToList();
         return Task.FromResult(openIssuesData);
     }
