@@ -130,14 +130,14 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Temporary debug output
         Console.WriteLine($"[DEBUG] GetPullRequestsBetweenTagsAsync called with from={from?.Tag ?? "null"}, to={to?.Tag ?? "null"}");
         
-        // Build GitHub API command to get commits
-        // Use GitHub API instead of git log to avoid needing fetch-depth: 0 in CI
-        string ghApiCommand;
+        // Get commits using GitHub API instead of git log
+        // This approach doesn't require fetch-depth: 0 in CI and works with shallow clones
+        string commitHashesOutput;
         
         if (from == null && to == null)
         {
             // No versions specified, get all commits using paginated API
-            ghApiCommand = "gh api repos/:owner/:repo/commits --paginate --jq .[].sha";
+            commitHashesOutput = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate --jq .[].sha");
         }
         else if (from == null)
         {
@@ -147,13 +147,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
             
             // Get all commits up to toRef
-            ghApiCommand = $"gh api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha";
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
         }
         else if (to == null)
         {
             // Only start version specified - compare from tag to HEAD
             var fromTag = ValidateTag(from.Tag);
-            ghApiCommand = $"gh api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha";
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha");
         }
         else
         {
@@ -162,26 +162,25 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             var toExists = await TagExistsAsync(to.Tag);
             var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
             
-            ghApiCommand = $"gh api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha";
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
         }
         
+        // Temporary debug output
+        Console.WriteLine($"[DEBUG] Commit hashes output length: {commitHashesOutput.Length}");
+
         // Pipe commit hashes to gh pr list to batch search for PRs
         // This is much faster than querying each commit individually
-        // Format: gh api ... | gh pr list --state all --json number --jq .[].number
-        var pipelineCommand = $"{ghApiCommand} | gh pr list --state all --json number --jq .[].number";
-        
-        Console.WriteLine($"[DEBUG] Running pipeline: {pipelineCommand}");
-        
+        // The commit hashes from the first command are piped as stdin to the second command
         string prSearchOutput;
         try
         {
-            // Run the piped command through bash/sh
-            prSearchOutput = await RunCommandAsync("sh", $"-c \"{pipelineCommand}\"");
+            // Search for PRs by piping commit hashes to gh pr list
+            prSearchOutput = await RunCommandAsync("gh", "pr list --state all --json number --jq .[].number", commitHashesOutput);
         }
         catch (InvalidOperationException ex)
         {
             // Fallback to empty result if batch query fails
-            Console.WriteLine($"[DEBUG] Pipeline failed: {ex.Message}");
+            Console.WriteLine($"[DEBUG] Batch PR search failed: {ex.Message}");
             prSearchOutput = string.Empty;
         }
         

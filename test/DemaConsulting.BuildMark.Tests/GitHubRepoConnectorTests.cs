@@ -56,11 +56,15 @@ internal class TestableGitHubRepoConnector : GitHubRepoConnector
     /// </summary>
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
+    /// <param name="standardInput">Optional input to pipe to the command's stdin.</param>
     /// <returns>Command output.</returns>
-    protected override Task<string> RunCommandAsync(string command, string arguments)
+    protected override Task<string> RunCommandAsync(string command, string arguments, string? standardInput = null)
     {
         // Look up pre-configured result for command
-        var key = $"{command} {arguments}";
+        // Include stdin in the key if provided to allow different results based on piped input
+        var key = standardInput != null 
+            ? $"{command} {arguments} <stdin:{standardInput.Length}>" 
+            : $"{command} {arguments}";
         
         // Check if this command should throw
         if (_commandExceptions.Contains(key))
@@ -133,10 +137,17 @@ public class GitHubRepoConnectorTests
         // Mock git rev-parse to indicate v2.0.0 tag exists
         connector.AddCommandResult("git", "rev-parse --verify v2.0.0", "abc123def456");
         
-        // Mock piped GitHub API command to get commits and search for PRs
+        // Mock GitHub API command to get commits between tags
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/compare/v1.0.0...v2.0.0 --jq .commits[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/compare/v1.0.0...v2.0.0 --jq .commits[].sha",
+            "abc123def456\ndef456789abc");
+        
+        // Mock piped gh pr list command (stdin is the commit hashes from above)
+        var stdinKey = "abc123def456\ndef456789abc";
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{stdinKey.Length}>",
             "10\n11");
 
         // Act
@@ -162,10 +173,17 @@ public class GitHubRepoConnectorTests
         // Mock git rev-parse to indicate v1.0.0 tag exists
         connector.AddCommandResult("git", "rev-parse --verify v1.0.0", "abc123def456");
         
-        // Mock piped GitHub API command to get commits up to v1.0.0 and search for PRs
+        // Mock GitHub API command to get commits up to v1.0.0
+        var commitOutput = "abc123def456";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/commits?sha=v1.0.0 --paginate --jq .[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/commits?sha=v1.0.0 --paginate --jq .[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "10");
 
         // Act
@@ -186,10 +204,17 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         
         // Mock git log for commit hashes
-        // Mock piped GitHub API command to compare v1.0.0 to HEAD and search for PRs
+        // Mock GitHub API command to compare v1.0.0 to HEAD
+        var commitOutput = "abc123def456";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/compare/v1.0.0...HEAD --jq .commits[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/compare/v1.0.0...HEAD --jq .commits[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "11");
 
         // Act
@@ -210,10 +235,17 @@ public class GitHubRepoConnectorTests
         var connector = new TestableGitHubRepoConnector();
         
         // Mock git log for commit hashes
-        // Mock piped GitHub API command to get all commits and search for PRs
+        // Mock GitHub API command to get all commits
+        var commitOutput = "abc123def456";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/commits --paginate --jq .[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/commits --paginate --jq .[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "12");
 
         // Act
@@ -236,11 +268,17 @@ public class GitHubRepoConnectorTests
         // Mock git rev-parse to indicate tag doesn't exist (throws exception)
         connector.AddCommandException("git", "rev-parse --verify 0.0.0-run.50");
         
-        // Mock git log for commit hashes
-        // Mock piped GitHub API command to compare v1.0.0 to HEAD (since 0.0.0-run.50 doesn't exist)
+        // Mock GitHub API command to compare v1.0.0 to HEAD (since 0.0.0-run.50 doesn't exist)
+        var commitOutput = "abc123def456";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/compare/v1.0.0...HEAD --jq .commits[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/compare/v1.0.0...HEAD --jq .commits[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "15");
 
         // Act - using a version that doesn't exist as a tag
@@ -262,11 +300,17 @@ public class GitHubRepoConnectorTests
         // Arrange
         var connector = new TestableGitHubRepoConnector();
         
-        // Mock git log for commit hashes
-        // Mock piped GitHub API command to get all commits and search for PRs - returns all PRs
+        // Mock GitHub API command to get all commits
+        var commitOutput = "abc123def456\ndef456789abc\n789abcdef123";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/commits --paginate --jq .[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/commits --paginate --jq .[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command - returns all PRs
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "18\n19\n20");
 
         // Act
@@ -288,16 +332,17 @@ public class GitHubRepoConnectorTests
         // Arrange
         var connector = new TestableGitHubRepoConnector();
         
-        // Mock git log for commit hashes (multiple commits from same PR)
+        // Mock GitHub API command to get all commits (multiple commits from same PR)
+        var commitOutput = "5e541195f387259ee8d72d33b70579a0f7b6fde4\nc3eb81cd24b9d054a626a9785b16975f0808ecb2";
         connector.AddCommandResult(
-            "git",
-            "log --format=%H HEAD",
-            "5e541195f387259ee8d72d33b70579a0f7b6fde4\nc3eb81cd24b9d054a626a9785b16975f0808ecb2");
+            "gh",
+            "api repos/:owner/:repo/commits --paginate --jq .[].sha",
+            commitOutput);
         
-        // Mock piped GitHub API command - should deduplicate PR 20 that appears twice
+        // Mock piped gh pr list command - should deduplicate PR 20 that appears twice
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/commits --paginate --jq .[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "20\n20"); // Duplicate PR 20
 
         // Act
@@ -317,10 +362,17 @@ public class GitHubRepoConnectorTests
         // Arrange
         var connector = new TestableGitHubRepoConnector();
         
-        // Mock piped GitHub API command to return multiple PRs for commits
+        // Mock GitHub API command to get all commits
+        var commitOutput = "91545652f4eeabfef6d7189ac4a3a859166655dc";
         connector.AddCommandResult(
-            "sh",
-            "-c \"gh api repos/:owner/:repo/commits --paginate --jq .[].sha | gh pr list --state all --json number --jq .[].number\"",
+            "gh",
+            "api repos/:owner/:repo/commits --paginate --jq .[].sha",
+            commitOutput);
+        
+        // Mock piped gh pr list command to return multiple PRs for commits
+        connector.AddCommandResult(
+            "gh",
+            $"pr list --state all --json number --jq .[].number <stdin:{commitOutput.Length}>",
             "16\n20");
 
         // Act
