@@ -54,7 +54,7 @@ public class MockRepoConnectorTests
         // Get pull requests for specific version range
         var connector = new MockRepoConnector();
         var prs = await connector.GetPullRequestsBetweenTagsAsync(
-            Version.Create("v1.0.0"), 
+            Version.Create("v1.0.0"),
             Version.Create("ver-1.1.0"));
 
         // Verify expected pull request is returned
@@ -73,7 +73,7 @@ public class MockRepoConnectorTests
 
         // Act
         var prs = await connector.GetPullRequestsBetweenTagsAsync(
-            Version.Create("ver-1.1.0"), 
+            Version.Create("ver-1.1.0"),
             Version.Create("2.0.0"));
 
         // Assert

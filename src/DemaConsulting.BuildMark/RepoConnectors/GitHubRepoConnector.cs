@@ -99,6 +99,27 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Checks if a git tag exists in the repository.
+    /// </summary>
+    /// <param name="tag">Tag name to check.</param>
+    /// <returns>True if the tag exists, false otherwise.</returns>
+    private async Task<bool> TagExistsAsync(string tag)
+    {
+        try
+        {
+            // Try to resolve the tag to a commit hash
+            // If tag doesn't exist, RunCommandAsync will throw InvalidOperationException
+            await RunCommandAsync("git", $"rev-parse --verify {ValidateTag(tag)}");
+            return true;
+        }
+        catch (InvalidOperationException)
+        {
+            // Tag doesn't exist
+            return false;
+        }
+    }
+
+    /// <summary>
     ///     Gets the list of pull request IDs between two versions.
     /// </summary>
     /// <param name="from">Starting version (null for start of history).</param>
@@ -106,46 +127,64 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of pull request IDs.</returns>
     public override async Task<List<string>> GetPullRequestsBetweenTagsAsync(Version? from, Version? to)
     {
-        // Build git log range based on provided versions
-        string range;
+        // Get commits using GitHub API instead of git log
+        // This approach doesn't require fetch-depth: 0 in CI and works with shallow clones
+        string commitHashesOutput;
+
         if (from == null && to == null)
         {
-            // No versions specified, use all of HEAD
-            range = "HEAD";
+            // No versions specified, get all commits using paginated API
+            commitHashesOutput = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate --jq .[].sha");
         }
         else if (from == null)
         {
-            // Only end version specified (to is not null here)
-            range = ValidateTag(to!.Tag);
+            // Only end version specified - get commits up to 'to' tag/HEAD
+            // Check if the tag exists; if not, use HEAD
+            var toExists = to != null && await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
+
+            // Get all commits up to toRef
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate --jq .[].sha");
         }
         else if (to == null)
         {
-            // Only start version specified, range to HEAD (from is not null here)
-            range = $"{ValidateTag(from.Tag)}..HEAD";
+            // Only start version specified - compare from tag to HEAD
+            var fromTag = ValidateTag(from.Tag);
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD --jq .commits[].sha");
         }
         else
         {
-            // Both versions specified (both from and to are not null here)
-            range = $"{ValidateTag(from.Tag)}..{ValidateTag(to.Tag)}";
+            // Both versions specified - compare from tag to to tag/HEAD
+            var fromTag = ValidateTag(from.Tag);
+            var toExists = await TagExistsAsync(to.Tag);
+            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
+
+            commitHashesOutput = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef} --jq .commits[].sha");
         }
 
-        // Get merge commits in range using git log
-        // Arguments: --oneline (one line per commit), --merges (only merge commits)
-        // Output format: "<short-hash> Merge pull request #<number> from <branch>"
-        var output = await RunCommandAsync("git", $"log --oneline --merges {range}");
+        // Pipe commit hashes to gh pr list to batch search for PRs
+        // This is much faster than querying each commit individually
+        // The commit hashes from the first command are piped as stdin to the second command
+        string prSearchOutput;
+        try
+        {
+            // Search for PRs by piping commit hashes to gh pr list
+            prSearchOutput = await RunCommandAsync("gh", "pr list --state all --json number --jq .[].number", commitHashesOutput);
+        }
+        catch (InvalidOperationException)
+        {
+            // Fallback to empty result if batch query fails
+            prSearchOutput = string.Empty;
+        }
 
-        // Extract pull request numbers from merge commit messages
-        // Each line is parsed for "#<number>" pattern to identify the PR
-        var regex = NumberReferenceRegex();
-
-        var pullRequests = output
+        var pullRequestsFromApi = prSearchOutput
             .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(line => regex.Match(line))
-            .Where(match => match.Success)
-            .Select(match => match.Groups[1].Value)
+            .Select(n => n.Trim())
+            .Where(n => !string.IsNullOrEmpty(n))
+            .Distinct()
             .ToList();
 
-        return pullRequests;
+        return pullRequestsFromApi;
     }
 
     /// <summary>
@@ -155,20 +194,19 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of issue IDs.</returns>
     public override async Task<List<string>> GetIssuesForPullRequestAsync(string pullRequestId)
     {
-        // Validate and fetch PR body using GitHub CLI
-        // Arguments: --json body (get body field), --jq .body (extract body value)
-        // Output: raw PR description text which may contain issue references
+        // Use GitHub API to get issues that are actually linked to close when PR merges
+        // This is more reliable than parsing PR body text which could contain any #numbers
+        // Arguments: --json closingIssuesReferences (get linked issues), --jq to extract numbers
+        // Output: issue numbers (one per line)
         var validatedId = ValidateId(pullRequestId, nameof(pullRequestId));
-        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json body --jq .body");
+        var output = await RunCommandAsync("gh", $"pr view {validatedId} --json closingIssuesReferences --jq .closingIssuesReferences[].number");
 
-        // Extract issue references (e.g., #123, #456) from PR body text
-        var issues = new List<string>();
-        var regex = NumberReferenceRegex();
-
-        foreach (Match match in regex.Matches(output))
-        {
-            issues.Add(match.Groups[1].Value);
-        }
+        // Parse output to get issue numbers
+        var issues = output
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
+            .Select(n => n.Trim())
+            .Where(n => !string.IsNullOrEmpty(n))
+            .ToList();
 
         return issues;
     }
@@ -195,10 +233,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<string> GetIssueTypeAsync(string issueId)
     {
         // Validate and fetch issue labels using GitHub CLI
-        // Arguments: --json labels (get labels array), --jq '.labels[].name' (extract label names)
+        // Arguments: --json labels (get labels array), --jq .labels[].name (extract label names)
         // Output: one label name per line
         var validatedId = ValidateId(issueId, nameof(issueId));
-        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq '.labels[].name'");
+        var output = await RunCommandAsync("gh", $"issue view {validatedId} --json labels --jq .labels[].name");
         var labels = output.Split('\n', StringSplitOptions.RemoveEmptyEntries);
 
         // Map labels to standardized issue types
@@ -248,9 +286,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     public override async Task<List<string>> GetOpenIssuesAsync()
     {
         // Fetch all open issue numbers using GitHub CLI
-        // Arguments: --state open (open issues only), --json number (get number field), --jq '.[].number' (extract numbers from array)
+        // Arguments: --state open (open issues only), --json number (get number field), --jq .[].number (extract numbers from array)
         // Output: one issue number per line
-        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq '.[].number'");
+        var output = await RunCommandAsync("gh", "issue list --state open --json number --jq .[].number");
 
         // Parse output into list of issue IDs
         return output
@@ -272,11 +310,4 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Compiled regular expression.</returns>
     [GeneratedRegex(@"^\d+$", RegexOptions.Compiled)]
     private static partial Regex NumericIdRegex();
-
-    /// <summary>
-    ///     Regular expression to match number references (#123).
-    /// </summary>
-    /// <returns>Compiled regular expression.</returns>
-    [GeneratedRegex(@"#(\d+)", RegexOptions.Compiled)]
-    private static partial Regex NumberReferenceRegex();
 }

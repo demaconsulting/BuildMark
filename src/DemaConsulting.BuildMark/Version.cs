@@ -64,14 +64,14 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
         var separator = match.Groups["separator"];
         var preReleaseGroup = match.Groups["pre_release"];
         var metadataGroup = match.Groups["metadata"];
-        
+
         // Determine if pre-release based on separator and content
         var hasPreRelease = separator.Success && preReleaseGroup.Success && !string.IsNullOrEmpty(preReleaseGroup.Value);
-        
+
         // Get pre-release and metadata strings
         var preRelease = hasPreRelease ? preReleaseGroup.Value : string.Empty;
         var metadata = metadataGroup.Success ? metadataGroup.Value : string.Empty;
-        
+
         // Construct full version string from components
         var fullVersion = version;
         if (hasPreRelease)
