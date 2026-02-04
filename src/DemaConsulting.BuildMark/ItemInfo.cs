@@ -27,4 +27,5 @@ namespace DemaConsulting.BuildMark;
 /// <param name="Title">Item title.</param>
 /// <param name="Url">Item URL.</param>
 /// <param name="Type">Item type (bug, feature, etc.).</param>
-public record ItemInfo(string Id, string Title, string Url, string Type);
+/// <param name="Index">Numeric index for sorting (PR number for PRs, issue number for issues).</param>
+public record ItemInfo(string Id, string Title, string Url, string Type, int Index = 0);

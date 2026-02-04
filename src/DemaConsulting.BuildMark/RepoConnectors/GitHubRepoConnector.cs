@@ -238,7 +238,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                         }
                     }
 
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType);
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, int.Parse(issueNumber));
                 }
             }
             catch (Exception)
@@ -246,7 +246,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 // If we can't fetch issue list, create fallback entries
                 foreach (var issueNumber in issueNumbers)
                 {
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other");
+                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other", int.Parse(issueNumber));
                 }
             }
         }
@@ -301,7 +301,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     }
                 }
 
-                changes.Add(new ItemInfo($"#{prNumber}", prTitle, prUrl, prType));
+                changes.Add(new ItemInfo(
+                    $"#{prNumber}",
+                    prTitle,
+                    prUrl,
+                    prType,
+                    int.Parse(prNumber)));
             }
         }
 
@@ -404,7 +409,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     }
                 }
 
-                openIssues.Add(new ItemInfo(issueNumber, issueTitle, issueUrl, issueType));
+                openIssues.Add(new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, int.Parse(issueNumber)));
             }
             catch (System.Text.Json.JsonException)
             {
