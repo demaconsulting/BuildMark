@@ -81,11 +81,11 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Build a mapping from commit SHA to pull request.
         // This is used to associate commits with their pull requests for change tracking.
         var commitHashToPr = BuildCommitToPrMap(pullRequests);
-        
+
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
         var branchCommitShas = new HashSet<string>(commits.Select(c => c.Sha));
-        
+
         // Build a set of tags filtered to those on the current branch.
         // This is used for efficient filtering of branch-related releases.
         var branchTagNames = new HashSet<string>(
@@ -153,7 +153,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Determine the starting release for comparing changes
         DemaConsulting.BuildMark.Version? fromTagInfo = null;
         string? fromHash = null;
-        
+
         if (releaseVersions.Count > 0)
         {
             // Find the position of target version in release history
@@ -210,7 +210,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             }
 
             // Get commit hash for baseline version if one was found
-            if (fromTagInfo != null && 
+            if (fromTagInfo != null &&
                 tagToRelease.TryGetValue(fromTagInfo.Tag, out var fromRelease) &&
                 tagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
             {
@@ -232,8 +232,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             {
                 // Find issues that are linked to this PR
                 // Use Issue.PullRequest.HtmlUrl to match with PullRequest.HtmlUrl
-                var linkedIssues = issues.Where(i => 
-                    i.State == ItemState.Closed && 
+                var linkedIssues = issues.Where(i =>
+                    i.State == ItemState.Closed &&
                     i.PullRequest != null &&
                     i.PullRequest.HtmlUrl == pr.HtmlUrl).ToList();
 
@@ -250,7 +250,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
                         allChangeIds.Add(issueId);
                         var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
-                        
+
                         if (itemInfo.Type == "bug")
                         {
                             bugs.Add(itemInfo);
@@ -269,7 +269,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     {
                         allChangeIds.Add(prId);
                         var itemInfo = CreateItemInfoFromPullRequest(pr);
-                        
+
                         if (itemInfo.Type == "bug")
                         {
                             bugs.Add(itemInfo);
@@ -330,7 +330,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     private static Dictionary<string, PullRequest> BuildCommitToPrMap(IReadOnlyList<PullRequest> pullRequests)
     {
         var map = new Dictionary<string, PullRequest>();
-        
+
         foreach (var pr in pullRequests.Where(p => p.Merged && p.MergeCommitSha != null))
         {
             map[pr.MergeCommitSha] = pr;
