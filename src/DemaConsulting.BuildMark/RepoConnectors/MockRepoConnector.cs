@@ -109,15 +109,23 @@ public class MockRepoConnector : RepoConnectorBase
         bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
+        // Build version tags from version and hash info
+        var currentTag = new VersionTag(toTagInfo, toHash.Trim());
+        var baselineTag = fromTagInfo != null && fromHash != null 
+            ? new VersionTag(fromTagInfo, fromHash.Trim()) 
+            : null;
+
+        // Generate mock changelog link
+        var changelogLink = GenerateMockChangelogLink(fromTagInfo?.Tag, toTagInfo.Tag);
+
         // Create and return build information with all collected data
         return new BuildInformation(
-            fromTagInfo,
-            toTagInfo,
-            fromHash?.Trim(),
-            toHash.Trim(),
+            baselineTag,
+            currentTag,
             nonBugChanges,
             bugs,
-            knownIssues);
+            knownIssues,
+            changelogLink);
     }
 
     /// <summary>
@@ -525,5 +533,26 @@ public class MockRepoConnector : RepoConnectorBase
 
         // Return task with open issues data
         return Task.FromResult(openIssuesData);
+    }
+
+    /// <summary>
+    ///     Generates a mock changelog link for testing.
+    /// </summary>
+    /// <param name="oldTag">Old tag name (null if from beginning).</param>
+    /// <param name="newTag">New tag name.</param>
+    /// <returns>WebLink to mock compare page, or null if no baseline tag.</returns>
+    private static WebLink? GenerateMockChangelogLink(string? oldTag, string newTag)
+    {
+        // Cannot generate comparison link without a baseline tag
+        if (oldTag == null)
+        {
+            return null;
+        }
+
+        // Build comparison label and URL for mock repo
+        var comparisonLabel = $"{oldTag}...{newTag}";
+        var comparisonUrl = $"https://github.com/example/repo/compare/{comparisonLabel}";
+
+        return new WebLink(comparisonLabel, comparisonUrl);
     }
 }

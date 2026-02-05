@@ -23,21 +23,19 @@ namespace DemaConsulting.BuildMark;
 /// <summary>
 ///     Represents build information for a release.
 /// </summary>
-/// <param name="FromVersion">Starting version (null if from beginning of history).</param>
-/// <param name="ToVersion">Ending version.</param>
-/// <param name="FromHash">Starting git hash (null if from beginning of history).</param>
-/// <param name="ToHash">Ending git hash.</param>
+/// <param name="BaselineVersionTag">Starting version tag (null if from beginning of history).</param>
+/// <param name="CurrentVersionTag">Ending version tag.</param>
 /// <param name="Changes">Non-bug changes performed between versions.</param>
 /// <param name="Bugs">Bugs fixed between versions.</param>
 /// <param name="KnownIssues">Known issues (unfixed or fixed but not in this build).</param>
+/// <param name="CompleteChangelogLink">Optional link to the full changelog (null if not available).</param>
 public record BuildInformation(
-    Version? FromVersion,
-    Version ToVersion,
-    string? FromHash,
-    string ToHash,
+    VersionTag? BaselineVersionTag,
+    VersionTag CurrentVersionTag,
     List<ItemInfo> Changes,
     List<ItemInfo> Bugs,
-    List<ItemInfo> KnownIssues)
+    List<ItemInfo> KnownIssues,
+    WebLink? CompleteChangelogLink)
 {
     /// <summary>
     ///     Generates a Markdown build report from this build information.
@@ -73,6 +71,12 @@ public record BuildInformation(
             AppendKnownIssuesSection(markdown, subHeading);
         }
 
+        // Add full changelog section if link is available
+        if (CompleteChangelogLink != null)
+        {
+            AppendCompleteChangelogSection(markdown, subHeading);
+        }
+
         // Return the complete markdown report
         return markdown.ToString();
     }
@@ -89,14 +93,14 @@ public record BuildInformation(
         markdown.AppendLine();
         markdown.AppendLine("| Field | Value |");
         markdown.AppendLine("|-------|-------|");
-        markdown.AppendLine($"| **Version** | {ToVersion.Tag} |");
-        markdown.AppendLine($"| **Commit Hash** | {ToHash} |");
+        markdown.AppendLine($"| **Version** | {CurrentVersionTag.VersionInfo.Tag} |");
+        markdown.AppendLine($"| **Commit Hash** | {CurrentVersionTag.CommitHash} |");
 
         // Add previous version information or N/A if this is the first release
-        if (FromVersion != null)
+        if (BaselineVersionTag != null)
         {
-            markdown.AppendLine($"| **Previous Version** | {FromVersion.Tag} |");
-            markdown.AppendLine($"| **Previous Commit Hash** | {FromHash} |");
+            markdown.AppendLine($"| **Previous Version** | {BaselineVersionTag.VersionInfo.Tag} |");
+            markdown.AppendLine($"| **Previous Commit Hash** | {BaselineVersionTag.CommitHash} |");
         }
         else
         {
@@ -195,6 +199,20 @@ public record BuildInformation(
         }
 
         // Add blank line after section
+        markdown.AppendLine();
+    }
+
+    /// <summary>
+    ///     Appends the full changelog section to the markdown report.
+    /// </summary>
+    /// <param name="markdown">StringBuilder containing the markdown report.</param>
+    /// <param name="subHeading">Sub-heading prefix.</param>
+    private void AppendCompleteChangelogSection(System.Text.StringBuilder markdown, string subHeading)
+    {
+        // Add full changelog section header and link
+        markdown.AppendLine($"{subHeading} Full Changelog");
+        markdown.AppendLine();
+        markdown.AppendLine($"See the full changelog at [{CompleteChangelogLink!.LinkText}]({CompleteChangelogLink.TargetUrl}).");
         markdown.AppendLine();
     }
 }

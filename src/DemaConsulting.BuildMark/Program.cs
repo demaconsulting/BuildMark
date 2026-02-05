@@ -186,12 +186,12 @@ internal static class Program
         }
 
         // Display build information summary
-        context.WriteLine($"Build Version: {buildInfo.ToVersion.Tag}");
-        context.WriteLine($"Commit Hash: {buildInfo.ToHash}");
-        if (buildInfo.FromVersion != null)
+        context.WriteLine($"Build Version: {buildInfo.CurrentVersionTag.VersionInfo.Tag}");
+        context.WriteLine($"Commit Hash: {buildInfo.CurrentVersionTag.CommitHash}");
+        if (buildInfo.BaselineVersionTag != null)
         {
-            context.WriteLine($"Previous Version: {buildInfo.FromVersion.Tag}");
-            context.WriteLine($"Previous Commit Hash: {buildInfo.FromHash}");
+            context.WriteLine($"Previous Version: {buildInfo.BaselineVersionTag.VersionInfo.Tag}");
+            context.WriteLine($"Previous Commit Hash: {buildInfo.BaselineVersionTag.CommitHash}");
         }
         context.WriteLine($"Changes: {buildInfo.Changes.Count}");
         context.WriteLine($"Bugs Fixed: {buildInfo.Bugs.Count}");

@@ -97,15 +97,23 @@ public class GitHubRepoConnector : RepoConnectorBase
         bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
+        // Build version tags from version and hash info
+        var currentTag = new VersionTag(toVersion, toHash);
+        var baselineTag = fromVersion != null && fromHash != null 
+            ? new VersionTag(fromVersion, fromHash) 
+            : null;
+
+        // Generate full changelog link for GitHub
+        var changelogLink = GenerateGitHubChangelogLink(owner, repo, fromVersion?.Tag, toVersion.Tag);
+
         // Create and return build information with all collected data
         return new BuildInformation(
-            fromVersion,
-            toVersion,
-            fromHash,
-            toHash,
+            baselineTag,
+            currentTag,
             nonBugChanges,
             bugs,
-            knownIssues);
+            knownIssues,
+            changelogLink);
     }
 
     /// <summary>
@@ -719,5 +727,28 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Return parsed owner and repo
         return (parts[0], parts[1]);
+    }
+
+    /// <summary>
+    ///     Generates a GitHub compare link for the full changelog.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="oldTag">Old tag name (null if from beginning).</param>
+    /// <param name="newTag">New tag name.</param>
+    /// <returns>WebLink to GitHub compare page, or null if no baseline tag.</returns>
+    private static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag)
+    {
+        // Cannot generate comparison link without a baseline tag
+        if (oldTag == null)
+        {
+            return null;
+        }
+
+        // Build comparison label and URL
+        var comparisonLabel = $"{oldTag}...{newTag}";
+        var comparisonUrl = $"https://github.com/{owner}/{repo}/compare/{comparisonLabel}";
+
+        return new WebLink(comparisonLabel, comparisonUrl);
     }
 }
