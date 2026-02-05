@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using System.Reflection;
+using DemaConsulting.BuildMark.RepoConnectors;
 
 namespace DemaConsulting.BuildMark;
 
@@ -176,7 +177,7 @@ internal static class Program
         BuildInformation buildInfo;
         try
         {
-            buildInfo = BuildInformation.CreateAsync(connector, buildVersion).GetAwaiter().GetResult();
+            buildInfo = connector.GetBuildInformationAsync(buildVersion).GetAwaiter().GetResult();
         }
         catch (InvalidOperationException ex)
         {

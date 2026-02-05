@@ -18,15 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using System.Text.Json;
-using System.Text.RegularExpressions;
+using Octokit;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
-///     GitHub repository connector implementation.
+///     GitHub repository connector implementation using Octokit.Net.
 /// </summary>
-public partial class GitHubRepoConnector : RepoConnectorBase
+public class GitHubRepoConnector : RepoConnectorBase
 {
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
@@ -40,475 +39,454 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     };
 
     /// <summary>
-    ///     Validates and sanitizes a tag name to prevent command injection.
+    ///     Gets build information for a release.
     /// </summary>
-    /// <param name="tag">Tag name to validate.</param>
-    /// <returns>Sanitized tag name.</returns>
-    /// <exception cref="ArgumentException">Thrown if tag name is invalid.</exception>
-    private static string ValidateTag(string tag)
+    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
+    /// <returns>BuildInformation record with all collected data.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
+    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
     {
-        // Ensure tag name matches allowed pattern to prevent injection attacks
-        if (!TagNameRegex().IsMatch(tag))
+        // Get repository metadata using git commands
+        var repoUrl = await RunCommandAsync("git", "remote get-url origin");
+        var branch = await RunCommandAsync("git", "rev-parse --abbrev-ref HEAD");
+        var currentCommitHash = await RunCommandAsync("git", "rev-parse HEAD");
+
+        // Parse owner and repo from URL
+        var (owner, repo) = ParseGitHubUrl(repoUrl);
+
+        // Get GitHub token
+        var token = await GetGitHubTokenAsync();
+
+        // Create Octokit client
+        var client = new GitHubClient(new Octokit.ProductHeaderValue("BuildMark"))
         {
-            throw new ArgumentException($"Invalid tag name: {tag}", nameof(tag));
-        }
+            Credentials = new Credentials(token)
+        };
 
-        return tag;
-    }
+        // Fetch all data from GitHub in parallel
+        var commitsTask = GetAllCommitsAsync(client, owner, repo, branch.Trim());
+        var releasesTask = client.Repository.Release.GetAll(owner, repo);
+        var tagsTask = client.Repository.GetAllTags(owner, repo);
+        var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
+        var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
 
-    /// <summary>
-    ///     Gets the history of tags leading to the current branch.
-    /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
-    public override async Task<List<Version>> GetTagHistoryAsync()
-    {
-        // Get all tags merged into current branch, sorted by creation date
-        // Arguments: --sort=creatordate (chronological order), --merged HEAD (reachable from HEAD)
-        // Output format: one tag name per line
-        var output = await RunCommandAsync("git", "tag --sort=creatordate --merged HEAD");
+        await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
 
-        // Split output into individual tag names
-        var tagNames = output
-            .Split('\n', StringSplitOptions.RemoveEmptyEntries)
-            .Select(t => t.Trim())
+        var commits = await commitsTask;
+        var releases = await releasesTask;
+        var tags = await tagsTask;
+        var pullRequests = await pullRequestsTask;
+        var issues = await issuesTask;
+
+        // Build a mapping from issue number to issue for efficient lookup.
+        // This is used to look up issue details when we find linked issue IDs.
+        var issueById = issues.ToDictionary(i => i.Number, i => i);
+
+        // Build a mapping from commit SHA to pull request.
+        // This is used to associate commits with their pull requests for change tracking.
+        // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
+        var commitHashToPr = pullRequests
+            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.Head?.Sha != null))
+            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.Head.Sha, p => p);
+
+        // Build a set of commit SHAs in the current branch.
+        // This is used for efficient filtering of branch-related tags.
+        var branchCommitShas = new HashSet<string>(commits.Select(c => c.Sha));
+
+        // Build a set of tags filtered to those on the current branch.
+        // This is used for efficient filtering of branch-related releases.
+        var branchTagNames = new HashSet<string>(
+            tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
+                .Select(t => t.Name));
+
+        // Build an ordered list of releases on the current branch.
+        // This is used to select the prior release version for identifying changes in the build.
+        var branchReleases = releases
+            .Where(r => !string.IsNullOrEmpty(r.TagName) && branchTagNames.Contains(r.TagName))
             .ToList();
 
-        // Parse and filter to valid version tags only
-        return tagNames
-            .Select(Version.TryCreate)
-            .Where(t => t != null)
+        // Build a mapping from tag name to tag object for quick lookup.
+        // This is used to get commit SHAs for release tags.
+        var tagsByName = tags.ToDictionary(t => t.Name, t => t);
+
+        // Build a mapping from tag name to release for version lookup.
+        // This is used to match version objects back to their releases.
+        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
+
+        // Parse release tags into Version objects, maintaining release order (newest to oldest).
+        // This is used to determine version history and find previous releases.
+        var releaseVersions = branchReleases
+            .Select(r => Version.TryCreate(r.TagName!))
+            .Where(v => v != null)
             .Cast<Version>()
             .ToList();
-    }
 
-    /// <summary>
-    ///     Gets the list of changes between two versions.
-    /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of changes with full information.</returns>
-    public override async Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
-    {
-        // Get commits using GitHub API
-        string commitHashesOutput;
-
-        if (from == null && to == null)
+        // Determine the target version and hash for build information
+        var toVersion = version;
+        var toHash = currentCommitHash.Trim();
+        if (toVersion == null)
         {
-            // No versions specified, get all commits using paginated API
-            var output = await RunCommandAsync("gh", "api repos/:owner/:repo/commits --paginate");
-            commitHashesOutput = ExtractShasFromCommitsJson(output);
-        }
-        else if (from == null)
-        {
-            // Only end version specified - get commits up to 'to' tag/HEAD
-            var toExists = to != null && await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to!.Tag) : "HEAD";
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/commits?sha={toRef} --paginate");
-            commitHashesOutput = ExtractShasFromCommitsJson(output);
-        }
-        else if (to == null)
-        {
-            // Only start version specified - compare from tag to HEAD
-            var fromTag = ValidateTag(from.Tag);
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...HEAD");
-            commitHashesOutput = ExtractShasFromCompareJson(output);
-        }
-        else
-        {
-            // Both versions specified - compare from tag to to tag/HEAD
-            var fromTag = ValidateTag(from.Tag);
-            var toExists = await TagExistsAsync(to.Tag);
-            var toRef = toExists ? ValidateTag(to.Tag) : "HEAD";
-            var output = await RunCommandAsync("gh", $"api repos/:owner/:repo/compare/{fromTag}...{toRef}");
-            commitHashesOutput = ExtractShasFromCompareJson(output);
-        }
-
-        // Batch fetch PR information with all details in one call
-        string prDataOutput;
-        try
-        {
-            // Fetch PRs with all required fields: number, title, url, labels, and closing issues with their details
-            // Note: Not using --jq to avoid shell quoting issues on Windows
-            prDataOutput = await RunCommandAsync(
-                "gh",
-                "pr list --state all --json number,title,url,labels,closingIssuesReferences",
-                commitHashesOutput);
-        }
-        catch (InvalidOperationException)
-        {
-            // Fallback to empty result if batch query fails
-            return new List<ItemInfo>();
-        }
-
-        // Parse the JSON array output
-        List<JsonElement> prArray;
-        try
-        {
-            var jsonDoc = JsonDocument.Parse(prDataOutput);
-            prArray = jsonDoc.RootElement.EnumerateArray().ToList();
-        }
-        catch (JsonException)
-        {
-            // Fallback to empty result if JSON parsing fails
-            return new List<ItemInfo>();
-        }
-
-        // Parse PR data and extract changes
-        var changes = new List<ItemInfo>();
-        var issueNumbers = new HashSet<string>();
-        var prData = new List<(string number, string title, string url, List<string> issueNumbers)>();
-
-        // First pass: collect issue numbers and PR data
-        foreach (var prElement in prArray)
-        {
-            try
+            if (releaseVersions.Count > 0)
             {
-                var prNumber = prElement.GetProperty("number").GetInt32().ToString();
-                var prTitle = prElement.GetProperty("title").GetString() ?? $"PR #{prNumber}";
-                var prUrl = prElement.GetProperty("url").GetString() ?? string.Empty;
+                // Use the most recent release (first in list since releases are newest to oldest)
+                var latestRelease = branchReleases[0];
+                var latestReleaseVersion = releaseVersions[0];
+                var latestTagCommit = tagsByName[latestRelease.TagName!];
 
-                var prIssues = new List<string>();
-                if (prElement.TryGetProperty("closingIssuesReferences", out var issuesElement) && issuesElement.ValueKind == JsonValueKind.Array)
+                if (latestTagCommit.Commit.Sha == toHash)
                 {
-                    foreach (var issue in issuesElement.EnumerateArray())
+                    // Current commit matches latest release tag, use it as target
+                    toVersion = latestReleaseVersion;
+                }
+                else
+                {
+                    // Current commit doesn't match any release tag, cannot determine version
+                    throw new InvalidOperationException(
+                        "Target version not specified and current commit does not match any release tag. " +
+                        "Please provide a version parameter.");
+                }
+            }
+            else
+            {
+                // No releases in repository and no version provided
+                throw new InvalidOperationException(
+                    "No releases found in repository and no version specified. " +
+                    "Please provide a version parameter.");
+            }
+        }
+
+        // Determine the starting release for comparing changes
+        Version? fromVersion = null;
+        string? fromHash = null;
+
+        if (releaseVersions.Count > 0)
+        {
+            // Find the position of target version in release history
+            var toIndex = FindVersionIndex(releaseVersions, toVersion.FullVersion);
+
+            if (toVersion.IsPreRelease)
+            {
+                // Pre-release versions use the immediately previous (older) release as baseline
+                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
+                {
+                    // Target version exists in history, use next older release (higher index)
+                    fromVersion = releaseVersions[toIndex + 1];
+                }
+                else if (toIndex == -1 && releaseVersions.Count > 0)
+                {
+                    // Target version not in history, use most recent (first) release as baseline
+                    fromVersion = releaseVersions[0];
+                }
+                // If toIndex is last in list, this is the oldest release, no baseline
+            }
+            else
+            {
+                // Release versions skip pre-releases and use previous non-pre-release as baseline
+                int startIndex;
+                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
+                {
+                    // Target version exists in history, start search from next older release
+                    startIndex = toIndex + 1;
+                }
+                else if (toIndex == -1 && releaseVersions.Count > 1)
+                {
+                    // Target version not in history, start from second release (skip most recent)
+                    // We skip the first (newest) release because the target is implicitly newer
+                    startIndex = 1;
+                }
+                else
+                {
+                    // Target is oldest release or not enough releases, no previous release exists
+                    startIndex = -1;
+                }
+
+                // Search forward through older releases (incrementing index) for previous non-pre-release version
+                if (startIndex >= 0)
+                {
+                    for (var i = startIndex; i < releaseVersions.Count; i++)
                     {
-                        if (issue.TryGetProperty("number", out var issueNumberElement))
+                        if (!releaseVersions[i].IsPreRelease)
                         {
-                            var issueNumber = issueNumberElement.GetInt32().ToString();
-                            issueNumbers.Add(issueNumber);
-                            prIssues.Add(issueNumber);
+                            fromVersion = releaseVersions[i];
+                            break;
                         }
                     }
                 }
-
-                prData.Add((prNumber, prTitle, prUrl, prIssues));
             }
-            catch (JsonException)
-            {
-                // Skip malformed JSON
-            }
-        }
 
-        // Build a map from issue number to PR number for Index assignment
-        var issueToPrMap = new Dictionary<string, int>();
-        foreach (var (prNumber, _, _, prIssues) in prData)
-        {
-            var prNumberInt = int.Parse(prNumber);
-            foreach (var issueNumber in prIssues)
+            // Get commit hash for baseline version if one was found
+            if (fromVersion != null &&
+                tagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
+                tagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
             {
-                // Use the first PR that references this issue (smallest PR number)
-                if (!issueToPrMap.ContainsKey(issueNumber) || prNumberInt < issueToPrMap[issueNumber])
-                {
-                    issueToPrMap[issueNumber] = prNumberInt;
-                }
+                fromHash = fromTagCommit.Commit.Sha;
             }
         }
 
-        // Second pass: batch fetch all issue details using issue list
-        var issueDetailsMap = new Dictionary<string, ItemInfo>();
-        if (issueNumbers.Count > 0)
+        // Get commits in range
+        var commitsInRange = GetCommitsInRange(commits, fromHash, toHash);
+
+        // Collect changes from PRs
+        var allChangeIds = new HashSet<string>();
+        var bugs = new List<ItemInfo>();
+        var nonBugChanges = new List<ItemInfo>();
+
+        // Create GraphQL client for finding linked issues (reused across multiple PR queries)
+        using var graphqlClient = new GitHubGraphQLClient(token);
+
+        foreach (var commit in commitsInRange)
         {
-            try
+            if (commitHashToPr.TryGetValue(commit.Sha, out var pr))
             {
-                var issuesOutput = await RunCommandAsync("gh", "issue list --state all --limit 1000 --json number,title,url,labels");
-                var issuesDoc = JsonDocument.Parse(issuesOutput);
+                // Find issue IDs that are linked to this PR using GitHub GraphQL API
+                // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
+                var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr.Number);
 
-                foreach (var issueElement in issuesDoc.RootElement.EnumerateArray())
+                if (linkedIssueIds.Count > 0)
                 {
-                    var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
-
-                    // Only process issues that are referenced by PRs
-                    if (!issueNumbers.Contains(issueNumber))
+                    // PR has linked issues - add them (deduplicated)
+                    foreach (var issueId in linkedIssueIds)
                     {
-                        continue;
-                    }
-
-                    var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
-                    var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
-
-                    // Determine type from labels
-                    var issueType = "other";
-                    if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
-                    {
-                        var labels = new List<string>();
-                        foreach (var label in labelsElement.EnumerateArray())
+                        var issueIdStr = issueId.ToString();
+                        if (allChangeIds.Contains(issueIdStr))
                         {
-                            if (label.TryGetProperty("name", out var labelName))
+                            continue;
+                        }
+
+                        // Look up the issue in the master issues list
+                        if (issueById.TryGetValue(issueId, out var issue))
+                        {
+                            allChangeIds.Add(issueIdStr);
+                            var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
+
+                            if (itemInfo.Type == "bug")
                             {
-                                labels.Add(labelName.GetString() ?? string.Empty);
+                                bugs.Add(itemInfo);
+                            }
+                            else
+                            {
+                                nonBugChanges.Add(itemInfo);
                             }
                         }
+                    }
+                }
+                else
+                {
+                    // PR didn't close any issues - add the PR itself
+                    var prId = $"#{pr.Number}";
+                    if (!allChangeIds.Contains(prId))
+                    {
+                        allChangeIds.Add(prId);
+                        var itemInfo = CreateItemInfoFromPullRequest(pr);
 
-                        // Map labels to type
-                        var matchingType = labels
-                            .Select(label => label.ToLowerInvariant())
-                            .SelectMany(lowerLabel => LabelTypeMap
-                                .Where(kvp => lowerLabel.Contains(kvp.Key))
-                                .Select(kvp => kvp.Value))
-                            .FirstOrDefault();
-
-                        if (matchingType != null)
+                        if (itemInfo.Type == "bug")
                         {
-                            issueType = matchingType;
+                            bugs.Add(itemInfo);
+                        }
+                        else
+                        {
+                            nonBugChanges.Add(itemInfo);
                         }
                     }
-
-                    // Use PR number as Index for ordering
-                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, index);
-                }
-            }
-            catch (Exception)
-            {
-                // If we can't fetch issue list, create fallback entries
-                foreach (var issueNumber in issueNumbers)
-                {
-                    var index = issueToPrMap.TryGetValue(issueNumber, out var prNum) ? prNum : int.Parse(issueNumber);
-                    issueDetailsMap[issueNumber] = new ItemInfo(issueNumber, $"Issue #{issueNumber}", string.Empty, "other", index);
                 }
             }
         }
 
-        // Third pass: add issues to changes list (avoiding duplicates)
-        var addedIssues = new HashSet<string>();
-        foreach (var (issueNumber, itemInfo) in issueDetailsMap)
-        {
-            if (!addedIssues.Contains(issueNumber))
-            {
-                changes.Add(itemInfo);
-                addedIssues.Add(issueNumber);
-            }
-        }
+        // Collect known issues (open bugs not fixed in this build)
+        var knownIssues = issues
+            .Where(i => i.State == ItemState.Open)
+            .Select(issue => (issue, issueId: issue.Number.ToString()))
+            .Where(tuple => !allChangeIds.Contains(tuple.issueId))
+            .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
+            .Where(itemInfo => itemInfo.Type == "bug")
+            .ToList();
 
-        // Fourth pass: add PRs without issues
-        foreach (var (prNumber, prTitle, prUrl, prIssues) in prData)
-        {
-            if (prIssues.Count == 0)
-            {
-                // PR has no issues - need to get labels from the pr list data
-                // Find the PR element again to get its labels
-                var prType = "other";
-                var prElement = prArray.FirstOrDefault(pe =>
-                    pe.TryGetProperty("number", out var numProp) &&
-                    numProp.GetInt32().ToString() == prNumber);
+        // Sort all lists by Index to ensure chronological order
+        nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
+        bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
+        knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
-                if (prElement.ValueKind != JsonValueKind.Undefined &&
-                    prElement.TryGetProperty("labels", out var labelsElement) &&
-                    labelsElement.ValueKind == JsonValueKind.Array)
-                {
-                    var labels = new List<string>();
-                    foreach (var label in labelsElement.EnumerateArray())
-                    {
-                        if (label.TryGetProperty("name", out var labelName))
-                        {
-                            labels.Add(labelName.GetString() ?? string.Empty);
-                        }
-                    }
-
-                    // Map labels to type
-                    var matchingType = labels
-                        .Select(label => label.ToLowerInvariant())
-                        .SelectMany(lowerLabel => LabelTypeMap
-                            .Where(kvp => lowerLabel.Contains(kvp.Key))
-                            .Select(kvp => kvp.Value))
-                        .FirstOrDefault();
-
-                    if (matchingType != null)
-                    {
-                        prType = matchingType;
-                    }
-                }
-
-                changes.Add(new ItemInfo(
-                    $"#{prNumber}",
-                    prTitle,
-                    prUrl,
-                    prType,
-                    int.Parse(prNumber)));
-            }
-        }
-
-        return changes;
+        // Create and return build information with all collected data
+        return new BuildInformation(
+            fromVersion,
+            toVersion,
+            fromHash,
+            toHash,
+            nonBugChanges,
+            bugs,
+            knownIssues);
     }
 
     /// <summary>
-    ///     Checks if a git tag exists in the repository.
+    ///     Gets all commits for a branch using pagination.
     /// </summary>
-    /// <param name="tag">Tag name to check.</param>
-    /// <returns>True if the tag exists, false otherwise.</returns>
-    private async Task<bool> TagExistsAsync(string tag)
+    /// <param name="client">GitHub client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="branch">Branch name.</param>
+    /// <returns>List of all commits.</returns>
+    private static async Task<IReadOnlyList<GitHubCommit>> GetAllCommitsAsync(GitHubClient client, string owner, string repo, string branch)
     {
+        var request = new CommitRequest { Sha = branch };
+        return await client.Repository.Commit.GetAll(owner, repo, request);
+    }
+
+    /// <summary>
+    ///     Gets commits in the range from fromHash (exclusive) to toHash (inclusive).
+    /// </summary>
+    /// <param name="commits">All commits.</param>
+    /// <param name="fromHash">Starting commit hash (exclusive - not included in results; null for start of history).</param>
+    /// <param name="toHash">Ending commit hash (inclusive - included in results).</param>
+    /// <returns>List of commits in range, excluding fromHash but including toHash.</returns>
+    private static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
+    {
+        var result = new List<GitHubCommit>();
+        var foundTo = false;
+
+        // Iterate through commits from newest to oldest
+        foreach (var commit in commits)
+        {
+            if (commit.Sha == toHash)
+            {
+                foundTo = true;
+            }
+
+            if (foundTo && commit.Sha != fromHash)
+            {
+                // Skip the fromHash commit itself - we want changes AFTER the last release
+                result.Add(commit);
+            }
+
+            if (commit.Sha == fromHash)
+            {
+                break;
+            }
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    ///     Creates an ItemInfo from an issue.
+    /// </summary>
+    /// <param name="issue">GitHub issue.</param>
+    /// <param name="index">Index for sorting.</param>
+    /// <returns>ItemInfo instance.</returns>
+    private static ItemInfo CreateItemInfoFromIssue(Issue issue, int index)
+    {
+        var type = GetTypeFromLabels(issue.Labels);
+        return new ItemInfo(
+            issue.Number.ToString(),
+            issue.Title,
+            issue.Url,
+            type,
+            index);
+    }
+
+    /// <summary>
+    ///     Creates an ItemInfo from a pull request.
+    /// </summary>
+    /// <param name="pr">GitHub pull request.</param>
+    /// <returns>ItemInfo instance.</returns>
+    private static ItemInfo CreateItemInfoFromPullRequest(PullRequest pr)
+    {
+        var type = GetTypeFromLabels(pr.Labels);
+        return new ItemInfo(
+            $"#{pr.Number}",
+            pr.Title,
+            pr.HtmlUrl,
+            type,
+            pr.Number);
+    }
+
+    /// <summary>
+    ///     Determines item type from labels.
+    /// </summary>
+    /// <param name="labels">List of labels.</param>
+    /// <returns>Item type string.</returns>
+    private static string GetTypeFromLabels(IReadOnlyList<Label> labels)
+    {
+        var matchingType = labels
+            .Select(label => label.Name.ToLowerInvariant())
+            .SelectMany(lowerLabel => LabelTypeMap
+                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Select(kvp => kvp.Value))
+            .FirstOrDefault();
+
+        return matchingType ?? "other";
+    }
+
+    /// <summary>
+    ///     Gets GitHub token from environment or gh CLI.
+    /// </summary>
+    /// <returns>GitHub token.</returns>
+    private async Task<string> GetGitHubTokenAsync()
+    {
+        // Try to get token from environment variable first
+        var token = Environment.GetEnvironmentVariable("GH_TOKEN");
+        if (!string.IsNullOrEmpty(token))
+        {
+            return token;
+        }
+
+        // Fall back to gh auth token
         try
         {
-            // Try to resolve the tag to a commit hash
-            // If tag doesn't exist, RunCommandAsync will throw InvalidOperationException
-            await RunCommandAsync("git", $"rev-parse --verify {ValidateTag(tag)}");
-            return true;
+            return await RunCommandAsync("gh", "auth token");
         }
         catch (InvalidOperationException)
         {
-            // Tag doesn't exist
-            return false;
+            throw new InvalidOperationException("Unable to get GitHub token. Set GH_TOKEN environment variable or authenticate with 'gh auth login'.");
         }
     }
 
     /// <summary>
-    ///     Gets the git hash for a tag.
+    ///     Parses GitHub owner and repo from a git remote URL.
     /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
-    /// <returns>Git hash.</returns>
-    public override async Task<string> GetHashForTagAsync(string? tag)
+    /// <param name="url">Git remote URL.</param>
+    /// <returns>Tuple of (owner, repo).</returns>
+    /// <exception cref="ArgumentException">Thrown if URL format is invalid.</exception>
+    private static (string owner, string repo) ParseGitHubUrl(string url)
     {
-        // Get commit hash for tag or HEAD using git rev-parse
-        // Arguments: tag name or "HEAD" for current commit
-        // Output: full 40-character commit SHA
-        var refName = tag == null ? "HEAD" : ValidateTag(tag);
-        return await RunCommandAsync("git", $"rev-parse {refName}");
+        url = url.Trim();
+
+        // Handle SSH URLs: git@github.com:owner/repo.git
+        if (url.StartsWith("git@github.com:", StringComparison.OrdinalIgnoreCase))
+        {
+            var path = url["git@github.com:".Length..];
+            return ParseOwnerRepo(path);
+        }
+
+        // Handle HTTPS URLs: https://github.com/owner/repo.git
+        if (url.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
+        {
+            var path = url["https://github.com/".Length..];
+            return ParseOwnerRepo(path);
+        }
+
+        throw new ArgumentException($"Unsupported GitHub URL format: {url}", nameof(url));
     }
 
     /// <summary>
-    ///     Gets the list of open issues with their details.
+    ///     Parses owner and repo from a path segment.
     /// </summary>
-    /// <returns>List of open issues with full information.</returns>
-    public override async Task<List<ItemInfo>> GetOpenIssuesAsync()
+    /// <param name="path">Path segment (e.g., "owner/repo.git").</param>
+    /// <returns>Tuple of (owner, repo).</returns>
+    /// <exception cref="ArgumentException">Thrown if path format is invalid.</exception>
+    private static (string owner, string repo) ParseOwnerRepo(string path)
     {
-        // Fetch all open issues with full details in a single batch call
-        // Arguments: --state open (open issues only), --json to get all required fields
-        // Note: Not using --jq to avoid shell quoting issues on Windows
-        var output = await RunCommandAsync("gh", "issue list --state open --json number,title,url,labels");
-
-        // Parse the JSON array output
-        List<JsonElement> issueArray;
-        try
+        // Remove .git suffix if present
+        if (path.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
         {
-            var jsonDoc = JsonDocument.Parse(output);
-            issueArray = jsonDoc.RootElement.EnumerateArray().ToList();
-        }
-        catch (JsonException)
-        {
-            // Return empty list if JSON parsing fails
-            return new List<ItemInfo>();
+            path = path[..^4];
         }
 
-        var openIssues = new List<ItemInfo>();
-
-        foreach (var issueElement in issueArray)
+        var parts = path.Split('/');
+        if (parts.Length != 2)
         {
-            try
-            {
-                var issueNumber = issueElement.GetProperty("number").GetInt32().ToString();
-                var issueTitle = issueElement.GetProperty("title").GetString() ?? $"Issue #{issueNumber}";
-                var issueUrl = issueElement.GetProperty("url").GetString() ?? string.Empty;
-
-                // Determine type from labels
-                var issueType = "other";
-                if (issueElement.TryGetProperty("labels", out var labelsElement) && labelsElement.ValueKind == JsonValueKind.Array)
-                {
-                    var labels = new List<string>();
-                    foreach (var label in labelsElement.EnumerateArray())
-                    {
-                        if (label.TryGetProperty("name", out var labelName))
-                        {
-                            labels.Add(labelName.GetString() ?? string.Empty);
-                        }
-                    }
-
-                    // Map labels to type
-                    var matchingType = labels
-                        .Select(label => label.ToLowerInvariant())
-                        .SelectMany(lowerLabel => LabelTypeMap
-                            .Where(kvp => lowerLabel.Contains(kvp.Key))
-                            .Select(kvp => kvp.Value))
-                        .FirstOrDefault();
-
-                    if (matchingType != null)
-                    {
-                        issueType = matchingType;
-                    }
-                }
-
-                openIssues.Add(new ItemInfo(issueNumber, issueTitle, issueUrl, issueType, int.Parse(issueNumber)));
-            }
-            catch (System.Text.Json.JsonException)
-            {
-                // Skip malformed JSON
-            }
+            throw new ArgumentException($"Invalid GitHub path format: {path}");
         }
 
-        return openIssues;
+        return (parts[0], parts[1]);
     }
-
-    /// <summary>
-    ///     Extracts SHA values from a commits API JSON response.
-    /// </summary>
-    /// <param name="json">JSON response from commits API.</param>
-    /// <returns>Newline-separated SHA values.</returns>
-    private static string ExtractShasFromCommitsJson(string json)
-    {
-        try
-        {
-            var doc = JsonDocument.Parse(json);
-            var shas = new List<string>();
-
-            foreach (var commit in doc.RootElement.EnumerateArray())
-            {
-                if (commit.TryGetProperty("sha", out var shaElement))
-                {
-                    var sha = shaElement.GetString();
-                    if (!string.IsNullOrEmpty(sha))
-                    {
-                        shas.Add(sha);
-                    }
-                }
-            }
-
-            return string.Join('\n', shas);
-        }
-        catch (JsonException)
-        {
-            return string.Empty;
-        }
-    }
-
-    /// <summary>
-    ///     Extracts SHA values from a compare API JSON response.
-    /// </summary>
-    /// <param name="json">JSON response from compare API.</param>
-    /// <returns>Newline-separated SHA values.</returns>
-    private static string ExtractShasFromCompareJson(string json)
-    {
-        try
-        {
-            var doc = JsonDocument.Parse(json);
-            var shas = new List<string>();
-
-            if (doc.RootElement.TryGetProperty("commits", out var commitsElement))
-            {
-                foreach (var commit in commitsElement.EnumerateArray())
-                {
-                    if (commit.TryGetProperty("sha", out var shaElement))
-                    {
-                        var sha = shaElement.GetString();
-                        if (!string.IsNullOrEmpty(sha))
-                        {
-                            shas.Add(sha);
-                        }
-                    }
-                }
-            }
-
-            return string.Join('\n', shas);
-        }
-        catch (JsonException)
-        {
-            return string.Empty;
-        }
-    }
-
-    /// <summary>
-    ///     Regular expression to match valid tag names (alphanumeric, dots, hyphens, underscores, slashes).
-    /// </summary>
-    /// <returns>Compiled regular expression.</returns>
-    [GeneratedRegex(@"^[a-zA-Z0-9._/-]+$", RegexOptions.Compiled)]
-    private static partial Regex TagNameRegex();
 }

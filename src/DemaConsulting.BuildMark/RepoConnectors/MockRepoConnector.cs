@@ -18,12 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Mock repository connector for deterministic testing.
 /// </summary>
-public class MockRepoConnector : IRepoConnector
+public class MockRepoConnector : RepoConnectorBase
 {
     private readonly Dictionary<string, string> _issueTitles = new()
     {
@@ -63,10 +63,183 @@ public class MockRepoConnector : IRepoConnector
     private readonly List<string> _openIssues = new() { "4", "5" };
 
     /// <summary>
+    ///     Gets build information for a release.
+    /// </summary>
+    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
+    /// <returns>BuildInformation record with all collected data.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
+    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+    {
+        // Retrieve tag history and current commit hash from the repository
+        var tags = await GetTagHistoryAsync();
+        var currentHash = await GetHashForTagAsync(null);
+
+        // Determine the target version and hash for build information
+        Version toTagInfo;
+        string toHash;
+        if (version != null)
+        {
+            // Use explicitly specified version as target
+            toTagInfo = version;
+            toHash = currentHash;
+        }
+        else if (tags.Count > 0)
+        {
+            // Verify current commit matches latest tag when no version specified
+            var latestTag = tags[^1];
+            var latestTagHash = await GetHashForTagAsync(latestTag.Tag);
+
+            if (latestTagHash.Trim() == currentHash.Trim())
+            {
+                // Current commit matches latest tag, use it as target
+                toTagInfo = latestTag;
+                toHash = currentHash;
+            }
+            else
+            {
+                // Current commit doesn't match any tag, cannot determine version
+                throw new InvalidOperationException(
+                    "Target version not specified and current commit does not match any tag. " +
+                    "Please provide a version parameter.");
+            }
+        }
+        else
+        {
+            // No tags in repository and no version provided
+            throw new InvalidOperationException(
+                "No tags found in repository and no version specified. " +
+                "Please provide a version parameter.");
+        }
+
+        // Determine the starting version for comparing changes
+        Version? fromTagInfo = null;
+        string? fromHash = null;
+        if (tags.Count > 0)
+        {
+            // Find the position of target version in tag history
+            var toIndex = FindVersionIndex(tags, toTagInfo.FullVersion);
+
+            if (toTagInfo.IsPreRelease)
+            {
+                // Pre-release versions use the immediately previous tag as baseline
+                if (toIndex > 0)
+                {
+                    // Target version exists in history, use previous tag
+                    fromTagInfo = tags[toIndex - 1];
+                }
+                else if (toIndex == -1)
+                {
+                    // Target version not in history, use most recent tag as baseline
+                    fromTagInfo = tags[^1];
+                }
+                // If toIndex == 0, this is the first tag, no baseline
+            }
+            else
+            {
+                // Release versions skip pre-releases and use previous release as baseline
+                int startIndex;
+                if (toIndex > 0)
+                {
+                    // Target version exists in history, start search from previous position
+                    startIndex = toIndex - 1;
+                }
+                else if (toIndex == -1)
+                {
+                    // Target version not in history, start from most recent tag
+                    startIndex = tags.Count - 1;
+                }
+                else
+                {
+                    // Target is first tag, no previous release exists
+                    startIndex = -1;
+                }
+
+                // Search backward for previous non-pre-release version
+                for (var i = startIndex; i >= 0; i--)
+                {
+                    if (!tags[i].IsPreRelease)
+                    {
+                        fromTagInfo = tags[i];
+                        break;
+                    }
+                }
+            }
+
+            // Get commit hash for baseline version if one was found
+            if (fromTagInfo != null)
+            {
+                fromHash = await GetHashForTagAsync(fromTagInfo.Tag);
+            }
+        }
+
+        // Collect all changes (issues and PRs) in version range
+        var changes = await GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
+        var allChangeIds = new HashSet<string>();
+        var bugs = new List<ItemInfo>();
+        var nonBugChanges = new List<ItemInfo>();
+
+        // Process and categorize each change
+        foreach (var change in changes)
+        {
+            // Skip changes already processed
+            if (allChangeIds.Contains(change.Id))
+            {
+                continue;
+            }
+
+            // Mark change as processed
+            allChangeIds.Add(change.Id);
+
+            // Categorize change by type
+            if (change.Type == "bug")
+            {
+                bugs.Add(change);
+            }
+            else
+            {
+                nonBugChanges.Add(change);
+            }
+        }
+
+        // Collect known issues (open bugs not fixed in this build)
+        var knownIssues = new List<ItemInfo>();
+        var openIssues = await GetOpenIssuesAsync();
+        foreach (var issue in openIssues)
+        {
+            // Skip issues already fixed in this build
+            if (allChangeIds.Contains(issue.Id))
+            {
+                continue;
+            }
+
+            // Only include bugs in known issues list
+            if (issue.Type == "bug")
+            {
+                knownIssues.Add(issue);
+            }
+        }
+
+        // Sort all lists by Index to ensure chronological order
+        nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
+        bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
+        knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
+
+        // Create and return build information with all collected data
+        return new BuildInformation(
+            fromTagInfo,
+            toTagInfo,
+            fromHash?.Trim(),
+            toHash.Trim(),
+            nonBugChanges,
+            bugs,
+            knownIssues);
+    }
+
+    /// <summary>
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    public Task<List<Version>> GetTagHistoryAsync()
+    private Task<List<Version>> GetTagHistoryAsync()
     {
         // Parse all mock tag names into Version objects
         var tagInfoList = _tagHashes.Keys
@@ -84,7 +257,7 @@ public class MockRepoConnector : IRepoConnector
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    private Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
     {
         // Extract tag names from version objects
         var fromTagName = from?.Tag;
@@ -148,7 +321,7 @@ public class MockRepoConnector : IRepoConnector
     /// </summary>
     /// <param name="tag">Tag name (null for current state).</param>
     /// <returns>Git hash.</returns>
-    public Task<string> GetHashForTagAsync(string? tag)
+    private Task<string> GetHashForTagAsync(string? tag)
     {
         // Return current hash for null tag
         if (tag == null)
@@ -167,7 +340,7 @@ public class MockRepoConnector : IRepoConnector
     ///     Gets the list of open issues with their details.
     /// </summary>
     /// <returns>List of open issues with full information.</returns>
-    public Task<List<ItemInfo>> GetOpenIssuesAsync()
+    private Task<List<ItemInfo>> GetOpenIssuesAsync()
     {
         // Return predefined list of open issues with full details
         var openIssuesData = _openIssues
