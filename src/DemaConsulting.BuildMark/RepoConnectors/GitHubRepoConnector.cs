@@ -234,50 +234,30 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Create GraphQL client for finding linked issues (reused across multiple PR queries)
         using var graphqlClient = new GitHubGraphQLClient(token);
 
-        foreach (var commit in commitsInRange)
+        foreach (var commit in commitsInRange.Where(c => commitHashToPr.ContainsKey(c.Sha)))
         {
-            if (commitHashToPr.TryGetValue(commit.Sha, out var pr))
+            commitHashToPr.TryGetValue(commit.Sha, out var pr);
+            
+            // Find issue IDs that are linked to this PR using GitHub GraphQL API
+            // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
+            var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr!.Number);
+
+            if (linkedIssueIds.Count > 0)
             {
-                // Find issue IDs that are linked to this PR using GitHub GraphQL API
-                // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
-                var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr.Number);
-
-                if (linkedIssueIds.Count > 0)
+                // PR has linked issues - add them (deduplicated)
+                foreach (var issueId in linkedIssueIds)
                 {
-                    // PR has linked issues - add them (deduplicated)
-                    foreach (var issueId in linkedIssueIds)
+                    var issueIdStr = issueId.ToString();
+                    if (allChangeIds.Contains(issueIdStr))
                     {
-                        var issueIdStr = issueId.ToString();
-                        if (allChangeIds.Contains(issueIdStr))
-                        {
-                            continue;
-                        }
-
-                        // Look up the issue in the master issues list
-                        if (issueById.TryGetValue(issueId, out var issue))
-                        {
-                            allChangeIds.Add(issueIdStr);
-                            var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
-
-                            if (itemInfo.Type == "bug")
-                            {
-                                bugs.Add(itemInfo);
-                            }
-                            else
-                            {
-                                nonBugChanges.Add(itemInfo);
-                            }
-                        }
+                        continue;
                     }
-                }
-                else
-                {
-                    // PR didn't close any issues - add the PR itself
-                    var prId = $"#{pr.Number}";
-                    if (!allChangeIds.Contains(prId))
+
+                    // Look up the issue in the master issues list
+                    if (issueById.TryGetValue(issueId, out var issue))
                     {
-                        allChangeIds.Add(prId);
-                        var itemInfo = CreateItemInfoFromPullRequest(pr);
+                        allChangeIds.Add(issueIdStr);
+                        var itemInfo = CreateItemInfoFromIssue(issue, pr!.Number);
 
                         if (itemInfo.Type == "bug")
                         {
@@ -287,6 +267,24 @@ public class GitHubRepoConnector : RepoConnectorBase
                         {
                             nonBugChanges.Add(itemInfo);
                         }
+                    }
+                }
+            }
+            else
+            {
+                // PR didn't close any issues - add the PR itself
+                var prId = $"#{pr!.Number}";
+                if (allChangeIds.Add(prId))
+                {
+                    var itemInfo = CreateItemInfoFromPullRequest(pr);
+
+                    if (itemInfo.Type == "bug")
+                    {
+                        bugs.Add(itemInfo);
+                    }
+                    else
+                    {
+                        nonBugChanges.Add(itemInfo);
                     }
                 }
             }

@@ -60,7 +60,7 @@ public class MockRepoConnector : RepoConnectorBase
         { "2.0.0", "mno345pqr678" }
     };
 
-    private readonly List<string> _openIssues = new() { "4", "5" };
+    private readonly List<string> _openIssues = ["4", "5"];
 
     /// <summary>
     ///     Gets build information for a release.
@@ -267,19 +267,19 @@ public class MockRepoConnector : RepoConnectorBase
         List<string> prs;
         if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
-            prs = new List<string> { "10", "13" }; // Include PR without issues
+            prs = ["10", "13"]; // Include PR without issues
         }
         else if (fromTagName == "ver-1.1.0" && (toTagName == "2.0.0" || toTagName == "v2.0.0"))
         {
-            prs = new List<string> { "11", "12" };
+            prs = ["11", "12"];
         }
         else if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
         {
-            prs = new List<string> { "10" };
+            prs = ["10"];
         }
         else
         {
-            prs = new List<string> { "10", "11", "12", "13" };
+            prs = ["10", "11", "12", "13"];
         }
 
         // Build changes from PRs
@@ -287,7 +287,7 @@ public class MockRepoConnector : RepoConnectorBase
         foreach (var pr in prs)
         {
             // Get issues for this PR
-            var issues = _pullRequestIssues.TryGetValue(pr, out var prIssues) ? prIssues : new List<string>();
+            var issues = _pullRequestIssues.TryGetValue(pr, out var prIssues) ? prIssues : [];
 
             if (issues.Count > 0)
             {

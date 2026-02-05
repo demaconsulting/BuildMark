@@ -97,7 +97,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
             };
 
             var jsonContent = JsonSerializer.Serialize(graphqlQuery);
-            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+            using var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
             var response = await _httpClient.PostAsync(_graphqlEndpoint, content);
             response.EnsureSuccessStatusCode();
@@ -113,12 +113,10 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 pullRequest.TryGetProperty("closingIssuesReferences", out var closingIssues) &&
                 closingIssues.TryGetProperty("nodes", out var nodes))
             {
-                foreach (var node in nodes.EnumerateArray())
+                foreach (var node in nodes.EnumerateArray().Where(n => n.TryGetProperty("number", out _)))
                 {
-                    if (node.TryGetProperty("number", out var number))
-                    {
-                        issueNumbers.Add(number.GetInt32());
-                    }
+                    node.TryGetProperty("number", out var number);
+                    issueNumbers.Add(number.GetInt32());
                 }
             }
 
