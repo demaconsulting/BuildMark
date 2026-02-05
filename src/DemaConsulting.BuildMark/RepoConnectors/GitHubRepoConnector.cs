@@ -398,11 +398,11 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         foreach (var commit in commitsInRange.Where(c => lookupData.CommitHashToPr.ContainsKey(c.Sha)))
         {
-            lookupData.CommitHashToPr.TryGetValue(commit.Sha, out var pr);
+            var pr = lookupData.CommitHashToPr[commit.Sha];
 
             // Find issue IDs that are linked to this PR using GitHub GraphQL API
             // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
-            var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr!.Number);
+            var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr.Number);
 
             if (linkedIssueIds.Count > 0)
             {
