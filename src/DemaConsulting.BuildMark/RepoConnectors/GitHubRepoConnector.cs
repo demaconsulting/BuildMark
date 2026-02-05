@@ -378,9 +378,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         int prNumber)
     {
         // Search for issues that link to this PR
-        // Use "linked:pr" search qualifier to find issues linked to the PR
-        // The query format is: "repo:owner/repo is:issue linked:pr-<owner>/<repo>#<number>"
-        var query = $"repo:{owner}/{repo} is:issue linked:pr-{owner}/{repo}#{prNumber}";
+        // The repo qualifier scopes the search, so we only need the PR number in linked:pr
+        var query = $"repo:{owner}/{repo} is:issue linked:pr-#{prNumber}";
 
         var searchRequest = new SearchIssuesRequest(query);
         var searchResult = await client.Search.SearchIssues(searchRequest);
