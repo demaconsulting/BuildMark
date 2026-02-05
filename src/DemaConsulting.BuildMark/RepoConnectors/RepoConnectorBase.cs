@@ -33,6 +33,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <returns>Command output.</returns>
     protected virtual Task<string> RunCommandAsync(string command, string arguments)
     {
+        // Delegate to ProcessRunner for command execution
         return ProcessRunner.RunAsync(command, arguments);
     }
 

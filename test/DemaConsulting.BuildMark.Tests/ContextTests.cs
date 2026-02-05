@@ -526,6 +526,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }
@@ -554,6 +555,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }
@@ -568,7 +570,7 @@ public class ContextTests
         var logFile = Path.GetTempFileName();
         try
         {
-            // Create context with log file
+            // Create context with log file and write a message
             using (var context = Context.Create(["--log", logFile]))
             {
                 // Write a line
@@ -613,6 +615,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }
@@ -641,6 +644,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }
@@ -655,7 +659,7 @@ public class ContextTests
         var logFile = Path.GetTempFileName();
         try
         {
-            // Create context with log file
+            // Create context with log file and write an error
             using (var context = Context.Create(["--log", logFile]))
             {
                 // Write an error
@@ -703,6 +707,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }
@@ -732,6 +737,7 @@ public class ContextTests
         }
         finally
         {
+            // Restore console output
             Console.SetOut(originalOut);
         }
     }

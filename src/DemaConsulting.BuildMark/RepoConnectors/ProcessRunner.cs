@@ -48,6 +48,7 @@ internal static class ProcessRunner
             CreateNoWindow = true
         };
 
+        // Initialize process with output and error buffers
         using var process = new Process { StartInfo = startInfo };
         var output = new StringBuilder();
         var error = new StringBuilder();

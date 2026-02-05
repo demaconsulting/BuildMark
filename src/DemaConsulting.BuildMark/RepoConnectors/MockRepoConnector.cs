@@ -118,12 +118,14 @@ public class MockRepoConnector : RepoConnectorBase
         List<Version> tags,
         string currentHash)
     {
+        // Use explicitly specified version if provided
         if (version != null)
         {
             // Use explicitly specified version as target
             return (version, currentHash);
         }
 
+        // Validate that repository has tags
         if (tags.Count == 0)
         {
             // No tags in repository and no version provided
@@ -136,6 +138,7 @@ public class MockRepoConnector : RepoConnectorBase
         var latestTag = tags[^1];
         var latestTagHash = await GetHashForTagAsync(latestTag.Tag);
 
+        // Check if current commit matches the latest tag
         if (latestTagHash.Trim() == currentHash.Trim())
         {
             // Current commit matches latest tag, use it as target
@@ -158,6 +161,7 @@ public class MockRepoConnector : RepoConnectorBase
         Version toTagInfo,
         List<Version> tags)
     {
+        // Return null baseline if no tags exist
         if (tags.Count == 0)
         {
             return (null, null);
@@ -166,6 +170,7 @@ public class MockRepoConnector : RepoConnectorBase
         // Find the position of target version in tag history
         var toIndex = FindVersionIndex(tags, toTagInfo.FullVersion);
 
+        // Determine baseline version based on whether target is pre-release
         Version? fromTagInfo;
         if (toTagInfo.IsPreRelease)
         {
@@ -183,6 +188,7 @@ public class MockRepoConnector : RepoConnectorBase
             return (fromTagInfo, fromHash);
         }
 
+        // Return baseline version with null hash
         return (fromTagInfo, null);
     }
 
@@ -201,6 +207,7 @@ public class MockRepoConnector : RepoConnectorBase
             return tags[toIndex - 1];
         }
 
+        // Target version not in history, use most recent tag as baseline
         if (toIndex == -1)
         {
             // Target version not in history, use most recent tag as baseline
@@ -231,6 +238,7 @@ public class MockRepoConnector : RepoConnectorBase
             }
         }
 
+        // No previous non-pre-release version found
         return null;
     }
 
@@ -242,12 +250,14 @@ public class MockRepoConnector : RepoConnectorBase
     /// <returns>Starting index for search, or -1 if no search needed.</returns>
     private static int DetermineSearchStartIndex(int toIndex, int tagCount)
     {
+        // Target version exists in history, start search from previous position
         if (toIndex > 0)
         {
             // Target version exists in history, start search from previous position
             return toIndex - 1;
         }
 
+        // Target version not in history, start from most recent tag
         if (toIndex == -1)
         {
             // Target version not in history, start from most recent tag
@@ -266,6 +276,7 @@ public class MockRepoConnector : RepoConnectorBase
     private static (List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)
         CategorizeChanges(List<ItemInfo> changes)
     {
+        // Initialize collections for categorized changes
         var allChangeIds = new HashSet<string>();
         var bugs = new List<ItemInfo>();
         var nonBugChanges = new List<ItemInfo>();
@@ -293,6 +304,7 @@ public class MockRepoConnector : RepoConnectorBase
             }
         }
 
+        // Return categorized changes
         return (bugs, nonBugChanges, allChangeIds);
     }
 
@@ -303,9 +315,11 @@ public class MockRepoConnector : RepoConnectorBase
     /// <returns>List of known issues.</returns>
     private async Task<List<ItemInfo>> CollectKnownIssuesAsync(HashSet<string> allChangeIds)
     {
+        // Initialize collection for known issues
         var knownIssues = new List<ItemInfo>();
         var openIssues = await GetOpenIssuesAsync();
 
+        // Process each open issue
         foreach (var issue in openIssues)
         {
             // Skip issues already fixed in this build
@@ -321,6 +335,7 @@ public class MockRepoConnector : RepoConnectorBase
             }
         }
 
+        // Return collected known issues
         return knownIssues;
     }
 
@@ -337,6 +352,7 @@ public class MockRepoConnector : RepoConnectorBase
             .Cast<Version>()
             .ToList();
 
+        // Return parsed tag history
         return Task.FromResult(tagInfoList);
     }
 
@@ -358,6 +374,7 @@ public class MockRepoConnector : RepoConnectorBase
         // Build changes from PRs
         var changes = BuildChangesFromPullRequests(prs);
 
+        // Return collected changes
         return Task.FromResult(changes);
     }
 
@@ -369,21 +386,25 @@ public class MockRepoConnector : RepoConnectorBase
     /// <returns>List of pull request IDs.</returns>
     private static List<string> GetPullRequestsForTagRange(string? fromTagName, string? toTagName)
     {
+        // Return PRs for specific tag ranges based on mock data
         if (fromTagName == "v1.0.0" && toTagName == "ver-1.1.0")
         {
             return ["10", "13"]; // Include PR without issues
         }
 
+        // Return PRs for version 2.0.0 range
         if (fromTagName == "ver-1.1.0" && (toTagName == "2.0.0" || toTagName == "v2.0.0"))
         {
             return ["11", "12"];
         }
 
+        // Return PRs for initial version
         if (string.IsNullOrEmpty(fromTagName) && toTagName == "v1.0.0")
         {
             return ["10"];
         }
 
+        // Default: return all PRs
         return ["10", "11", "12", "13"];
     }
 
@@ -394,13 +415,16 @@ public class MockRepoConnector : RepoConnectorBase
     /// <returns>List of changes.</returns>
     private List<ItemInfo> BuildChangesFromPullRequests(List<string> prs)
     {
+        // Initialize collection for changes
         var changes = new List<ItemInfo>();
 
+        // Process each pull request
         foreach (var pr in prs)
         {
             // Get issues for this PR
             var issues = _pullRequestIssues.TryGetValue(pr, out var prIssues) ? prIssues : [];
 
+            // Process PR based on whether it has associated issues
             if (issues.Count > 0)
             {
                 AddIssuesAsChanges(changes, issues, pr);
@@ -411,6 +435,7 @@ public class MockRepoConnector : RepoConnectorBase
             }
         }
 
+        // Return collected changes
         return changes;
     }
 
@@ -426,9 +451,12 @@ public class MockRepoConnector : RepoConnectorBase
         // Use PR number as index for chronological ordering
         foreach (var issueId in issues)
         {
+            // Get issue details from mock data
             var title = _issueTitles.TryGetValue(issueId, out var issueTitle) ? issueTitle : $"Issue {issueId}";
             var url = $"https://github.com/example/repo/issues/{issueId}";
             var type = _issueTypes.TryGetValue(issueId, out var issueType) ? issueType : "other";
+
+            // Add issue as a change
             changes.Add(new ItemInfo(issueId, title, url, type, int.Parse(pr)));
         }
     }
@@ -484,6 +512,8 @@ public class MockRepoConnector : RepoConnectorBase
                 _issueTypes.TryGetValue(issueId, out var type) ? type : "other",
                 int.Parse(issueId)))
             .ToList();
+
+        // Return task with open issues data
         return Task.FromResult(openIssuesData);
     }
 }

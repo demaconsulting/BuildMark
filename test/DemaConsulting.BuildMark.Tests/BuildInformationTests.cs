@@ -41,6 +41,7 @@ public class BuildInformationTests
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await connector.GetBuildInformationAsync());
 
+        // Verify exception message contains expected text
         Assert.Contains("No tags found", exception.Message);
     }
 
@@ -57,6 +58,7 @@ public class BuildInformationTests
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await connector.GetBuildInformationAsync());
 
+        // Verify exception message contains expected text
         Assert.Contains("does not match any tag", exception.Message);
     }
 
@@ -195,7 +197,7 @@ public class BuildInformationTests
         // Act
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
-        // Assert
+        // Assert - verify bugs and changes are properly separated
         Assert.HasCount(1, buildInfo.Changes);
         Assert.HasCount(1, buildInfo.Bugs);
         Assert.AreEqual("2", buildInfo.Bugs[0].Id);
@@ -214,7 +216,7 @@ public class BuildInformationTests
         // Act
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
 
-        // Assert
+        // Assert - verify first release has no previous version
         Assert.IsNull(buildInfo.FromVersion);
         Assert.IsNull(buildInfo.FromHash);
         Assert.AreEqual("v1.0.0", buildInfo.ToVersion.Tag);
@@ -233,7 +235,7 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown();
 
-        // Assert
+        // Assert - verify all required sections are present
         Assert.Contains("# Build Report", markdown);
         Assert.Contains("## Version Information", markdown);
         Assert.Contains("## Changes", markdown);
@@ -256,7 +258,7 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
 
-        // Assert
+        // Assert - verify known issues section is included
         Assert.Contains("## Known Issues", markdown);
         Assert.Contains("Known bug A", markdown);
         Assert.Contains("Known bug B", markdown);
@@ -275,7 +277,7 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown(headingDepth: 3);
 
-        // Assert
+        // Assert - verify heading depth is correct
         Assert.Contains("### Build Report", markdown);
         Assert.Contains("#### Version Information", markdown);
         Assert.Contains("#### Changes", markdown);
@@ -346,7 +348,7 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown();
 
-        // Assert
+        // Assert - verify issue links are properly formatted
         Assert.Contains("[3](https://github.com/example/repo/issues/3)", markdown);
         Assert.Contains("[2](https://github.com/example/repo/issues/2)", markdown);
     }
@@ -364,7 +366,7 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown();
 
-        // Assert
+        // Assert - verify previous version shows N/A for first release
         var versionInfoStart = markdown.IndexOf("## Version Information", StringComparison.Ordinal);
         var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
         var versionInfo = markdown.Substring(versionInfoStart, changesStart - versionInfoStart);

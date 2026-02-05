@@ -51,6 +51,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     /// <param name="graphqlEndpoint">Optional GraphQL endpoint URL. Defaults to public GitHub API. For GitHub Enterprise, use https://your-github-enterprise/api/graphql.</param>
     public GitHubGraphQLClient(string token, string? graphqlEndpoint = null)
     {
+        // Initialize HTTP client with authentication and user agent headers
         _httpClient = new HttpClient();
         _httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
@@ -96,12 +97,15 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 }
             };
 
+            // Serialize query and send POST request to GraphQL endpoint
             var jsonContent = JsonSerializer.Serialize(graphqlQuery);
             using var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
 
+            // Execute GraphQL query and ensure success
             var response = await _httpClient.PostAsync(_graphqlEndpoint, content);
             response.EnsureSuccessStatusCode();
 
+            // Parse response JSON
             var responseBody = await response.Content.ReadAsStringAsync();
             var jsonDoc = JsonDocument.Parse(responseBody);
 
@@ -113,6 +117,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 pullRequest.TryGetProperty("closingIssuesReferences", out var closingIssues) &&
                 closingIssues.TryGetProperty("nodes", out var nodes))
             {
+                // Enumerate all issue nodes and extract their numbers
                 foreach (var node in nodes.EnumerateArray().Where(n => n.TryGetProperty("number", out _)))
                 {
                     node.TryGetProperty("number", out var number);
@@ -120,6 +125,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 }
             }
 
+            // Return list of linked issue numbers
             return issueNumbers;
         }
         catch
@@ -134,6 +140,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     /// </summary>
     public void Dispose()
     {
+        // Clean up HTTP client resources
         _httpClient.Dispose();
     }
 }

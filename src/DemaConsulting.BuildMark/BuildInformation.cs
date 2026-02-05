@@ -84,6 +84,7 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendVersionInformation(System.Text.StringBuilder markdown, string subHeading)
     {
+        // Add version information section header and table structure
         markdown.AppendLine($"{subHeading} Version Information");
         markdown.AppendLine();
         markdown.AppendLine("| Field | Value |");
@@ -91,6 +92,7 @@ public record BuildInformation(
         markdown.AppendLine($"| **Version** | {ToVersion.Tag} |");
         markdown.AppendLine($"| **Commit Hash** | {ToHash} |");
 
+        // Add previous version information or N/A if this is the first release
         if (FromVersion != null)
         {
             markdown.AppendLine($"| **Previous Version** | {FromVersion.Tag} |");
@@ -102,6 +104,7 @@ public record BuildInformation(
             markdown.AppendLine("| **Previous Commit Hash** | N/A |");
         }
 
+        // Add blank line after section
         markdown.AppendLine();
     }
 
@@ -112,11 +115,13 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendChangesSection(System.Text.StringBuilder markdown, string subHeading)
     {
+        // Add changes section header and table structure
         markdown.AppendLine($"{subHeading} Changes");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
 
+        // Add change items or N/A if no changes exist
         if (Changes.Count > 0)
         {
             foreach (var issue in Changes)
@@ -129,6 +134,7 @@ public record BuildInformation(
             markdown.AppendLine("| N/A | N/A |");
         }
 
+        // Add blank line after section
         markdown.AppendLine();
     }
 
@@ -139,11 +145,13 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendBugsFixedSection(System.Text.StringBuilder markdown, string subHeading)
     {
+        // Add bugs fixed section header and table structure
         markdown.AppendLine($"{subHeading} Bugs Fixed");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
 
+        // Add bug items or N/A if no bugs were fixed
         if (Bugs.Count > 0)
         {
             foreach (var issue in Bugs)
@@ -156,6 +164,7 @@ public record BuildInformation(
             markdown.AppendLine("| N/A | N/A |");
         }
 
+        // Add blank line after section
         markdown.AppendLine();
     }
 
@@ -166,11 +175,13 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendKnownIssuesSection(System.Text.StringBuilder markdown, string subHeading)
     {
+        // Add known issues section header and table structure
         markdown.AppendLine($"{subHeading} Known Issues");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
 
+        // Add known issue items or N/A if no known issues exist
         if (KnownIssues.Count > 0)
         {
             foreach (var issue in KnownIssues)
@@ -183,6 +194,7 @@ public record BuildInformation(
             markdown.AppendLine("| N/A | N/A |");
         }
 
+        // Add blank line after section
         markdown.AppendLine();
     }
 }
