@@ -152,40 +152,40 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
             if (toTagInfo.IsPreRelease)
             {
-                // Pre-release versions use the immediately previous release as baseline
-                if (toIndex > 0)
+                // Pre-release versions use the immediately previous (older) release as baseline
+                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
                 {
-                    // Target version exists in history, use previous release
-                    fromTagInfo = releaseVersions[toIndex - 1];
+                    // Target version exists in history, use next older release (higher index)
+                    fromTagInfo = releaseVersions[toIndex + 1];
                 }
-                else if (toIndex == -1)
+                else if (toIndex == -1 && releaseVersions.Count > 0)
                 {
-                    // Target version not in history, use most recent release as baseline
+                    // Target version not in history, use most recent (first) release as baseline
                     fromTagInfo = releaseVersions[0];
                 }
-                // If toIndex == 0, this is the first release, no baseline
+                // If toIndex is last in list, this is the oldest release, no baseline
             }
             else
             {
                 // Release versions skip pre-releases and use previous non-pre-release as baseline
                 int startIndex;
-                if (toIndex > 0)
+                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
                 {
-                    // Target version exists in history, start search from previous position
-                    startIndex = toIndex - 1;
+                    // Target version exists in history, start search from next older release
+                    startIndex = toIndex + 1;
                 }
-                else if (toIndex == -1)
+                else if (toIndex == -1 && releaseVersions.Count > 0)
                 {
-                    // Target version not in history, start from most recent release
-                    startIndex = 0;
+                    // Target version not in history, start from second release (skip first as it's newer)
+                    startIndex = 1;
                 }
                 else
                 {
-                    // Target is first release, no previous release exists
+                    // Target is oldest release or not enough releases, no previous release exists
                     startIndex = -1;
                 }
 
-                // Search forward (toward older releases) for previous non-pre-release version
+                // Search forward (toward older releases, incrementing index) for previous non-pre-release version
                 for (var i = startIndex; i >= 0 && i < releaseVersions.Count; i++)
                 {
                     if (!releaseVersions[i].IsPreRelease)
