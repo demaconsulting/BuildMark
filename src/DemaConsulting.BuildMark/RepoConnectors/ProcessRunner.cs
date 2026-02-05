@@ -21,7 +21,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Helper class for running external processes and capturing output.

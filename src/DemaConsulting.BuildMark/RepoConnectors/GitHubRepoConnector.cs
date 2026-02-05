@@ -20,7 +20,7 @@
 
 using Octokit;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     GitHub repository connector implementation using Octokit.Net.

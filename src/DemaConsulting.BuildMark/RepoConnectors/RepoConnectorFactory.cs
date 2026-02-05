@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Factory for creating repository connector instances.

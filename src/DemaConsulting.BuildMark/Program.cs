@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using System.Reflection;
+using DemaConsulting.BuildMark.RepoConnectors;
 
 namespace DemaConsulting.BuildMark;
 
