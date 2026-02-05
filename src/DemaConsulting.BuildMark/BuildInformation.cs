@@ -155,9 +155,13 @@ public record BuildInformation(
     /// <summary>
     ///     Finds the index of a tag in the tag history by normalized version.
     /// </summary>
-    /// <param name="tags">List of tags.</param>
-    /// <param name="normalizedVersion">Normalized version to find.</param>
-    /// <returns>Index of the tag, or -1 if not found.</returns>
+    /// <param name="tags">List of tags to search.</param>
+    /// <param name="normalizedVersion">Normalized version string to find (e.g., "1.0.0" or "2.0.0-beta.1").</param>
+    /// <returns>Index of the tag in the list, or -1 if not found.</returns>
+    /// <remarks>
+    ///     This method is public to allow repository connectors to determine version positions
+    ///     in tag history when constructing BuildInformation objects.
+    /// </remarks>
     public static int FindTagIndex(List<Version> tags, string normalizedVersion)
     {
         // Search for tag matching the normalized version

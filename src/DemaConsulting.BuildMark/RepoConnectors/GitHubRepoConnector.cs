@@ -79,12 +79,13 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Build helper dictionary for PR lookup
         var commitHashToPr = BuildCommitToPrMap(pullRequests);
 
-        // Parse tags into Version objects
+        // Parse tags into Version objects and create lookup dictionary
+        var tagLookup = tags.ToDictionary(t => t.Name, t => t.Commit.Sha);
         var versionTags = tags
             .Select(t => DemaConsulting.BuildMark.Version.TryCreate(t.Name))
             .Where(v => v != null)
             .Cast<DemaConsulting.BuildMark.Version>()
-            .OrderBy(v => tags.First(t => t.Name == v.Tag).Commit.Sha)
+            .OrderBy(v => tagLookup[v.Tag])
             .ToList();
 
         // Determine the target version and hash for build information
@@ -199,13 +200,17 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         {
             if (commitHashToPr.TryGetValue(commit.Sha, out var pr))
             {
-                // Find issues closed by this PR
+                // Find issues referenced in the PR body or title
+                // This is a simplified approach - in a real scenario, you might want to:
+                // 1. Parse PR body for "fixes #123", "closes #456" patterns
+                // 2. Use Octokit's timeline events API for more precise relationships
+                // 3. Check if issues are linked via GitHub's issue references
                 var closedIssues = issues.Where(i => 
                     i.State == ItemState.Closed && 
                     i.ClosedAt.HasValue && 
                     pr.MergedAt.HasValue &&
-                    i.ClosedAt.Value <= pr.MergedAt.Value &&
-                    i.ClosedAt.Value >= pr.MergedAt.Value.AddDays(-1)).ToList();
+                    // Match issues closed within a day of PR merge as a heuristic
+                    Math.Abs((i.ClosedAt.Value - pr.MergedAt.Value).TotalDays) < 1).ToList();
 
                 if (closedIssues.Count > 0)
                 {

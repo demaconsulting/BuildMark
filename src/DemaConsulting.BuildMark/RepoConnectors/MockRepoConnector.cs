@@ -68,11 +68,11 @@ public class MockRepoConnector : IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+    public async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
     {
         // Retrieve tag history and current commit hash from the repository
-        var tags = GetTagHistoryAsync().Result;
-        var currentHash = GetHashForTagAsync(null).Result;
+        var tags = await GetTagHistoryAsync();
+        var currentHash = await GetHashForTagAsync(null);
 
         // Determine the target version and hash for build information
         Version toTagInfo;
@@ -87,7 +87,7 @@ public class MockRepoConnector : IRepoConnector
         {
             // Verify current commit matches latest tag when no version specified
             var latestTag = tags[^1];
-            var latestTagHash = GetHashForTagAsync(latestTag.Tag).Result;
+            var latestTagHash = await GetHashForTagAsync(latestTag.Tag);
 
             if (latestTagHash.Trim() == currentHash.Trim())
             {
@@ -168,12 +168,12 @@ public class MockRepoConnector : IRepoConnector
             // Get commit hash for baseline version if one was found
             if (fromTagInfo != null)
             {
-                fromHash = GetHashForTagAsync(fromTagInfo.Tag).Result;
+                fromHash = await GetHashForTagAsync(fromTagInfo.Tag);
             }
         }
 
         // Collect all changes (issues and PRs) in version range
-        var changes = GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo).Result;
+        var changes = await GetChangesBetweenTagsAsync(fromTagInfo, toTagInfo);
         var allChangeIds = new HashSet<string>();
         var bugs = new List<ItemInfo>();
         var nonBugChanges = new List<ItemInfo>();
@@ -203,7 +203,7 @@ public class MockRepoConnector : IRepoConnector
 
         // Collect known issues (open bugs not fixed in this build)
         var knownIssues = new List<ItemInfo>();
-        var openIssues = GetOpenIssuesAsync().Result;
+        var openIssues = await GetOpenIssuesAsync();
         foreach (var issue in openIssues)
         {
             // Skip issues already fixed in this build
@@ -225,14 +225,14 @@ public class MockRepoConnector : IRepoConnector
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
         // Create and return build information with all collected data
-        return Task.FromResult(new BuildInformation(
+        return new BuildInformation(
             fromTagInfo,
             toTagInfo,
             fromHash?.Trim(),
             toHash.Trim(),
             nonBugChanges,
             bugs,
-            knownIssues));
+            knownIssues);
     }
 
     /// <summary>
