@@ -174,9 +174,10 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     // Target version exists in history, start search from next older release
                     startIndex = toIndex + 1;
                 }
-                else if (toIndex == -1 && releaseVersions.Count > 0)
+                else if (toIndex == -1 && releaseVersions.Count > 1)
                 {
-                    // Target version not in history, start from second release (skip first as it's newer)
+                    // Target version not in history, start from second release (skip most recent)
+                    // We skip the first (newest) release because the target is implicitly newer
                     startIndex = 1;
                 }
                 else
@@ -185,13 +186,16 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     startIndex = -1;
                 }
 
-                // Search forward (toward older releases, incrementing index) for previous non-pre-release version
-                for (var i = startIndex; i >= 0 && i < releaseVersions.Count; i++)
+                // Search forward through older releases (incrementing index) for previous non-pre-release version
+                if (startIndex >= 0)
                 {
-                    if (!releaseVersions[i].IsPreRelease)
+                    for (var i = startIndex; i < releaseVersions.Count; i++)
                     {
-                        fromTagInfo = releaseVersions[i];
-                        break;
+                        if (!releaseVersions[i].IsPreRelease)
+                        {
+                            fromTagInfo = releaseVersions[i];
+                            break;
+                        }
                     }
                 }
             }
