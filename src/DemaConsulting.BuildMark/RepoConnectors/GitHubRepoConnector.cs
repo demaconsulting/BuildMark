@@ -129,7 +129,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         if (versionTags.Count > 0)
         {
             // Find the position of target version in tag history
-            var toIndex = BuildInformation.FindTagIndex(versionTags, toTagInfo.FullVersion);
+            var toIndex = FindTagIndex(versionTags, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {

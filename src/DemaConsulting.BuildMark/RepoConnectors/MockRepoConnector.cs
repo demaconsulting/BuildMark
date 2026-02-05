@@ -23,7 +23,7 @@ namespace DemaConsulting.BuildMark;
 /// <summary>
 ///     Mock repository connector for deterministic testing.
 /// </summary>
-public class MockRepoConnector : IRepoConnector
+public class MockRepoConnector : RepoConnectorBase
 {
     private readonly Dictionary<string, string> _issueTitles = new()
     {
@@ -68,7 +68,7 @@ public class MockRepoConnector : IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
     {
         // Retrieve tag history and current commit hash from the repository
         var tags = await GetTagHistoryAsync();
@@ -117,7 +117,7 @@ public class MockRepoConnector : IRepoConnector
         if (tags.Count > 0)
         {
             // Find the position of target version in tag history
-            var toIndex = BuildInformation.FindTagIndex(tags, toTagInfo.FullVersion);
+            var toIndex = FindTagIndex(tags, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {
