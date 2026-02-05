@@ -25,7 +25,7 @@ namespace DemaConsulting.BuildMark;
 /// <summary>
 ///     GitHub repository connector implementation using Octokit.Net.
 /// </summary>
-public partial class GitHubRepoConnector : RepoConnectorBase
+public class GitHubRepoConnector : RepoConnectorBase
 {
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
@@ -44,7 +44,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public override async Task<BuildInformation> GetBuildInformationAsync(DemaConsulting.BuildMark.Version? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
     {
         // Get repository metadata using git commands
         var repoUrl = await RunCommandAsync("git", "remote get-url origin");
@@ -80,7 +80,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
         // Build a mapping from commit SHA to pull request.
         // This is used to associate commits with their pull requests for change tracking.
-        var commitHashToPr = BuildCommitToPrMap(pullRequests);
+        var commitHashToPr = pullRequests
+            .Where(p => p.Merged && p.MergeCommitSha != null)
+            .ToDictionary(p => p.MergeCommitSha!, p => p);
 
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
@@ -109,68 +111,66 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Parse release tags into Version objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
-            .Select(r => DemaConsulting.BuildMark.Version.TryCreate(r.TagName!))
+            .Select(r => Version.TryCreate(r.TagName!))
             .Where(v => v != null)
-            .Cast<DemaConsulting.BuildMark.Version>()
+            .Cast<Version>()
             .ToList();
 
         // Determine the target version and hash for build information
-        DemaConsulting.BuildMark.Version toTagInfo;
-        string toHash = currentCommitHash.Trim();
-        if (version != null)
+        var toVersion = version;
+        var toHash = currentCommitHash.Trim();
+        if (toVersion == null)
         {
-            // Use explicitly specified version as target
-            toTagInfo = version;
-        }
-        else if (releaseVersions.Count > 0)
-        {
-            // Use the most recent release (first in list since releases are newest to oldest)
-            var latestRelease = branchReleases[0];
-            var latestReleaseVersion = releaseVersions[0];
-            var latestTagCommit = tagsByName[latestRelease.TagName!];
-
-            if (latestTagCommit.Commit.Sha == toHash)
+            if (releaseVersions.Count > 0)
             {
-                // Current commit matches latest release tag, use it as target
-                toTagInfo = latestReleaseVersion;
+                // Use the most recent release (first in list since releases are newest to oldest)
+                var latestRelease = branchReleases[0];
+                var latestReleaseVersion = releaseVersions[0];
+                var latestTagCommit = tagsByName[latestRelease.TagName!];
+
+                if (latestTagCommit.Commit.Sha == toHash)
+                {
+                    // Current commit matches latest release tag, use it as target
+                    toVersion = latestReleaseVersion;
+                }
+                else
+                {
+                    // Current commit doesn't match any release tag, cannot determine version
+                    throw new InvalidOperationException(
+                        "Target version not specified and current commit does not match any release tag. " +
+                        "Please provide a version parameter.");
+                }
             }
             else
             {
-                // Current commit doesn't match any release tag, cannot determine version
+                // No releases in repository and no version provided
                 throw new InvalidOperationException(
-                    "Target version not specified and current commit does not match any release tag. " +
+                    "No releases found in repository and no version specified. " +
                     "Please provide a version parameter.");
             }
         }
-        else
-        {
-            // No releases in repository and no version provided
-            throw new InvalidOperationException(
-                "No releases found in repository and no version specified. " +
-                "Please provide a version parameter.");
-        }
 
         // Determine the starting release for comparing changes
-        DemaConsulting.BuildMark.Version? fromTagInfo = null;
+        Version? fromVersion = null;
         string? fromHash = null;
 
         if (releaseVersions.Count > 0)
         {
             // Find the position of target version in release history
-            var toIndex = FindVersionIndex(releaseVersions, toTagInfo.FullVersion);
+            var toIndex = FindVersionIndex(releaseVersions, toVersion.FullVersion);
 
-            if (toTagInfo.IsPreRelease)
+            if (toVersion.IsPreRelease)
             {
                 // Pre-release versions use the immediately previous (older) release as baseline
                 if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
                 {
                     // Target version exists in history, use next older release (higher index)
-                    fromTagInfo = releaseVersions[toIndex + 1];
+                    fromVersion = releaseVersions[toIndex + 1];
                 }
                 else if (toIndex == -1 && releaseVersions.Count > 0)
                 {
                     // Target version not in history, use most recent (first) release as baseline
-                    fromTagInfo = releaseVersions[0];
+                    fromVersion = releaseVersions[0];
                 }
                 // If toIndex is last in list, this is the oldest release, no baseline
             }
@@ -202,7 +202,7 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                     {
                         if (!releaseVersions[i].IsPreRelease)
                         {
-                            fromTagInfo = releaseVersions[i];
+                            fromVersion = releaseVersions[i];
                             break;
                         }
                     }
@@ -210,8 +210,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             }
 
             // Get commit hash for baseline version if one was found
-            if (fromTagInfo != null &&
-                tagToRelease.TryGetValue(fromTagInfo.Tag, out var fromRelease) &&
+            if (fromVersion != null &&
+                tagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
                 tagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
             {
                 fromHash = fromTagCommit.Commit.Sha;
@@ -299,8 +299,8 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
         // Create and return build information with all collected data
         return new BuildInformation(
-            fromTagInfo,
-            toTagInfo,
+            fromVersion,
+            toVersion,
             fromHash,
             toHash,
             nonBugChanges,
@@ -323,29 +323,12 @@ public partial class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Builds a map from commit hash (merge SHA) to pull request.
-    /// </summary>
-    /// <param name="pullRequests">List of pull requests.</param>
-    /// <returns>Dictionary mapping commit hash to pull request.</returns>
-    private static Dictionary<string, PullRequest> BuildCommitToPrMap(IReadOnlyList<PullRequest> pullRequests)
-    {
-        var map = new Dictionary<string, PullRequest>();
-
-        foreach (var pr in pullRequests.Where(p => p.Merged && p.MergeCommitSha != null))
-        {
-            map[pr.MergeCommitSha] = pr;
-        }
-
-        return map;
-    }
-
-    /// <summary>
-    ///     Gets commits in the range from fromHash to toHash.
+    ///     Gets commits in the range from fromHash (exclusive) to toHash (inclusive).
     /// </summary>
     /// <param name="commits">All commits.</param>
-    /// <param name="fromHash">Starting commit hash (null for start of history).</param>
-    /// <param name="toHash">Ending commit hash.</param>
-    /// <returns>List of commits in range.</returns>
+    /// <param name="fromHash">Starting commit hash (exclusive - not included in results; null for start of history).</param>
+    /// <param name="toHash">Ending commit hash (inclusive - included in results).</param>
+    /// <returns>List of commits in range, excluding fromHash but including toHash.</returns>
     private static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
     {
         var result = new List<GitHubCommit>();
@@ -359,8 +342,9 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 foundTo = true;
             }
 
-            if (foundTo)
+            if (foundTo && commit.Sha != fromHash)
             {
+                // Skip the fromHash commit itself - we want changes AFTER the last release
                 result.Add(commit);
             }
 
