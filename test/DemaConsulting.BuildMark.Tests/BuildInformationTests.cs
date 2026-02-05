@@ -294,9 +294,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<ItemInfo>(), // No changes
-            new List<ItemInfo> { new ItemInfo("2", "Bug fix", "https://example.com/2", "bug") },
-            new List<ItemInfo>());
+            [], // No changes
+            [new ItemInfo("2", "Bug fix", "https://example.com/2", "bug")],
+            []);
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -320,9 +320,9 @@ public class BuildInformationTests
             Version.Create("v1.1.0"),
             "abc123",
             "def456",
-            new List<ItemInfo> { new ItemInfo("1", "Feature", "https://example.com/1", "feature") },
-            new List<ItemInfo>(), // No bugs
-            new List<ItemInfo>());
+            [new ItemInfo("1", "Feature", "https://example.com/1", "feature")],
+            [], // No bugs
+            []);
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -414,9 +414,9 @@ public class BuildInformationTests
                 toVersion,
                 "def456ghi789",
                 "mno345pqr678",
-                new List<ItemInfo>(),
-                new List<ItemInfo>(),
-                new List<ItemInfo>()));
+                [],
+                [],
+                []));
         }
     }
 }

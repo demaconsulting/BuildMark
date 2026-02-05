@@ -248,6 +248,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_UnsupportedArgument_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with unsupported argument
@@ -258,9 +260,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("Unsupported argument '--unsupported'", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("Unsupported argument '--unsupported'", caughtException.Message);
     }
 
     /// <summary>
@@ -269,6 +274,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_BuildVersionWithoutValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --build-version but no value
@@ -279,9 +286,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--build-version requires a version argument", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--build-version requires a version argument", caughtException.Message);
     }
 
     /// <summary>
@@ -290,6 +300,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportWithoutValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --report but no value
@@ -300,9 +312,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--report requires a filename argument", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--report requires a filename argument", caughtException.Message);
     }
 
     /// <summary>
@@ -311,6 +326,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportDepthWithoutValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --report-depth but no value
@@ -321,9 +338,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--report-depth requires a depth argument", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--report-depth requires a depth argument", caughtException.Message);
     }
 
     /// <summary>
@@ -332,6 +352,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --report-depth with non-integer value
@@ -342,9 +364,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--report-depth requires a positive integer", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
@@ -353,6 +378,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --report-depth with zero value
@@ -363,9 +390,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--report-depth requires a positive integer", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
@@ -374,6 +404,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --report-depth with negative value
@@ -384,9 +416,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--report-depth requires a positive integer", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
@@ -395,6 +430,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ResultsWithoutValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --results but no value
@@ -405,9 +442,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--results requires a results filename argument", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--results requires a results filename argument", caughtException.Message);
     }
 
     /// <summary>
@@ -416,6 +456,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_LogWithoutValue_ThrowsArgumentException()
     {
+        ArgumentException? caughtException = null;
+
         try
         {
             // Attempt to create context with --log but no value
@@ -426,9 +468,12 @@ public class ContextTests
         }
         catch (ArgumentException ex)
         {
-            // Verify exception message
-            Assert.Contains("--log requires a filename argument", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--log requires a filename argument", caughtException.Message);
     }
 
     /// <summary>
@@ -437,6 +482,8 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException()
     {
+        InvalidOperationException? caughtException = null;
+
         try
         {
             // Attempt to create context with invalid log file path
@@ -447,9 +494,12 @@ public class ContextTests
         }
         catch (InvalidOperationException ex)
         {
-            // Verify exception message
-            Assert.Contains("Failed to open log file", ex.Message);
+            caughtException = ex;
         }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("Failed to open log file", caughtException.Message);
     }
 
     /// <summary>
