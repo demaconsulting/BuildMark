@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Net.Http.Headers;
+using System.Text;
+using System.Text.Json;
 using Octokit;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
@@ -27,6 +30,8 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public class GitHubRepoConnector : RepoConnectorBase
 {
+    private const string GitHubGraphQLEndpoint = "https://api.github.com/graphql";
+
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
         { "bug", "bug" },
@@ -58,7 +63,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var token = await GetGitHubTokenAsync();
 
         // Create Octokit client
-        var client = new GitHubClient(new ProductHeaderValue("BuildMark"))
+        var client = new GitHubClient(new Octokit.ProductHeaderValue("BuildMark"))
         {
             Credentials = new Credentials(token)
         };
@@ -364,26 +369,84 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Finds issue IDs that are linked to a specific pull request using GitHub Search API.
+    ///     Finds issue IDs linked to a pull request using GitHub GraphQL API.
+    ///     Uses the closingIssuesReferences connection to find issues that the PR closes.
     /// </summary>
-    /// <param name="client">GitHub client.</param>
+    /// <param name="client">GitHub REST client (used to get credentials).</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <param name="prNumber">Pull request number.</param>
-    /// <returns>List of issue IDs (numbers) linked to the pull request.</returns>
+    /// <returns>List of issue IDs (numbers) that are linked/closed by the pull request.</returns>
     private static async Task<List<int>> FindIssueIdsLinkedToPullRequestAsync(
         GitHubClient client,
         string owner,
         string repo,
         int prNumber)
     {
-        // Search for issues that link to this PR
-        // The repo qualifier scopes the search, so we only need the PR number in linked:pr
-        var query = $"repo:{owner}/{repo} is:issue linked:pr-#{prNumber}";
+        try
+        {
+            using var httpClient = new HttpClient();
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", client.Credentials.GetToken());
+            httpClient.DefaultRequestHeaders.UserAgent.Add(
+                new ProductInfoHeaderValue("BuildMark", "1.0"));
 
-        var searchRequest = new SearchIssuesRequest(query);
-        var searchResult = await client.Search.SearchIssues(searchRequest);
-        return searchResult.Items.Select(i => i.Number).ToList();
+            // GraphQL query to get closing issues for a pull request
+            var graphqlQuery = new
+            {
+                query = @"
+                    query($owner: String!, $repo: String!, $prNumber: Int!) {
+                        repository(owner: $owner, name: $repo) {
+                            pullRequest(number: $prNumber) {
+                                closingIssuesReferences(first: 100) {
+                                    nodes {
+                                        number
+                                    }
+                                }
+                            }
+                        }
+                    }",
+                variables = new
+                {
+                    owner,
+                    repo,
+                    prNumber
+                }
+            };
+
+            var jsonContent = JsonSerializer.Serialize(graphqlQuery);
+            var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+
+            var response = await httpClient.PostAsync(GitHubGraphQLEndpoint, content);
+            response.EnsureSuccessStatusCode();
+
+            var responseBody = await response.Content.ReadAsStringAsync();
+            var jsonDoc = JsonDocument.Parse(responseBody);
+
+            // Extract issue numbers from the GraphQL response
+            var issueNumbers = new List<int>();
+            if (jsonDoc.RootElement.TryGetProperty("data", out var data) &&
+                data.TryGetProperty("repository", out var repository) &&
+                repository.TryGetProperty("pullRequest", out var pullRequest) &&
+                pullRequest.TryGetProperty("closingIssuesReferences", out var closingIssues) &&
+                closingIssues.TryGetProperty("nodes", out var nodes))
+            {
+                foreach (var node in nodes.EnumerateArray())
+                {
+                    if (node.TryGetProperty("number", out var number))
+                    {
+                        issueNumbers.Add(number.GetInt32());
+                    }
+                }
+            }
+
+            return issueNumbers;
+        }
+        catch
+        {
+            // If GraphQL query fails (e.g., PR doesn't exist or no permissions), return empty list
+            return new List<int>();
+        }
     }
 
     /// <summary>
