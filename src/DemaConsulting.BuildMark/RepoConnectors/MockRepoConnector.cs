@@ -60,6 +60,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "2.0.0", "mno345pqr678" }
     };
 
+    /// <summary>
+    ///     List of open issue IDs for testing.
+    /// </summary>
     private readonly List<string> _openIssues = ["4", "5"];
 
     /// <summary>

@@ -25,27 +25,27 @@ using System.Text.Json;
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
-/// Helper class for executing GitHub GraphQL queries.
+///     Helper class for executing GitHub GraphQL queries.
 /// </summary>
 internal sealed class GitHubGraphQLClient : IDisposable
 {
     /// <summary>
-    /// Default GitHub GraphQL API endpoint.
+    ///     Default GitHub GraphQL API endpoint.
     /// </summary>
     private const string DefaultGitHubGraphQLEndpoint = "https://api.github.com/graphql";
 
     /// <summary>
-    /// HTTP client for making GraphQL requests.
+    ///     HTTP client for making GraphQL requests.
     /// </summary>
     private readonly HttpClient _httpClient;
 
     /// <summary>
-    /// GraphQL endpoint URL.
+    ///     GraphQL endpoint URL.
     /// </summary>
     private readonly string _graphqlEndpoint;
 
     /// <summary>
-    /// Initializes a new instance of the <see cref="GitHubGraphQLClient"/> class.
+    ///     Initializes a new instance of the <see cref="GitHubGraphQLClient"/> class.
     /// </summary>
     /// <param name="token">GitHub authentication token.</param>
     /// <param name="graphqlEndpoint">Optional GraphQL endpoint URL. Defaults to public GitHub API. For GitHub Enterprise, use https://your-github-enterprise/api/graphql.</param>
@@ -61,7 +61,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
-    /// Finds issue IDs linked to a pull request via closingIssuesReferences.
+    ///     Finds issue IDs linked to a pull request via closingIssuesReferences.
     /// </summary>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
@@ -136,7 +136,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
-    /// Disposes the HTTP client.
+    ///     Disposes the HTTP client.
     /// </summary>
     public void Dispose()
     {
