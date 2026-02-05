@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+#pragma warning disable CS0618 // Type or member is obsolete
+
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>

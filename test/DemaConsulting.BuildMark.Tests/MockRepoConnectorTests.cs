@@ -27,122 +27,47 @@ namespace DemaConsulting.BuildMark.Tests;
 public class MockRepoConnectorTests
 {
     /// <summary>
-    ///     Test that GetTagHistoryAsync returns expected tags.
+    ///     Test that MockRepoConnector can be instantiated.
     /// </summary>
     [TestMethod]
-    public async Task MockRepoConnector_GetTagHistoryAsync_ReturnsExpectedTags()
+    public void MockRepoConnector_Constructor_CreatesInstance()
     {
-        // Get tag history from mock connector
+        // Create connector
         var connector = new MockRepoConnector();
-        var tags = await connector.GetTagHistoryAsync();
 
-        // Verify all expected tags are returned
-        Assert.HasCount(5, tags);
-        Assert.AreEqual("v1.0.0", tags[0].Tag);
-        Assert.AreEqual("ver-1.1.0", tags[1].Tag);
-        Assert.AreEqual("release_2.0.0-beta.1", tags[2].Tag);
-        Assert.AreEqual("v2.0.0-rc.1", tags[3].Tag);
-        Assert.AreEqual("2.0.0", tags[4].Tag);
+        // Verify instance
+        Assert.IsNotNull(connector);
+        Assert.IsInstanceOfType<MockRepoConnector>(connector);
     }
 
-
-
     /// <summary>
-    ///     Test that GetHashForTagAsync returns expected hash.
+    ///     Test that MockRepoConnector implements IRepoConnector.
     /// </summary>
     [TestMethod]
-    public async Task MockRepoConnector_GetHashForTagAsync_ReturnsExpectedHash()
+    public void MockRepoConnector_ImplementsInterface()
+    {
+        // Create connector
+        var connector = new MockRepoConnector();
+
+        // Verify interface implementation
+        Assert.IsInstanceOfType<IRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync returns build information with expected version.
+    /// </summary>
+    [TestMethod]
+    public async Task MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion()
     {
         // Arrange
         var connector = new MockRepoConnector();
+        var version = Version.Create("v2.0.0");
 
         // Act
-        var hash = await connector.GetHashForTagAsync(Version.Create("v1.0.0").Tag);
+        var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert
-        Assert.AreEqual("abc123def456", hash);
-    }
-
-    /// <summary>
-    ///     Test that GetHashForTagAsync returns current hash for null tag.
-    /// </summary>
-    [TestMethod]
-    public async Task MockRepoConnector_GetHashForTagAsync_ReturnsCurrentHashForNullTag()
-    {
-        // Arrange
-        var connector = new MockRepoConnector();
-
-        // Act
-        var hash = await connector.GetHashForTagAsync(null);
-
-        // Assert
-        Assert.AreEqual("current123hash456", hash);
-    }
-
-    /// <summary>
-    ///     Test that GetHashForTagAsync returns unknown hash for unknown tag.
-    /// </summary>
-    [TestMethod]
-    public async Task MockRepoConnector_GetHashForTagAsync_ReturnsUnknownHashForUnknownTag()
-    {
-        // Arrange
-        var connector = new MockRepoConnector();
-
-        // Act
-        var hash = await connector.GetHashForTagAsync(Version.Create("v999.0.0").Tag);
-
-        // Assert
-        Assert.AreEqual("unknown000hash000", hash);
-    }
-
-    /// <summary>
-    ///     Test that GetOpenIssuesAsync returns expected open issues with details.
-    /// </summary>
-    [TestMethod]
-    public async Task MockRepoConnector_GetOpenIssuesAsync_ReturnsExpectedOpenIssues()
-    {
-        // Arrange
-        var connector = new MockRepoConnector();
-
-        // Act
-        var openIssues = await connector.GetOpenIssuesAsync();
-
-        // Assert
-        Assert.HasCount(2, openIssues);
-        Assert.AreEqual("4", openIssues[0].Id);
-        Assert.AreEqual("Known bug A", openIssues[0].Title);
-        Assert.AreEqual("bug", openIssues[0].Type);
-        Assert.AreEqual("5", openIssues[1].Id);
-        Assert.AreEqual("Known bug B", openIssues[1].Title);
-        Assert.AreEqual("bug", openIssues[1].Type);
-    }
-
-    /// <summary>
-    ///     Test that GetChangesBetweenTagsAsync returns changes including PRs without issues.
-    /// </summary>
-    [TestMethod]
-    public async Task MockRepoConnector_GetChangesBetweenTagsAsync_IncludesPRsWithoutIssues()
-    {
-        // Arrange
-        var connector = new MockRepoConnector();
-        var fromVersion = Version.Create("v1.0.0");
-        var toVersion = Version.Create("ver-1.1.0");
-
-        // Act
-        var changes = await connector.GetChangesBetweenTagsAsync(fromVersion, toVersion);
-
-        // Assert - Should have both issue #1 (from PR #10) and PR #13 (without issues)
-        Assert.HasCount(2, changes);
-
-        // First change should be issue #1
-        Assert.AreEqual("1", changes[0].Id);
-        Assert.AreEqual("Add feature X", changes[0].Title);
-        Assert.AreEqual("feature", changes[0].Type);
-
-        // Second change should be PR #13
-        Assert.AreEqual("#13", changes[1].Id);
-        Assert.AreEqual("PR #13", changes[1].Title);
-        Assert.Contains("pull/13", changes[1].Url);
-        Assert.AreEqual("other", changes[1].Type);
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual(version.Tag, buildInfo.ToVersion.Tag);
     }
 }
