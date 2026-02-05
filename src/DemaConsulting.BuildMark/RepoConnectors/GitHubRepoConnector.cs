@@ -27,6 +27,9 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public class GitHubRepoConnector : RepoConnectorBase
 {
+    /// <summary>
+    ///     Mapping of label keywords to their normalized item types.
+    /// </summary>
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
         { "bug", "bug" },

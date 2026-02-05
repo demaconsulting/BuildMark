@@ -25,6 +25,9 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public class MockRepoConnector : RepoConnectorBase
 {
+    /// <summary>
+    ///     Mapping of issue IDs to their titles for testing.
+    /// </summary>
     private readonly Dictionary<string, string> _issueTitles = new()
     {
         { "1", "Add feature X" },
@@ -34,6 +37,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "5", "Known bug B" }
     };
 
+    /// <summary>
+    ///     Mapping of issue IDs to their types for testing.
+    /// </summary>
     private readonly Dictionary<string, string> _issueTypes = new()
     {
         { "1", "feature" },
@@ -43,6 +49,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "5", "bug" }
     };
 
+    /// <summary>
+    ///     Mapping of pull request IDs to their linked issue IDs for testing.
+    /// </summary>
     private readonly Dictionary<string, List<string>> _pullRequestIssues = new()
     {
         { "10", new List<string> { "1" } },
@@ -51,6 +60,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "13", new List<string>() } // PR with no issues
     };
 
+    /// <summary>
+    ///     Mapping of tag names to their commit hashes for testing.
+    /// </summary>
     private readonly Dictionary<string, string> _tagHashes = new()
     {
         { "v1.0.0", "abc123def456" },
