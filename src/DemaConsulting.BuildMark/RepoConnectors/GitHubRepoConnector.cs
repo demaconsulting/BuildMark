@@ -323,7 +323,6 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Target version not in history, use most recent release as baseline
         if (toIndex == -1 && releaseVersions.Count > 0)
         {
-            // Target version not in history, use most recent (first) release as baseline
             return releaseVersions[0];
         }
 
@@ -369,7 +368,6 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Target version exists in history, start search from next older release
         if (toIndex >= 0 && toIndex < releaseCount - 1)
         {
-            // Target version exists in history, start search from next older release
             return toIndex + 1;
         }
 
@@ -572,7 +570,6 @@ public class GitHubRepoConnector : RepoConnectorBase
             // Collect commits in range, excluding the fromHash commit itself
             if (foundTo && commit.Sha != fromHash)
             {
-                // Skip the fromHash commit itself - we want changes AFTER the last release
                 result.Add(commit);
             }
 

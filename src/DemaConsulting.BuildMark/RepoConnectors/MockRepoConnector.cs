@@ -121,7 +121,6 @@ public class MockRepoConnector : RepoConnectorBase
         // Use explicitly specified version if provided
         if (version != null)
         {
-            // Use explicitly specified version as target
             return (version, currentHash);
         }
 
@@ -210,7 +209,6 @@ public class MockRepoConnector : RepoConnectorBase
         // Target version not in history, use most recent tag as baseline
         if (toIndex == -1)
         {
-            // Target version not in history, use most recent tag as baseline
             return tags[^1];
         }
 
@@ -253,14 +251,12 @@ public class MockRepoConnector : RepoConnectorBase
         // Target version exists in history, start search from previous position
         if (toIndex > 0)
         {
-            // Target version exists in history, start search from previous position
             return toIndex - 1;
         }
 
         // Target version not in history, start from most recent tag
         if (toIndex == -1)
         {
-            // Target version not in history, start from most recent tag
             return tagCount - 1;
         }
 
