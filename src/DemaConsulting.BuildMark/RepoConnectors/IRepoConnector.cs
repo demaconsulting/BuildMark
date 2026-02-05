@@ -26,29 +26,10 @@ namespace DemaConsulting.BuildMark;
 public interface IRepoConnector
 {
     /// <summary>
-    ///     Gets the history of tags leading to the current branch.
+    ///     Gets build information for a release.
     /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
-    Task<List<Version>> GetTagHistoryAsync();
-
-    /// <summary>
-    ///     Gets the list of changes between two versions.
-    /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of changes with full information.</returns>
-    Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
-
-    /// <summary>
-    ///     Gets the git hash for a tag.
-    /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
-    /// <returns>Git hash.</returns>
-    Task<string> GetHashForTagAsync(string? tag);
-
-    /// <summary>
-    ///     Gets the list of open issues with their details.
-    /// </summary>
-    /// <returns>List of open issues with full information.</returns>
-    Task<List<ItemInfo>> GetOpenIssuesAsync();
+    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
+    /// <returns>BuildInformation record with all collected data.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
+    Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
 }

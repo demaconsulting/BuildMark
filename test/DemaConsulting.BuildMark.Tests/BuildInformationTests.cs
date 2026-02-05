@@ -375,10 +375,13 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync() => Task.FromResult(new List<Version>());
-        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
-        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult("hash123");
-        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
+        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+        {
+            // No tags, will throw
+            throw new InvalidOperationException(
+                "No tags found in repository and no version specified. " +
+                "Please provide a version parameter.");
+        }
     }
 
     /// <summary>
@@ -386,13 +389,13 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMismatch : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync()
+        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
         {
-            return Task.FromResult(new List<Version> { Version.Create("v1.0.0") });
+            // Current commit doesn't match tag, will throw
+            throw new InvalidOperationException(
+                "Target version not specified and current commit does not match any tag. " +
+                "Please provide a version parameter.");
         }
-        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
-        public Task<string> GetHashForTagAsync(string? tag) => Task.FromResult(tag == null ? "different123" : "hash123");
-        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 
     /// <summary>
@@ -400,32 +403,18 @@ public class BuildInformationTests
     /// </summary>
     private class MockRepoConnectorMatchingTag : IRepoConnector
     {
-        public Task<List<Version>> GetTagHistoryAsync()
+        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
         {
-            return Task.FromResult(new List<Version>
-            {
-                Version.Create("v1.0.0"),
+            // Simple test implementation that returns a BuildInformation
+            var toVersion = version ?? Version.Create("v2.0.0");
+            return Task.FromResult(new BuildInformation(
                 Version.Create("ver-1.1.0"),
-                Version.Create("v2.0.0")
-            });
+                toVersion,
+                "def456ghi789",
+                "mno345pqr678",
+                new List<ItemInfo>(),
+                new List<ItemInfo>(),
+                new List<ItemInfo>()));
         }
-        public Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to) => Task.FromResult(new List<ItemInfo>());
-
-        public Task<string> GetHashForTagAsync(string? tag)
-        {
-            if (tag == null || tag == "v2.0.0")
-            {
-                return Task.FromResult("mno345pqr678");
-            }
-
-            if (tag == "ver-1.1.0")
-            {
-                return Task.FromResult("def456ghi789");
-            }
-
-            return Task.FromResult("abc123def456");
-        }
-
-        public Task<List<ItemInfo>> GetOpenIssuesAsync() => Task.FromResult(new List<ItemInfo>());
     }
 }
