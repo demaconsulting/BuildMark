@@ -236,7 +236,6 @@ public class MockRepoConnector : RepoConnectorBase
             }
         }
 
-        // No previous non-pre-release version found
         return null;
     }
 

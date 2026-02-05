@@ -353,7 +353,6 @@ public class GitHubRepoConnector : RepoConnectorBase
             }
         }
 
-        // No previous non-pre-release version found
         return null;
     }
 
@@ -691,7 +690,6 @@ public class GitHubRepoConnector : RepoConnectorBase
             return ParseOwnerRepo(path);
         }
 
-        // URL format not recognized
         throw new ArgumentException($"Unsupported GitHub URL format: {url}", nameof(url));
     }
 
