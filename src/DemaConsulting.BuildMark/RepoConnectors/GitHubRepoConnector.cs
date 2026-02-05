@@ -370,7 +370,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         return new ItemInfo(
             issue.Number.ToString(),
             issue.Title,
-            issue.HtmlUrl,
+            issue.Url,
             type,
             index);
     }
