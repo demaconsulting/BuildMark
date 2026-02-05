@@ -78,6 +78,10 @@ public class GitHubRepoConnector : RepoConnectorBase
         var pullRequests = await pullRequestsTask;
         var issues = await issuesTask;
 
+        // Build a mapping from issue number to issue for efficient lookup.
+        // This is used to look up issue details when we find linked issue IDs.
+        var issueById = issues.ToDictionary(i => i.Number, i => i);
+
         // Build a mapping from commit SHA to pull request.
         // This is used to associate commits with their pull requests for change tracking.
         // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
@@ -231,34 +235,35 @@ public class GitHubRepoConnector : RepoConnectorBase
         {
             if (commitHashToPr.TryGetValue(commit.Sha, out var pr))
             {
-                // Find issues that are linked to this PR
-                // Use Issue.PullRequest.HtmlUrl to match with PullRequest.HtmlUrl
-                // Include both open and closed issues referenced by the PR
-                var linkedIssues = issues.Where(i =>
-                    i.PullRequest != null &&
-                    i.PullRequest.HtmlUrl == pr.HtmlUrl).ToList();
+                // Find issue IDs that are linked to this PR using GitHub Search API
+                // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
+                var linkedIssueIds = await FindIssueIdsLinkedToPullRequestAsync(client, owner, repo, pr.Number);
 
-                if (linkedIssues.Count > 0)
+                if (linkedIssueIds.Count > 0)
                 {
-                    // PR closed issues - add them
-                    foreach (var issue in linkedIssues)
+                    // PR has linked issues - add them (deduplicated)
+                    foreach (var issueId in linkedIssueIds)
                     {
-                        var issueId = issue.Number.ToString();
-                        if (allChangeIds.Contains(issueId))
+                        var issueIdStr = issueId.ToString();
+                        if (allChangeIds.Contains(issueIdStr))
                         {
                             continue;
                         }
 
-                        allChangeIds.Add(issueId);
-                        var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
+                        // Look up the issue in the master issues list
+                        if (issueById.TryGetValue(issueId, out var issue))
+                        {
+                            allChangeIds.Add(issueIdStr);
+                            var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
 
-                        if (itemInfo.Type == "bug")
-                        {
-                            bugs.Add(itemInfo);
-                        }
-                        else
-                        {
-                            nonBugChanges.Add(itemInfo);
+                            if (itemInfo.Type == "bug")
+                            {
+                                bugs.Add(itemInfo);
+                            }
+                            else
+                            {
+                                nonBugChanges.Add(itemInfo);
+                            }
                         }
                     }
                 }
@@ -356,6 +361,30 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         return result;
+    }
+
+    /// <summary>
+    ///     Finds issue IDs that are linked to a specific pull request using GitHub Search API.
+    /// </summary>
+    /// <param name="client">GitHub client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="prNumber">Pull request number.</param>
+    /// <returns>List of issue IDs (numbers) linked to the pull request.</returns>
+    private static async Task<List<int>> FindIssueIdsLinkedToPullRequestAsync(
+        GitHubClient client,
+        string owner,
+        string repo,
+        int prNumber)
+    {
+        // Search for issues that link to this PR
+        // Use "linked:pr" search qualifier to find issues linked to the PR
+        // The query format is: "repo:owner/repo is:issue linked:pr-<owner>/<repo>#<number>"
+        var query = $"repo:{owner}/{repo} is:issue linked:pr-{owner}/{repo}#{prNumber}";
+
+        var searchRequest = new SearchIssuesRequest(query);
+        var searchResult = await client.Search.SearchIssues(searchRequest);
+        return searchResult.Items.Select(i => i.Number).ToList();
     }
 
     /// <summary>
