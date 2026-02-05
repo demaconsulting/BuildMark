@@ -70,6 +70,6 @@ public class MockRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual(version.Tag, buildInfo.ToVersion.Tag);
+        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionInfo.Tag);
     }
 }

@@ -73,10 +73,10 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.1.0"));
 
         // Verify version and hashes are set correctly
-        Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
-        Assert.AreEqual("current123hash456", buildInfo.ToHash);
-        Assert.AreEqual("2.0.0", buildInfo.FromVersion?.Tag);
-        Assert.AreEqual("mno345pqr678", buildInfo.FromHash);
+        Assert.AreEqual("v2.1.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("current123hash456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.AreEqual("2.0.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
+        Assert.AreEqual("mno345pqr678", buildInfo.BaselineVersionTag?.CommitHash);
     }
 
     /// <summary>
@@ -92,9 +92,9 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync();
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
-        Assert.AreEqual("mno345pqr678", buildInfo.ToHash);
-        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
     }
 
     /// <summary>
@@ -110,8 +110,8 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0-beta.1"));
 
         // Assert
-        Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion.Tag);
-        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
+        Assert.AreEqual("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
     }
 
     /// <summary>
@@ -127,8 +127,8 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
-        Assert.AreEqual("ver-1.1.0", buildInfo.FromVersion?.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
     }
 
     /// <summary>
@@ -217,9 +217,8 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
 
         // Assert - verify first release has no previous version
-        Assert.IsNull(buildInfo.FromVersion);
-        Assert.IsNull(buildInfo.FromHash);
-        Assert.AreEqual("v1.0.0", buildInfo.ToVersion.Tag);
+        Assert.IsNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
     }
 
     /// <summary>
@@ -292,13 +291,12 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no change issues
         var buildInfo = new BuildInformation(
-            Version.Create("v1.0.0"),
-            Version.Create("v1.1.0"),
-            "abc123",
-            "def456",
+            new VersionTag(Version.Create("v1.0.0"), "abc123"),
+            new VersionTag(Version.Create("v1.1.0"), "def456"),
             [], // No changes
             [new ItemInfo("2", "Bug fix", "https://example.com/2", "bug")],
-            []);
+            [],
+            null);
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -318,13 +316,12 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no bug issues
         var buildInfo = new BuildInformation(
-            Version.Create("v1.0.0"),
-            Version.Create("v1.1.0"),
-            "abc123",
-            "def456",
+            new VersionTag(Version.Create("v1.0.0"), "abc123"),
+            new VersionTag(Version.Create("v1.1.0"), "def456"),
             [new ItemInfo("1", "Feature", "https://example.com/1", "feature")],
             [], // No bugs
-            []);
+            [],
+            null);
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -375,6 +372,79 @@ public class BuildInformationTests
     }
 
     /// <summary>
+    ///     Test that ToMarkdown includes Full Changelog section when link is present.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - verify full changelog section is included
+        Assert.Contains("## Full Changelog", markdown);
+        Assert.Contains("See the full changelog at", markdown);
+        Assert.Contains("ver-1.1.0...v2.0.0", markdown);
+        Assert.Contains("https://github.com/example/repo/compare/ver-1.1.0...v2.0.0", markdown);
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown excludes Full Changelog section when no baseline version.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - verify full changelog section is not included
+        Assert.DoesNotContain("## Full Changelog", markdown);
+    }
+
+    /// <summary>
+    ///     Test that VersionTag correctly stores version and hash.
+    /// </summary>
+    [TestMethod]
+    public void VersionTag_Constructor_StoresVersionAndHash()
+    {
+        // Arrange
+        var version = Version.Create("v1.0.0");
+        var hash = "abc123def456";
+
+        // Act
+        var versionTag = new VersionTag(version, hash);
+
+        // Assert
+        Assert.AreEqual(version, versionTag.VersionInfo);
+        Assert.AreEqual(hash, versionTag.CommitHash);
+    }
+
+    /// <summary>
+    ///     Test that WebLink correctly stores text and URL.
+    /// </summary>
+    [TestMethod]
+    public void WebLink_Constructor_StoresTextAndUrl()
+    {
+        // Arrange
+        var text = "v1.0.0...v2.0.0";
+        var url = "https://github.com/owner/repo/compare/v1.0.0...v2.0.0";
+
+        // Act
+        var webLink = new WebLink(text, url);
+
+        // Assert
+        Assert.AreEqual(text, webLink.LinkText);
+        Assert.AreEqual(url, webLink.TargetUrl);
+    }
+
+    /// <summary>
     ///     Mock connector with no tags.
     /// </summary>
     private class MockRepoConnectorEmpty : IRepoConnector
@@ -412,13 +482,12 @@ public class BuildInformationTests
             // Simple test implementation that returns a BuildInformation
             var toVersion = version ?? Version.Create("v2.0.0");
             return Task.FromResult(new BuildInformation(
-                Version.Create("ver-1.1.0"),
-                toVersion,
-                "def456ghi789",
-                "mno345pqr678",
+                new VersionTag(Version.Create("ver-1.1.0"), "def456ghi789"),
+                new VersionTag(toVersion, "mno345pqr678"),
                 [],
                 [],
-                []));
+                [],
+                null));
         }
     }
 }
