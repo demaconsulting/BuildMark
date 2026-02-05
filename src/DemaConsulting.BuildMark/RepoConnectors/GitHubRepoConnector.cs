@@ -78,25 +78,31 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var pullRequests = await pullRequestsTask;
         var issues = await issuesTask;
 
-        // Build helper dictionary for PR lookup
+        // Build helper dictionaries
         var commitHashToPr = BuildCommitToPrMap(pullRequests);
+        
+        // Build a set of commit SHAs in the current branch for filtering
+        var branchCommitShas = new HashSet<string>(commits.Select(c => c.Sha));
+        
+        // Build a mapping from tag name to tag object for quick lookup
+        var tagsByName = tags.ToDictionary(t => t.Name, t => t);
 
-        // Build a mapping from tag name to release order (releases are ordered newest to oldest)
-        // This gives us the proper chronological ordering
-        var tagToReleaseOrder = new Dictionary<string, int>();
-        for (var i = 0; i < releases.Count; i++)
-        {
-            tagToReleaseOrder[releases[i].TagName] = releases.Count - i - 1; // Reverse order so oldest = 0
-        }
+        // Filter releases to only those with tags that point to commits in the current branch
+        // This avoids confusion with releases from other branches (like LTS branches)
+        var branchReleases = releases
+            .Where(r => !string.IsNullOrEmpty(r.TagName) && 
+                        tagsByName.TryGetValue(r.TagName, out var tag) && 
+                        branchCommitShas.Contains(tag.Commit.Sha))
+            .ToList();
 
-        // Parse tags into Version objects and order by release order
-        // For tags not in releases, we'll assign them an order based on their position in the tags list
-        var versionTags = tags
-            .Select(t => DemaConsulting.BuildMark.Version.TryCreate(t.Name))
+        // Build a mapping from tag name to release for version lookup
+        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
+
+        // Parse release tags into Version objects, maintaining release order (newest to oldest)
+        var releaseVersions = branchReleases
+            .Select(r => DemaConsulting.BuildMark.Version.TryCreate(r.TagName!))
             .Where(v => v != null)
             .Cast<DemaConsulting.BuildMark.Version>()
-            .OrderBy(v => tagToReleaseOrder.TryGetValue(v.Tag, out var order) ? order : int.MaxValue)
-            .ThenBy(v => v.Tag) // Secondary sort for non-release tags
             .ToList();
 
         // Determine the target version and hash for build information
@@ -107,59 +113,61 @@ public partial class GitHubRepoConnector : RepoConnectorBase
             // Use explicitly specified version as target
             toTagInfo = version;
         }
-        else if (versionTags.Count > 0)
+        else if (releaseVersions.Count > 0)
         {
-            // Verify current commit matches latest tag when no version specified
-            var latestTag = versionTags[^1];
-            var latestTagCommit = tags.First(t => t.Name == latestTag.Tag);
+            // Use the most recent release (first in list since releases are newest to oldest)
+            var latestRelease = branchReleases[0];
+            var latestReleaseVersion = releaseVersions[0];
+            var latestTagCommit = tagsByName[latestRelease.TagName!];
 
             if (latestTagCommit.Commit.Sha == toHash)
             {
-                // Current commit matches latest tag, use it as target
-                toTagInfo = latestTag;
+                // Current commit matches latest release tag, use it as target
+                toTagInfo = latestReleaseVersion;
             }
             else
             {
-                // Current commit doesn't match any tag, cannot determine version
+                // Current commit doesn't match any release tag, cannot determine version
                 throw new InvalidOperationException(
-                    "Target version not specified and current commit does not match any tag. " +
+                    "Target version not specified and current commit does not match any release tag. " +
                     "Please provide a version parameter.");
             }
         }
         else
         {
-            // No tags in repository and no version provided
+            // No releases in repository and no version provided
             throw new InvalidOperationException(
-                "No tags found in repository and no version specified. " +
+                "No releases found in repository and no version specified. " +
                 "Please provide a version parameter.");
         }
 
-        // Determine the starting version for comparing changes
+        // Determine the starting release for comparing changes
         DemaConsulting.BuildMark.Version? fromTagInfo = null;
         string? fromHash = null;
-        if (versionTags.Count > 0)
+        
+        if (releaseVersions.Count > 0)
         {
-            // Find the position of target version in tag history
-            var toIndex = FindTagIndex(versionTags, toTagInfo.FullVersion);
+            // Find the position of target version in release history
+            var toIndex = FindVersionIndex(releaseVersions, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {
-                // Pre-release versions use the immediately previous tag as baseline
+                // Pre-release versions use the immediately previous release as baseline
                 if (toIndex > 0)
                 {
-                    // Target version exists in history, use previous tag
-                    fromTagInfo = versionTags[toIndex - 1];
+                    // Target version exists in history, use previous release
+                    fromTagInfo = releaseVersions[toIndex - 1];
                 }
                 else if (toIndex == -1)
                 {
-                    // Target version not in history, use most recent tag as baseline
-                    fromTagInfo = versionTags[^1];
+                    // Target version not in history, use most recent release as baseline
+                    fromTagInfo = releaseVersions[0];
                 }
-                // If toIndex == 0, this is the first tag, no baseline
+                // If toIndex == 0, this is the first release, no baseline
             }
             else
             {
-                // Release versions skip pre-releases and use previous release as baseline
+                // Release versions skip pre-releases and use previous non-pre-release as baseline
                 int startIndex;
                 if (toIndex > 0)
                 {
@@ -168,34 +176,32 @@ public partial class GitHubRepoConnector : RepoConnectorBase
                 }
                 else if (toIndex == -1)
                 {
-                    // Target version not in history, start from most recent tag
-                    startIndex = versionTags.Count - 1;
+                    // Target version not in history, start from most recent release
+                    startIndex = 0;
                 }
                 else
                 {
-                    // Target is first tag, no previous release exists
+                    // Target is first release, no previous release exists
                     startIndex = -1;
                 }
 
-                // Search backward for previous non-pre-release version
-                for (var i = startIndex; i >= 0; i--)
+                // Search forward (toward older releases) for previous non-pre-release version
+                for (var i = startIndex; i >= 0 && i < releaseVersions.Count; i++)
                 {
-                    if (!versionTags[i].IsPreRelease)
+                    if (!releaseVersions[i].IsPreRelease)
                     {
-                        fromTagInfo = versionTags[i];
+                        fromTagInfo = releaseVersions[i];
                         break;
                     }
                 }
             }
 
             // Get commit hash for baseline version if one was found
-            if (fromTagInfo != null)
+            if (fromTagInfo != null && 
+                tagToRelease.TryGetValue(fromTagInfo.Tag, out var fromRelease) &&
+                tagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
             {
-                var fromTagCommit = tags.FirstOrDefault(t => t.Name == fromTagInfo.Tag);
-                if (fromTagCommit != null)
-                {
-                    fromHash = fromTagCommit.Commit.Sha;
-                }
+                fromHash = fromTagCommit.Commit.Sha;
             }
         }
 

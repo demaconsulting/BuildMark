@@ -45,27 +45,27 @@ public abstract class RepoConnectorBase : IRepoConnector
     public abstract Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
 
     /// <summary>
-    ///     Finds the index of a tag in the tag history by normalized version.
+    ///     Finds the index of a version in a version list by normalized version string.
     /// </summary>
-    /// <param name="tags">List of tags to search.</param>
+    /// <param name="versions">List of versions to search.</param>
     /// <param name="normalizedVersion">Normalized version string to find (e.g., "1.0.0" or "2.0.0-beta.1").</param>
-    /// <returns>Index of the tag in the list, or -1 if not found.</returns>
+    /// <returns>Index of the version in the list, or -1 if not found.</returns>
     /// <remarks>
     ///     This method is protected to allow repository connectors to determine version positions
-    ///     in tag history when constructing BuildInformation objects.
+    ///     when constructing BuildInformation objects.
     /// </remarks>
-    protected static int FindTagIndex(List<Version> tags, string normalizedVersion)
+    protected static int FindVersionIndex(List<Version> versions, string normalizedVersion)
     {
-        // Search for tag matching the normalized version
-        for (var i = 0; i < tags.Count; i++)
+        // Search for version matching the normalized version string
+        for (var i = 0; i < versions.Count; i++)
         {
-            if (tags[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            if (versions[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
             {
                 return i;
             }
         }
 
-        // Tag not found in history
+        // Version not found in list
         return -1;
     }
 }

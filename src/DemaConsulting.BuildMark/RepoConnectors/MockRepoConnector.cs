@@ -117,7 +117,7 @@ public class MockRepoConnector : RepoConnectorBase
         if (tags.Count > 0)
         {
             // Find the position of target version in tag history
-            var toIndex = FindTagIndex(tags, toTagInfo.FullVersion);
+            var toIndex = FindVersionIndex(tags, toTagInfo.FullVersion);
 
             if (toTagInfo.IsPreRelease)
             {
