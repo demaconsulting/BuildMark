@@ -80,9 +80,21 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Build a mapping from commit SHA to pull request.
         // This is used to associate commits with their pull requests for change tracking.
-        var commitHashToPr = pullRequests
-            .Where(p => p.Merged && p.MergeCommitSha != null)
-            .ToDictionary(p => p.MergeCommitSha!, p => p);
+        // Include both merged PRs (via MergeCommitSha) and open PRs (via head SHA).
+        var commitHashToPr = new Dictionary<string, PullRequest>();
+        foreach (var pr in pullRequests)
+        {
+            if (pr.Merged && pr.MergeCommitSha != null)
+            {
+                // Add merged PR by its merge commit SHA
+                commitHashToPr.TryAdd(pr.MergeCommitSha, pr);
+            }
+            else if (pr.State == ItemState.Open && pr.Head?.Sha != null)
+            {
+                // Add open PR by its head commit SHA
+                commitHashToPr.TryAdd(pr.Head.Sha, pr);
+            }
+        }
 
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
@@ -232,8 +244,8 @@ public class GitHubRepoConnector : RepoConnectorBase
             {
                 // Find issues that are linked to this PR
                 // Use Issue.PullRequest.HtmlUrl to match with PullRequest.HtmlUrl
+                // Include both open and closed issues referenced by the PR
                 var linkedIssues = issues.Where(i =>
-                    i.State == ItemState.Closed &&
                     i.PullRequest != null &&
                     i.PullRequest.HtmlUrl == pr.HtmlUrl).ToList();
 
