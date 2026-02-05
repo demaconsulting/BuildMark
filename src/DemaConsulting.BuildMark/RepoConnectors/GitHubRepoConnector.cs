@@ -27,6 +27,9 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public class GitHubRepoConnector : RepoConnectorBase
 {
+    /// <summary>
+    ///     Mapping of label keywords to their normalized item types.
+    /// </summary>
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
         { "bug", "bug" },
@@ -143,8 +146,10 @@ public class GitHubRepoConnector : RepoConnectorBase
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
 
+        // Wait for all parallel fetches to complete
         await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
 
+        // Return collected data as a container
         return new GitHubData(
             await commitsTask,
             await releasesTask,
@@ -225,14 +230,17 @@ public class GitHubRepoConnector : RepoConnectorBase
         string currentCommitHash,
         LookupData lookupData)
     {
+        // Use provided version if specified
         var toVersion = version;
         var toHash = currentCommitHash;
 
+        // Return early if version was explicitly provided
         if (toVersion != null)
         {
             return (toVersion, toHash);
         }
 
+        // Validate that repository has releases
         if (lookupData.ReleaseVersions.Count == 0)
         {
             throw new InvalidOperationException(
@@ -245,6 +253,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var latestReleaseVersion = lookupData.ReleaseVersions[0];
         var latestTagCommit = lookupData.TagsByName[latestRelease.TagName!];
 
+        // Check if current commit matches latest release tag
         if (latestTagCommit.Commit.Sha == toHash)
         {
             // Current commit matches latest release tag, use it as target
@@ -267,6 +276,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         Version toVersion,
         LookupData lookupData)
     {
+        // Return null baseline if no releases exist
         if (lookupData.ReleaseVersions.Count == 0)
         {
             return (null, null);
@@ -275,6 +285,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Find the position of target version in release history
         var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion.FullVersion);
 
+        // Determine baseline version based on whether target is pre-release
         Version? fromVersion;
         if (toVersion.IsPreRelease)
         {
@@ -293,6 +304,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             return (fromVersion, fromTagCommit.Commit.Sha);
         }
 
+        // Return baseline version with null hash if commit not found
         return (fromVersion, null);
     }
 
@@ -311,9 +323,9 @@ public class GitHubRepoConnector : RepoConnectorBase
             return releaseVersions[toIndex + 1];
         }
 
+        // Target version not in history, use most recent release as baseline
         if (toIndex == -1 && releaseVersions.Count > 0)
         {
-            // Target version not in history, use most recent (first) release as baseline
             return releaseVersions[0];
         }
 
@@ -355,12 +367,13 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Starting index for search, or -1 if no search needed.</returns>
     private static int DetermineSearchStartIndex(int toIndex, int releaseCount)
     {
+        // Target version exists in history, start search from next older release
         if (toIndex >= 0 && toIndex < releaseCount - 1)
         {
-            // Target version exists in history, start search from next older release
             return toIndex + 1;
         }
 
+        // Target version not in history, start from second release (skip most recent)
         if (toIndex == -1 && releaseCount > 1)
         {
             // Target version not in history, start from second release (skip most recent)
@@ -389,6 +402,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             string repo,
             string token)
     {
+        // Initialize collections for tracking changes
         var allChangeIds = new HashSet<string>();
         var bugs = new List<ItemInfo>();
         var nonBugChanges = new List<ItemInfo>();
@@ -396,6 +410,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Create GraphQL client for finding linked issues (reused across multiple PR queries)
         using var graphqlClient = new GitHubGraphQLClient(token);
 
+        // Process each commit that has an associated PR
         foreach (var commit in commitsInRange.Where(c => lookupData.CommitHashToPr.ContainsKey(c.Sha)))
         {
             var pr = lookupData.CommitHashToPr[commit.Sha];
@@ -404,6 +419,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
             var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr.Number);
 
+            // Process PR based on whether it has linked issues
             if (linkedIssueIds.Count > 0)
             {
                 ProcessLinkedIssues(linkedIssueIds, lookupData.IssueById, pr, allChangeIds, bugs, nonBugChanges);
@@ -414,6 +430,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             }
         }
 
+        // Return categorized changes
         return (bugs, nonBugChanges, allChangeIds);
     }
 
@@ -437,6 +454,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // PR has linked issues - add them (deduplicated)
         foreach (var issueId in linkedIssueIds)
         {
+            // Check if issue already processed
             var issueIdStr = issueId.ToString();
             if (allChangeIds.Contains(issueIdStr))
             {
@@ -446,9 +464,11 @@ public class GitHubRepoConnector : RepoConnectorBase
             // Look up the issue in the master issues list
             if (issueById.TryGetValue(issueId, out var issue))
             {
+                // Mark issue as processed and create item info
                 allChangeIds.Add(issueIdStr);
                 var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
 
+                // Categorize by type
                 if (itemInfo.Type == "bug")
                 {
                     bugs.Add(itemInfo);
@@ -478,8 +498,10 @@ public class GitHubRepoConnector : RepoConnectorBase
         var prId = $"#{pr.Number}";
         if (allChangeIds.Add(prId))
         {
+            // Create item info from PR
             var itemInfo = CreateItemInfoFromPullRequest(pr);
 
+            // Categorize by type
             if (itemInfo.Type == "bug")
             {
                 bugs.Add(itemInfo);
@@ -518,7 +540,10 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of all commits.</returns>
     private static async Task<IReadOnlyList<GitHubCommit>> GetAllCommitsAsync(GitHubClient client, string owner, string repo, string branch)
     {
+        // Create request for branch commits
         var request = new CommitRequest { Sha = branch };
+
+        // Fetch and return all commits for the branch
         return await client.Repository.Commit.GetAll(owner, repo, request);
     }
 
@@ -531,29 +556,33 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>List of commits in range, excluding fromHash but including toHash.</returns>
     private static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
     {
+        // Initialize collection and state tracking
         var result = new List<GitHubCommit>();
         var foundTo = false;
 
         // Iterate through commits from newest to oldest
         foreach (var commit in commits)
         {
+            // Mark when we've found the target commit
             if (commit.Sha == toHash)
             {
                 foundTo = true;
             }
 
+            // Collect commits in range, excluding the fromHash commit itself
             if (foundTo && commit.Sha != fromHash)
             {
-                // Skip the fromHash commit itself - we want changes AFTER the last release
                 result.Add(commit);
             }
 
+            // Stop when we reach the starting commit
             if (commit.Sha == fromHash)
             {
                 break;
             }
         }
 
+        // Return collected commits
         return result;
     }
 
@@ -565,7 +594,10 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>ItemInfo instance.</returns>
     private static ItemInfo CreateItemInfoFromIssue(Issue issue, int index)
     {
+        // Determine item type from issue labels
         var type = GetTypeFromLabels(issue.Labels);
+
+        // Create and return item info with issue details
         return new ItemInfo(
             issue.Number.ToString(),
             issue.Title,
@@ -581,7 +613,10 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>ItemInfo instance.</returns>
     private static ItemInfo CreateItemInfoFromPullRequest(PullRequest pr)
     {
+        // Determine item type from PR labels
         var type = GetTypeFromLabels(pr.Labels);
+
+        // Create and return item info with PR details
         return new ItemInfo(
             $"#{pr.Number}",
             pr.Title,
@@ -597,6 +632,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Item type string.</returns>
     private static string GetTypeFromLabels(IReadOnlyList<Label> labels)
     {
+        // Find first matching label type by checking label names against the type map
         var matchingType = labels
             .Select(label => label.Name.ToLowerInvariant())
             .SelectMany(lowerLabel => LabelTypeMap
@@ -604,6 +640,7 @@ public class GitHubRepoConnector : RepoConnectorBase
                 .Select(kvp => kvp.Value))
             .FirstOrDefault();
 
+        // Return matched type or default to "other"
         return matchingType ?? "other";
     }
 
@@ -639,6 +676,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <exception cref="ArgumentException">Thrown if URL format is invalid.</exception>
     private static (string owner, string repo) ParseGitHubUrl(string url)
     {
+        // Normalize URL by trimming whitespace
         url = url.Trim();
 
         // Handle SSH URLs: git@github.com:owner/repo.git
@@ -672,12 +710,14 @@ public class GitHubRepoConnector : RepoConnectorBase
             path = path[..^4];
         }
 
+        // Split path into owner and repo components
         var parts = path.Split('/');
         if (parts.Length != 2)
         {
             throw new ArgumentException($"Invalid GitHub path format: {path}");
         }
 
+        // Return parsed owner and repo
         return (parts[0], parts[1]);
     }
 }
