@@ -78,27 +78,36 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         var pullRequests = await pullRequestsTask;
         var issues = await issuesTask;
 
-        // Build helper dictionaries
+        // Build a mapping from commit SHA to pull request.
+        // This is used to associate commits with their pull requests for change tracking.
         var commitHashToPr = BuildCommitToPrMap(pullRequests);
         
-        // Build a set of commit SHAs in the current branch for filtering
+        // Build a set of commit SHAs in the current branch.
+        // This is used for efficient filtering of branch-related tags.
         var branchCommitShas = new HashSet<string>(commits.Select(c => c.Sha));
         
-        // Build a mapping from tag name to tag object for quick lookup
-        var tagsByName = tags.ToDictionary(t => t.Name, t => t);
+        // Build a set of tags filtered to those on the current branch.
+        // This is used for efficient filtering of branch-related releases.
+        var branchTagNames = new HashSet<string>(
+            tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
+                .Select(t => t.Name));
 
-        // Filter releases to only those with tags that point to commits in the current branch
-        // This avoids confusion with releases from other branches (like LTS branches)
+        // Build an ordered list of releases on the current branch.
+        // This is used to select the prior release version for identifying changes in the build.
         var branchReleases = releases
-            .Where(r => !string.IsNullOrEmpty(r.TagName) && 
-                        tagsByName.TryGetValue(r.TagName, out var tag) && 
-                        branchCommitShas.Contains(tag.Commit.Sha))
+            .Where(r => !string.IsNullOrEmpty(r.TagName) && branchTagNames.Contains(r.TagName))
             .ToList();
 
-        // Build a mapping from tag name to release for version lookup
+        // Build a mapping from tag name to tag object for quick lookup.
+        // This is used to get commit SHAs for release tags.
+        var tagsByName = tags.ToDictionary(t => t.Name, t => t);
+
+        // Build a mapping from tag name to release for version lookup.
+        // This is used to match version objects back to their releases.
         var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
 
-        // Parse release tags into Version objects, maintaining release order (newest to oldest)
+        // Parse release tags into Version objects, maintaining release order (newest to oldest).
+        // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
             .Select(r => DemaConsulting.BuildMark.Version.TryCreate(r.TagName!))
             .Where(v => v != null)
