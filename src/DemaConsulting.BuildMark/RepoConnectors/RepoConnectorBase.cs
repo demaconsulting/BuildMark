@@ -30,11 +30,10 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// </summary>
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
-    /// <param name="standardInput">Optional input to pipe to the command's stdin.</param>
     /// <returns>Command output.</returns>
-    protected virtual Task<string> RunCommandAsync(string command, string arguments, string? standardInput = null)
+    protected virtual Task<string> RunCommandAsync(string command, string arguments)
     {
-        return ProcessRunner.RunAsync(command, arguments, standardInput);
+        return ProcessRunner.RunAsync(command, arguments);
     }
 
     /// <summary>

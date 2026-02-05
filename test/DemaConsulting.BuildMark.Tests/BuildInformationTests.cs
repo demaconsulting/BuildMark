@@ -18,8 +18,6 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-#pragma warning disable CS0618 // Type or member is obsolete
-
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>
@@ -29,46 +27,46 @@ namespace DemaConsulting.BuildMark.Tests;
 public class BuildInformationTests
 {
     /// <summary>
-    ///     Test that CreateAsync throws when no version specified and no tags found.
+    ///     Test that GetBuildInformationAsync throws when no version specified and no tags found.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_ThrowsWhenNoVersionAndNoTags()
+    public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags()
     {
         // Create connector with no tags
         var connector = new MockRepoConnectorEmpty();
 
         // Verify exception is thrown when no version and no tags
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await BuildInformation.CreateAsync(connector));
+            async () => await connector.GetBuildInformationAsync());
 
         Assert.Contains("No tags found", exception.Message);
     }
 
     /// <summary>
-    ///     Test that CreateAsync throws when no version specified and current commit doesn't match tag.
+    ///     Test that GetBuildInformationAsync throws when no version specified and current commit doesn't match tag.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag()
+    public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag()
     {
         // Arrange
         var connector = new MockRepoConnectorMismatch();
 
         // Act & Assert
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
-            async () => await BuildInformation.CreateAsync(connector));
+            async () => await connector.GetBuildInformationAsync());
 
         Assert.Contains("does not match any tag", exception.Message);
     }
 
     /// <summary>
-    ///     Test that CreateAsync works with explicit version parameter.
+    ///     Test that GetBuildInformationAsync works with explicit version parameter.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_WorksWithExplicitVersion()
+    public async Task BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion()
     {
         // Create build information with explicit version
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.1.0"));
 
         // Verify version and hashes are set correctly
         Assert.AreEqual("v2.1.0", buildInfo.ToVersion.Tag);
@@ -78,16 +76,16 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync works when current commit matches latest tag.
+    ///     Test that GetBuildInformationAsync works when current commit matches latest tag.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_WorksWhenCurrentCommitMatchesLatestTag()
+    public async Task BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag()
     {
         // Arrange
         var connector = new MockRepoConnectorMatchingTag();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector);
+        var buildInfo = await connector.GetBuildInformationAsync();
 
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
@@ -96,16 +94,16 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync correctly identifies pre-release and uses previous tag.
+    ///     Test that GetBuildInformationAsync correctly identifies pre-release and uses previous tag.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_PreReleaseUsesPreviousTag()
+    public async Task BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag()
     {
         // Arrange
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0-beta.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0-beta.1"));
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.ToVersion.Tag);
@@ -113,16 +111,16 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync correctly identifies release and skips pre-releases.
+    ///     Test that GetBuildInformationAsync correctly identifies release and skips pre-releases.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_ReleaseSkipsPreReleases()
+    public async Task BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases()
     {
         // Arrange
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.ToVersion.Tag);
@@ -130,14 +128,14 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync collects issues correctly.
+    ///     Test that GetBuildInformationAsync collects issues correctly.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_CollectsIssuesCorrectly()
+    public async Task BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly()
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("ver-1.1.0"));
 
         // Verify change issues are collected (including PR without issues)
         Assert.HasCount(2, buildInfo.Changes);
@@ -158,14 +156,14 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync orders changes by Index (PR number).
+    ///     Test that GetBuildInformationAsync orders changes by Index (PR number).
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_OrdersChangesByIndex()
+    public async Task BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex()
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("ver-1.1.0"));
 
         // Verify changes are ordered by Index (PR number)
         // Issue #1 from PR #10 should come before PR #13
@@ -184,16 +182,16 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync separates bug and change issues.
+    ///     Test that GetBuildInformationAsync separates bug and change issues.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_SeparatesBugAndChangeIssues()
+    public async Task BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues()
     {
         // Arrange
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Assert
         Assert.HasCount(1, buildInfo.Changes);
@@ -203,16 +201,16 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync handles first release correctly (no from version).
+    ///     Test that GetBuildInformationAsync handles first release correctly (no from version).
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_CreateAsync_HandlesFirstReleaseCorrectly()
+    public async Task BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly()
     {
         // Arrange
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
 
         // Assert
         Assert.IsNull(buildInfo.FromVersion);
@@ -228,7 +226,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -251,7 +249,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -270,7 +268,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(headingDepth: 3);
@@ -341,7 +339,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -359,7 +357,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await BuildInformation.CreateAsync(connector, Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();

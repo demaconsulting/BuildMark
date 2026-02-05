@@ -40,20 +40,6 @@ public record BuildInformation(
     List<ItemInfo> KnownIssues)
 {
     /// <summary>
-    ///     Creates a BuildInformation record from a repository connector.
-    /// </summary>
-    /// <param name="connector">Repository connector to fetch information from.</param>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    [Obsolete("Use IRepoConnector.GetBuildInformationAsync instead. This method will be removed in a future version.")]
-    [System.Diagnostics.CodeAnalysis.SuppressMessage("SonarAnalyzer.CSharp", "S1133:Deprecated code should be removed", Justification = "Kept for backward compatibility with existing tests")]
-    public static async Task<BuildInformation> CreateAsync(IRepoConnector connector, Version? version = null)
-    {
-        return await connector.GetBuildInformationAsync(version);
-    }
-
-    /// <summary>
     ///     Generates a Markdown build report from this build information.
     /// </summary>
     /// <param name="headingDepth">Root markdown heading depth (default 1).</param>
