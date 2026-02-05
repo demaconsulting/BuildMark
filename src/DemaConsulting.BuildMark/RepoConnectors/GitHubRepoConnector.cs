@@ -65,13 +65,15 @@ public partial class GitHubRepoConnector : RepoConnectorBase
 
         // Fetch all data from GitHub in parallel
         var commitsTask = GetAllCommitsAsync(client, owner, repo, branch.Trim());
+        var releasesTask = client.Repository.Release.GetAll(owner, repo);
         var tagsTask = client.Repository.GetAllTags(owner, repo);
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
 
-        await Task.WhenAll(commitsTask, tagsTask, pullRequestsTask, issuesTask);
+        await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
 
         var commits = await commitsTask;
+        var releases = await releasesTask;
         var tags = await tagsTask;
         var pullRequests = await pullRequestsTask;
         var issues = await issuesTask;
@@ -79,13 +81,22 @@ public partial class GitHubRepoConnector : RepoConnectorBase
         // Build helper dictionary for PR lookup
         var commitHashToPr = BuildCommitToPrMap(pullRequests);
 
-        // Parse tags into Version objects and create lookup dictionary
-        var tagLookup = tags.ToDictionary(t => t.Name, t => t.Commit.Sha);
+        // Build a mapping from tag name to release order (releases are ordered newest to oldest)
+        // This gives us the proper chronological ordering
+        var tagToReleaseOrder = new Dictionary<string, int>();
+        for (var i = 0; i < releases.Count; i++)
+        {
+            tagToReleaseOrder[releases[i].TagName] = releases.Count - i - 1; // Reverse order so oldest = 0
+        }
+
+        // Parse tags into Version objects and order by release order
+        // For tags not in releases, we'll assign them an order based on their position in the tags list
         var versionTags = tags
             .Select(t => DemaConsulting.BuildMark.Version.TryCreate(t.Name))
             .Where(v => v != null)
             .Cast<DemaConsulting.BuildMark.Version>()
-            .OrderBy(v => tagLookup[v.Tag])
+            .OrderBy(v => tagToReleaseOrder.TryGetValue(v.Tag, out var order) ? order : int.MaxValue)
+            .ThenBy(v => v.Tag) // Secondary sort for non-release tags
             .ToList();
 
         // Determine the target version and hash for build information
