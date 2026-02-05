@@ -21,7 +21,7 @@
 using System.Diagnostics;
 using System.Text;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Helper class for running external processes and capturing output.
@@ -33,10 +33,9 @@ internal static class ProcessRunner
     /// </summary>
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
-    /// <param name="standardInput">Optional input to pipe to the command's stdin.</param>
     /// <returns>Command output.</returns>
     /// <exception cref="InvalidOperationException">Thrown when command fails.</exception>
-    public static async Task<string> RunAsync(string command, string arguments, string? standardInput = null)
+    public static async Task<string> RunAsync(string command, string arguments)
     {
         // Configure process to capture output
         var startInfo = new ProcessStartInfo
@@ -45,7 +44,6 @@ internal static class ProcessRunner
             Arguments = arguments,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
-            RedirectStandardInput = standardInput != null,
             UseShellExecute = false,
             CreateNoWindow = true
         };
@@ -73,14 +71,6 @@ internal static class ProcessRunner
 
         // Start process and begin reading streams
         process.Start();
-
-        // Write to stdin if provided
-        if (standardInput != null)
-        {
-            await process.StandardInput.WriteAsync(standardInput);
-            process.StandardInput.Close();
-        }
-
         process.BeginOutputReadLine();
         process.BeginErrorReadLine();
         await process.WaitForExitAsync();

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Base class for repository connectors with common functionality.
@@ -30,37 +30,42 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// </summary>
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
-    /// <param name="standardInput">Optional input to pipe to the command's stdin.</param>
     /// <returns>Command output.</returns>
-    protected virtual Task<string> RunCommandAsync(string command, string arguments, string? standardInput = null)
+    protected virtual Task<string> RunCommandAsync(string command, string arguments)
     {
-        return ProcessRunner.RunAsync(command, arguments, standardInput);
+        return ProcessRunner.RunAsync(command, arguments);
     }
 
     /// <summary>
-    ///     Gets the history of tags leading to the current branch.
+    ///     Gets build information for a release.
     /// </summary>
-    /// <returns>List of tags in chronological order.</returns>
-    public abstract Task<List<Version>> GetTagHistoryAsync();
+    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
+    /// <returns>BuildInformation record with all collected data.</returns>
+    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
+    public abstract Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
 
     /// <summary>
-    ///     Gets the list of changes between two versions.
+    ///     Finds the index of a version in a version list by normalized version string.
     /// </summary>
-    /// <param name="from">Starting version (null for start of history).</param>
-    /// <param name="to">Ending version (null for current state).</param>
-    /// <returns>List of changes with full information.</returns>
-    public abstract Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to);
+    /// <param name="versions">List of versions to search.</param>
+    /// <param name="normalizedVersion">Normalized version string to find (e.g., "1.0.0" or "2.0.0-beta.1").</param>
+    /// <returns>Index of the version in the list, or -1 if not found.</returns>
+    /// <remarks>
+    ///     This method is protected to allow repository connectors to determine version positions
+    ///     when constructing BuildInformation objects.
+    /// </remarks>
+    protected static int FindVersionIndex(List<Version> versions, string normalizedVersion)
+    {
+        // Search for version matching the normalized version string
+        for (var i = 0; i < versions.Count; i++)
+        {
+            if (versions[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            {
+                return i;
+            }
+        }
 
-    /// <summary>
-    ///     Gets the git hash for a tag.
-    /// </summary>
-    /// <param name="tag">Tag name (null for current state).</param>
-    /// <returns>Git hash.</returns>
-    public abstract Task<string> GetHashForTagAsync(string? tag);
-
-    /// <summary>
-    ///     Gets the list of open issues with their details.
-    /// </summary>
-    /// <returns>List of open issues with full information.</returns>
-    public abstract Task<List<ItemInfo>> GetOpenIssuesAsync();
+        // Version not found in list
+        return -1;
+    }
 }
