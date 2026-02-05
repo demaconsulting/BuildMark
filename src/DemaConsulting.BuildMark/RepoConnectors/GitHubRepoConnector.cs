@@ -63,241 +63,31 @@ public class GitHubRepoConnector : RepoConnectorBase
             Credentials = new Credentials(token)
         };
 
-        // Fetch all data from GitHub in parallel
-        var commitsTask = GetAllCommitsAsync(client, owner, repo, branch.Trim());
-        var releasesTask = client.Repository.Release.GetAll(owner, repo);
-        var tagsTask = client.Repository.GetAllTags(owner, repo);
-        var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
-        var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
+        // Fetch all data from GitHub
+        var gitHubData = await FetchGitHubDataAsync(client, owner, repo, branch.Trim());
 
-        await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
+        // Build lookup dictionaries and mappings
+        var lookupData = BuildLookupData(gitHubData);
 
-        var commits = await commitsTask;
-        var releases = await releasesTask;
-        var tags = await tagsTask;
-        var pullRequests = await pullRequestsTask;
-        var issues = await issuesTask;
-
-        // Build a mapping from issue number to issue for efficient lookup.
-        // This is used to look up issue details when we find linked issue IDs.
-        var issueById = issues.ToDictionary(i => i.Number, i => i);
-
-        // Build a mapping from commit SHA to pull request.
-        // This is used to associate commits with their pull requests for change tracking.
-        // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
-        var commitHashToPr = pullRequests
-            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.Head?.Sha != null))
-            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.Head.Sha, p => p);
-
-        // Build a set of commit SHAs in the current branch.
-        // This is used for efficient filtering of branch-related tags.
-        var branchCommitShas = new HashSet<string>(commits.Select(c => c.Sha));
-
-        // Build a set of tags filtered to those on the current branch.
-        // This is used for efficient filtering of branch-related releases.
-        var branchTagNames = new HashSet<string>(
-            tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
-                .Select(t => t.Name));
-
-        // Build an ordered list of releases on the current branch.
-        // This is used to select the prior release version for identifying changes in the build.
-        var branchReleases = releases
-            .Where(r => !string.IsNullOrEmpty(r.TagName) && branchTagNames.Contains(r.TagName))
-            .ToList();
-
-        // Build a mapping from tag name to tag object for quick lookup.
-        // This is used to get commit SHAs for release tags.
-        var tagsByName = tags.ToDictionary(t => t.Name, t => t);
-
-        // Build a mapping from tag name to release for version lookup.
-        // This is used to match version objects back to their releases.
-        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
-
-        // Parse release tags into Version objects, maintaining release order (newest to oldest).
-        // This is used to determine version history and find previous releases.
-        var releaseVersions = branchReleases
-            .Select(r => Version.TryCreate(r.TagName!))
-            .Where(v => v != null)
-            .Cast<Version>()
-            .ToList();
-
-        // Determine the target version and hash for build information
-        var toVersion = version;
-        var toHash = currentCommitHash.Trim();
-        if (toVersion == null)
-        {
-            if (releaseVersions.Count > 0)
-            {
-                // Use the most recent release (first in list since releases are newest to oldest)
-                var latestRelease = branchReleases[0];
-                var latestReleaseVersion = releaseVersions[0];
-                var latestTagCommit = tagsByName[latestRelease.TagName!];
-
-                if (latestTagCommit.Commit.Sha == toHash)
-                {
-                    // Current commit matches latest release tag, use it as target
-                    toVersion = latestReleaseVersion;
-                }
-                else
-                {
-                    // Current commit doesn't match any release tag, cannot determine version
-                    throw new InvalidOperationException(
-                        "Target version not specified and current commit does not match any release tag. " +
-                        "Please provide a version parameter.");
-                }
-            }
-            else
-            {
-                // No releases in repository and no version provided
-                throw new InvalidOperationException(
-                    "No releases found in repository and no version specified. " +
-                    "Please provide a version parameter.");
-            }
-        }
+        // Determine the target version and hash
+        var (toVersion, toHash) = DetermineTargetVersion(version, currentCommitHash.Trim(), lookupData);
 
         // Determine the starting release for comparing changes
-        Version? fromVersion = null;
-        string? fromHash = null;
-
-        if (releaseVersions.Count > 0)
-        {
-            // Find the position of target version in release history
-            var toIndex = FindVersionIndex(releaseVersions, toVersion.FullVersion);
-
-            if (toVersion.IsPreRelease)
-            {
-                // Pre-release versions use the immediately previous (older) release as baseline
-                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
-                {
-                    // Target version exists in history, use next older release (higher index)
-                    fromVersion = releaseVersions[toIndex + 1];
-                }
-                else if (toIndex == -1 && releaseVersions.Count > 0)
-                {
-                    // Target version not in history, use most recent (first) release as baseline
-                    fromVersion = releaseVersions[0];
-                }
-                // If toIndex is last in list, this is the oldest release, no baseline
-            }
-            else
-            {
-                // Release versions skip pre-releases and use previous non-pre-release as baseline
-                int startIndex;
-                if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
-                {
-                    // Target version exists in history, start search from next older release
-                    startIndex = toIndex + 1;
-                }
-                else if (toIndex == -1 && releaseVersions.Count > 1)
-                {
-                    // Target version not in history, start from second release (skip most recent)
-                    // We skip the first (newest) release because the target is implicitly newer
-                    startIndex = 1;
-                }
-                else
-                {
-                    // Target is oldest release or not enough releases, no previous release exists
-                    startIndex = -1;
-                }
-
-                // Search forward through older releases (incrementing index) for previous non-pre-release version
-                if (startIndex >= 0)
-                {
-                    for (var i = startIndex; i < releaseVersions.Count; i++)
-                    {
-                        if (!releaseVersions[i].IsPreRelease)
-                        {
-                            fromVersion = releaseVersions[i];
-                            break;
-                        }
-                    }
-                }
-            }
-
-            // Get commit hash for baseline version if one was found
-            if (fromVersion != null &&
-                tagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
-                tagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
-            {
-                fromHash = fromTagCommit.Commit.Sha;
-            }
-        }
+        var (fromVersion, fromHash) = DetermineBaselineVersion(toVersion, lookupData);
 
         // Get commits in range
-        var commitsInRange = GetCommitsInRange(commits, fromHash, toHash);
+        var commitsInRange = GetCommitsInRange(gitHubData.Commits, fromHash, toHash);
 
         // Collect changes from PRs
-        var allChangeIds = new HashSet<string>();
-        var bugs = new List<ItemInfo>();
-        var nonBugChanges = new List<ItemInfo>();
+        var (bugs, nonBugChanges, allChangeIds) = await CollectChangesFromPullRequestsAsync(
+            commitsInRange,
+            lookupData,
+            owner,
+            repo,
+            token);
 
-        // Create GraphQL client for finding linked issues (reused across multiple PR queries)
-        using var graphqlClient = new GitHubGraphQLClient(token);
-
-        foreach (var commit in commitsInRange.Where(c => commitHashToPr.ContainsKey(c.Sha)))
-        {
-            commitHashToPr.TryGetValue(commit.Sha, out var pr);
-            
-            // Find issue IDs that are linked to this PR using GitHub GraphQL API
-            // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
-            var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr!.Number);
-
-            if (linkedIssueIds.Count > 0)
-            {
-                // PR has linked issues - add them (deduplicated)
-                foreach (var issueId in linkedIssueIds)
-                {
-                    var issueIdStr = issueId.ToString();
-                    if (allChangeIds.Contains(issueIdStr))
-                    {
-                        continue;
-                    }
-
-                    // Look up the issue in the master issues list
-                    if (issueById.TryGetValue(issueId, out var issue))
-                    {
-                        allChangeIds.Add(issueIdStr);
-                        var itemInfo = CreateItemInfoFromIssue(issue, pr!.Number);
-
-                        if (itemInfo.Type == "bug")
-                        {
-                            bugs.Add(itemInfo);
-                        }
-                        else
-                        {
-                            nonBugChanges.Add(itemInfo);
-                        }
-                    }
-                }
-            }
-            else
-            {
-                // PR didn't close any issues - add the PR itself
-                var prId = $"#{pr!.Number}";
-                if (allChangeIds.Add(prId))
-                {
-                    var itemInfo = CreateItemInfoFromPullRequest(pr);
-
-                    if (itemInfo.Type == "bug")
-                    {
-                        bugs.Add(itemInfo);
-                    }
-                    else
-                    {
-                        nonBugChanges.Add(itemInfo);
-                    }
-                }
-            }
-        }
-
-        // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = issues
-            .Where(i => i.State == ItemState.Open)
-            .Select(issue => (issue, issueId: issue.Number.ToString()))
-            .Where(tuple => !allChangeIds.Contains(tuple.issueId))
-            .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
-            .Where(itemInfo => itemInfo.Type == "bug")
-            .ToList();
+        // Collect known issues
+        var knownIssues = CollectKnownIssues(gitHubData.Issues, allChangeIds);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -313,6 +103,409 @@ public class GitHubRepoConnector : RepoConnectorBase
             nonBugChanges,
             bugs,
             knownIssues);
+    }
+
+    /// <summary>
+    ///     Container for GitHub data fetched from the API.
+    /// </summary>
+    private sealed record GitHubData(
+        IReadOnlyList<GitHubCommit> Commits,
+        IReadOnlyList<Release> Releases,
+        IReadOnlyList<RepositoryTag> Tags,
+        IReadOnlyList<PullRequest> PullRequests,
+        IReadOnlyList<Issue> Issues);
+
+    /// <summary>
+    ///     Container for lookup data structures built from GitHub data.
+    /// </summary>
+    private sealed record LookupData(
+        Dictionary<int, Issue> IssueById,
+        Dictionary<string, PullRequest> CommitHashToPr,
+        List<Release> BranchReleases,
+        Dictionary<string, RepositoryTag> TagsByName,
+        Dictionary<string, Release> TagToRelease,
+        List<Version> ReleaseVersions);
+
+    /// <summary>
+    ///     Fetches all required data from GitHub API in parallel.
+    /// </summary>
+    /// <param name="client">GitHub client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="branch">Branch name.</param>
+    /// <returns>Container with all fetched GitHub data.</returns>
+    private static async Task<GitHubData> FetchGitHubDataAsync(GitHubClient client, string owner, string repo, string branch)
+    {
+        // Fetch all data from GitHub in parallel
+        var commitsTask = GetAllCommitsAsync(client, owner, repo, branch);
+        var releasesTask = client.Repository.Release.GetAll(owner, repo);
+        var tagsTask = client.Repository.GetAllTags(owner, repo);
+        var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
+        var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
+
+        await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
+
+        return new GitHubData(
+            await commitsTask,
+            await releasesTask,
+            await tagsTask,
+            await pullRequestsTask,
+            await issuesTask);
+    }
+
+    /// <summary>
+    ///     Builds lookup data structures from GitHub data.
+    /// </summary>
+    /// <param name="data">GitHub data.</param>
+    /// <returns>Container with all lookup data structures.</returns>
+    private static LookupData BuildLookupData(GitHubData data)
+    {
+        // Build a mapping from issue number to issue for efficient lookup.
+        // This is used to look up issue details when we find linked issue IDs.
+        var issueById = data.Issues.ToDictionary(i => i.Number, i => i);
+
+        // Build a mapping from commit SHA to pull request.
+        // This is used to associate commits with their pull requests for change tracking.
+        // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
+        var commitHashToPr = data.PullRequests
+            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.Head?.Sha != null))
+            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.Head.Sha, p => p);
+
+        // Build a set of commit SHAs in the current branch.
+        // This is used for efficient filtering of branch-related tags.
+        var branchCommitShas = new HashSet<string>(data.Commits.Select(c => c.Sha));
+
+        // Build a set of tags filtered to those on the current branch.
+        // This is used for efficient filtering of branch-related releases.
+        var branchTagNames = new HashSet<string>(
+            data.Tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
+                .Select(t => t.Name));
+
+        // Build an ordered list of releases on the current branch.
+        // This is used to select the prior release version for identifying changes in the build.
+        var branchReleases = data.Releases
+            .Where(r => !string.IsNullOrEmpty(r.TagName) && branchTagNames.Contains(r.TagName))
+            .ToList();
+
+        // Build a mapping from tag name to tag object for quick lookup.
+        // This is used to get commit SHAs for release tags.
+        var tagsByName = data.Tags.ToDictionary(t => t.Name, t => t);
+
+        // Build a mapping from tag name to release for version lookup.
+        // This is used to match version objects back to their releases.
+        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
+
+        // Parse release tags into Version objects, maintaining release order (newest to oldest).
+        // This is used to determine version history and find previous releases.
+        var releaseVersions = branchReleases
+            .Select(r => Version.TryCreate(r.TagName!))
+            .Where(v => v != null)
+            .Cast<Version>()
+            .ToList();
+
+        return new LookupData(
+            issueById,
+            commitHashToPr,
+            branchReleases,
+            tagsByName,
+            tagToRelease,
+            releaseVersions);
+    }
+
+    /// <summary>
+    ///     Determines the target version and hash for the build.
+    /// </summary>
+    /// <param name="version">Optional target version provided by caller.</param>
+    /// <param name="currentCommitHash">Current commit hash.</param>
+    /// <param name="lookupData">Lookup data structures.</param>
+    /// <returns>Tuple of (toVersion, toHash).</returns>
+    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
+    private static (Version toVersion, string toHash) DetermineTargetVersion(
+        Version? version,
+        string currentCommitHash,
+        LookupData lookupData)
+    {
+        var toVersion = version;
+        var toHash = currentCommitHash;
+
+        if (toVersion != null)
+        {
+            return (toVersion, toHash);
+        }
+
+        if (lookupData.ReleaseVersions.Count == 0)
+        {
+            throw new InvalidOperationException(
+                "No releases found in repository and no version specified. " +
+                "Please provide a version parameter.");
+        }
+
+        // Use the most recent release (first in list since releases are newest to oldest)
+        var latestRelease = lookupData.BranchReleases[0];
+        var latestReleaseVersion = lookupData.ReleaseVersions[0];
+        var latestTagCommit = lookupData.TagsByName[latestRelease.TagName!];
+
+        if (latestTagCommit.Commit.Sha == toHash)
+        {
+            // Current commit matches latest release tag, use it as target
+            return (latestReleaseVersion, toHash);
+        }
+
+        // Current commit doesn't match any release tag, cannot determine version
+        throw new InvalidOperationException(
+            "Target version not specified and current commit does not match any release tag. " +
+            "Please provide a version parameter.");
+    }
+
+    /// <summary>
+    ///     Determines the baseline version for comparing changes.
+    /// </summary>
+    /// <param name="toVersion">Target version.</param>
+    /// <param name="lookupData">Lookup data structures.</param>
+    /// <returns>Tuple of (fromVersion, fromHash).</returns>
+    private static (Version? fromVersion, string? fromHash) DetermineBaselineVersion(
+        Version toVersion,
+        LookupData lookupData)
+    {
+        if (lookupData.ReleaseVersions.Count == 0)
+        {
+            return (null, null);
+        }
+
+        // Find the position of target version in release history
+        var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion.FullVersion);
+
+        Version? fromVersion;
+        if (toVersion.IsPreRelease)
+        {
+            fromVersion = DetermineBaselineForPreRelease(toIndex, lookupData.ReleaseVersions);
+        }
+        else
+        {
+            fromVersion = DetermineBaselineForRelease(toIndex, lookupData.ReleaseVersions);
+        }
+
+        // Get commit hash for baseline version if one was found
+        if (fromVersion != null &&
+            lookupData.TagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
+            lookupData.TagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
+        {
+            return (fromVersion, fromTagCommit.Commit.Sha);
+        }
+
+        return (fromVersion, null);
+    }
+
+    /// <summary>
+    ///     Determines the baseline version for a pre-release.
+    /// </summary>
+    /// <param name="toIndex">Index of target version in release history.</param>
+    /// <param name="releaseVersions">List of release versions.</param>
+    /// <returns>Baseline version or null.</returns>
+    private static Version? DetermineBaselineForPreRelease(int toIndex, List<Version> releaseVersions)
+    {
+        // Pre-release versions use the immediately previous (older) release as baseline
+        if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
+        {
+            // Target version exists in history, use next older release (higher index)
+            return releaseVersions[toIndex + 1];
+        }
+
+        if (toIndex == -1 && releaseVersions.Count > 0)
+        {
+            // Target version not in history, use most recent (first) release as baseline
+            return releaseVersions[0];
+        }
+
+        // If toIndex is last in list, this is the oldest release, no baseline
+        return null;
+    }
+
+    /// <summary>
+    ///     Determines the baseline version for a release (non-pre-release).
+    /// </summary>
+    /// <param name="toIndex">Index of target version in release history.</param>
+    /// <param name="releaseVersions">List of release versions.</param>
+    /// <returns>Baseline version or null.</returns>
+    private static Version? DetermineBaselineForRelease(int toIndex, List<Version> releaseVersions)
+    {
+        // Release versions skip pre-releases and use previous non-pre-release as baseline
+        var startIndex = DetermineSearchStartIndex(toIndex, releaseVersions.Count);
+
+        // Search forward through older releases (incrementing index) for previous non-pre-release version
+        if (startIndex >= 0)
+        {
+            for (var i = startIndex; i < releaseVersions.Count; i++)
+            {
+                if (!releaseVersions[i].IsPreRelease)
+                {
+                    return releaseVersions[i];
+                }
+            }
+        }
+
+        return null;
+    }
+
+    /// <summary>
+    ///     Determines the starting index for searching for previous releases.
+    /// </summary>
+    /// <param name="toIndex">Index of target version in release history.</param>
+    /// <param name="releaseCount">Total number of releases.</param>
+    /// <returns>Starting index for search, or -1 if no search needed.</returns>
+    private static int DetermineSearchStartIndex(int toIndex, int releaseCount)
+    {
+        if (toIndex >= 0 && toIndex < releaseCount - 1)
+        {
+            // Target version exists in history, start search from next older release
+            return toIndex + 1;
+        }
+
+        if (toIndex == -1 && releaseCount > 1)
+        {
+            // Target version not in history, start from second release (skip most recent)
+            // We skip the first (newest) release because the target is implicitly newer
+            return 1;
+        }
+
+        // Target is oldest release or not enough releases, no previous release exists
+        return -1;
+    }
+
+    /// <summary>
+    ///     Collects changes from pull requests in the commit range.
+    /// </summary>
+    /// <param name="commitsInRange">Commits in range.</param>
+    /// <param name="lookupData">Lookup data structures.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="token">GitHub token.</param>
+    /// <returns>Tuple of (bugs, nonBugChanges, allChangeIds).</returns>
+    private static async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
+        CollectChangesFromPullRequestsAsync(
+            List<GitHubCommit> commitsInRange,
+            LookupData lookupData,
+            string owner,
+            string repo,
+            string token)
+    {
+        var allChangeIds = new HashSet<string>();
+        var bugs = new List<ItemInfo>();
+        var nonBugChanges = new List<ItemInfo>();
+
+        // Create GraphQL client for finding linked issues (reused across multiple PR queries)
+        using var graphqlClient = new GitHubGraphQLClient(token);
+
+        foreach (var commit in commitsInRange.Where(c => lookupData.CommitHashToPr.ContainsKey(c.Sha)))
+        {
+            lookupData.CommitHashToPr.TryGetValue(commit.Sha, out var pr);
+
+            // Find issue IDs that are linked to this PR using GitHub GraphQL API
+            // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
+            var linkedIssueIds = await graphqlClient.FindIssueIdsLinkedToPullRequestAsync(owner, repo, pr!.Number);
+
+            if (linkedIssueIds.Count > 0)
+            {
+                ProcessLinkedIssues(linkedIssueIds, lookupData.IssueById, pr, allChangeIds, bugs, nonBugChanges);
+            }
+            else
+            {
+                ProcessPullRequestWithoutIssues(pr, allChangeIds, bugs, nonBugChanges);
+            }
+        }
+
+        return (bugs, nonBugChanges, allChangeIds);
+    }
+
+    /// <summary>
+    ///     Processes issues linked to a pull request.
+    /// </summary>
+    /// <param name="linkedIssueIds">List of linked issue IDs.</param>
+    /// <param name="issueById">Dictionary mapping issue IDs to issues.</param>
+    /// <param name="pr">Pull request.</param>
+    /// <param name="allChangeIds">Set of all change IDs (modified in place).</param>
+    /// <param name="bugs">List of bug changes (modified in place).</param>
+    /// <param name="nonBugChanges">List of non-bug changes (modified in place).</param>
+    private static void ProcessLinkedIssues(
+        IReadOnlyList<int> linkedIssueIds,
+        Dictionary<int, Issue> issueById,
+        PullRequest pr,
+        HashSet<string> allChangeIds,
+        List<ItemInfo> bugs,
+        List<ItemInfo> nonBugChanges)
+    {
+        // PR has linked issues - add them (deduplicated)
+        foreach (var issueId in linkedIssueIds)
+        {
+            var issueIdStr = issueId.ToString();
+            if (allChangeIds.Contains(issueIdStr))
+            {
+                continue;
+            }
+
+            // Look up the issue in the master issues list
+            if (issueById.TryGetValue(issueId, out var issue))
+            {
+                allChangeIds.Add(issueIdStr);
+                var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
+
+                if (itemInfo.Type == "bug")
+                {
+                    bugs.Add(itemInfo);
+                }
+                else
+                {
+                    nonBugChanges.Add(itemInfo);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Processes a pull request without linked issues.
+    /// </summary>
+    /// <param name="pr">Pull request.</param>
+    /// <param name="allChangeIds">Set of all change IDs (modified in place).</param>
+    /// <param name="bugs">List of bug changes (modified in place).</param>
+    /// <param name="nonBugChanges">List of non-bug changes (modified in place).</param>
+    private static void ProcessPullRequestWithoutIssues(
+        PullRequest pr,
+        HashSet<string> allChangeIds,
+        List<ItemInfo> bugs,
+        List<ItemInfo> nonBugChanges)
+    {
+        // PR didn't close any issues - add the PR itself
+        var prId = $"#{pr.Number}";
+        if (allChangeIds.Add(prId))
+        {
+            var itemInfo = CreateItemInfoFromPullRequest(pr);
+
+            if (itemInfo.Type == "bug")
+            {
+                bugs.Add(itemInfo);
+            }
+            else
+            {
+                nonBugChanges.Add(itemInfo);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Collects known issues (open bugs not fixed in this build).
+    /// </summary>
+    /// <param name="issues">All issues from GitHub.</param>
+    /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <returns>List of known issues.</returns>
+    private static List<ItemInfo> CollectKnownIssues(IReadOnlyList<Issue> issues, HashSet<string> allChangeIds)
+    {
+        return issues
+            .Where(i => i.State == ItemState.Open)
+            .Select(issue => (issue, issueId: issue.Number.ToString()))
+            .Where(tuple => !allChangeIds.Contains(tuple.issueId))
+            .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
+            .Where(itemInfo => itemInfo.Type == "bug")
+            .ToList();
     }
 
     /// <summary>

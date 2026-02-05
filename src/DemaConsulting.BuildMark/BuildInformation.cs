@@ -59,12 +59,38 @@ public record BuildInformation(
         markdown.AppendLine();
 
         // Add version information section
+        AppendVersionInformation(markdown, subHeading);
+
+        // Add changes section
+        AppendChangesSection(markdown, subHeading);
+
+        // Add bugs fixed section
+        AppendBugsFixedSection(markdown, subHeading);
+
+        // Add known issues section if requested
+        if (includeKnownIssues)
+        {
+            AppendKnownIssuesSection(markdown, subHeading);
+        }
+
+        // Return the complete markdown report
+        return markdown.ToString();
+    }
+
+    /// <summary>
+    ///     Appends the version information section to the markdown report.
+    /// </summary>
+    /// <param name="markdown">StringBuilder containing the markdown report.</param>
+    /// <param name="subHeading">Sub-heading prefix.</param>
+    private void AppendVersionInformation(System.Text.StringBuilder markdown, string subHeading)
+    {
         markdown.AppendLine($"{subHeading} Version Information");
         markdown.AppendLine();
         markdown.AppendLine("| Field | Value |");
         markdown.AppendLine("|-------|-------|");
         markdown.AppendLine($"| **Version** | {ToVersion.Tag} |");
         markdown.AppendLine($"| **Commit Hash** | {ToHash} |");
+
         if (FromVersion != null)
         {
             markdown.AppendLine($"| **Previous Version** | {FromVersion.Tag} |");
@@ -75,13 +101,22 @@ public record BuildInformation(
             markdown.AppendLine("| **Previous Version** | N/A |");
             markdown.AppendLine("| **Previous Commit Hash** | N/A |");
         }
-        markdown.AppendLine();
 
-        // Add changes section
+        markdown.AppendLine();
+    }
+
+    /// <summary>
+    ///     Appends the changes section to the markdown report.
+    /// </summary>
+    /// <param name="markdown">StringBuilder containing the markdown report.</param>
+    /// <param name="subHeading">Sub-heading prefix.</param>
+    private void AppendChangesSection(System.Text.StringBuilder markdown, string subHeading)
+    {
         markdown.AppendLine($"{subHeading} Changes");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
+
         if (Changes.Count > 0)
         {
             foreach (var issue in Changes)
@@ -93,13 +128,22 @@ public record BuildInformation(
         {
             markdown.AppendLine("| N/A | N/A |");
         }
-        markdown.AppendLine();
 
-        // Add bugs fixed section
+        markdown.AppendLine();
+    }
+
+    /// <summary>
+    ///     Appends the bugs fixed section to the markdown report.
+    /// </summary>
+    /// <param name="markdown">StringBuilder containing the markdown report.</param>
+    /// <param name="subHeading">Sub-heading prefix.</param>
+    private void AppendBugsFixedSection(System.Text.StringBuilder markdown, string subHeading)
+    {
         markdown.AppendLine($"{subHeading} Bugs Fixed");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
         markdown.AppendLine("|-------|-------|");
+
         if (Bugs.Count > 0)
         {
             foreach (var issue in Bugs)
@@ -111,30 +155,34 @@ public record BuildInformation(
         {
             markdown.AppendLine("| N/A | N/A |");
         }
-        markdown.AppendLine();
 
-        // Add known issues section if requested
-        if (includeKnownIssues)
+        markdown.AppendLine();
+    }
+
+    /// <summary>
+    ///     Appends the known issues section to the markdown report.
+    /// </summary>
+    /// <param name="markdown">StringBuilder containing the markdown report.</param>
+    /// <param name="subHeading">Sub-heading prefix.</param>
+    private void AppendKnownIssuesSection(System.Text.StringBuilder markdown, string subHeading)
+    {
+        markdown.AppendLine($"{subHeading} Known Issues");
+        markdown.AppendLine();
+        markdown.AppendLine("| Issue | Title |");
+        markdown.AppendLine("|-------|-------|");
+
+        if (KnownIssues.Count > 0)
         {
-            markdown.AppendLine($"{subHeading} Known Issues");
-            markdown.AppendLine();
-            markdown.AppendLine("| Issue | Title |");
-            markdown.AppendLine("|-------|-------|");
-            if (KnownIssues.Count > 0)
+            foreach (var issue in KnownIssues)
             {
-                foreach (var issue in KnownIssues)
-                {
-                    markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
-                }
+                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
             }
-            else
-            {
-                markdown.AppendLine("| N/A | N/A |");
-            }
-            markdown.AppendLine();
+        }
+        else
+        {
+            markdown.AppendLine("| N/A | N/A |");
         }
 
-        // Return the complete markdown report
-        return markdown.ToString();
+        markdown.AppendLine();
     }
 }

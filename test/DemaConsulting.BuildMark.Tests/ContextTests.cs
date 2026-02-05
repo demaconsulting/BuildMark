@@ -249,7 +249,7 @@ public class ContextTests
     public void Context_Create_UnsupportedArgument_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with unsupported argument
@@ -275,7 +275,7 @@ public class ContextTests
     public void Context_Create_BuildVersionWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --build-version but no value
@@ -301,7 +301,7 @@ public class ContextTests
     public void Context_Create_ReportWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --report but no value
@@ -327,7 +327,7 @@ public class ContextTests
     public void Context_Create_ReportDepthWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --report-depth but no value
@@ -353,7 +353,7 @@ public class ContextTests
     public void Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --report-depth with non-integer value
@@ -379,7 +379,7 @@ public class ContextTests
     public void Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --report-depth with zero value
@@ -405,7 +405,7 @@ public class ContextTests
     public void Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --report-depth with negative value
@@ -431,7 +431,7 @@ public class ContextTests
     public void Context_Create_ResultsWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --results but no value
@@ -457,7 +457,7 @@ public class ContextTests
     public void Context_Create_LogWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with --log but no value
@@ -483,7 +483,7 @@ public class ContextTests
     public void Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException()
     {
         InvalidOperationException? caughtException = null;
-        
+
         try
         {
             // Attempt to create context with invalid log file path
