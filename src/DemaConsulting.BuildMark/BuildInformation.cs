@@ -123,7 +123,7 @@ public record BuildInformation(
         markdown.AppendLine($"{subHeading} Changes");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("|-------|-------|");
+        markdown.AppendLine("| :-: | :---------- |");
 
         // Add change items or N/A if no changes exist
         if (Changes.Count > 0)
@@ -153,7 +153,7 @@ public record BuildInformation(
         markdown.AppendLine($"{subHeading} Bugs Fixed");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("|-------|-------|");
+        markdown.AppendLine("| :-: | :---------- |");
 
         // Add bug items or N/A if no bugs were fixed
         if (Bugs.Count > 0)
@@ -183,7 +183,7 @@ public record BuildInformation(
         markdown.AppendLine($"{subHeading} Known Issues");
         markdown.AppendLine();
         markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("|-------|-------|");
+        markdown.AppendLine("| :-: | :---------- |");
 
         // Add known issue items or N/A if no known issues exist
         if (KnownIssues.Count > 0)
