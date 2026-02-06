@@ -609,7 +609,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         return new ItemInfo(
             issue.Number.ToString(),
             issue.Title,
-            issue.Url,
+            issue.HtmlUrl,
             type,
             index);
     }
