@@ -381,15 +381,15 @@ public class GitHubRepoConnector : RepoConnectorBase
             return toIndex + 1;
         }
 
-        // Target version not in history, start from second release (skip most recent)
-        if (toIndex == -1 && releaseCount > 1)
+        // Target version not in history, start from most recent release
+        if (toIndex == -1 && releaseCount > 0)
         {
-            // Target version not in history, start from second release (skip most recent)
-            // We skip the first (newest) release because the target is implicitly newer
-            return 1;
+            // Target version not in history, start from most recent release
+            // The target is newer than all existing releases, so use the most recent as baseline
+            return 0;
         }
 
-        // Target is oldest release or not enough releases, no previous release exists
+        // Target is oldest release or no releases exist, no previous release exists
         return -1;
     }
 
