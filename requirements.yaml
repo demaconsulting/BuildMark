@@ -55,82 +55,28 @@ sections:
               - "Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException"
 
           - id: "CLI-009"
-            title: "The tool shall support processing multiple command-line arguments."
-            tests:
-              - "Context_Create_MultipleArguments_SetsAllPropertiesCorrectly"
-
-          - id: "CLI-010"
             title: "The tool shall return appropriate exit codes."
             tests:
               - "Context_ExitCode_NoErrors_RemainsZero"
               - "Context_WriteError_SetsExitCodeToOne"
 
-      - title: "Git Integration"
-        requirements:
-          - id: "GIT-001"
-            title: "The tool shall analyze Git repository history."
-            tests:
-              - "BuildMark_GitIntegration"
-
-          - id: "GIT-002"
-            title: "The tool shall identify and parse Git version tags."
-            tests:
-              - "TagInfo_Constructor_ParsesSimpleVPrefix"
-              - "TagInfo_Constructor_ParsesVerPrefix"
-              - "TagInfo_Constructor_ParsesReleaseUnderscorePrefix"
-              - "TagInfo_Constructor_HandlesNoPrefix"
-              - "TagInfo_Constructor_HandlesComplexPrefix"
-              - "VersionTag_Constructor_StoresVersionAndHash"
-              - "Version_TryCreate_ReturnsNullForInvalidTag"
-              - "Version_Create_ThrowsForInvalidTag"
-
-          - id: "GIT-003"
-            title: "The tool shall retrieve commit information between versions."
-            tests:
-              - "BuildMark_GitIntegration"
-
-          - id: "GIT-004"
-            title: "The tool shall extract build information from repository."
-            tests:
-              - "BuildMark_GitIntegration"
-
       - title: "GitHub Integration"
         requirements:
           - id: "GH-001"
-            title: "The tool shall connect to GitHub repositories."
+            title: "The tool shall generate build notes from GitHub repositories."
             tests:
-              - "GitHubRepoConnector_Constructor_CreatesInstance"
-              - "GitHubRepoConnector_ImplementsInterface"
-              - "RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo"
+              - "BuildMark_GitIntegration"
+              - "BuildMark_MarkdownReportGeneration"
 
           - id: "GH-002"
-            title: "The tool shall authenticate with GitHub using tokens."
+            title: "The tool shall track issues and pull requests from GitHub."
             tests:
-              - "GitHubRepoConnector_Constructor_CreatesInstance"
+              - "BuildMark_IssueTracking"
 
           - id: "GH-003"
-            title: "The tool shall fetch issue information from GitHub."
+            title: "The tool shall identify changes between version tags."
             tests:
-              - "BuildMark_IssueTracking"
-
-          - id: "GH-004"
-            title: "The tool shall fetch pull request information from GitHub."
-            tests:
-              - "BuildMark_IssueTracking"
-
-          - id: "GH-005"
-            title: "The tool shall handle GitHub API errors gracefully."
-            tests:
-              - "BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags"
-              - "BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag"
-
-          - id: "GH-006"
-            title: "The tool shall support repositories without GitHub integration."
-            tests:
-              - "RepoConnectorFactory_Create_ReturnsConnector"
-              - "MockRepoConnector_Constructor_CreatesInstance"
-              - "MockRepoConnector_ImplementsInterface"
-              - "MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion"
+              - "BuildMark_GitIntegration"
 
       - title: "Report Generation"
         requirements:
@@ -210,61 +156,6 @@ sections:
             title: "The tool shall support JUnit format for test results."
             tests:
               - "IntegrationTest_ResultsParameter_IsAccepted"
-
-      - title: "Data Models"
-        requirements:
-          - id: "MDL-001"
-            title: "The tool shall model version tags with semantic versioning."
-            tests:
-              - "VersionTag_Constructor_StoresVersionAndHash"
-              - "TagInfo_Constructor_ParsesSimpleVPrefix"
-              - "TagInfo_Constructor_ParsesVerPrefix"
-              - "TagInfo_Constructor_ParsesReleaseUnderscorePrefix"
-              - "TagInfo_Constructor_DetectsAlphaPreRelease"
-              - "TagInfo_Constructor_DetectsBetaPreRelease"
-              - "TagInfo_Constructor_DetectsRcPreRelease"
-              - "TagInfo_Constructor_DetectsPrePreRelease"
-              - "TagInfo_Constructor_ParsesBuildMetadata"
-              - "Version_TryCreate_ReturnsNullForInvalidTag"
-              - "Version_Create_ThrowsForInvalidTag"
-
-          - id: "MDL-002"
-            title: "The tool shall model item information for issues and pull requests."
-            tests:
-              - "BuildMark_IssueTracking"
-
-          - id: "MDL-003"
-            title: "The tool shall model web links for markdown generation."
-            tests:
-              - "BuildMark_MarkdownReportGeneration"
-
-          - id: "MDL-004"
-            title: "The tool shall model build information with changes, bugs, and known issues."
-            tests:
-              - "BuildMark_GitIntegration"
-              - "BuildMark_IssueTracking"
-              - "BuildMark_KnownIssuesReporting"
-
-      - title: "Repository Connectors"
-        requirements:
-          - id: "RCN-001"
-            title: "The tool shall provide a factory for creating repository connectors."
-            tests:
-              - "RepoConnectorFactory_Create_ReturnsConnector"
-              - "RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo"
-
-          - id: "RCN-002"
-            title: "The tool shall support GitHub repository connector."
-            tests:
-              - "GitHubRepoConnector_Constructor_CreatesInstance"
-              - "GitHubRepoConnector_ImplementsInterface"
-
-          - id: "RCN-003"
-            title: "The tool shall support mock repository connector for testing."
-            tests:
-              - "MockRepoConnector_Constructor_CreatesInstance"
-              - "MockRepoConnector_ImplementsInterface"
-              - "MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion"
 
       - title: "Platform Support"
         requirements:
