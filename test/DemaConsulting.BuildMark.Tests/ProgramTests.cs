@@ -130,4 +130,52 @@ public class ProgramTests
             Console.SetOut(originalOut);
         }
     }
+
+    /// <summary>
+    ///     Test that Run with report and include-known-issues flags generates report with known issues.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues()
+    {
+        // Create temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with report and include-known-issues flags
+            using var context = Context.Create(["--report", reportFile, "--include-known-issues"]);
+
+            // Verify IncludeKnownIssues property is set
+            Assert.IsTrue(context.IncludeKnownIssues);
+
+            // Capture console output
+            var originalOut = Console.Out;
+            using var writer = new StringWriter();
+            Console.SetOut(writer);
+
+            try
+            {
+                // Run program
+                Program.Run(context);
+
+                // Verify report file was created
+                Assert.IsTrue(File.Exists(reportFile));
+
+                // Verify the context flag was set correctly
+                Assert.IsTrue(context.IncludeKnownIssues);
+            }
+            finally
+            {
+                // Restore console output
+                Console.SetOut(originalOut);
+            }
+        }
+        finally
+        {
+            // Clean up report file
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
 }

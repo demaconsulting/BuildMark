@@ -43,6 +43,7 @@ public class ContextTests
         Assert.IsNull(context.BuildVersion);
         Assert.IsNull(context.ReportFile);
         Assert.AreEqual(1, context.ReportDepth);
+        Assert.IsFalse(context.IncludeKnownIssues);
         Assert.IsNull(context.ResultsFile);
         Assert.AreEqual(0, context.ExitCode);
     }
@@ -178,6 +179,19 @@ public class ContextTests
     }
 
     /// <summary>
+    ///     Test that Context.Create with --include-known-issues flag sets IncludeKnownIssues property.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty()
+    {
+        // Create context with --include-known-issues flag
+        using var context = Context.Create(["--include-known-issues"]);
+
+        // Verify IncludeKnownIssues property is set
+        Assert.IsTrue(context.IncludeKnownIssues);
+    }
+
+    /// <summary>
     ///     Test that Context.Create with --results argument sets ResultsFile property.
     /// </summary>
     [TestMethod]
@@ -230,6 +244,7 @@ public class ContextTests
             "--build-version", "1.2.3",
             "--report", "report.md",
             "--report-depth", "2",
+            "--include-known-issues",
             "--results", "results.trx"
         ]);
 
@@ -239,6 +254,7 @@ public class ContextTests
         Assert.AreEqual("1.2.3", context.BuildVersion);
         Assert.AreEqual("report.md", context.ReportFile);
         Assert.AreEqual(2, context.ReportDepth);
+        Assert.IsTrue(context.IncludeKnownIssues);
         Assert.AreEqual("results.trx", context.ResultsFile);
     }
 
