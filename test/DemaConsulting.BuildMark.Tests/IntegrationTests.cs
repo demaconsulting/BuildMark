@@ -260,10 +260,7 @@ public class IntegrationTests
     public void BuildMark_MarkdownReportGeneration()
     {
         // Skip if GitHub token not available
-        if (!HasGitHubToken())
-        {
-            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
-        }
+        SkipIfNoGitHubToken();
 
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
@@ -307,10 +304,7 @@ public class IntegrationTests
     public void BuildMark_GitIntegration()
     {
         // Skip if GitHub token not available
-        if (!HasGitHubToken())
-        {
-            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
-        }
+        SkipIfNoGitHubToken();
 
         // Run BuildMark to test Git integration
         var exitCode = Runner.Run(
@@ -331,10 +325,7 @@ public class IntegrationTests
     public void BuildMark_IssueTracking()
     {
         // Skip if GitHub token not available
-        if (!HasGitHubToken())
-        {
-            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
-        }
+        SkipIfNoGitHubToken();
 
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
@@ -371,10 +362,7 @@ public class IntegrationTests
     public void BuildMark_KnownIssuesReporting()
     {
         // Skip if GitHub token not available
-        if (!HasGitHubToken())
-        {
-            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
-        }
+        SkipIfNoGitHubToken();
 
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
@@ -406,6 +394,17 @@ public class IntegrationTests
             {
                 File.Delete(reportFile);
             }
+        }
+    }
+
+    /// <summary>
+    ///     Skips the test if GitHub token is not available.
+    /// </summary>
+    private static void SkipIfNoGitHubToken()
+    {
+        if (!HasGitHubToken())
+        {
+            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
         }
     }
 
