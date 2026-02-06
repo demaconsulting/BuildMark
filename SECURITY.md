@@ -20,10 +20,7 @@ If you discover a security vulnerability in BuildMark, please help us by reporti
 
 **Do not** report security vulnerabilities through public GitHub issues.
 
-Instead, please report security issues by:
-
-1. Creating a private security advisory on GitHub
-2. Emailing the maintainers with details (contact information available in the repository)
+Instead, please report security issues by creating a private security advisory on GitHub.
 
 ### What to Include
 
