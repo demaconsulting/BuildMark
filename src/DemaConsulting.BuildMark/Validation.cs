@@ -536,16 +536,16 @@ internal static class Validation
     /// </summary>
     /// <param name="test">The test result to update.</param>
     /// <param name="context">The context for output.</param>
-    /// <param name="testName">The name of the test for error messages.</param>
+    /// <param name="displayName">The display name for console output.</param>
     /// <param name="ex">The exception that occurred.</param>
     private static void HandleTestException(
         DemaConsulting.TestResults.TestResult test,
         Context context,
-        string testName,
+        string displayName,
         Exception ex)
     {
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
-        context.WriteError($"✗ {testName} - FAILED: {ex.Message}");
+        context.WriteError($"✗ {displayName} - FAILED: {ex.Message}");
     }
 }
