@@ -423,7 +423,6 @@ public class BuildInformationTests
 
         // Assert - verify table separators use correct width format (10:1 ratio with centered Issue)
         // The separator should have centered Issue column (:-:) and wide left-aligned Title column (:----------)
-        Assert.Contains("| :-: | :---------- |", markdown);
         
         // Verify the table separator appears in Changes section
         var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
@@ -440,7 +439,6 @@ public class BuildInformationTests
         var knownIssuesSection = markdown.Substring(knownIssuesStart);
         Assert.Contains("| :-: | :---------- |", knownIssuesSection);
     }
-
 
     /// <summary>
     ///     Test that VersionTag correctly stores version and hash.
