@@ -160,10 +160,8 @@ public class ProgramTests
                 // Verify report file was created
                 Assert.IsTrue(File.Exists(reportFile));
 
-                // Verify report was generated (file is not empty if data is available)
-                // Note: The content depends on repository data availability
-                var fileInfo = new FileInfo(reportFile);
-                Assert.IsTrue(fileInfo.Length >= 0);
+                // Verify the context flag was set correctly
+                Assert.IsTrue(context.IncludeKnownIssues);
             }
             finally
             {
