@@ -252,4 +252,170 @@ public class IntegrationTests
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
+
+    /// <summary>
+    ///     Test BuildMark markdown report generation on itself.
+    /// </summary>
+    [TestMethod]
+    public void BuildMark_MarkdownReportGeneration()
+    {
+        // Skip if GitHub token not available
+        if (!HasGitHubToken())
+        {
+            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
+        }
+
+        // Create temporary report file
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Run BuildMark to generate its own build report
+            var exitCode = Runner.Run(
+                out var output,
+                "dotnet",
+                _dllPath,
+                "--silent",
+                "--report", reportFile);
+
+            // Verify success
+            Assert.AreEqual(0, exitCode, $"BuildMark failed with output: {output}");
+
+            // Verify report file was created
+            Assert.IsTrue(File.Exists(reportFile), "Report file was not created");
+
+            // Verify report contains expected sections
+            var report = File.ReadAllText(reportFile);
+            Assert.Contains("# Build Report", report);
+            Assert.Contains("## Version Information", report);
+            Assert.Contains("## Changes", report);
+            Assert.Contains("## Bugs Fixed", report);
+        }
+        finally
+        {
+            // Clean up temporary file
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test BuildMark Git integration on itself.
+    /// </summary>
+    [TestMethod]
+    public void BuildMark_GitIntegration()
+    {
+        // Skip if GitHub token not available
+        if (!HasGitHubToken())
+        {
+            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
+        }
+
+        // Run BuildMark to test Git integration
+        var exitCode = Runner.Run(
+            out var output,
+            "dotnet",
+            _dllPath,
+            "--silent",
+            "--validate");
+
+        // Verify success (validate flag exercises Git integration)
+        Assert.AreEqual(0, exitCode, $"BuildMark Git integration failed with output: {output}");
+    }
+
+    /// <summary>
+    ///     Test BuildMark issue tracking on itself.
+    /// </summary>
+    [TestMethod]
+    public void BuildMark_IssueTracking()
+    {
+        // Skip if GitHub token not available
+        if (!HasGitHubToken())
+        {
+            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
+        }
+
+        // Create temporary report file
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Run BuildMark to generate report (exercises issue tracking)
+            var exitCode = Runner.Run(
+                out var output,
+                "dotnet",
+                _dllPath,
+                "--silent",
+                "--report", reportFile);
+
+            // Verify success
+            Assert.AreEqual(0, exitCode, $"BuildMark issue tracking failed with output: {output}");
+
+            // Verify report was generated (confirms issue tracking worked)
+            Assert.IsTrue(File.Exists(reportFile));
+        }
+        finally
+        {
+            // Clean up temporary file
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test BuildMark known issues reporting on itself.
+    /// </summary>
+    [TestMethod]
+    public void BuildMark_KnownIssuesReporting()
+    {
+        // Skip if GitHub token not available
+        if (!HasGitHubToken())
+        {
+            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
+        }
+
+        // Create temporary report file
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Run BuildMark with known issues flag
+            var exitCode = Runner.Run(
+                out var output,
+                "dotnet",
+                _dllPath,
+                "--silent",
+                "--report", reportFile,
+                "--include-known-issues");
+
+            // Verify success
+            Assert.AreEqual(0, exitCode, $"BuildMark known issues reporting failed with output: {output}");
+
+            // Verify report file was created
+            Assert.IsTrue(File.Exists(reportFile), "Report file was not created");
+
+            // Verify report contains known issues section
+            var report = File.ReadAllText(reportFile);
+            Assert.Contains("## Known Issues", report);
+        }
+        finally
+        {
+            // Clean up temporary file
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Checks if GitHub token is available in environment.
+    /// </summary>
+    /// <returns>True if GitHub token is available.</returns>
+    private static bool HasGitHubToken()
+    {
+        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")) ||
+               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GH_TOKEN"));
+    }
 }
