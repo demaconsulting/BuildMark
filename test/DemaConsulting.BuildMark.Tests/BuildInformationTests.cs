@@ -409,6 +409,38 @@ public class BuildInformationTests
     }
 
     /// <summary>
+    ///     Test that ToMarkdown uses correct table widths with centered Issue column.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildInformation_ToMarkdown_UsesCorrectTableWidths()
+    {
+        // Arrange
+        var connector = new MockRepoConnector();
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+
+        // Act
+        var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
+
+        // Assert - verify table separators use correct width format (10:1 ratio with centered Issue)
+        // The separator should have centered Issue column (:-:) and wide left-aligned Title column (:----------)
+        
+        // Verify the table separator appears in Changes section
+        var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
+        var bugsStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
+        var changesSection = markdown.Substring(changesStart, bugsStart - changesStart);
+        Assert.Contains("| :-: | :---------- |", changesSection);
+        
+        // Verify the table separator appears in Bugs Fixed section
+        var knownIssuesStart = markdown.IndexOf("## Known Issues", StringComparison.Ordinal);
+        var bugsSection = markdown.Substring(bugsStart, knownIssuesStart - bugsStart);
+        Assert.Contains("| :-: | :---------- |", bugsSection);
+        
+        // Verify the table separator appears in Known Issues section
+        var knownIssuesSection = markdown.Substring(knownIssuesStart);
+        Assert.Contains("| :-: | :---------- |", knownIssuesSection);
+    }
+
+    /// <summary>
     ///     Test that VersionTag correctly stores version and hash.
     /// </summary>
     [TestMethod]
