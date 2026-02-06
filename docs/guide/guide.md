@@ -1,15 +1,12 @@
-# BuildMark Usage Guide
+<!-- markdownlint-disable MD025 -->
 
-This guide provides comprehensive documentation for using BuildMark to generate build notes from Git repository
-history and GitHub issues.
-
-## Introduction
+# Introduction
 
 BuildMark is a .NET command-line tool that generates comprehensive markdown build notes reports from Git repository
 history and GitHub issues. It analyzes commits, pull requests, and issues to create human-readable build notes,
 making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
-### Key Features
+## Key Features
 
 - **Git Integration**: Analyze Git repository history and tags
 - **GitHub Integration**: Extract bug fixes and changes from GitHub issues and pull requests
@@ -20,13 +17,13 @@ making it easy to integrate release documentation into your CI/CD pipelines and 
 - **Self-Validation**: Built-in tests without requiring external tools
 - **Detailed Reporting**: Track changes, bug fixes, and known issues between versions
 
-## Installation
+# Installation
 
-### Prerequisites
+## Prerequisites
 
 - [.NET SDK][dotnet-download] 8.0, 9.0, or 10.0
 
-### Global Installation
+## Global Installation
 
 Install BuildMark as a global .NET tool for system-wide access:
 
@@ -40,7 +37,7 @@ Verify the installation:
 buildmark --version
 ```
 
-### Local Installation
+## Local Installation
 
 For team projects, install BuildMark as a local tool to ensure version consistency:
 
@@ -58,7 +55,7 @@ Run the locally installed tool:
 dotnet buildmark --version
 ```
 
-### Update
+## Update
 
 To update to the latest version:
 
@@ -70,9 +67,9 @@ dotnet tool update --global DemaConsulting.BuildMark
 dotnet tool update DemaConsulting.BuildMark
 ```
 
-## Getting Started
+# Getting Started
 
-### Basic Usage
+## Basic Usage
 
 The most basic usage requires specifying a build version and report file:
 
@@ -83,7 +80,7 @@ buildmark --build-version v1.2.3 --report build-notes.md
 This will analyze the Git repository in the current directory, find the previous version tag, and generate a
 markdown report with all changes, bug fixes, and other relevant information.
 
-### With GitHub Token
+## With GitHub Token
 
 For accessing private repositories or to avoid GitHub API rate limits, provide a GitHub token:
 
@@ -97,7 +94,7 @@ export GITHUB_TOKEN=ghp_abc123...
 buildmark --build-version v1.2.3 --report build-notes.md
 ```
 
-### Including Known Issues
+## Including Known Issues
 
 To include known issues in the report:
 
@@ -105,11 +102,11 @@ To include known issues in the report:
 buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues
 ```
 
-## Command-Line Options
+# Command-Line Options
 
-### Display Options
+## Display Options
 
-#### `--version`, `-v`
+### `--version`, `-v`
 
 Display version information and exit.
 
@@ -117,7 +114,7 @@ Display version information and exit.
 buildmark --version
 ```
 
-#### `--help`, `-h`, `-?`
+### `--help`, `-h`, `-?`
 
 Display help message with all available options.
 
@@ -125,9 +122,9 @@ Display help message with all available options.
 buildmark --help
 ```
 
-### Output Control
+## Output Control
 
-#### `--silent`
+### `--silent`
 
 Suppress console output. Useful in automated scripts where only the exit code matters.
 
@@ -135,7 +132,7 @@ Suppress console output. Useful in automated scripts where only the exit code ma
 buildmark --build-version v1.2.3 --report build-notes.md --silent
 ```
 
-#### `--log <file>`
+### `--log <file>`
 
 Write all output to a log file in addition to console output.
 
@@ -143,9 +140,9 @@ Write all output to a log file in addition to console output.
 buildmark --build-version v1.2.3 --report build-notes.md --log analysis.log
 ```
 
-### Build Version Options
+## Build Version Options
 
-#### `--build-version <version>` (Required for report generation)
+### `--build-version <version>` (Required for report generation)
 
 Specify the build version for which to generate the report. This should be a version tag in your Git repository
 (e.g., `v1.2.3`, `1.2.3`).
@@ -157,9 +154,9 @@ buildmark --build-version v1.2.3 --report build-notes.md
 BuildMark will automatically find the previous version tag and generate a report covering all changes between
 the two versions.
 
-### Report Generation
+## Report Generation
 
-#### `--report <file>`
+### `--report <file>`
 
 Export build notes to a markdown file. The file will contain version information, changes, bug fixes, and
 optionally known issues.
@@ -168,7 +165,7 @@ optionally known issues.
 buildmark --build-version v1.2.3 --report build-notes.md
 ```
 
-#### `--report-depth <depth>`
+### `--report-depth <depth>`
 
 Set the markdown header depth for the report. Default is 1. Use this when embedding the report in larger documents.
 
@@ -177,7 +174,7 @@ Set the markdown header depth for the report. Default is 1. Use this when embedd
 buildmark --build-version v1.2.3 --report build-notes.md --report-depth 2
 ```
 
-#### `--include-known-issues`
+### `--include-known-issues`
 
 Include known issues in the generated report. Known issues are open bugs in the GitHub repository.
 
@@ -185,9 +182,9 @@ Include known issues in the generated report. Known issues are open bugs in the 
 buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues
 ```
 
-### Self-Validation
+## Self-Validation
 
-#### `--validate`
+### `--validate`
 
 Run built-in self-validation tests. These tests verify BuildMark functionality without requiring access to a real
 Git repository or GitHub.
@@ -196,7 +193,7 @@ Git repository or GitHub.
 buildmark --validate
 ```
 
-#### `--results <file>`
+### `--results <file>`
 
 Write validation results to a file. Supports TRX (`.trx`) and JUnit XML (`.xml`) formats. Requires `--validate`.
 
@@ -208,9 +205,9 @@ buildmark --validate --results validation-results.trx
 buildmark --validate --results validation-results.xml
 ```
 
-## Common Use Cases
+# Common Use Cases
 
-### CI/CD Integration
+## CI/CD Integration
 
 Integrate BuildMark into your CI/CD pipeline to automatically generate build notes:
 
@@ -231,7 +228,7 @@ Integrate BuildMark into your CI/CD pipeline to automatically generate build not
     path: docs/build-notes.md
 ```
 
-### Release Documentation
+## Release Documentation
 
 Generate build notes for a specific release:
 
@@ -240,7 +237,7 @@ Generate build notes for a specific release:
 buildmark --build-version v2.0.0 --report release-notes-2.0.0.md --include-known-issues
 ```
 
-### Integration Testing
+## Integration Testing
 
 Run self-validation tests in your CI/CD pipeline:
 
@@ -248,7 +245,7 @@ Run self-validation tests in your CI/CD pipeline:
 buildmark --validate --results validation-results.trx
 ```
 
-### Automated Reporting
+## Automated Reporting
 
 Generate timestamped build notes for archival purposes:
 
@@ -262,11 +259,11 @@ buildmark --build-version "$VERSION" \
   --log "analysis-${TIMESTAMP}.log"
 ```
 
-## Report Format
+# Report Format
 
 The generated markdown report includes the following sections:
 
-### Build Report Header
+## Build Report Header
 
 The report begins with a title showing the version:
 
@@ -274,7 +271,7 @@ The report begins with a title showing the version:
 # Build Report
 ```
 
-### Version Information
+## Version Information
 
 Shows the current version, baseline version (previous version), and commit information:
 
@@ -287,7 +284,7 @@ Shows the current version, baseline version (previous version), and commit infor
 **Commit Date:** 2024-01-15
 ```
 
-### Changes
+## Changes
 
 Lists all non-bug changes implemented in this build, extracted from GitHub pull requests and issues:
 
@@ -304,7 +301,7 @@ Each change entry includes:
 - **Issue/PR number**: Linked to the GitHub issue or pull request
 - **Description**: Title of the issue or pull request
 
-### Bugs Fixed
+## Bugs Fixed
 
 Lists all bugs resolved in this build, extracted from GitHub issues labeled as bugs:
 
@@ -315,7 +312,7 @@ Lists all bugs resolved in this build, extracted from GitHub issues labeled as b
 - [#41](https://github.com/owner/repo/issues/41): Correct validation logic
 ```
 
-### Known Issues
+## Known Issues
 
 When `--include-known-issues` is specified, lists currently open bugs:
 
@@ -326,7 +323,7 @@ When `--include-known-issues` is specified, lists currently open bugs:
 - [#51](https://github.com/owner/repo/issues/51): UI glitch in dark mode
 ```
 
-### Complete Changelog
+## Complete Changelog
 
 Provides a link to the full changelog on GitHub comparing the baseline and current versions:
 
@@ -336,18 +333,18 @@ Provides a link to the full changelog on GitHub comparing the baseline and curre
 [View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
 ```
 
-## Running Self-Validation
+# Running Self-Validation
 
 BuildMark includes built-in self-validation tests to verify functionality without requiring access to a real
 Git repository or GitHub. The validation uses mock data to test core features.
 
-### Running Validation
+## Running Validation
 
 ```bash
 buildmark --validate
 ```
 
-### Validation Tests
+## Validation Tests
 
 The self-validation suite includes the following tests that verify core functionality:
 
@@ -369,7 +366,7 @@ These tests provide evidence of the tool's functionality and are particularly us
 **Note**: The test names with the `BuildMark_` prefix are designed for clear identification in test
 result files (TRX/JUnit) when integrating with larger projects or test frameworks.
 
-### Validation Output
+## Validation Output
 
 Example output:
 
@@ -390,7 +387,7 @@ Passed: 5
 Failed: 0
 ```
 
-### Saving Validation Results
+## Saving Validation Results
 
 Save results in TRX or JUnit XML format for integration with test reporting tools:
 
@@ -402,38 +399,38 @@ buildmark --validate --results validation-results.trx
 buildmark --validate --results validation-results.xml
 ```
 
-## Best Practices
+# Best Practices
 
-### Version Tagging
+## Version Tagging
 
 - **Use semantic versioning**: Follow the `vX.Y.Z` format for version tags
 - **Tag releases consistently**: Ensure all releases are tagged in Git
 - **Use annotated tags**: Create annotated tags with `git tag -a` for better metadata
 
-### GitHub Integration
+## GitHub Integration
 
 - **Store tokens securely**: Use environment variables or secret management systems
 - **Use read-only tokens**: BuildMark only needs read access to the GitHub API
 - **Don't commit tokens**: Never commit tokens to version control
 - **Set appropriate rate limits**: Be aware of GitHub API rate limits
 
-### CI/CD Best Practices
+## CI/CD Best Practices
 
 - **Generate on every release**: Automate build notes generation for every release
 - **Archive reports**: Save build notes as build artifacts for historical tracking
 - **Use silent mode**: Suppress unnecessary output in automated scripts with `--silent`
 - **Handle failures gracefully**: Use appropriate error handling in your CI/CD scripts
 
-### Report Best Practices
+## Report Best Practices
 
 - **Use meaningful filenames**: Include version numbers or timestamps in report filenames
 - **Adjust header depth**: Use `--report-depth` when embedding reports in larger documents
 - **Include known issues**: Use `--include-known-issues` for comprehensive release documentation
 - **Combine with logging**: Use `--log` to capture detailed execution information
 
-## Troubleshooting
+# Troubleshooting
 
-### Git Repository Issues
+## Git Repository Issues
 
 **Problem**: Cannot find Git repository
 
@@ -443,7 +440,7 @@ buildmark --validate --results validation-results.xml
 - Ensure the `.git` directory exists in the current or parent directories
 - Check file permissions on the Git repository
 
-### Version Tag Issues
+## Version Tag Issues
 
 **Problem**: Cannot find version tags
 
@@ -453,7 +450,7 @@ buildmark --validate --results validation-results.xml
 - Ensure tags follow a recognizable version format (e.g., `v1.2.3` or `1.2.3`)
 - Check if the specified build version exists as a tag
 
-### GitHub API Issues
+## GitHub API Issues
 
 **Problem**: GitHub API rate limit exceeded or authentication failures
 
@@ -464,7 +461,7 @@ buildmark --validate --results validation-results.xml
 - Wait for the rate limit to reset (typically one hour)
 - Use a GitHub token to increase rate limits from 60 to 5000 requests per hour
 
-### Report Generation Issues
+## Report Generation Issues
 
 **Problem**: Report file is not generated or is empty
 
@@ -475,7 +472,7 @@ buildmark --validate --results validation-results.xml
 - Ensure there's enough disk space
 - Check the log output for specific error messages
 
-### Validation Failures
+## Validation Failures
 
 **Problem**: Self-validation tests fail
 
@@ -485,7 +482,7 @@ buildmark --validate --results validation-results.xml
 - Check if there are any known issues in the GitHub repository
 - Report the issue with full validation output if problem persists
 
-### Exit Codes
+## Exit Codes
 
 BuildMark uses the following exit codes:
 
@@ -504,7 +501,7 @@ else
 fi
 ```
 
-## Additional Resources
+# Additional Resources
 
 - [GitHub Repository][github]
 - [Issue Tracker][issues]
