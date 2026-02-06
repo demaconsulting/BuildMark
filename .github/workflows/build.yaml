@@ -379,6 +379,22 @@ jobs:
           docs/buildnotes/buildnotes.html
           "docs/BuildMark Build Notes.pdf"
 
+      - name: Generate User Guide HTML with Pandoc
+        shell: bash
+        run: >
+          dotnet pandoc
+          --defaults docs/guide/definition.yaml
+          --metadata version="${{ inputs.version }}"
+          --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
+          --output docs/guide/guide.html
+
+      - name: Convert User Guide HTML to PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/guide/guide.html
+          "docs/BuildMark User Guide.pdf"
+
       - name: Generate Requirements HTML with Pandoc
         shell: bash
         run: >
