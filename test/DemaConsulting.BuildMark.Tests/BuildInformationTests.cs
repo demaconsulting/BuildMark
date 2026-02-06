@@ -423,18 +423,18 @@ public class BuildInformationTests
 
         // Assert - verify table separators use correct width format (10:1 ratio with centered Issue)
         // The separator should have centered Issue column (:-:) and wide left-aligned Title column (:----------)
-        
+
         // Verify the table separator appears in Changes section
         var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
         var bugsStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
         var changesSection = markdown.Substring(changesStart, bugsStart - changesStart);
         Assert.Contains("| :-: | :---------- |", changesSection);
-        
+
         // Verify the table separator appears in Bugs Fixed section
         var knownIssuesStart = markdown.IndexOf("## Known Issues", StringComparison.Ordinal);
         var bugsSection = markdown.Substring(bugsStart, knownIssuesStart - bugsStart);
         Assert.Contains("| :-: | :---------- |", bugsSection);
-        
+
         // Verify the table separator appears in Known Issues section
         var knownIssuesSection = markdown.Substring(knownIssuesStart);
         Assert.Contains("| :-: | :---------- |", knownIssuesSection);

@@ -155,8 +155,8 @@ internal static class Program
     /// <param name="context">The context containing command line arguments and program state.</param>
     private static void ProcessBuildNotes(Context context)
     {
-        // Create repository connector
-        var connector = RepoConnectorFactory.Create();
+        // Create repository connector using factory if provided, otherwise use default
+        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create();
 
         // Parse build version if provided
         DemaConsulting.BuildMark.Version? buildVersion = null;

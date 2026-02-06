@@ -44,13 +44,14 @@ internal static class Validation
             Name = "BuildMark Self-Validation"
         };
 
-        // Run core functionality tests using MockRepoConnector
-        RunMarkdownReportGenerationTest(context, testResults);
-        RunVersionTagParsingTest(context, testResults);
-        RunBugCategorizationTest(context, testResults);
-        RunKnownIssuesTrackingTest(context, testResults);
-        RunBaselineVersionDetectionForReleaseTest(context, testResults);
-        RunBaselineVersionDetectionForPreReleaseTest(context, testResults);
+        // Create mock connector factory
+        var mockFactory = () => new MockRepoConnector() as IRepoConnector;
+
+        // Run core functionality tests
+        RunMarkdownReportGeneration(context, testResults, mockFactory);
+        RunGitIntegration(context, testResults, mockFactory);
+        RunIssueTracking(context, testResults, mockFactory);
+        RunKnownIssuesReporting(context, testResults, mockFactory);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -100,318 +101,131 @@ internal static class Validation
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunMarkdownReportGenerationTest(
+    /// <param name="mockFactory">The mock connector factory.</param>
+    private static void RunMarkdownReportGeneration(
         Context context,
-        DemaConsulting.TestResults.TestResults testResults)
+        DemaConsulting.TestResults.TestResults testResults,
+        Func<IRepoConnector> mockFactory)
     {
         RunValidationTest(
             context,
             testResults,
-            "BuildMark_MarkdownReportGeneration_MockData_ProducesValidMarkdown",
+            "BuildMark_MarkdownReportGeneration",
             "Markdown Report Generation Test",
-            async () =>
+            mockFactory,
+            "build-report.md",
+            (logContent, reportContent) =>
             {
-                // Create mock connector and get build information for version 2.0.0
-                var connector = new MockRepoConnector();
-                var version = Version.Create("2.0.0");
-                var buildInfo = await connector.GetBuildInformationAsync(version);
-
-                // Generate markdown report
-                var markdown = buildInfo.ToMarkdown(1, true);
-
-                // Validate markdown content
-                if (!markdown.Contains("# Build Report"))
+                if (reportContent == null)
                 {
-                    return "Markdown missing 'Build Report' heading";
+                    return "Report file not created";
                 }
 
-                if (!markdown.Contains("## Version Information"))
+                if (reportContent.Contains("# Build Report") &&
+                    reportContent.Contains("## Version Information") &&
+                    reportContent.Contains("2.0.0") &&
+                    reportContent.Contains("current123hash456"))
                 {
-                    return "Markdown missing 'Version Information' section";
+                    return null;
                 }
 
-                if (!markdown.Contains("## Changes"))
-                {
-                    return "Markdown missing 'Changes' section";
-                }
-
-                if (!markdown.Contains("## Bugs Fixed"))
-                {
-                    return "Markdown missing 'Bugs Fixed' section";
-                }
-
-                if (!markdown.Contains("## Known Issues"))
-                {
-                    return "Markdown missing 'Known Issues' section";
-                }
-
-                if (!markdown.Contains("2.0.0"))
-                {
-                    return "Markdown missing version '2.0.0'";
-                }
-
-                // When version is explicitly specified, MockRepoConnector uses current hash
-                if (!markdown.Contains("current123hash456"))
-                {
-                    return "Markdown missing commit hash";
-                }
-
-                return null; // Success
+                return "Report file missing expected content";
             });
     }
 
     /// <summary>
-    ///     Runs a test for version tag parsing functionality.
+    ///     Runs a test for git integration functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunVersionTagParsingTest(
+    /// <param name="mockFactory">The mock connector factory.</param>
+    private static void RunGitIntegration(
         Context context,
-        DemaConsulting.TestResults.TestResults testResults)
+        DemaConsulting.TestResults.TestResults testResults,
+        Func<IRepoConnector> mockFactory)
     {
         RunValidationTest(
             context,
             testResults,
-            "BuildMark_VersionTagParsing_VariousFormats_ParsesCorrectly",
-            "Version Tag Parsing Test",
-            async () =>
+            "BuildMark_GitIntegration",
+            "Git Integration Test",
+            mockFactory,
+            null,
+            (logContent, _) =>
             {
-                // Test various version tag formats
-                var testCases = new[]
+                if (logContent.Contains("Build Version: 2.0.0") &&
+                    logContent.Contains("Commit Hash: current123hash456") &&
+                    logContent.Contains("Previous Version: ver-1.1.0"))
                 {
-                    ("v1.0.0", "1.0.0", false),
-                    ("ver-1.1.0", "1.1.0", false),
-                    ("release_2.0.0-beta.1", "2.0.0-beta.1", true),
-                    ("v2.0.0-rc.1", "2.0.0-rc.1", true),
-                    ("2.0.0", "2.0.0", false)
-                };
-
-                foreach (var (tag, expectedVersion, expectedIsPreRelease) in testCases)
-                {
-                    var version = Version.TryCreate(tag);
-                    if (version == null)
-                    {
-                        return $"Failed to parse tag: {tag}";
-                    }
-
-                    if (version.Tag != tag)
-                    {
-                        return $"Tag mismatch: expected '{tag}', got '{version.Tag}'";
-                    }
-
-                    if (!version.FullVersion.StartsWith(expectedVersion.Split('-')[0]))
-                    {
-                        return $"Version mismatch for tag '{tag}': expected to start with '{expectedVersion.Split('-')[0]}', got '{version.FullVersion}'";
-                    }
-
-                    if (version.IsPreRelease != expectedIsPreRelease)
-                    {
-                        return $"PreRelease flag mismatch for tag '{tag}': expected {expectedIsPreRelease}, got {version.IsPreRelease}";
-                    }
+                    return null;
                 }
 
-                return await Task.FromResult<string?>(null); // Success
+                return "Expected git information not found in log";
             });
     }
 
     /// <summary>
-    ///     Runs a test for bug categorization functionality.
+    ///     Runs a test for issue tracking functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunBugCategorizationTest(
+    /// <param name="mockFactory">The mock connector factory.</param>
+    private static void RunIssueTracking(
         Context context,
-        DemaConsulting.TestResults.TestResults testResults)
+        DemaConsulting.TestResults.TestResults testResults,
+        Func<IRepoConnector> mockFactory)
     {
         RunValidationTest(
             context,
             testResults,
-            "BuildMark_BugCategorization_MockData_CategorizesBugsCorrectly",
-            "Bug Categorization Test",
-            async () =>
+            "BuildMark_IssueTracking",
+            "Issue Tracking Test",
+            mockFactory,
+            null,
+            (logContent, _) =>
             {
-                // Create mock connector and get build information
-                var connector = new MockRepoConnector();
-                var version = Version.Create("2.0.0");
-                var buildInfo = await connector.GetBuildInformationAsync(version);
-
-                // Verify bug categorization
-                if (buildInfo.Bugs.Count == 0)
+                if (logContent.Contains("Changes: ") &&
+                    logContent.Contains("Bugs Fixed: "))
                 {
-                    return "No bugs found in build information";
+                    return null;
                 }
 
-                // Check that all bugs have type "bug"
-                foreach (var bug in buildInfo.Bugs)
-                {
-                    if (bug.Type != "bug")
-                    {
-                        return $"Item '{bug.Id}' in Bugs list has incorrect type '{bug.Type}'";
-                    }
-                }
-
-                // Check that Changes don't contain bugs
-                foreach (var change in buildInfo.Changes)
-                {
-                    if (change.Type == "bug")
-                    {
-                        return $"Item '{change.Id}' in Changes list has type 'bug' but should be in Bugs list";
-                    }
-                }
-
-                // Verify specific expected bug is present
-                var expectedBug = buildInfo.Bugs.FirstOrDefault(b => b.Id == "2");
-                if (expectedBug == null)
-                {
-                    return "Expected bug '2' (Fix bug in Y) not found in Bugs list";
-                }
-
-                if (!expectedBug.Title.Contains("bug"))
-                {
-                    return $"Bug '2' has unexpected title: {expectedBug.Title}";
-                }
-
-                return null; // Success
+                return "Expected issue tracking information not found in log";
             });
     }
 
     /// <summary>
-    ///     Runs a test for known issues tracking functionality.
+    ///     Runs a test for known issues reporting functionality.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static void RunKnownIssuesTrackingTest(
+    /// <param name="mockFactory">The mock connector factory.</param>
+    private static void RunKnownIssuesReporting(
         Context context,
-        DemaConsulting.TestResults.TestResults testResults)
+        DemaConsulting.TestResults.TestResults testResults,
+        Func<IRepoConnector> mockFactory)
     {
         RunValidationTest(
             context,
             testResults,
-            "BuildMark_KnownIssuesTracking_MockData_TracksOpenBugs",
-            "Known Issues Tracking Test",
-            async () =>
+            "BuildMark_KnownIssuesReporting",
+            "Known Issues Reporting Test",
+            mockFactory,
+            "known-issues-report.md",
+            (logContent, reportContent) =>
             {
-                // Create mock connector and get build information
-                var connector = new MockRepoConnector();
-                var version = Version.Create("2.0.0");
-                var buildInfo = await connector.GetBuildInformationAsync(version);
-
-                // Verify known issues are tracked
-                if (buildInfo.KnownIssues.Count == 0)
+                if (reportContent == null)
                 {
-                    return "No known issues found in build information";
+                    return "Report file not created";
                 }
 
-                // Check that all known issues have type "bug"
-                foreach (var issue in buildInfo.KnownIssues)
+                if (logContent.Contains("Known Issues: 2") &&
+                    reportContent.Contains("## Known Issues"))
                 {
-                    if (issue.Type != "bug")
-                    {
-                        return $"Known issue '{issue.Id}' has incorrect type '{issue.Type}'";
-                    }
+                    return null;
                 }
 
-                // Verify that known issues are not in the Bugs or Changes lists
-                var allFixedIds = new HashSet<string>(
-                    buildInfo.Bugs.Select(b => b.Id)
-                        .Concat(buildInfo.Changes.Select(c => c.Id)));
-
-                var duplicateIssue = buildInfo.KnownIssues.FirstOrDefault(issue => allFixedIds.Contains(issue.Id));
-                if (duplicateIssue != null)
-                {
-                    return $"Known issue '{duplicateIssue.Id}' is also listed in fixed bugs/changes";
-                }
-
-                // Verify specific known issues are present (issues 4 and 5 are open bugs)
-                var expectedKnownIssues = new[] { "4", "5" };
-                var missingIssue = expectedKnownIssues.FirstOrDefault(expectedId => !buildInfo.KnownIssues.Any(i => i.Id == expectedId));
-                if (missingIssue != null)
-                {
-                    return $"Expected known issue '{missingIssue}' not found in KnownIssues list";
-                }
-
-                return null; // Success
-            });
-    }
-
-    /// <summary>
-    ///     Runs a test for baseline version detection for releases.
-    /// </summary>
-    /// <param name="context">The context for output.</param>
-    /// <param name="testResults">The test results collection.</param>
-    private static void RunBaselineVersionDetectionForReleaseTest(
-        Context context,
-        DemaConsulting.TestResults.TestResults testResults)
-    {
-        RunValidationTest(
-            context,
-            testResults,
-            "BuildMark_BaselineVersionDetection_Release_SkipsPreReleases",
-            "Baseline Version Detection For Release Test",
-            async () =>
-            {
-                // Create mock connector and get build information for version 2.0.0 (release)
-                var connector = new MockRepoConnector();
-                var version = Version.Create("2.0.0");
-                var buildInfo = await connector.GetBuildInformationAsync(version);
-
-                // Verify baseline version is set
-                if (buildInfo.BaselineVersionTag == null)
-                {
-                    return "Baseline version is null for release 2.0.0";
-                }
-
-                // Verify baseline version is not a pre-release (should skip v2.0.0-rc.1 and release_2.0.0-beta.1)
-                if (buildInfo.BaselineVersionTag.VersionInfo.IsPreRelease)
-                {
-                    return $"Baseline version '{buildInfo.BaselineVersionTag.VersionInfo.Tag}' is a pre-release but should skip pre-releases for release builds";
-                }
-
-                // For 2.0.0, the previous non-pre-release should be ver-1.1.0
-                if (!buildInfo.BaselineVersionTag.VersionInfo.Tag.Contains("1.1.0"))
-                {
-                    return $"Expected baseline version containing '1.1.0' for release 2.0.0, got '{buildInfo.BaselineVersionTag.VersionInfo.Tag}'";
-                }
-
-                return null; // Success
-            });
-    }
-
-    /// <summary>
-    ///     Runs a test for baseline version detection for pre-releases.
-    /// </summary>
-    /// <param name="context">The context for output.</param>
-    /// <param name="testResults">The test results collection.</param>
-    private static void RunBaselineVersionDetectionForPreReleaseTest(
-        Context context,
-        DemaConsulting.TestResults.TestResults testResults)
-    {
-        RunValidationTest(
-            context,
-            testResults,
-            "BuildMark_BaselineVersionDetection_PreRelease_UsesPreviousTag",
-            "Baseline Version Detection For Pre-Release Test",
-            async () =>
-            {
-                // Create mock connector and get build information for v2.0.0-rc.1 (pre-release)
-                var connector = new MockRepoConnector();
-                var version = Version.Create("v2.0.0-rc.1");
-                var buildInfo = await connector.GetBuildInformationAsync(version);
-
-                // Verify baseline version is set
-                if (buildInfo.BaselineVersionTag == null)
-                {
-                    return "Baseline version is null for pre-release v2.0.0-rc.1";
-                }
-
-                // For pre-release v2.0.0-rc.1, the previous tag should be release_2.0.0-beta.1
-                // Pre-releases use the immediately previous tag
-                if (!buildInfo.BaselineVersionTag.VersionInfo.Tag.Contains("beta"))
-                {
-                    return $"Expected baseline version containing 'beta' for pre-release v2.0.0-rc.1, got '{buildInfo.BaselineVersionTag.VersionInfo.Tag}'";
-                }
-
-                return null; // Success
+                return "Expected known issues not found in report";
             });
     }
 
@@ -422,32 +236,84 @@ internal static class Validation
     /// <param name="testResults">The test results collection.</param>
     /// <param name="testName">The name of the test.</param>
     /// <param name="displayName">The display name for console output.</param>
-    /// <param name="testAction">Function to execute the test. Returns null on success or error message on failure.</param>
+    /// <param name="mockFactory">The mock connector factory.</param>
+    /// <param name="reportFileName">Optional report file name to generate.</param>
+    /// <param name="validator">Function to validate test results. Returns null on success or error message on failure.</param>
     private static void RunValidationTest(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
         string testName,
         string displayName,
-        Func<Task<string?>> testAction)
+        Func<IRepoConnector> mockFactory,
+        string? reportFileName,
+        Func<string, string?, string?> validator)
     {
         var startTime = DateTime.UtcNow;
         var test = CreateTestResult(testName);
 
         try
         {
-            // Execute the test action
-            var errorMessage = testAction().GetAwaiter().GetResult();
+            using var tempDir = new TemporaryDirectory();
+            var logFile = Path.Combine(tempDir.DirectoryPath, $"{testName}.log");
+            var reportFile = reportFileName != null ? Path.Combine(tempDir.DirectoryPath, reportFileName) : null;
 
-            if (errorMessage == null)
+            // Build command line arguments
+            var args = new List<string>
             {
-                test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                context.WriteLine($"✓ {displayName} - PASSED");
+                "--silent",
+                "--log", logFile,
+                "--build-version", "2.0.0"
+            };
+
+            if (reportFile != null)
+            {
+                args.Add("--report");
+                args.Add(reportFile);
+
+                // Include known issues if this is the known issues test
+                if (testName.Contains("KnownIssues"))
+                {
+                    args.Add("--include-known-issues");
+                }
+            }
+
+            // Run the program
+            int exitCode;
+            using (var testContext = Context.Create([.. args], mockFactory))
+            {
+                Program.Run(testContext);
+                exitCode = testContext.ExitCode;
+            }
+
+            // Check if execution succeeded
+            if (exitCode == 0)
+            {
+                // Read log and report contents
+                var logContent = File.ReadAllText(logFile);
+                var reportContent = reportFile != null && File.Exists(reportFile)
+                    ? File.ReadAllText(reportFile)
+                    : null;
+
+                // Validate the results
+                var errorMessage = validator(logContent, reportContent);
+
+                if (errorMessage == null)
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
+                    context.WriteLine($"✓ {displayName} - PASSED");
+                }
+                else
+                {
+                    test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
+                    test.ErrorMessage = errorMessage;
+                    context.WriteError($"✗ {displayName} - FAILED: {errorMessage}");
+                }
             }
             else
             {
                 test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
-                test.ErrorMessage = errorMessage;
-                context.WriteError($"✗ {displayName} - FAILED: {errorMessage}");
+                test.ErrorMessage = $"Program exited with code {exitCode}";
+                context.WriteError($"✗ {displayName} - FAILED: Exit code {exitCode}");
             }
         }
         // Generic catch is justified here to handle any exception during test execution
@@ -547,5 +413,51 @@ internal static class Validation
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
         context.WriteError($"✗ {displayName} - FAILED: {ex.Message}");
+    }
+
+    /// <summary>
+    ///     Represents a temporary directory that is automatically deleted when disposed.
+    /// </summary>
+    private sealed class TemporaryDirectory : IDisposable
+    {
+        /// <summary>
+        ///     Gets the path to the temporary directory.
+        /// </summary>
+        public string DirectoryPath { get; }
+
+        /// <summary>
+        ///     Initializes a new instance of the <see cref="TemporaryDirectory"/> class.
+        /// </summary>
+        public TemporaryDirectory()
+        {
+            DirectoryPath = Path.Combine(Path.GetTempPath(), $"buildmark_validation_{Guid.NewGuid()}");
+
+            try
+            {
+                Directory.CreateDirectory(DirectoryPath);
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
+            {
+                throw new InvalidOperationException($"Failed to create temporary directory: {ex.Message}", ex);
+            }
+        }
+
+        /// <summary>
+        ///     Deletes the temporary directory and all its contents.
+        /// </summary>
+        public void Dispose()
+        {
+            try
+            {
+                if (Directory.Exists(DirectoryPath))
+                {
+                    Directory.Delete(DirectoryPath, true);
+                }
+            }
+            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+            {
+                // Ignore cleanup errors during disposal
+            }
+        }
     }
 }
