@@ -99,8 +99,8 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Build version tags from version and hash info
         var currentTag = new VersionTag(toVersion, toHash);
-        var baselineTag = fromVersion != null && fromHash != null 
-            ? new VersionTag(fromVersion, fromHash) 
+        var baselineTag = fromVersion != null && fromHash != null
+            ? new VersionTag(fromVersion, fromHash)
             : null;
 
         // Generate full changelog link for GitHub

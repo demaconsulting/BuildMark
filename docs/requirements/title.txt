@@ -1,0 +1,17 @@
+---
+title: BuildMark Requirements
+subtitle: Requirements Specification for the BuildMark Tool
+author: DEMA Consulting
+description: Requirements Specification for the BuildMark Tool
+lang: en-US
+keywords:
+  - BuildMark
+  - Requirements
+  - Specification
+  - .NET
+  - YAML
+  - Command-Line Tool
+  - Git
+  - GitHub
+  - Markdown
+---

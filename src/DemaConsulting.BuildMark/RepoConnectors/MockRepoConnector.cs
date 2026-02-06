@@ -111,8 +111,8 @@ public class MockRepoConnector : RepoConnectorBase
 
         // Build version tags from version and hash info
         var currentTag = new VersionTag(toTagInfo, toHash.Trim());
-        var baselineTag = fromTagInfo != null && fromHash != null 
-            ? new VersionTag(fromTagInfo, fromHash.Trim()) 
+        var baselineTag = fromTagInfo != null && fromHash != null
+            ? new VersionTag(fromTagInfo, fromHash.Trim())
             : null;
 
         // Generate mock changelog link

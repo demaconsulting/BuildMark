@@ -86,6 +86,11 @@ internal sealed class Context : IDisposable
     public int ExitCode => _hasErrors ? 1 : 0;
 
     /// <summary>
+    ///     Gets the repository connector factory for creating connectors.
+    /// </summary>
+    public Func<RepoConnectors.IRepoConnector>? ConnectorFactory { get; private init; }
+
+    /// <summary>
     ///     Private constructor - use Create factory method instead.
     /// </summary>
     private Context()
@@ -100,6 +105,18 @@ internal sealed class Context : IDisposable
     /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
     public static Context Create(string[] args)
     {
+        return Create(args, null);
+    }
+
+    /// <summary>
+    ///     Creates a Context instance from command-line arguments with optional connector factory.
+    /// </summary>
+    /// <param name="args">Command-line arguments.</param>
+    /// <param name="connectorFactory">Optional repository connector factory for testing.</param>
+    /// <returns>A new Context instance.</returns>
+    /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
+    public static Context Create(string[] args, Func<RepoConnectors.IRepoConnector>? connectorFactory)
+    {
         var parser = new ArgumentParser();
         parser.ParseArguments(args);
 
@@ -113,7 +130,8 @@ internal sealed class Context : IDisposable
             ReportFile = parser.ReportFile,
             ReportDepth = parser.ReportDepth,
             IncludeKnownIssues = parser.IncludeKnownIssues,
-            ResultsFile = parser.ResultsFile
+            ResultsFile = parser.ResultsFile,
+            ConnectorFactory = connectorFactory
         };
 
         // Open log file if specified

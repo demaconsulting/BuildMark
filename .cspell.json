@@ -25,6 +25,7 @@
     "opencover",
     "reqstream",
     "snupkg",
+    "tracematrix",
     "trx",
     "yamllint"
   ],

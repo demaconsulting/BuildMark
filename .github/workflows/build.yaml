@@ -234,6 +234,21 @@ jobs:
           buildmark --help || { echo "✗ Help command failed"; exit 1; }
           echo "✓ Help command succeeded"
 
+      - name: Run BuildMark self-validation
+        shell: bash
+        run: |
+          echo "Running BuildMark self-validation..."
+          buildmark --validate --results validation-${{ matrix.os }}-dotnet${{ matrix.dotnet-version }}.trx \
+            || { echo "✗ Self-validation failed"; exit 1; }
+          echo "✓ Self-validation succeeded"
+
+      - name: Upload validation test results
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: validation-test-results-${{ matrix.os }}-dotnet${{ matrix.dotnet-version }}
+          path: validation-${{ matrix.os }}-dotnet${{ matrix.dotnet-version }}.trx
+
   build-docs:
     name: Build Documents
     runs-on: windows-latest
@@ -278,18 +293,27 @@ jobs:
       - name: Install npm dependencies
         run: npm install
 
-      - name: Download All Test Results
+      - name: Download all test results
         uses: actions/download-artifact@v7
         with:
-          pattern: test-results-*
           path: test-results
-          merge-multiple: true
+          pattern: '*test-results*'
+        continue-on-error: true
 
       - name: Download CodeQL SARIF
         uses: actions/download-artifact@v7
         with:
           name: codeql-sarif
           path: codeql-results
+
+      - name: Generate Requirements Report and Trace Matrix
+        run: >
+          dotnet reqstream
+          --requirements requirements.yaml
+          --tests "test-results/**/*.trx"
+          --report docs/requirements/requirements.md
+          --matrix docs/tracematrix/tracematrix.md
+          --enforce
 
       - name: Generate CodeQL Quality Report with SarifMark
         run: >
@@ -354,6 +378,38 @@ jobs:
           dotnet weasyprint
           docs/buildnotes/buildnotes.html
           "docs/BuildMark Build Notes.pdf"
+
+      - name: Generate Requirements HTML with Pandoc
+        shell: bash
+        run: >
+          dotnet pandoc
+          --defaults docs/requirements/definition.yaml
+          --metadata version="${{ inputs.version }}"
+          --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
+          --output docs/requirements/requirements.html
+
+      - name: Generate Requirements PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/requirements/requirements.html
+          "docs/BuildMark Requirements.pdf"
+
+      - name: Generate Trace Matrix HTML with Pandoc
+        shell: bash
+        run: >
+          dotnet pandoc
+          --defaults docs/tracematrix/definition.yaml
+          --metadata version="${{ inputs.version }}"
+          --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
+          --output docs/tracematrix/tracematrix.html
+
+      - name: Generate Trace Matrix PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/tracematrix/tracematrix.html
+          "docs/BuildMark Trace Matrix.pdf"
 
       - name: Generate Code Quality HTML with Pandoc
         shell: bash
