@@ -71,6 +71,11 @@ internal sealed class Context : IDisposable
     public int ReportDepth { get; private init; } = 1;
 
     /// <summary>
+    ///     Gets a value indicating whether to include known issues in the report.
+    /// </summary>
+    public bool IncludeKnownIssues { get; private init; }
+
+    /// <summary>
     ///     Gets the validation results file path.
     /// </summary>
     public string? ResultsFile { get; private init; }
@@ -107,6 +112,7 @@ internal sealed class Context : IDisposable
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
             ReportDepth = parser.ReportDepth,
+            IncludeKnownIssues = parser.IncludeKnownIssues,
             ResultsFile = parser.ResultsFile
         };
 
@@ -179,6 +185,11 @@ internal sealed class Context : IDisposable
         public int ReportDepth { get; private set; } = 1;
 
         /// <summary>
+        ///     Gets a value indicating whether to include known issues in the report.
+        /// </summary>
+        public bool IncludeKnownIssues { get; private set; }
+
+        /// <summary>
         ///     Gets the log file path.
         /// </summary>
         public string? LogFile { get; private set; }
@@ -243,6 +254,10 @@ internal sealed class Context : IDisposable
                 case "--report-depth":
                     ReportDepth = GetRequiredIntArgument(arg, args, index);
                     return index + 1;
+
+                case "--include-known-issues":
+                    IncludeKnownIssues = true;
+                    return index;
 
                 case "--build-version":
                     BuildVersion = GetRequiredStringArgument(arg, args, index, "a version argument");

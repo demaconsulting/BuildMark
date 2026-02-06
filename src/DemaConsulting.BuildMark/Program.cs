@@ -146,6 +146,7 @@ internal static class Program
         context.WriteLine("  --build-version <version>    Specify the build version");
         context.WriteLine("  --report <file>              Specify the report file name");
         context.WriteLine("  --report-depth <depth>       Specify the report markdown depth (default: 1)");
+        context.WriteLine("  --include-known-issues       Include known issues in the report");
     }
 
     /// <summary>
@@ -203,7 +204,7 @@ internal static class Program
             context.WriteLine($"Writing build report to {context.ReportFile}...");
             try
             {
-                var markdown = buildInfo.ToMarkdown(context.ReportDepth);
+                var markdown = buildInfo.ToMarkdown(context.ReportDepth, context.IncludeKnownIssues);
                 File.WriteAllText(context.ReportFile, markdown);
                 context.WriteLine("Build report generated successfully.");
             }
