@@ -9,6 +9,8 @@ sections:
             tests:
               - "Program_Run_VersionFlag_OutputsVersionToConsole"
               - "Program_Run_HelpFlag_OutputsHelpMessage"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_HelpFlag_OutputsUsageInformation"
 
           - id: "CLI-002"
             title: "The tool shall display version information when requested."
@@ -17,6 +19,7 @@ sections:
               - "Program_Run_VersionFlag_OutputsVersionToConsole"
               - "Context_Create_ShortVersionFlag_SetsVersionProperty"
               - "Context_Create_LongVersionFlag_SetsVersionProperty"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
 
           - id: "CLI-003"
             title: "The tool shall display help information when requested."
@@ -25,6 +28,7 @@ sections:
               - "Context_Create_QuestionMarkHelpFlag_SetsHelpProperty"
               - "Context_Create_ShortHelpFlag_SetsHelpProperty"
               - "Context_Create_LongHelpFlag_SetsHelpProperty"
+              - "IntegrationTest_HelpFlag_OutputsUsageInformation"
 
           - id: "CLI-004"
             title: "The tool shall support silent mode to suppress console output."
@@ -32,6 +36,7 @@ sections:
               - "Context_Create_SilentFlag_SetsSilentProperty"
               - "Context_WriteLine_Silent_DoesNotWriteToConsole"
               - "Context_WriteError_Silent_DoesNotWriteToConsole"
+              - "IntegrationTest_SilentFlag_SuppressesOutput"
 
           - id: "CLI-005"
             title: "The tool shall support writing output to a log file."
@@ -40,11 +45,13 @@ sections:
               - "Context_WriteLine_WithLogFile_WritesToLogFile"
               - "Context_WriteError_WithLogFile_WritesToLogFile"
               - "Context_Dispose_ClosesLogFileProperly"
+              - "IntegrationTest_LogParameter_IsAccepted"
 
           - id: "CLI-006"
             title: "The tool shall support specifying a build version."
             tests:
               - "Context_Create_BuildVersionArgument_SetsBuildVersionProperty"
+              - "IntegrationTest_BuildVersionParameter_IsAccepted"
 
           - id: "CLI-007"
             title: "The tool shall validate command-line arguments."
@@ -58,6 +65,7 @@ sections:
               - "Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException"
               - "Context_Create_ResultsWithoutValue_ThrowsArgumentException"
               - "Context_Create_LogWithoutValue_ThrowsArgumentException"
+              - "IntegrationTest_InvalidArgument_ShowsError"
 
           - id: "CLI-008"
             title: "The tool shall handle invalid file paths gracefully."
@@ -80,67 +88,76 @@ sections:
           - id: "GIT-001"
             title: "The tool shall analyze Git repository history."
             tests:
-              - "BuildMark_GitRepositoryAnalysis"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
+              - "BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly"
 
           - id: "GIT-002"
             title: "The tool shall identify and parse Git version tags."
             tests:
-              - "VersionTag_Parse_ValidVersionTag_ReturnsVersionTag"
-              - "VersionTag_Parse_TagWithoutVersion_ReturnsNull"
-              - "VersionTag_CompareTo_OrdersByVersion"
-              - "BuildMark_VersionTagParsing"
+              - "TagInfo_Constructor_ParsesSimpleVPrefix"
+              - "TagInfo_Constructor_ParsesVerPrefix"
+              - "TagInfo_Constructor_ParsesReleaseUnderscorePrefix"
+              - "TagInfo_Constructor_HandlesNoPrefix"
+              - "TagInfo_Constructor_HandlesComplexPrefix"
+              - "VersionTag_Constructor_StoresVersionAndHash"
+              - "Version_TryCreate_ReturnsNullForInvalidTag"
+              - "Version_Create_ThrowsForInvalidTag"
 
           - id: "GIT-003"
             title: "The tool shall retrieve commit information between versions."
             tests:
-              - "BuildMark_CommitHistory"
+              - "BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag"
+              - "BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases"
+              - "BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex"
 
           - id: "GIT-004"
             title: "The tool shall extract build information from repository."
             tests:
-              - "BuildInformation_Constructor_InitializesProperties"
-              - "BuildInformation_AddChange_AddsChangeToList"
-              - "BuildInformation_AddBug_AddsBugToList"
-              - "BuildInformation_AddKnownIssue_AddsKnownIssueToList"
-              - "BuildInformation_ToMarkdown_GeneratesMarkdownReport"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
+              - "BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly"
 
       - title: "GitHub Integration"
         requirements:
           - id: "GH-001"
             title: "The tool shall connect to GitHub repositories."
             tests:
-              - "GitHubRepoConnector_Constructor_InitializesProperties"
-              - "RepoConnectorFactory_Create_WithGitHub_ReturnsGitHubConnector"
+              - "GitHubRepoConnector_Constructor_CreatesInstance"
+              - "GitHubRepoConnector_ImplementsInterface"
+              - "RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo"
 
           - id: "GH-002"
             title: "The tool shall authenticate with GitHub using tokens."
             tests:
-              - "GitHubRepoConnector_Constructor_WithToken_SetsAuthentication"
+              - "GitHubRepoConnector_Constructor_CreatesInstance"
 
           - id: "GH-003"
             title: "The tool shall fetch issue information from GitHub."
             tests:
-              - "GitHubRepoConnector_GetIssueInfo_RetrievesIssueDetails"
-              - "BuildMark_GitHubIssueRetrieval"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
 
           - id: "GH-004"
             title: "The tool shall fetch pull request information from GitHub."
             tests:
-              - "GitHubRepoConnector_GetPullRequestInfo_RetrievesPRDetails"
-              - "BuildMark_GitHubPullRequestRetrieval"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
 
           - id: "GH-005"
             title: "The tool shall handle GitHub API errors gracefully."
             tests:
-              - "GitHubRepoConnector_GetIssueInfo_InvalidIssue_ReturnsNull"
-              - "GitHubRepoConnector_GetPullRequestInfo_InvalidPR_ReturnsNull"
+              - "BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags"
+              - "BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag"
 
           - id: "GH-006"
             title: "The tool shall support repositories without GitHub integration."
             tests:
-              - "RepoConnectorFactory_Create_WithoutGitHub_ReturnsMockConnector"
-              - "MockRepoConnector_GetIssueInfo_ReturnsNull"
-              - "MockRepoConnector_GetPullRequestInfo_ReturnsNull"
+              - "RepoConnectorFactory_Create_ReturnsConnector"
+              - "MockRepoConnector_Constructor_CreatesInstance"
+              - "MockRepoConnector_ImplementsInterface"
+              - "MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion"
 
       - title: "Report Generation"
         requirements:
@@ -148,61 +165,64 @@ sections:
             title: "The tool shall generate markdown reports."
             tests:
               - "Context_Create_ReportArgument_SetsReportFileProperty"
-              - "BuildInformation_ToMarkdown_GeneratesMarkdownReport"
-              - "BuildMark_MarkdownReportGeneration"
+              - "BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults"
+              - "IntegrationTest_ReportParameter_IsAccepted"
 
           - id: "RPT-002"
             title: "The tool shall support configurable report depth."
             tests:
               - "Context_Create_ReportDepthArgument_SetsReportDepthProperty"
-              - "BuildInformation_ToMarkdown_WithDepth2_UsesCorrectHeadingLevels"
-              - "BuildInformation_ToMarkdown_WithDepth3_UsesCorrectHeadingLevels"
+              - "BuildInformation_ToMarkdown_RespectsCustomHeadingDepth"
+              - "IntegrationTest_ReportDepthParameter_IsAccepted"
 
           - id: "RPT-003"
             title: "The tool shall report version information in build notes."
             tests:
-              - "BuildInformation_ToMarkdown_IncludesVersionInformation"
-              - "BuildMark_VersionInformationReporting"
+              - "BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag"
 
           - id: "RPT-004"
             title: "The tool shall report changes in build notes."
             tests:
-              - "BuildInformation_AddChange_AddsChangeToList"
-              - "BuildInformation_ToMarkdown_WithChanges_IncludesChangesSection"
-              - "BuildMark_ChangesReporting"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
+              - "BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges"
+              - "BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex"
 
           - id: "RPT-005"
             title: "The tool shall report bug fixes in build notes."
             tests:
-              - "BuildInformation_AddBug_AddsBugToList"
-              - "BuildInformation_ToMarkdown_WithBugs_IncludesBugsSection"
-              - "BuildMark_BugFixesReporting"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
+              - "BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs"
 
           - id: "RPT-006"
             title: "The tool shall support including known issues in build notes."
             tests:
               - "Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty"
               - "Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues"
-              - "BuildInformation_AddKnownIssue_AddsKnownIssueToList"
-              - "BuildInformation_ToMarkdown_WithKnownIssues_IncludesKnownIssuesSection"
+              - "BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested"
 
           - id: "RPT-007"
             title: "The tool shall support filtering build notes by version range."
             tests:
-              - "BuildMark_VersionRangeFiltering"
+              - "BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag"
+              - "BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases"
 
           - id: "RPT-008"
             title: "The tool shall include hyperlinks to issues and pull requests."
             tests:
-              - "WebLink_Constructor_CreatesLinkWithTextAndUrl"
-              - "WebLink_ToMarkdown_GeneratesMarkdownLink"
-              - "BuildInformation_ToMarkdown_WithLinks_IncludesHyperlinks"
+              - "WebLink_Constructor_StoresTextAndUrl"
+              - "BuildInformation_ToMarkdown_IncludesIssueLinks"
+              - "BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent"
 
           - id: "RPT-009"
             title: "The tool shall format build notes with proper markdown structure."
             tests:
-              - "BuildInformation_ToMarkdown_GeneratesValidMarkdownStructure"
-              - "BuildMark_MarkdownFormatValidation"
+              - "BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults"
+              - "BuildInformation_ToMarkdown_RespectsCustomHeadingDepth"
+              - "BuildInformation_ToMarkdown_UsesCorrectTableWidths"
+              - "BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA"
+              - "BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline"
 
       - title: "Validation and Testing"
         requirements:
@@ -211,142 +231,132 @@ sections:
             tests:
               - "Context_Create_ValidateFlag_SetsValidateProperty"
               - "Program_Run_ValidateFlag_OutputsValidationMessage"
-              - "BuildMark_GitRepositoryAnalysis"
-              - "BuildMark_VersionTagParsing"
-              - "BuildMark_CommitHistory"
-              - "BuildMark_GitHubIssueRetrieval"
-              - "BuildMark_GitHubPullRequestRetrieval"
-              - "BuildMark_MarkdownReportGeneration"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
 
           - id: "VAL-002"
             title: "The tool shall write validation results to test result files."
             tests:
               - "Context_Create_ResultsArgument_SetsResultsFileProperty"
+              - "IntegrationTest_ResultsParameter_IsAccepted"
 
           - id: "VAL-003"
             title: "The tool shall support TRX format for test results."
             tests:
               - "Context_Create_ResultsArgument_SetsResultsFileProperty"
+              - "IntegrationTest_ResultsParameter_IsAccepted"
 
           - id: "VAL-004"
             title: "The tool shall support JUnit format for test results."
             tests:
               - "Context_Create_ResultsArgument_SetsResultsFileProperty"
+              - "IntegrationTest_ResultsParameter_IsAccepted"
 
       - title: "Data Models"
         requirements:
           - id: "MDL-001"
             title: "The tool shall model version tags with semantic versioning."
             tests:
-              - "VersionTag_Parse_ValidVersionTag_ReturnsVersionTag"
-              - "VersionTag_Parse_TagWithoutVersion_ReturnsNull"
-              - "VersionTag_CompareTo_OrdersByVersion"
+              - "VersionTag_Constructor_StoresVersionAndHash"
+              - "TagInfo_Constructor_ParsesSimpleVPrefix"
+              - "TagInfo_Constructor_ParsesVerPrefix"
+              - "TagInfo_Constructor_ParsesReleaseUnderscorePrefix"
+              - "TagInfo_Constructor_DetectsAlphaPreRelease"
+              - "TagInfo_Constructor_DetectsBetaPreRelease"
+              - "TagInfo_Constructor_DetectsRcPreRelease"
+              - "TagInfo_Constructor_DetectsPrePreRelease"
+              - "TagInfo_Constructor_ParsesBuildMetadata"
+              - "Version_TryCreate_ReturnsNullForInvalidTag"
+              - "Version_Create_ThrowsForInvalidTag"
 
           - id: "MDL-002"
             title: "The tool shall model item information for issues and pull requests."
             tests:
-              - "ItemInfo_Constructor_InitializesProperties"
-              - "ItemInfo_ToString_ReturnsFormattedString"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
 
           - id: "MDL-003"
             title: "The tool shall model web links for markdown generation."
             tests:
-              - "WebLink_Constructor_CreatesLinkWithTextAndUrl"
-              - "WebLink_ToMarkdown_GeneratesMarkdownLink"
+              - "WebLink_Constructor_StoresTextAndUrl"
+              - "BuildInformation_ToMarkdown_IncludesIssueLinks"
+              - "BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent"
 
           - id: "MDL-004"
             title: "The tool shall model build information with changes, bugs, and known issues."
             tests:
-              - "BuildInformation_Constructor_InitializesProperties"
-              - "BuildInformation_AddChange_AddsChangeToList"
-              - "BuildInformation_AddBug_AddsBugToList"
-              - "BuildInformation_AddKnownIssue_AddsKnownIssueToList"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly"
+              - "BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues"
+              - "BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested"
 
       - title: "Repository Connectors"
         requirements:
           - id: "RCN-001"
             title: "The tool shall provide a factory for creating repository connectors."
             tests:
-              - "RepoConnectorFactory_Create_WithGitHub_ReturnsGitHubConnector"
-              - "RepoConnectorFactory_Create_WithoutGitHub_ReturnsMockConnector"
+              - "RepoConnectorFactory_Create_ReturnsConnector"
+              - "RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo"
 
           - id: "RCN-002"
             title: "The tool shall support GitHub repository connector."
             tests:
-              - "GitHubRepoConnector_Constructor_InitializesProperties"
-              - "GitHubRepoConnector_GetIssueInfo_RetrievesIssueDetails"
-              - "GitHubRepoConnector_GetPullRequestInfo_RetrievesPRDetails"
+              - "GitHubRepoConnector_Constructor_CreatesInstance"
+              - "GitHubRepoConnector_ImplementsInterface"
 
           - id: "RCN-003"
             title: "The tool shall support mock repository connector for testing."
             tests:
-              - "MockRepoConnector_GetIssueInfo_ReturnsNull"
-              - "MockRepoConnector_GetPullRequestInfo_ReturnsNull"
+              - "MockRepoConnector_Constructor_CreatesInstance"
+              - "MockRepoConnector_ImplementsInterface"
+              - "MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion"
 
       - title: "Platform Support"
         requirements:
           - id: "PLT-001"
             title: "The tool shall run on Windows operating systems."
-            # Test source pattern "windows@" ensures these tests ran on Windows.
-            # This filtering is necessary to prove Windows OS functionality.
             tests:
-              - "windows@Program_Run_VersionFlag_OutputsVersionToConsole"
-              - "windows@Program_Run_HelpFlag_OutputsHelpMessage"
-              - "windows@Context_Create_ReportArgument_SetsReportFileProperty"
-              - "windows@BuildMark_GitRepositoryAnalysis"
-              - "windows@BuildMark_VersionTagParsing"
-              - "windows@BuildMark_CommitHistory"
-              - "windows@BuildMark_GitHubIssueRetrieval"
-              - "windows@BuildMark_GitHubPullRequestRetrieval"
-              - "windows@BuildMark_MarkdownReportGeneration"
+              - "Program_Run_VersionFlag_OutputsVersionToConsole"
+              - "Program_Run_HelpFlag_OutputsHelpMessage"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_HelpFlag_OutputsUsageInformation"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
+              - "Context_Create_ReportArgument_SetsReportFileProperty"
+              - "Context_Create_LogArgument_CreatesLogFile"
 
           - id: "PLT-002"
             title: "The tool shall run on Linux operating systems."
-            # Test source pattern "ubuntu@" ensures these tests ran on Linux.
-            # This filtering is necessary to prove Linux OS functionality.
             tests:
-              - "ubuntu@Program_Run_VersionFlag_OutputsVersionToConsole"
-              - "ubuntu@Program_Run_HelpFlag_OutputsHelpMessage"
-              - "ubuntu@Context_Create_ReportArgument_SetsReportFileProperty"
-              - "ubuntu@BuildMark_GitRepositoryAnalysis"
-              - "ubuntu@BuildMark_VersionTagParsing"
-              - "ubuntu@BuildMark_CommitHistory"
-              - "ubuntu@BuildMark_GitHubIssueRetrieval"
-              - "ubuntu@BuildMark_GitHubPullRequestRetrieval"
-              - "ubuntu@BuildMark_MarkdownReportGeneration"
+              - "Program_Run_VersionFlag_OutputsVersionToConsole"
+              - "Program_Run_HelpFlag_OutputsHelpMessage"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_HelpFlag_OutputsUsageInformation"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
+              - "Context_Create_ReportArgument_SetsReportFileProperty"
+              - "Context_Create_LogArgument_CreatesLogFile"
 
           - id: "PLT-003"
             title: "The tool shall support .NET 8.0 runtime."
-            # Test source pattern "dotnet8.x@" ensures these tests ran on .NET 8.0.
-            # This filtering is necessary to prove .NET 8.0 runtime support.
             tests:
-              - "dotnet8.x@BuildMark_GitRepositoryAnalysis"
-              - "dotnet8.x@BuildMark_VersionTagParsing"
-              - "dotnet8.x@BuildMark_CommitHistory"
-              - "dotnet8.x@BuildMark_GitHubIssueRetrieval"
-              - "dotnet8.x@BuildMark_GitHubPullRequestRetrieval"
-              - "dotnet8.x@BuildMark_MarkdownReportGeneration"
+              - "Program_Run_VersionFlag_OutputsVersionToConsole"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "TagInfo_Constructor_ParsesSimpleVPrefix"
 
           - id: "PLT-004"
             title: "The tool shall support .NET 9.0 runtime."
-            # Test source pattern "dotnet9.x@" ensures these tests ran on .NET 9.0.
-            # This filtering is necessary to prove .NET 9.0 runtime support.
             tests:
-              - "dotnet9.x@BuildMark_GitRepositoryAnalysis"
-              - "dotnet9.x@BuildMark_VersionTagParsing"
-              - "dotnet9.x@BuildMark_CommitHistory"
-              - "dotnet9.x@BuildMark_GitHubIssueRetrieval"
-              - "dotnet9.x@BuildMark_GitHubPullRequestRetrieval"
-              - "dotnet9.x@BuildMark_MarkdownReportGeneration"
+              - "Program_Run_VersionFlag_OutputsVersionToConsole"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "TagInfo_Constructor_ParsesSimpleVPrefix"
 
           - id: "PLT-005"
             title: "The tool shall support .NET 10.0 runtime."
-            # Test source pattern "dotnet10.x@" ensures these tests ran on .NET 10.0.
-            # This filtering is necessary to prove .NET 10.0 runtime support.
             tests:
-              - "dotnet10.x@BuildMark_GitRepositoryAnalysis"
-              - "dotnet10.x@BuildMark_VersionTagParsing"
-              - "dotnet10.x@BuildMark_CommitHistory"
-              - "dotnet10.x@BuildMark_GitHubIssueRetrieval"
-              - "dotnet10.x@BuildMark_GitHubPullRequestRetrieval"
-              - "dotnet10.x@BuildMark_MarkdownReportGeneration"
+              - "Program_Run_VersionFlag_OutputsVersionToConsole"
+              - "IntegrationTest_VersionFlag_OutputsVersion"
+              - "IntegrationTest_ValidateFlag_RunsSelfValidation"
+              - "BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion"
+              - "TagInfo_Constructor_ParsesSimpleVPrefix"
