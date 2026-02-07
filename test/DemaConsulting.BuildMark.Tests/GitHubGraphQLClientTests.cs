@@ -278,11 +278,16 @@ public class GitHubGraphQLClientTests
             HttpRequestMessage request,
             CancellationToken cancellationToken)
         {
-            // Note: HttpResponseMessage will be disposed by the caller (HttpClient)
-            return Task.FromResult(new HttpResponseMessage(_statusCode)
+            // Create response with content
+            // Note: The returned HttpResponseMessage will be disposed by HttpClient,
+            // which also disposes the Content. This is the expected pattern for HttpMessageHandler.
+            var content = new StringContent(_responseContent, Encoding.UTF8, "application/json");
+            var response = new HttpResponseMessage(_statusCode)
             {
-                Content = new StringContent(_responseContent, Encoding.UTF8, "application/json")
-            });
+                Content = content
+            };
+
+            return Task.FromResult(response);
         }
     }
 }
