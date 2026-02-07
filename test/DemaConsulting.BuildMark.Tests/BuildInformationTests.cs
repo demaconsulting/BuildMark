@@ -19,6 +19,8 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors;
+using NSubstitute;
+using NSubstitute.ExceptionExtensions;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -34,8 +36,12 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags()
     {
-        // Create connector with no tags
-        var connector = new MockRepoConnectorEmpty();
+        // Create mock connector that throws for no tags
+        var connector = Substitute.For<IRepoConnector>();
+        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+            .Throws(new InvalidOperationException(
+                "No tags found in repository and no version specified. " +
+                "Please provide a version parameter."));
 
         // Verify exception is thrown when no version and no tags
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
@@ -51,10 +57,14 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag()
     {
-        // Arrange
-        var connector = new MockRepoConnectorMismatch();
+        // Create mock connector that throws for commit mismatch
+        var connector = Substitute.For<IRepoConnector>();
+        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+            .Throws(new InvalidOperationException(
+                "Target version not specified and current commit does not match any tag. " +
+                "Please provide a version parameter."));
 
-        // Act & Assert
+        // Verify exception is thrown
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
             async () => await connector.GetBuildInformationAsync());
 
@@ -85,8 +95,16 @@ public class BuildInformationTests
     [TestMethod]
     public async Task BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag()
     {
-        // Arrange
-        var connector = new MockRepoConnectorMatchingTag();
+        // Create mock connector that returns data for matching tag
+        var connector = Substitute.For<IRepoConnector>();
+        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+            .Returns(Task.FromResult(new BuildInformation(
+                new VersionTag(Version.Create("ver-1.1.0"), "def456ghi789"),
+                new VersionTag(Version.Create("v2.0.0"), "mno345pqr678"),
+                [],
+                [],
+                [],
+                null)));
 
         // Act
         var buildInfo = await connector.GetBuildInformationAsync();
@@ -474,52 +492,5 @@ public class BuildInformationTests
         // Assert
         Assert.AreEqual(text, webLink.LinkText);
         Assert.AreEqual(url, webLink.TargetUrl);
-    }
-
-    /// <summary>
-    ///     Mock connector with no tags.
-    /// </summary>
-    private class MockRepoConnectorEmpty : IRepoConnector
-    {
-        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
-        {
-            // No tags, will throw
-            throw new InvalidOperationException(
-                "No tags found in repository and no version specified. " +
-                "Please provide a version parameter.");
-        }
-    }
-
-    /// <summary>
-    ///     Mock connector where current commit doesn't match latest tag.
-    /// </summary>
-    private class MockRepoConnectorMismatch : IRepoConnector
-    {
-        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
-        {
-            // Current commit doesn't match tag, will throw
-            throw new InvalidOperationException(
-                "Target version not specified and current commit does not match any tag. " +
-                "Please provide a version parameter.");
-        }
-    }
-
-    /// <summary>
-    ///     Mock connector where current commit matches latest tag.
-    /// </summary>
-    private class MockRepoConnectorMatchingTag : IRepoConnector
-    {
-        public Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
-        {
-            // Simple test implementation that returns a BuildInformation
-            var toVersion = version ?? Version.Create("v2.0.0");
-            return Task.FromResult(new BuildInformation(
-                new VersionTag(Version.Create("ver-1.1.0"), "def456ghi789"),
-                new VersionTag(toVersion, "mno345pqr678"),
-                [],
-                [],
-                [],
-                null));
-        }
     }
 }
