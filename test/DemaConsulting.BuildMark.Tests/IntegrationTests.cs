@@ -259,9 +259,6 @@ public class IntegrationTests
     [TestMethod]
     public void BuildMark_MarkdownReportGeneration()
     {
-        // Skip if GitHub token not available
-        SkipIfNoGitHubToken();
-
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
         try
@@ -303,9 +300,6 @@ public class IntegrationTests
     [TestMethod]
     public void BuildMark_GitIntegration()
     {
-        // Skip if GitHub token not available
-        SkipIfNoGitHubToken();
-
         // Run BuildMark to test Git integration
         var exitCode = Runner.Run(
             out var output,
@@ -324,9 +318,6 @@ public class IntegrationTests
     [TestMethod]
     public void BuildMark_IssueTracking()
     {
-        // Skip if GitHub token not available
-        SkipIfNoGitHubToken();
-
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
         try
@@ -361,9 +352,6 @@ public class IntegrationTests
     [TestMethod]
     public void BuildMark_KnownIssuesReporting()
     {
-        // Skip if GitHub token not available
-        SkipIfNoGitHubToken();
-
         // Create temporary report file
         var reportFile = Path.GetTempFileName();
         try
@@ -397,24 +385,4 @@ public class IntegrationTests
         }
     }
 
-    /// <summary>
-    ///     Skips the test if GitHub token is not available.
-    /// </summary>
-    private static void SkipIfNoGitHubToken()
-    {
-        if (!HasGitHubToken())
-        {
-            Assert.Inconclusive("GitHub token not available - test requires GH_TOKEN or GITHUB_TOKEN environment variable");
-        }
-    }
-
-    /// <summary>
-    ///     Checks if GitHub token is available in environment.
-    /// </summary>
-    /// <returns>True if GitHub token is available.</returns>
-    private static bool HasGitHubToken()
-    {
-        return !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_TOKEN")) ||
-               !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GH_TOKEN"));
-    }
 }
