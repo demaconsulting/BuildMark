@@ -294,15 +294,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion.FullVersion);
 
         // Determine baseline version based on whether target is pre-release
-        Version? fromVersion;
-        if (toVersion.IsPreRelease)
-        {
-            fromVersion = DetermineBaselineForPreRelease(toIndex, lookupData.ReleaseVersions);
-        }
-        else
-        {
-            fromVersion = DetermineBaselineForRelease(toIndex, lookupData.ReleaseVersions);
-        }
+        var fromVersion = toVersion.IsPreRelease
+            ? DetermineBaselineForPreRelease(toIndex, lookupData.ReleaseVersions)
+            : DetermineBaselineForRelease(toIndex, lookupData.ReleaseVersions);
 
         // Get commit hash for baseline version if one was found
         if (fromVersion != null &&
@@ -419,9 +413,10 @@ public class GitHubRepoConnector : RepoConnectorBase
         using var graphqlClient = new GitHubGraphQLClient(token);
 
         // Process each commit that has an associated PR
-        foreach (var commit in commitsInRange.Where(c => lookupData.CommitHashToPr.ContainsKey(c.Sha)))
+        foreach (var pr in commitsInRange
+            .Where(c => lookupData.CommitHashToPr.ContainsKey(c.Sha))
+            .Select(c => lookupData.CommitHashToPr[c.Sha]))
         {
-            var pr = lookupData.CommitHashToPr[commit.Sha];
 
             // Find issue IDs that are linked to this PR using GitHub GraphQL API
             // All PRs are also issues, so we need to find the "real" issues (non-PR issues) that link to this PR
