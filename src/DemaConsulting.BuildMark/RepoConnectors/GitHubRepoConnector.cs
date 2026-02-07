@@ -562,7 +562,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="fromHash">Starting commit hash (exclusive - not included in results; null for start of history).</param>
     /// <param name="toHash">Ending commit hash (inclusive - included in results).</param>
     /// <returns>List of commits in range, excluding fromHash but including toHash.</returns>
-    private static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
+    internal static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
     {
         // Initialize collection and state tracking
         var result = new List<GitHubCommit>();
@@ -600,7 +600,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="issue">GitHub issue.</param>
     /// <param name="index">Index for sorting.</param>
     /// <returns>ItemInfo instance.</returns>
-    private static ItemInfo CreateItemInfoFromIssue(Issue issue, int index)
+    internal static ItemInfo CreateItemInfoFromIssue(Issue issue, int index)
     {
         // Determine item type from issue labels
         var type = GetTypeFromLabels(issue.Labels);
@@ -619,7 +619,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="pr">GitHub pull request.</param>
     /// <returns>ItemInfo instance.</returns>
-    private static ItemInfo CreateItemInfoFromPullRequest(PullRequest pr)
+    internal static ItemInfo CreateItemInfoFromPullRequest(PullRequest pr)
     {
         // Determine item type from PR labels
         var type = GetTypeFromLabels(pr.Labels);
@@ -638,7 +638,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="labels">List of labels.</param>
     /// <returns>Item type string.</returns>
-    private static string GetTypeFromLabels(IReadOnlyList<Label> labels)
+    internal static string GetTypeFromLabels(IReadOnlyList<Label> labels)
     {
         // Find first matching label type by checking label names against the type map
         var matchingType = labels
@@ -682,7 +682,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="url">Git remote URL.</param>
     /// <returns>Tuple of (owner, repo).</returns>
     /// <exception cref="ArgumentException">Thrown if URL format is invalid.</exception>
-    private static (string owner, string repo) ParseGitHubUrl(string url)
+    internal static (string owner, string repo) ParseGitHubUrl(string url)
     {
         // Normalize URL by trimming whitespace
         url = url.Trim();
@@ -710,7 +710,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="path">Path segment (e.g., "owner/repo.git").</param>
     /// <returns>Tuple of (owner, repo).</returns>
     /// <exception cref="ArgumentException">Thrown if path format is invalid.</exception>
-    private static (string owner, string repo) ParseOwnerRepo(string path)
+    internal static (string owner, string repo) ParseOwnerRepo(string path)
     {
         // Remove .git suffix if present
         if (path.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
@@ -737,7 +737,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="oldTag">Old tag name (null if from beginning).</param>
     /// <param name="newTag">New tag name.</param>
     /// <returns>WebLink to GitHub compare page, or null if no baseline tag.</returns>
-    private static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag)
+    internal static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag)
     {
         // Cannot generate comparison link without a baseline tag
         if (oldTag == null)
