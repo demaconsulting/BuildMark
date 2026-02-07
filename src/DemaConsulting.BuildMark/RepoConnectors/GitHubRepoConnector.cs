@@ -119,7 +119,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
-    private sealed record GitHubData(
+    internal sealed record GitHubData(
         IReadOnlyList<GitHubCommit> Commits,
         IReadOnlyList<Release> Releases,
         IReadOnlyList<RepositoryTag> Tags,
@@ -129,7 +129,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Container for lookup data structures built from GitHub data.
     /// </summary>
-    private sealed record LookupData(
+    internal sealed record LookupData(
         Dictionary<int, Issue> IssueById,
         Dictionary<string, PullRequest> CommitHashToPr,
         List<Release> BranchReleases,
@@ -171,7 +171,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="data">GitHub data.</param>
     /// <returns>Container with all lookup data structures.</returns>
-    private static LookupData BuildLookupData(GitHubData data)
+    internal static LookupData BuildLookupData(GitHubData data)
     {
         // Build a mapping from issue number to issue for efficient lookup.
         // This is used to look up issue details when we find linked issue IDs.
@@ -233,7 +233,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (toVersion, toHash).</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    private static (Version toVersion, string toHash) DetermineTargetVersion(
+    internal static (Version toVersion, string toHash) DetermineTargetVersion(
         Version? version,
         string currentCommitHash,
         LookupData lookupData)
@@ -280,7 +280,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toVersion">Target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (fromVersion, fromHash).</returns>
-    private static (Version? fromVersion, string? fromHash) DetermineBaselineVersion(
+    internal static (Version? fromVersion, string? fromHash) DetermineBaselineVersion(
         Version toVersion,
         LookupData lookupData)
     {

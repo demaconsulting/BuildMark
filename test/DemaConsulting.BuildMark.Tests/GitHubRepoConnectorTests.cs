@@ -309,4 +309,84 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.IsNull(link);
     }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion returns provided version when specified.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_ProvidedVersion_ReturnsProvidedVersion()
+    {
+        // Arrange
+        var version = Version.Create("v1.0.0");
+        var currentHash = "abc123";
+        var lookupData = new GitHubRepoConnector.LookupData(
+            new Dictionary<int, Issue>(),
+            new Dictionary<string, PullRequest>(),
+            new List<Release>(),
+            new Dictionary<string, RepositoryTag>(),
+            new Dictionary<string, Release>(),
+            new List<Version>());
+
+        // Act
+        var (toVersion, toHash) = GitHubRepoConnector.DetermineTargetVersion(version, currentHash, lookupData);
+
+        // Assert
+        Assert.AreEqual(version, toVersion);
+        Assert.AreEqual(currentHash, toHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion throws when no version and no releases.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_NoVersionNoReleases_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var currentHash = "abc123";
+        var lookupData = new GitHubRepoConnector.LookupData(
+            new Dictionary<int, Issue>(),
+            new Dictionary<string, PullRequest>(),
+            new List<Release>(),
+            new Dictionary<string, RepositoryTag>(),
+            new Dictionary<string, Release>(),
+            new List<Version>());
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.DetermineTargetVersion(null, currentHash, lookupData);
+
+            // Assert - Fail if no exception is thrown
+            Assert.Fail("Expected InvalidOperationException to be thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Verify exception message contains expected text
+            Assert.Contains("No releases found", ex.Message);
+        }
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion returns null when no releases.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_NoReleases_ReturnsNull()
+    {
+        // Arrange
+        var toVersion = Version.Create("v1.0.0");
+        var lookupData = new GitHubRepoConnector.LookupData(
+            new Dictionary<int, Issue>(),
+            new Dictionary<string, PullRequest>(),
+            new List<Release>(),
+            new Dictionary<string, RepositoryTag>(),
+            new Dictionary<string, Release>(),
+            new List<Version>());
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.IsNull(fromVersion);
+        Assert.IsNull(fromHash);
+    }
 }
