@@ -40,6 +40,11 @@ internal sealed class GitHubGraphQLClient : IDisposable
     private readonly HttpClient _httpClient;
 
     /// <summary>
+    ///     Indicates whether this instance owns the HTTP client and should dispose it.
+    /// </summary>
+    private readonly bool _ownsHttpClient;
+
+    /// <summary>
     ///     GraphQL endpoint URL.
     /// </summary>
     private readonly string _graphqlEndpoint;
@@ -58,6 +63,24 @@ internal sealed class GitHubGraphQLClient : IDisposable
         _httpClient.DefaultRequestHeaders.UserAgent.Add(
             new ProductInfoHeaderValue("BuildMark", "1.0"));
         _graphqlEndpoint = graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint;
+        _ownsHttpClient = true;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="GitHubGraphQLClient"/> class with a pre-configured HTTP client.
+    /// </summary>
+    /// <param name="httpClient">Pre-configured HTTP client for making requests. Useful for testing with mocked responses.</param>
+    /// <param name="graphqlEndpoint">Optional GraphQL endpoint URL. Defaults to public GitHub API. For GitHub Enterprise, use https://your-github-enterprise/api/graphql.</param>
+    /// <remarks>
+    ///     This constructor is intended for testing scenarios where you need to inject a mocked HttpClient with pre-canned responses.
+    ///     The caller is responsible for disposing the provided HttpClient.
+    /// </remarks>
+    internal GitHubGraphQLClient(HttpClient httpClient, string? graphqlEndpoint = null)
+    {
+        // Use provided HTTP client (typically a mocked one for testing)
+        _httpClient = httpClient;
+        _graphqlEndpoint = graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint;
+        _ownsHttpClient = false;
     }
 
     /// <summary>
@@ -136,11 +159,14 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
-    ///     Disposes the HTTP client.
+    ///     Disposes the HTTP client if owned by this instance.
     /// </summary>
     public void Dispose()
     {
-        // Clean up HTTP client resources
-        _httpClient.Dispose();
+        // Clean up HTTP client resources only if we own it
+        if (_ownsHttpClient)
+        {
+            _httpClient.Dispose();
+        }
     }
 }
