@@ -254,10 +254,8 @@ internal static class Validation
         try
         {
             using var tempDir = new TemporaryDirectory();
-            // Ensure log file name doesn't contain path separators or absolute paths
-            var safeTestName = testName.Replace(Path.DirectorySeparatorChar, '_').Replace(Path.AltDirectorySeparatorChar, '_');
-            var logFile = Path.Combine(tempDir.DirectoryPath, $"{safeTestName}.log");
-            var reportFile = reportFileName != null ? Path.Combine(tempDir.DirectoryPath, Path.GetFileName(reportFileName)) : null;
+            var logFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, $"{testName}.log");
+            var reportFile = reportFileName != null ? PathHelpers.SafePathCombine(tempDir.DirectoryPath, reportFileName) : null;
 
             // Build command line arguments
             var args = new List<string>
@@ -432,9 +430,7 @@ internal static class Validation
         /// </summary>
         public TemporaryDirectory()
         {
-            // Use Guid as filename to ensure it's not an absolute path
-            var uniqueName = $"buildmark_validation_{Guid.NewGuid()}";
-            DirectoryPath = Path.Combine(Path.GetTempPath(), uniqueName);
+            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"buildmark_validation_{Guid.NewGuid()}");
 
             try
             {

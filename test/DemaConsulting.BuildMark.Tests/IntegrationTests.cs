@@ -37,9 +37,7 @@ public class IntegrationTests
         // The DLL should be in the same directory as the test assembly
         // because the test project references the main project
         var baseDir = AppContext.BaseDirectory;
-        // Ensure we're using just the filename to avoid absolute path issues
-        var dllFileName = "DemaConsulting.BuildMark.dll";
-        _dllPath = Path.Combine(baseDir, dllFileName);
+        _dllPath = PathHelpers.SafePathCombine(baseDir, "DemaConsulting.BuildMark.dll");
 
         Assert.IsTrue(File.Exists(_dllPath), $"Could not find BuildMark DLL at {_dllPath}");
     }
