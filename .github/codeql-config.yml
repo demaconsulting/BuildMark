@@ -32,7 +32,6 @@ query-filters:
       id: cs/path-combine
     paths:
       - src/DemaConsulting.BuildMark/PathHelpers.cs
-      - test/DemaConsulting.BuildMark.Tests/PathHelpers.cs
   # Exclude HttpResponseMessage disposal warning in mock handler (disposed by HttpClient)
   - exclude:
       id: cs/local-not-disposed
