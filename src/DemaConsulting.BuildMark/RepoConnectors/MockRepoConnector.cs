@@ -193,15 +193,9 @@ public class MockRepoConnector : RepoConnectorBase
         var toIndex = FindVersionIndex(tags, toTagInfo.FullVersion);
 
         // Determine baseline version based on whether target is pre-release
-        Version? fromTagInfo;
-        if (toTagInfo.IsPreRelease)
-        {
-            fromTagInfo = DetermineBaselineForPreRelease(toIndex, tags);
-        }
-        else
-        {
-            fromTagInfo = DetermineBaselineForRelease(toIndex, tags);
-        }
+        var fromTagInfo = toTagInfo.IsPreRelease
+            ? DetermineBaselineForPreRelease(toIndex, tags)
+            : DetermineBaselineForRelease(toIndex, tags);
 
         // Get commit hash for baseline version if one was found
         if (fromTagInfo != null)

@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors;
+using Octokit;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -46,12 +47,352 @@ public class GitHubRepoConnectorTests
     ///     Test that GitHubRepoConnector implements IRepoConnector.
     /// </summary>
     [TestMethod]
-    public void GitHubRepoConnector_ImplementsInterface()
+    public void GitHubRepoConnector_ImplementsInterface_ReturnsTrue()
     {
         // Create connector
         var connector = new GitHubRepoConnector();
 
         // Verify interface implementation
         Assert.IsInstanceOfType<IRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl correctly parses SSH URL.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_SshUrl_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var url = "git@github.com:owner/repo.git";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseGitHubUrl(url);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl correctly parses HTTPS URL.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_HttpsUrl_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var url = "https://github.com/owner/repo.git";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseGitHubUrl(url);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl correctly parses URL without .git suffix.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_NoGitSuffix_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var url = "https://github.com/owner/repo";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseGitHubUrl(url);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl throws ArgumentException for invalid URL format.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_InvalidUrl_ThrowsArgumentException()
+    {
+        // Arrange
+        var url = "invalid-url";
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.ParseGitHubUrl(url);
+
+            // Assert - Fail if no exception is thrown
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception for invalid URL format
+        }
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl throws ArgumentException for URL with wrong host.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_WrongHost_ThrowsArgumentException()
+    {
+        // Arrange
+        var url = "https://gitlab.com/owner/repo.git";
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.ParseGitHubUrl(url);
+
+            // Assert - Fail if no exception is thrown
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception for wrong host
+        }
+    }
+
+    /// <summary>
+    ///     Test that ParseGitHubUrl handles URL with whitespace.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseGitHubUrl_UrlWithWhitespace_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var url = "  https://github.com/owner/repo.git  ";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseGitHubUrl(url);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseOwnerRepo correctly parses path with .git suffix.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseOwnerRepo_PathWithGitSuffix_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var path = "owner/repo.git";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseOwnerRepo(path);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseOwnerRepo correctly parses path without .git suffix.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseOwnerRepo_PathWithoutGitSuffix_ReturnsOwnerAndRepo()
+    {
+        // Arrange
+        var path = "owner/repo";
+
+        // Act
+        var (owner, repo) = GitHubRepoConnector.ParseOwnerRepo(path);
+
+        // Assert
+        Assert.AreEqual("owner", owner);
+        Assert.AreEqual("repo", repo);
+    }
+
+    /// <summary>
+    ///     Test that ParseOwnerRepo throws ArgumentException for invalid path.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseOwnerRepo_InvalidPath_ThrowsArgumentException()
+    {
+        // Arrange
+        var path = "invalid";
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.ParseOwnerRepo(path);
+
+            // Assert - Fail if no exception is thrown
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception for invalid path format
+        }
+    }
+
+    /// <summary>
+    ///     Test that ParseOwnerRepo throws ArgumentException for path with too many segments.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_ParseOwnerRepo_TooManySegments_ThrowsArgumentException()
+    {
+        // Arrange
+        var path = "owner/repo/extra";
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.ParseOwnerRepo(path);
+
+            // Assert - Fail if no exception is thrown
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException)
+        {
+            // Expected exception for too many path segments
+        }
+    }
+
+    /// <summary>
+    ///     Test that GetTypeFromLabels returns "other" for empty labels.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GetTypeFromLabels_EmptyLabels_ReturnsOther()
+    {
+        // Arrange
+        var labels = new List<Label>();
+
+        // Act
+        var type = GitHubRepoConnector.GetTypeFromLabels(labels);
+
+        // Assert
+        Assert.AreEqual("other", type);
+    }
+
+    /// <summary>
+    ///     Test that GetCommitsInRange returns empty list when toHash not found.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GetCommitsInRange_ToHashNotFound_ReturnsEmptyList()
+    {
+        // Arrange - empty list of commits
+        var commits = new List<GitHubCommit>();
+
+        // Act
+        var result = GitHubRepoConnector.GetCommitsInRange(commits, "hash1", "hash4");
+
+        // Assert
+        Assert.IsEmpty(result);
+    }
+
+    /// <summary>
+    ///     Test that GenerateGitHubChangelogLink creates correct link.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GenerateGitHubChangelogLink_ValidTags_ReturnsWebLink()
+    {
+        // Act
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0");
+
+        // Assert
+        Assert.IsNotNull(link);
+        Assert.AreEqual("v1.0.0...v2.0.0", link.LinkText);
+        Assert.AreEqual("https://github.com/owner/repo/compare/v1.0.0...v2.0.0", link.TargetUrl);
+    }
+
+    /// <summary>
+    ///     Test that GenerateGitHubChangelogLink returns null when oldTag is null.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GenerateGitHubChangelogLink_NullOldTag_ReturnsNull()
+    {
+        // Act
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", null, "v2.0.0");
+
+        // Assert
+        Assert.IsNull(link);
+    }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion returns provided version when specified.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_ProvidedVersion_ReturnsProvidedVersion()
+    {
+        // Arrange
+        var version = Version.Create("v1.0.0");
+        var currentHash = "abc123";
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [],
+            [],
+            [],
+            []);
+
+        // Act
+        var (toVersion, toHash) = GitHubRepoConnector.DetermineTargetVersion(version, currentHash, lookupData);
+
+        // Assert
+        Assert.AreEqual(version, toVersion);
+        Assert.AreEqual(currentHash, toHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion throws when no version and no releases.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_NoVersionNoReleases_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var currentHash = "abc123";
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [],
+            [],
+            [],
+            []);
+
+        InvalidOperationException? caughtException = null;
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.DetermineTargetVersion(null, currentHash, lookupData);
+
+            // Fail if no exception is thrown
+            Assert.Fail("Expected InvalidOperationException to be thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Store exception for verification
+            caughtException = ex;
+        }
+
+        // Assert - Verify exception message contains expected text
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("No releases found", caughtException.Message);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion returns null when no releases.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_NoReleases_ReturnsNull()
+    {
+        // Arrange
+        var toVersion = Version.Create("v1.0.0");
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [],
+            [],
+            [],
+            []);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.IsNull(fromVersion);
+        Assert.IsNull(fromHash);
     }
 }

@@ -27,3 +27,13 @@ query-filters:
       - src/DemaConsulting.BuildMark/Context.cs
       - src/DemaConsulting.BuildMark/Program.cs
       - src/DemaConsulting.BuildMark/RepoConnectors/ProcessRunner.cs
+  # Exclude path-combine warnings in PathHelpers (validated safe usage)
+  - exclude:
+      id: cs/path-combine
+    paths:
+      - src/DemaConsulting.BuildMark/PathHelpers.cs
+  # Exclude HttpResponseMessage disposal warning in mock handler (disposed by HttpClient)
+  - exclude:
+      id: cs/local-not-disposed
+    paths:
+      - test/DemaConsulting.BuildMark.Tests/GitHubGraphQLClientTests.cs

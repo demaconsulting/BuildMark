@@ -254,8 +254,8 @@ internal static class Validation
         try
         {
             using var tempDir = new TemporaryDirectory();
-            var logFile = Path.Combine(tempDir.DirectoryPath, $"{testName}.log");
-            var reportFile = reportFileName != null ? Path.Combine(tempDir.DirectoryPath, reportFileName) : null;
+            var logFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, $"{testName}.log");
+            var reportFile = reportFileName != null ? PathHelpers.SafePathCombine(tempDir.DirectoryPath, reportFileName) : null;
 
             // Build command line arguments
             var args = new List<string>
@@ -430,7 +430,7 @@ internal static class Validation
         /// </summary>
         public TemporaryDirectory()
         {
-            DirectoryPath = Path.Combine(Path.GetTempPath(), $"buildmark_validation_{Guid.NewGuid()}");
+            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"buildmark_validation_{Guid.NewGuid()}");
 
             try
             {
