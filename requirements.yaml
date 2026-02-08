@@ -227,9 +227,9 @@ sections:
           - id: VAL-001
             title: The tool shall support self-validation mode.
             justification: |
-              Self-validation mode enables BuildMark to verify its own requirements are met,
-              providing a mechanism for continuous validation of the tool's capabilities and
-              ensuring requirements traceability is maintained throughout development.
+              Self-validation mode allows users to validate the tool's functionality in their
+              environment, providing evidence that the user's environment does not introduce
+              unexpected behaviors, and giving users evidence they can rely on the tool's output.
             tests:
               - IntegrationTest_ValidateFlag_RunsSelfValidation
 
