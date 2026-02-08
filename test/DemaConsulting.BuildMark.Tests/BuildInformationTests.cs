@@ -323,7 +323,7 @@ public class BuildInformationTests
         var changesSectionStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
         var bugsSectionStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
         var changesSection = markdown.Substring(changesSectionStart, bugsSectionStart - changesSectionStart);
-        Assert.Contains("| N/A | N/A |", changesSection);
+        Assert.Contains("- N/A", changesSection);
     }
 
     /// <summary>
@@ -347,11 +347,11 @@ public class BuildInformationTests
         // Assert - Check that Bugs Fixed section contains N/A
         var bugsSectionStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
         var bugsSection = markdown.Substring(bugsSectionStart);
-        Assert.Contains("| N/A | N/A |", bugsSection);
+        Assert.Contains("- N/A", bugsSection);
     }
 
     /// <summary>
-    ///     Test that ToMarkdown includes issue links in tables.
+    ///     Test that ToMarkdown includes issue links in bullet lists.
     /// </summary>
     [TestMethod]
     public async Task BuildInformation_ToMarkdown_IncludesIssueLinks()
@@ -364,8 +364,8 @@ public class BuildInformationTests
         var markdown = buildInfo.ToMarkdown();
 
         // Assert - verify issue links are properly formatted
-        Assert.Contains("[3](https://github.com/example/repo/issues/3)", markdown);
-        Assert.Contains("[2](https://github.com/example/repo/issues/2)", markdown);
+        Assert.Contains("- [3](https://github.com/example/repo/issues/3)", markdown);
+        Assert.Contains("- [2](https://github.com/example/repo/issues/2)", markdown);
     }
 
     /// <summary>
@@ -427,10 +427,10 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that ToMarkdown uses correct table widths with centered Issue column.
+    ///     Test that ToMarkdown uses bullet lists for changes, bugs, and known issues.
     /// </summary>
     [TestMethod]
-    public async Task BuildInformation_ToMarkdown_UsesCorrectTableWidths()
+    public async Task BuildInformation_ToMarkdown_UsesBulletLists()
     {
         // Arrange
         var connector = new MockRepoConnector();
@@ -439,23 +439,25 @@ public class BuildInformationTests
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
 
-        // Assert - verify table separators use correct width format (10:1 ratio with centered Issue)
-        // The separator should have centered Issue column (:-:) and wide left-aligned Title column (:----------)
-
-        // Verify the table separator appears in Changes section
+        // Assert - verify bullet list format is used for changes, bugs, and known issues
+        // Verify the bullet list appears in Changes section
         var changesStart = markdown.IndexOf("## Changes", StringComparison.Ordinal);
         var bugsStart = markdown.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
         var changesSection = markdown.Substring(changesStart, bugsStart - changesStart);
-        Assert.Contains("| :-: | :---------- |", changesSection);
+        Assert.Contains("- [", changesSection);
+        Assert.DoesNotContain("| :-: | :---------- |", changesSection);
 
-        // Verify the table separator appears in Bugs Fixed section
+        // Verify the bullet list appears in Bugs Fixed section
         var knownIssuesStart = markdown.IndexOf("## Known Issues", StringComparison.Ordinal);
         var bugsSection = markdown.Substring(bugsStart, knownIssuesStart - bugsStart);
-        Assert.Contains("| :-: | :---------- |", bugsSection);
+        Assert.Contains("- [", bugsSection);
+        Assert.DoesNotContain("| :-: | :---------- |", bugsSection);
 
-        // Verify the table separator appears in Known Issues section
-        var knownIssuesSection = markdown.Substring(knownIssuesStart);
-        Assert.Contains("| :-: | :---------- |", knownIssuesSection);
+        // Verify the bullet list appears in Known Issues section
+        var fullChangelogStart = markdown.IndexOf("## Full Changelog", StringComparison.Ordinal);
+        var knownIssuesSection = markdown.Substring(knownIssuesStart, fullChangelogStart - knownIssuesStart);
+        Assert.Contains("- [", knownIssuesSection);
+        Assert.DoesNotContain("| :-: | :---------- |", knownIssuesSection);
     }
 
     /// <summary>
