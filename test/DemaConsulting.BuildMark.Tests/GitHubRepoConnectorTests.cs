@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors;
+using NSubstitute;
 using Octokit;
 
 namespace DemaConsulting.BuildMark.Tests;
@@ -394,5 +395,260 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.IsNull(fromVersion);
         Assert.IsNull(fromHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion throws when current commit doesn't match latest tag.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_CommitNotMatchingLatestTag_ThrowsInvalidOperationException()
+    {
+        // Arrange
+        var currentHash = "different123";
+        var tag1 = CreateMockTag("v1.0.0", "commit1");
+        var release1 = CreateMockRelease("v1.0.0");
+        var releases = new List<Release> { release1 };
+        var version1 = Version.Create("v1.0.0");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            releases,
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 } },
+            [version1]);
+
+        InvalidOperationException? caughtException = null;
+
+        try
+        {
+            // Act
+            GitHubRepoConnector.DetermineTargetVersion(null, currentHash, lookupData);
+
+            // Fail if no exception is thrown
+            Assert.Fail("Expected InvalidOperationException to be thrown");
+        }
+        catch (InvalidOperationException ex)
+        {
+            // Store exception for verification
+            caughtException = ex;
+        }
+
+        // Assert - Verify exception message contains expected text
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("does not match any release tag", caughtException.Message);
+    }
+
+    /// <summary>
+    ///     Test that DetermineTargetVersion uses latest release when commit matches.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineTargetVersion_CommitMatchesLatestTag_ReturnsLatestVersion()
+    {
+        // Arrange
+        var currentHash = "commit1";
+        var tag1 = CreateMockTag("v1.0.0", currentHash);
+        var release1 = CreateMockRelease("v1.0.0");
+        var releases = new List<Release> { release1 };
+        var version1 = Version.Create("v1.0.0");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            releases,
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 } },
+            [version1]);
+
+        // Act
+        var (toVersion, toHash) = GitHubRepoConnector.DetermineTargetVersion(null, currentHash, lookupData);
+
+        // Assert
+        Assert.AreEqual(version1, toVersion);
+        Assert.AreEqual(currentHash, toHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion handles pre-release with previous version.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_PreReleaseWithPreviousVersion_ReturnsPreviousVersion()
+    {
+        // Arrange
+        var toVersion = Version.Create("v2.0.0-beta1");
+        var v1 = Version.Create("v1.0.0");
+        var v2Beta = Version.Create("v2.0.0-beta1");
+
+        var release1 = CreateMockRelease("v1.0.0");
+        var release2 = CreateMockRelease("v2.0.0-beta1");
+        var tag1 = CreateMockTag("v1.0.0", "hash1");
+        var tag2 = CreateMockTag("v2.0.0-beta1", "hash2");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [release2, release1],
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 }, { "v2.0.0-beta1", tag2 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 }, { "v2.0.0-beta1", release2 } },
+            [v2Beta, v1]);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.AreEqual(v1, fromVersion);
+        Assert.AreEqual("hash1", fromHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion handles release skipping pre-releases.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_ReleaseSkipsPreReleases_ReturnsPreviousRelease()
+    {
+        // Arrange
+        var toVersion = Version.Create("v2.0.0");
+        var v1 = Version.Create("v1.0.0");
+        var v2Beta = Version.Create("v2.0.0-beta1");
+        var v2 = Version.Create("v2.0.0");
+
+        var release1 = CreateMockRelease("v1.0.0");
+        var release2Beta = CreateMockRelease("v2.0.0-beta1");
+        var release2 = CreateMockRelease("v2.0.0");
+        var tag1 = CreateMockTag("v1.0.0", "hash1");
+        var tag2Beta = CreateMockTag("v2.0.0-beta1", "hash2beta");
+        var tag2 = CreateMockTag("v2.0.0", "hash2");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [release2, release2Beta, release1],
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 }, { "v2.0.0-beta1", tag2Beta }, { "v2.0.0", tag2 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 }, { "v2.0.0-beta1", release2Beta }, { "v2.0.0", release2 } },
+            [v2, v2Beta, v1]);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.AreEqual(v1, fromVersion);
+        Assert.AreEqual("hash1", fromHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion returns null when version not in history and is release.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_NewReleaseNotInHistory_ReturnsLatestRelease()
+    {
+        // Arrange
+        var toVersion = Version.Create("v3.0.0");
+        var v1 = Version.Create("v1.0.0");
+        var v2 = Version.Create("v2.0.0");
+
+        var release1 = CreateMockRelease("v1.0.0");
+        var release2 = CreateMockRelease("v2.0.0");
+        var tag1 = CreateMockTag("v1.0.0", "hash1");
+        var tag2 = CreateMockTag("v2.0.0", "hash2");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [release2, release1],
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 }, { "v2.0.0", tag2 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 }, { "v2.0.0", release2 } },
+            [v2, v1]);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.AreEqual(v2, fromVersion);
+        Assert.AreEqual("hash2", fromHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion returns null when version is oldest.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_OldestVersion_ReturnsNull()
+    {
+        // Arrange
+        var toVersion = Version.Create("v1.0.0");
+        var v1 = Version.Create("v1.0.0");
+
+        var release1 = CreateMockRelease("v1.0.0");
+        var tag1 = CreateMockTag("v1.0.0", "hash1");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [release1],
+            new Dictionary<string, RepositoryTag> { { "v1.0.0", tag1 } },
+            new Dictionary<string, Release> { { "v1.0.0", release1 } },
+            [v1]);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.IsNull(fromVersion);
+        Assert.IsNull(fromHash);
+    }
+
+    /// <summary>
+    ///     Test that DetermineBaselineVersion returns null hash when tag not found.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_DetermineBaselineVersion_TagNotFound_ReturnsNullHash()
+    {
+        // Arrange
+        var toVersion = Version.Create("v2.0.0");
+        var v1 = Version.Create("v1.0.0");
+        var v2 = Version.Create("v2.0.0");
+
+        var release1 = CreateMockRelease("v1.0.0");
+        var release2 = CreateMockRelease("v2.0.0");
+
+        var lookupData = new GitHubRepoConnector.LookupData(
+            [],
+            [],
+            [release2, release1],
+            [],  // Empty tags dictionary
+            new Dictionary<string, Release> { { "v1.0.0", release1 }, { "v2.0.0", release2 } },
+            [v2, v1]);
+
+        // Act
+        var (fromVersion, fromHash) = GitHubRepoConnector.DetermineBaselineVersion(toVersion, lookupData);
+
+        // Assert
+        Assert.AreEqual(v1, fromVersion);
+        Assert.IsNull(fromHash);
+    }
+
+    /// <summary>
+    ///     Helper method to create a mock RepositoryTag using NSubstitute.
+    /// </summary>
+    private static RepositoryTag CreateMockTag(string name, string sha)
+    {
+        var commitRef = Substitute.For<GitReference>();
+        commitRef.Sha.Returns(sha);
+
+        var tag = Substitute.For<RepositoryTag>();
+        tag.Name.Returns(name);
+        tag.Commit.Returns(commitRef);
+
+        return tag;
+    }
+
+    /// <summary>
+    ///     Helper method to create a mock Release using NSubstitute.
+    /// </summary>
+    private static Release CreateMockRelease(string tagName)
+    {
+        var release = Substitute.For<Release>();
+        release.TagName.Returns(tagName);
+        release.Prerelease.Returns(tagName.Contains("-"));
+        return release;
     }
 }
