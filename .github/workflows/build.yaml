@@ -313,6 +313,7 @@ jobs:
           --tests "test-results/**/*.trx"
           --report docs/requirements/requirements.md
           --matrix docs/tracematrix/tracematrix.md
+          --justifications docs/justifications/justifications.md
           --enforce
 
       - name: Generate CodeQL Quality Report with SarifMark
@@ -426,6 +427,22 @@ jobs:
           dotnet weasyprint
           docs/tracematrix/tracematrix.html
           "docs/BuildMark Trace Matrix.pdf"
+
+      - name: Generate Requirements Justifications HTML with Pandoc
+        shell: bash
+        run: >
+          dotnet pandoc
+          --defaults docs/justifications/definition.yaml
+          --metadata version="${{ inputs.version }}"
+          --metadata date="$(date +'%Y-%m-%d')"
+          --filter node_modules/.bin/mermaid-filter.cmd
+          --output docs/justifications/justifications.html
+
+      - name: Convert Requirements Justifications HTML to PDF with Weasyprint
+        run: >
+          dotnet weasyprint
+          docs/justifications/justifications.html
+          "docs/BuildMark Requirements Justifications.pdf"
 
       - name: Generate Code Quality HTML with Pandoc
         shell: bash
