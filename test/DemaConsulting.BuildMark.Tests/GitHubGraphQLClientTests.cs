@@ -61,7 +61,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(3, issueIds.Count);
+        Assert.HasCount(3, issueIds);
         Assert.AreEqual(123, issueIds[0]);
         Assert.AreEqual(456, issueIds[1]);
         Assert.AreEqual(789, issueIds[2]);
@@ -94,7 +94,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(0, issueIds.Count);
+        Assert.IsEmpty(issueIds);
     }
 
     /// <summary>
@@ -118,7 +118,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(0, issueIds.Count);
+        Assert.IsEmpty(issueIds);
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(0, issueIds.Count);
+        Assert.IsEmpty(issueIds);
     }
 
     /// <summary>
@@ -158,7 +158,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(0, issueIds.Count);
+        Assert.IsEmpty(issueIds);
     }
 
     /// <summary>
@@ -190,7 +190,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(1, issueIds.Count);
+        Assert.HasCount(1, issueIds);
         Assert.AreEqual(999, issueIds[0]);
     }
 
@@ -225,7 +225,7 @@ public class GitHubGraphQLClientTests
 
         // Assert
         Assert.IsNotNull(issueIds);
-        Assert.AreEqual(2, issueIds.Count);
+        Assert.HasCount(2, issueIds);
         Assert.AreEqual(100, issueIds[0]);
         Assert.AreEqual(200, issueIds[1]);
     }
