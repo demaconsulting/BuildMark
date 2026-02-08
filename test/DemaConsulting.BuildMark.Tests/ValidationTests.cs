@@ -43,14 +43,12 @@ public class ValidationTests
             var trxFile = Path.Combine(tempDir, "results.trx");
             var args = new[] { "--validate", "--results", trxFile };
 
-            StringWriter? outputWriter = null;
-            StringWriter? errorWriter = null;
+            using var outputWriter = new StringWriter();
+            using var errorWriter = new StringWriter();
 
             try
             {
                 // Capture console output
-                outputWriter = new StringWriter();
-                errorWriter = new StringWriter();
                 Console.SetOut(outputWriter);
                 Console.SetError(errorWriter);
 
@@ -73,9 +71,6 @@ public class ValidationTests
                 Console.SetOut(standardOutput);
                 var standardError = new StreamWriter(Console.OpenStandardError()) { AutoFlush = true };
                 Console.SetError(standardError);
-
-                outputWriter?.Dispose();
-                errorWriter?.Dispose();
             }
         }
         finally
@@ -103,14 +98,12 @@ public class ValidationTests
             var xmlFile = Path.Combine(tempDir, "results.xml");
             var args = new[] { "--validate", "--results", xmlFile };
 
-            StringWriter? outputWriter = null;
-            StringWriter? errorWriter = null;
+            using var outputWriter = new StringWriter();
+            using var errorWriter = new StringWriter();
 
             try
             {
                 // Capture console output
-                outputWriter = new StringWriter();
-                errorWriter = new StringWriter();
                 Console.SetOut(outputWriter);
                 Console.SetError(errorWriter);
 
@@ -133,9 +126,6 @@ public class ValidationTests
                 Console.SetOut(standardOutput);
                 var standardError = new StreamWriter(Console.OpenStandardError()) { AutoFlush = true };
                 Console.SetError(standardError);
-
-                outputWriter?.Dispose();
-                errorWriter?.Dispose();
             }
         }
         finally
@@ -163,12 +153,11 @@ public class ValidationTests
             var unsupportedFile = Path.Combine(tempDir, "results.json");
             var args = new[] { "--validate", "--results", unsupportedFile };
 
-            StringWriter? outputWriter = null;
+            using var outputWriter = new StringWriter();
 
             try
             {
                 // Capture console output
-                outputWriter = new StringWriter();
                 Console.SetOut(outputWriter);
 
                 // Act
@@ -184,8 +173,6 @@ public class ValidationTests
                 // Restore console output
                 var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
                 Console.SetOut(standardOutput);
-
-                outputWriter?.Dispose();
             }
         }
         finally
@@ -208,12 +195,11 @@ public class ValidationTests
         var invalidPath = Path.Combine("/invalid_path_that_does_not_exist_12345678", "results.trx");
         var args = new[] { "--validate", "--results", invalidPath };
 
-        StringWriter? outputWriter = null;
+        using var outputWriter = new StringWriter();
 
         try
         {
             // Capture console output
-            outputWriter = new StringWriter();
             Console.SetOut(outputWriter);
 
             // Act
@@ -229,8 +215,6 @@ public class ValidationTests
             // Restore console output
             var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
             Console.SetOut(standardOutput);
-
-            outputWriter?.Dispose();
         }
     }
 }
