@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors;
-using NSubstitute;
 using Octokit;
 
 namespace DemaConsulting.BuildMark.Tests;

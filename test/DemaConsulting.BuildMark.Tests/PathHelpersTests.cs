@@ -53,94 +53,10 @@ public class PathHelpersTests
         var basePath = "/home/user/project";
         var relativePath = "../etc/passwd";
 
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Act
-            PathHelpers.SafePathCombine(basePath, relativePath);
-
-            // Assert - Fail if no exception is thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            // Store exception for verification
-            caughtException = ex;
-        }
-
-        // Assert - Verify exception
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Invalid path component", caughtException.Message);
-    }
-
-    /// <summary>
-    ///     Test that SafePathCombine throws ArgumentException for rooted path.
-    /// </summary>
-    [TestMethod]
-    public void PathHelpers_SafePathCombine_RootedPath_ThrowsArgumentException()
-    {
-        // Arrange
-        var basePath = "/home/user/project";
-        var relativePath = "/etc/passwd";
-
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Act
-            PathHelpers.SafePathCombine(basePath, relativePath);
-
-            // Assert - Fail if no exception is thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            // Store exception for verification
-            caughtException = ex;
-        }
-
-        // Assert - Verify exception
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Invalid path component", caughtException.Message);
-    }
-
-    /// <summary>
-    ///     Test that SafePathCombine throws ArgumentException for Windows rooted path.
-    /// </summary>
-    [TestMethod]
-    public void PathHelpers_SafePathCombine_WindowsRootedPath_ThrowsArgumentException()
-    {
-        // Skip test on non-Windows platforms where Windows paths are not considered rooted
-        if (!OperatingSystem.IsWindows())
-        {
-            Assert.Inconclusive("Test only applies on Windows");
-            return;
-        }
-
-        // Arrange
-        var basePath = "C:\\Users\\project";
-        var relativePath = "C:\\Windows\\System32\\file.txt";
-
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Act
-            PathHelpers.SafePathCombine(basePath, relativePath);
-
-            // Assert - Fail if no exception is thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            // Store exception for verification
-            caughtException = ex;
-        }
-
-        // Assert - Verify exception
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Invalid path component", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() =>
+            PathHelpers.SafePathCombine(basePath, relativePath));
+        Assert.Contains("Invalid path component", exception.Message);
     }
 
     /// <summary>
@@ -153,24 +69,33 @@ public class PathHelpersTests
         var basePath = "/home/user/project";
         var relativePath = "subfolder/../../../etc/passwd";
 
-        ArgumentException? caughtException = null;
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentException>(() =>
+            PathHelpers.SafePathCombine(basePath, relativePath));
+        Assert.Contains("Invalid path component", exception.Message);
+    }
 
-        try
+    /// <summary>
+    ///     Test that SafePathCombine throws ArgumentException for absolute paths.
+    /// </summary>
+    [TestMethod]
+    public void PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException()
+    {
+        // Test Unix absolute path
+        var unixBasePath = "/home/user/project";
+        var unixRelativePath = "/etc/passwd";
+        var unixException = Assert.Throws<ArgumentException>(() =>
+            PathHelpers.SafePathCombine(unixBasePath, unixRelativePath));
+        Assert.Contains("Invalid path component", unixException.Message);
+
+        // Test Windows absolute path (only on Windows since Windows paths may not be rooted on Unix)
+        if (OperatingSystem.IsWindows())
         {
-            // Act
-            PathHelpers.SafePathCombine(basePath, relativePath);
-
-            // Assert - Fail if no exception is thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
+            var windowsBasePath = "C:\\Users\\project";
+            var windowsRelativePath = "C:\\Windows\\System32\\file.txt";
+            var windowsException = Assert.Throws<ArgumentException>(() =>
+                PathHelpers.SafePathCombine(windowsBasePath, windowsRelativePath));
+            Assert.Contains("Invalid path component", windowsException.Message);
         }
-        catch (ArgumentException ex)
-        {
-            // Store exception for verification
-            caughtException = ex;
-        }
-
-        // Assert - Verify exception
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Invalid path component", caughtException.Message);
     }
 }
