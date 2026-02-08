@@ -1,0 +1,18 @@
+---
+title: BuildMark Requirements Justifications
+subtitle: Requirements Justifications for the BuildMark Tool
+author: DEMA Consulting
+description: Requirements Justifications for the BuildMark Tool
+lang: en-US
+keywords:
+  - BuildMark
+  - Requirements
+  - Justifications
+  - Specification
+  - .NET
+  - YAML
+  - Command-Line Tool
+  - Git
+  - GitHub
+  - Markdown
+---
