@@ -131,7 +131,7 @@ sections:
             tests:
               - "BuildMark_MarkdownReportGeneration"
               - "BuildInformation_ToMarkdown_RespectsCustomHeadingDepth"
-              - "BuildInformation_ToMarkdown_UsesCorrectTableWidths"
+              - "BuildInformation_ToMarkdown_UsesBulletLists"
               - "BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA"
               - "BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline"
 

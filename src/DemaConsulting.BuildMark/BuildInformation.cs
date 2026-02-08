@@ -119,23 +119,21 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendChangesSection(System.Text.StringBuilder markdown, string subHeading)
     {
-        // Add changes section header and table structure
+        // Add changes section header
         markdown.AppendLine($"{subHeading} Changes");
         markdown.AppendLine();
-        markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("| :-: | :---------- |");
 
         // Add change items or N/A if no changes exist
         if (Changes.Count > 0)
         {
             foreach (var issue in Changes)
             {
-                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
         {
-            markdown.AppendLine("| N/A | N/A |");
+            markdown.AppendLine("- N/A");
         }
 
         // Add blank line after section
@@ -149,23 +147,21 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendBugsFixedSection(System.Text.StringBuilder markdown, string subHeading)
     {
-        // Add bugs fixed section header and table structure
+        // Add bugs fixed section header
         markdown.AppendLine($"{subHeading} Bugs Fixed");
         markdown.AppendLine();
-        markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("| :-: | :---------- |");
 
         // Add bug items or N/A if no bugs were fixed
         if (Bugs.Count > 0)
         {
             foreach (var issue in Bugs)
             {
-                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
         {
-            markdown.AppendLine("| N/A | N/A |");
+            markdown.AppendLine("- N/A");
         }
 
         // Add blank line after section
@@ -179,23 +175,21 @@ public record BuildInformation(
     /// <param name="subHeading">Sub-heading prefix.</param>
     private void AppendKnownIssuesSection(System.Text.StringBuilder markdown, string subHeading)
     {
-        // Add known issues section header and table structure
+        // Add known issues section header
         markdown.AppendLine($"{subHeading} Known Issues");
         markdown.AppendLine();
-        markdown.AppendLine("| Issue | Title |");
-        markdown.AppendLine("| :-: | :---------- |");
 
         // Add known issue items or N/A if no known issues exist
         if (KnownIssues.Count > 0)
         {
             foreach (var issue in KnownIssues)
             {
-                markdown.AppendLine($"| [{issue.Id}]({issue.Url}) | {issue.Title} |");
+                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
         {
-            markdown.AppendLine("| N/A | N/A |");
+            markdown.AppendLine("- N/A");
         }
 
         // Add blank line after section
