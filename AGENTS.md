@@ -30,7 +30,7 @@ Project-specific guidance for agents working on BuildMark - a .NET CLI tool for 
 
 ## Testing
 
-- **Test Naming**: `BuildMark_MethodUnderTest_Scenario` for self-validation tests
+- **Test Naming**: `BuildMark_FeatureBeingValidated` for self-validation tests
 - **Self-Validation**: All tests run via `--validate` flag and can output TRX/JUnit format
 - **Test Framework**: Uses DemaConsulting.TestResults library for test result generation
 - **MSTest v4**: Use `Assert.HasCount()`, `Assert.IsEmpty()`, `Assert.DoesNotContain()` (not old APIs)
@@ -50,17 +50,6 @@ Project-specific guidance for agents working on BuildMark - a .NET CLI tool for 
 - **Context.cs**: Handles command-line argument parsing, logging, and output
 - **Program.cs**: Main entry point with version/help/validation routing
 - **Validation.cs**: Self-validation tests with TRX/JUnit output support
-
-## Standard Command-Line Arguments
-
-All DEMA Consulting tools should support:
-
-- `-v`, `--version` - Display version information
-- `-?`, `-h`, `--help` - Display help message
-- `--silent` - Suppress console output
-- `--validate` - Run self-validation
-- `--results <file>` - Write validation results to file (TRX or JUnit format)
-- `--log <file>` - Write output to log file
 
 ## Build and Test
 
