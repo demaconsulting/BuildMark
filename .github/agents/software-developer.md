@@ -52,8 +52,7 @@ var results = ProcessFile(options.InputFile);
 
 ### BuildMark-Specific Rules
 
-- **XML Docs**: On ALL members (public/internal/private) with spaces after `///`
-  - XML doc comments follow C# indentation (4 spaces)
+- **XML Docs**: On ALL members (public/internal/private) with spaces after `///` in summaries
 - **Errors**: `ArgumentException` for parsing, `InvalidOperationException` for runtime issues
 - **Namespace**: File-scoped namespaces only
 - **Using Statements**: Top of file only
