@@ -60,7 +60,7 @@ var results = ProcessFile(options.InputFile);
 
 ### Self-Validation Tests
 
-- Naming: `BuildMark_FeatureBeingValidated`
+- Naming: `BuildMark_MethodUnderTest_Scenario`
 - These tests ship with the product and run via `--validate` flag
 - Must support TRX/JUnit output format
 - Link to requirements in `requirements.yaml`
