@@ -23,9 +23,10 @@ Project-specific guidance for agents working on BuildMark - a .NET CLI tool for 
 
 ## Requirements
 
-- Link ALL requirements to tests (prefer `BuildMark_*` self-validation tests)
+- Link ALL requirements to tests (prefer `BuildMark_*` self-validation tests for command-line behavior)
 - Enforced in CI: `dotnet reqstream --requirements requirements.yaml --tests "test-results/**/*.trx" --enforce`
 - When adding features: add requirement + link to test
+- See Requirements Agent for detailed test coverage strategy
 
 ## Testing
 
