@@ -25,10 +25,12 @@
     "nupkg",
     "oneline",
     "opencover",
+    "pandoc",
     "reqstream",
     "snupkg",
     "tracematrix",
     "trx",
+    "Weasyprint",
     "yamllint"
   ],
   "ignorePaths": [
