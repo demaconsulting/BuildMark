@@ -39,3 +39,6 @@ docs/quality/codeql-quality.md
 docs/quality/*.html
 docs/buildnotes.md
 docs/buildnotes/*.html
+
+# Agent report files
+AGENT_REPORT_*.md
