@@ -44,6 +44,21 @@ internal static class PathHelpers
         // 1. relativePath doesn't contain ".." (path traversal)
         // 2. relativePath is not an absolute path (IsPathRooted check)
         // This ensures the combined path will always be under basePath
-        return Path.Combine(basePath, relativePath);
+        var combinedPath = Path.Combine(basePath, relativePath);
+
+        // Additional security validation: ensure the combined path is still under the base path.
+        // This defense-in-depth approach protects against edge cases that might bypass the
+        // initial validation, ensuring the final path stays within the intended directory.
+        var fullBasePath = Path.GetFullPath(basePath);
+        var fullCombinedPath = Path.GetFullPath(combinedPath);
+
+        // Use GetRelativePath to verify the relationship between paths
+        var relativeCheck = Path.GetRelativePath(fullBasePath, fullCombinedPath);
+        if (relativeCheck.StartsWith("..") || Path.IsPathRooted(relativeCheck))
+        {
+            throw new ArgumentException($"Invalid path component: {relativePath}", nameof(relativePath));
+        }
+
+        return combinedPath;
     }
 }
