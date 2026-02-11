@@ -55,6 +55,15 @@ public void ClassName_MethodUnderTest_Scenario_ExpectedBehavior()
 - Clear failure messages for assertions
 - Consider edge cases and error conditions
 
+### Tests and Requirements
+
+- **All requirements MUST have linked tests** - this is enforced in CI
+- **Not all tests need requirements** - tests may be created for:
+  - Exploring corner cases not explicitly stated in requirements
+  - Testing design decisions and implementation details
+  - Failure-testing and error handling scenarios
+  - Verifying internal behavior beyond requirement scope
+
 ### BuildMark-Specific
 
 - **NOT self-validation tests** - those are handled by Software Developer Agent

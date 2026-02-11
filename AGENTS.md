@@ -23,7 +23,8 @@ Project-specific guidance for agents working on BuildMark - a .NET CLI tool for 
 
 ## Requirements
 
-- Link ALL requirements to tests (prefer `BuildMark_*` self-validation tests for command-line behavior)
+- All requirements MUST be linked to tests (prefer `BuildMark_*` self-validation tests for command-line behavior)
+- Not all tests need to be linked to requirements (tests may exist for corner cases, design testing, failure-testing, etc.)
 - Enforced in CI: `dotnet reqstream --requirements requirements.yaml --tests "test-results/**/*.trx" --enforce`
 - When adding features: add requirement + link to test
 - See Requirements Agent for detailed test coverage strategy
@@ -95,3 +96,14 @@ lint.bat      # Windows
 # Pack as NuGet tool
 dotnet pack --configuration Release
 ```
+
+## Agent Report Files
+
+When agents need to write report files to communicate with each other or the user, follow these guidelines:
+
+- **Naming Convention**: Use the pattern `AGENT_REPORT_xxxx.md` (e.g., `AGENT_REPORT_analysis.md`, `AGENT_REPORT_results.md`)
+- **Purpose**: These files are for temporary inter-agent communication and should not be committed
+- **Exclusions**: Files matching `AGENT_REPORT_*.md` are automatically:
+  - Excluded from git (via .gitignore)
+  - Excluded from markdown linting
+  - Excluded from spell checking

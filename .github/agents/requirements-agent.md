@@ -29,6 +29,12 @@ Invoke the requirements-agent for:
 
 ### Test Coverage Strategy
 
+- **All requirements MUST be linked to tests** - this is enforced in CI
+- **Not all tests need to be linked to requirements** - tests may exist for:
+  - Exploring corner cases
+  - Testing design decisions
+  - Failure-testing scenarios
+  - Implementation validation beyond requirement scope
 - **Self-validation tests** (`BuildMark_*`): Preferred for command-line behavior, features
   that ship with the product
 - **Unit tests**: For internal component behavior, isolated logic
@@ -54,4 +60,5 @@ Follow the `requirements.yaml` structure:
 
 - Mix requirements with implementation details
 - Create requirements without test linkage
+- Expect all tests to be linked to requirements (some tests exist for other purposes)
 - Change code directly (delegate to developer agents)
