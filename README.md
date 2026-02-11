@@ -203,6 +203,131 @@ Example report structure:
 [View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
 ```
 
+## Building from Source
+
+### Prerequisites
+
+- [.NET SDK](https://dotnet.microsoft.com/download) 8.0, 9.0, or 10.0
+- [Git](https://git-scm.com/)
+
+### Clone and Build
+
+```bash
+# Clone the repository
+git clone https://github.com/demaconsulting/BuildMark.git
+cd BuildMark
+
+# Build the project
+dotnet build --configuration Release
+
+# Run tests
+dotnet test --configuration Release
+
+# Or use the convenience scripts
+./build.sh      # Linux/macOS
+build.bat       # Windows
+```
+
+### Run Locally
+
+```bash
+# Run the tool directly from source
+dotnet run --project src/DemaConsulting.BuildMark --configuration Release -- --help
+```
+
+### Package as Tool
+
+```bash
+# Create NuGet package
+dotnet pack --configuration Release
+
+# Install locally for testing
+dotnet tool install --global --add-source ./src/DemaConsulting.BuildMark/bin/Release DemaConsulting.BuildMark
+```
+
+### Linting
+
+The project uses several linters to ensure code quality:
+
+```bash
+# Run all linters
+./lint.sh       # Linux/macOS
+lint.bat        # Windows
+
+# Or run individually
+npx markdownlint-cli2 "**/*.md"   # Markdown linting
+npx cspell "**/*.{md,cs}"         # Spell checking
+yamllint .                        # YAML linting
+dotnet format                     # Code formatting
+```
+
+## Project Structure
+
+```text
+BuildMark/
+├── .github/               # GitHub configuration
+│   ├── agents/           # GitHub Copilot agent definitions
+│   ├── workflows/        # CI/CD workflow definitions
+│   └── ISSUE_TEMPLATE/   # Issue templates
+├── docs/                 # Documentation
+│   ├── guide/           # User guide
+│   ├── requirements/    # Requirements documentation
+│   ├── tracematrix/     # Traceability matrix
+│   ├── justifications/  # Requirements justifications
+│   ├── quality/         # Code quality reports
+│   └── buildnotes/      # Generated build notes
+├── src/                 # Source code
+│   └── DemaConsulting.BuildMark/
+│       ├── Context.cs           # Command-line context
+│       ├── Program.cs           # Main entry point
+│       ├── Validation.cs        # Self-validation tests
+│       ├── PathHelpers.cs       # Safe path operations
+│       └── RepositoryConnectors/ # Repository integration
+├── test/                # Test projects
+│   └── DemaConsulting.BuildMark.Tests/
+├── requirements.yaml    # Requirements specification
+├── build.sh / build.bat # Build scripts
+├── lint.sh / lint.bat   # Linting scripts
+└── README.md           # This file
+```
+
+## CI/CD Pipeline
+
+BuildMark uses GitHub Actions for continuous integration and deployment:
+
+### Build Workflow
+
+- **Trigger**: On push to main branch and pull requests
+- **Platforms**: Windows and Linux
+- **Frameworks**: .NET 8.0, 9.0, and 10.0
+- **Steps**:
+  1. Code quality checks (markdown lint, spell check, YAML lint)
+  2. Build project for all target frameworks
+  3. Run self-validation tests
+  4. CodeQL security analysis
+  5. SonarCloud quality analysis
+  6. Generate documentation (requirements, trace matrix, build notes)
+  7. Upload artifacts
+
+### Release Workflow
+
+- **Trigger**: On creating a new release tag
+- **Steps**:
+  1. Build and test on Windows and Linux
+  2. Package as NuGet tool package
+  3. Publish to NuGet.org
+  4. Generate release documentation
+
+### Quality Gates
+
+The CI pipeline enforces several quality gates:
+
+- All tests must pass
+- No markdown or spell check errors
+- CodeQL security scan must pass
+- SonarCloud quality gate must pass
+- Requirements traceability must be maintained
+
 ## Contributing
 
 Contributions are welcome! We appreciate your interest in improving BuildMark.
