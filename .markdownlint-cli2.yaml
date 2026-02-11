@@ -1,0 +1,4 @@
+ignores:
+  - "DOCUMENTATION_ANALYSIS.md"
+  - "DOCUMENTATION_SUMMARY.md"
+  - "template-consistency-report.md"

@@ -2,6 +2,7 @@
   "version": "0.2",
   "language": "en",
   "words": [
+    "browsable",
     "buildmark",
     "BuildMark",
     "buildnotes",
@@ -18,6 +19,7 @@
     "dependabot",
     "dotnet",
     "editorconfig",
+    "errorlevel",
     "ibiqlik",
     "markdownlint",
     "mstest",
