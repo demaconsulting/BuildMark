@@ -52,7 +52,9 @@ internal static class PathHelpers
         var fullBasePath = Path.GetFullPath(basePath);
         var fullCombinedPath = Path.GetFullPath(combinedPath);
 
-        if (!fullCombinedPath.StartsWith(fullBasePath, StringComparison.OrdinalIgnoreCase))
+        // Use GetRelativePath to verify the relationship between paths
+        var relativeCheck = Path.GetRelativePath(fullBasePath, fullCombinedPath);
+        if (relativeCheck.StartsWith("..") || Path.IsPathRooted(relativeCheck))
         {
             throw new ArgumentException($"Invalid path component: {relativePath}", nameof(relativePath));
         }

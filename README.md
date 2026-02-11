@@ -205,7 +205,7 @@ Example report structure:
 
 ## Building from Source
 
-### Prerequisites
+### Development Prerequisites
 
 - [.NET SDK](https://dotnet.microsoft.com/download) 8.0, 9.0, or 10.0
 - [Git](https://git-scm.com/)
