@@ -6,6 +6,8 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "github-actions"
@@ -15,6 +17,12 @@ updates:
     directory: "/"
     schedule:
       interval: "weekly"
+      day: "monday"
+    open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "nuget"
+    groups:
+      nuget-dependencies:
+        patterns:
+          - "*"
