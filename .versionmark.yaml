@@ -4,6 +4,7 @@
 
 tools:
   # .NET SDK
+  # Note: .NET SDK versions include up to 4 components (e.g., 10.0.102, 8.0.404)
   dotnet:
     command: dotnet --version
     regex: '(?<version>\d+\.\d+\.\d+(?:\.\d+)?)'
