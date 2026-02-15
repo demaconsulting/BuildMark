@@ -49,6 +49,12 @@
       "commands": [
         "sarifmark"
       ]
+    },
+    "demaconsulting.versionmark": {
+      "version": "0.1.0",
+      "commands": [
+        "versionmark"
+      ]
     }
   }
 }
