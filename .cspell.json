@@ -36,6 +36,7 @@
     "snupkg",
     "tracematrix",
     "trx",
+    "versionmark",
     "Weasyprint",
     "yamllint"
   ],
