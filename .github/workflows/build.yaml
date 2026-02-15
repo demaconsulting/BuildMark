@@ -145,8 +145,7 @@ jobs:
           # Create short job ID: build-win, build-ubuntu
           OS_SHORT=$(echo "${{ matrix.os }}" | sed 's/windows-latest/win/;s/ubuntu-latest/ubuntu/')
           JOB_ID="build-${OS_SHORT}"
-          dotnet versionmark --capture --job-id "${JOB_ID}" -- \
-            dotnet git dotnet-sonarscanner versionmark
+          dotnet versionmark --capture --job-id "${JOB_ID}" -- dotnet git dotnet-sonarscanner versionmark
           echo "✓ Tool versions captured"
 
       - name: Upload version capture
@@ -438,14 +437,17 @@ jobs:
         run: |
           echo "Capturing tool versions..."
           dotnet versionmark --capture --job-id "build-docs" -- \
-            dotnet git node npm pandoc weasyprint sarifmark sonarmark reqstream buildmark versionmark
+            dotnet git node npm pandoc weasyprint \
+            sarifmark sonarmark reqstream buildmark versionmark
           echo "✓ Tool versions captured"
 
       - name: Publish Tool Versions
         shell: bash
         run: |
           echo "Publishing tool versions..."
-          dotnet versionmark --publish --report docs/buildnotes/versions.md --report-depth 1 \
+          dotnet versionmark --publish \
+            --report docs/buildnotes/versions.md \
+            --report-depth 1 \
             -- "versionmark-*.json" "version-captures/**/versionmark-*.json"
           echo "✓ Tool versions published"
 
