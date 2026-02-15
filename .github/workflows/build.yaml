@@ -25,8 +25,7 @@ jobs:
           dotnet-version: 10.x
 
       - name: Restore Tools
-        run: >
-          dotnet tool restore
+        run: dotnet tool restore
 
       - name: Capture tool versions
         shell: bash
@@ -258,8 +257,7 @@ jobs:
           dotnet-version: ${{ matrix.dotnet-version }}
 
       - name: Restore Tools
-        run: >
-          dotnet tool restore
+        run: dotnet tool restore
 
       - name: Install tool from package
         shell: bash
