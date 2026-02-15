@@ -54,9 +54,10 @@ tools:
     command: dotnet tool list
     regex: '(?i)demaconsulting\.reqstream\s+(?<version>\d+\.\d+\.\d+)'
 
-  # BuildMark (DemaConsulting.BuildMark from dotnet tool list)
+  # BuildMark (DemaConsulting.BuildMark from dotnet tool list --global)
+  # Note: BuildMark is installed globally in integration-test and build-docs jobs
   buildmark:
-    command: dotnet tool list
+    command: dotnet tool list --global
     regex: '(?i)demaconsulting\.buildmark\s+(?<version>\d+\.\d+\.\d+)'
 
   # VersionMark (DemaConsulting.VersionMark from dotnet tool list)

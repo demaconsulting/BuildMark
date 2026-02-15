@@ -299,7 +299,7 @@ jobs:
           OS_SHORT=$(echo "${{ matrix.os }}" | sed 's/windows-latest/win/;s/ubuntu-latest/ubuntu/')
           DOTNET_SHORT=$(echo "${{ matrix.dotnet-version }}" | sed 's/\.x$//')
           JOB_ID="int-${OS_SHORT}-${DOTNET_SHORT}"
-          dotnet versionmark --capture --job-id "${JOB_ID}" -- dotnet git versionmark
+          dotnet versionmark --capture --job-id "${JOB_ID}" -- dotnet git buildmark versionmark
           echo "✓ Tool versions captured"
 
       - name: Upload version capture
