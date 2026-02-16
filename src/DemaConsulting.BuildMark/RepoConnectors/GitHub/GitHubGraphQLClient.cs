@@ -102,41 +102,61 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            // Create GraphQL request to get closing issues for a pull request.
-            // Note: Limited to first 100 issues per GitHub API. In practice, PRs rarely have more than 100 linked issues.
-            var request = new GraphQLRequest
+            var allIssueNumbers = new List<int>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all closing issues
+            do
             {
-                Query = @"
-                    query($owner: String!, $repo: String!, $prNumber: Int!) {
-                        repository(owner: $owner, name: $repo) {
-                            pullRequest(number: $prNumber) {
-                                closingIssuesReferences(first: 100) {
-                                    nodes {
-                                        number
+                // Create GraphQL request to get closing issues for a pull request with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $prNumber: Int!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                pullRequest(number: $prNumber) {
+                                    closingIssuesReferences(first: 100, after: $after) {
+                                        nodes {
+                                            number
+                                        }
+                                        pageInfo {
+                                            hasNextPage
+                                            endCursor
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }",
-                Variables = new
-                {
-                    owner,
-                    repo,
-                    prNumber
-                }
-            };
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        prNumber,
+                        after = afterCursor
+                    }
+                };
 
-            // Execute GraphQL query
-            var response = await _graphqlClient.SendQueryAsync<GitHubGraphQLTypes.FindIssueIdsResponse>(request);
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<FindIssueIdsResponse>(request);
 
-            // Extract issue numbers from the GraphQL response, filtering out null or invalid values
-            var issueNumbers = response.Data?.Repository?.PullRequest?.ClosingIssuesReferences?.Nodes?
-                .Where(n => n.Number.HasValue)
-                .Select(n => n.Number!.Value)
-                .ToList() ?? [];
+                // Extract issue numbers from the GraphQL response, filtering out null or invalid values
+                var pageIssueNumbers = response.Data?.Repository?.PullRequest?.ClosingIssuesReferences?.Nodes?
+                    .Where(n => n.Number.HasValue)
+                    .Select(n => n.Number!.Value)
+                    .ToList() ?? [];
 
-            // Return list of linked issue numbers
-            return issueNumbers;
+                allIssueNumbers.AddRange(pageIssueNumbers);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.PullRequest?.ClosingIssuesReferences?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage && afterCursor != null);
+
+            // Return list of all linked issue numbers
+            return allIssueNumbers;
         }
         catch
         {

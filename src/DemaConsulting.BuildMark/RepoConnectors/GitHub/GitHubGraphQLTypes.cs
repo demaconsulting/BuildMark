@@ -21,42 +21,47 @@
 namespace DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 /// <summary>
-///     GitHub GraphQL response types.
+///     Response for finding issues linked to a pull request.
 /// </summary>
-internal static class GitHubGraphQLTypes
-{
-    /// <summary>
-    ///     Response for finding issues linked to a pull request.
-    /// </summary>
-    /// <param name="Repository">Repository data.</param>
-    internal record FindIssueIdsResponse(
-        RepositoryData? Repository);
+/// <param name="Repository">Repository data.</param>
+internal record FindIssueIdsResponse(
+    RepositoryData? Repository);
 
-    /// <summary>
-    ///     Repository data containing pull request information.
-    /// </summary>
-    /// <param name="PullRequest">Pull request data.</param>
-    internal record RepositoryData(
-        PullRequestData? PullRequest);
+/// <summary>
+///     Repository data containing pull request information.
+/// </summary>
+/// <param name="PullRequest">Pull request data.</param>
+internal record RepositoryData(
+    PullRequestData? PullRequest);
 
-    /// <summary>
-    ///     Pull request data containing closing issues.
-    /// </summary>
-    /// <param name="ClosingIssuesReferences">Closing issues references.</param>
-    internal record PullRequestData(
-        ClosingIssuesReferencesData? ClosingIssuesReferences);
+/// <summary>
+///     Pull request data containing closing issues.
+/// </summary>
+/// <param name="ClosingIssuesReferences">Closing issues references.</param>
+internal record PullRequestData(
+    ClosingIssuesReferencesData? ClosingIssuesReferences);
 
-    /// <summary>
-    ///     Closing issues references data containing nodes.
-    /// </summary>
-    /// <param name="Nodes">Issue nodes.</param>
-    internal record ClosingIssuesReferencesData(
-        List<IssueNode>? Nodes);
+/// <summary>
+///     Closing issues references data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Issue nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record ClosingIssuesReferencesData(
+    List<IssueNode>? Nodes,
+    PageInfo? PageInfo);
 
-    /// <summary>
-    ///     Issue node containing issue number.
-    /// </summary>
-    /// <param name="Number">Issue number.</param>
-    internal record IssueNode(
-        int? Number);
-}
+/// <summary>
+///     Issue node containing issue number.
+/// </summary>
+/// <param name="Number">Issue number.</param>
+internal record IssueNode(
+    int? Number);
+
+/// <summary>
+///     Pagination information for GraphQL queries.
+/// </summary>
+/// <param name="HasNextPage">Indicates whether there are more pages.</param>
+/// <param name="EndCursor">Cursor for the next page.</param>
+internal record PageInfo(
+    bool HasNextPage,
+    string? EndCursor);

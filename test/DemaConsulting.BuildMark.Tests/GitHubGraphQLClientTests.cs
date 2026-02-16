@@ -46,7 +46,11 @@ public class GitHubGraphQLClientTests
                                 { ""number"": 123 },
                                 { ""number"": 456 },
                                 { ""number"": 789 }
-                            ]
+                            ],
+                            ""pageInfo"": {
+                                ""hasNextPage"": false,
+                                ""endCursor"": null
+                            }
                         }
                     }
                 }
@@ -79,7 +83,11 @@ public class GitHubGraphQLClientTests
                 ""repository"": {
                     ""pullRequest"": {
                         ""closingIssuesReferences"": {
-                            ""nodes"": []
+                            ""nodes"": [],
+                            ""pageInfo"": {
+                                ""hasNextPage"": false,
+                                ""endCursor"": null
+                            }
                         }
                     }
                 }
@@ -175,7 +183,11 @@ public class GitHubGraphQLClientTests
                         ""closingIssuesReferences"": {
                             ""nodes"": [
                                 { ""number"": 999 }
-                            ]
+                            ],
+                            ""pageInfo"": {
+                                ""hasNextPage"": false,
+                                ""endCursor"": null
+                            }
                         }
                     }
                 }
@@ -210,7 +222,11 @@ public class GitHubGraphQLClientTests
                                 { ""number"": 100 },
                                 { ""title"": ""Missing number"" },
                                 { ""number"": 200 }
-                            ]
+                            ],
+                            ""pageInfo"": {
+                                ""hasNextPage"": false,
+                                ""endCursor"": null
+                            }
                         }
                     }
                 }
@@ -228,6 +244,28 @@ public class GitHubGraphQLClientTests
         Assert.HasCount(2, issueIds);
         Assert.AreEqual(100, issueIds[0]);
         Assert.AreEqual(200, issueIds[1]);
+    }
+
+    /// <summary>
+    ///     Test that FindIssueIdsLinkedToPullRequestAsync handles pagination correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues()
+    {
+        // Arrange - Create mock handler that returns different responses for different pages
+        var mockHandler = new PaginationMockHttpMessageHandler();
+        using var httpClient = new HttpClient(mockHandler);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 10);
+
+        // Assert
+        Assert.IsNotNull(issueIds);
+        Assert.HasCount(3, issueIds);
+        Assert.AreEqual(100, issueIds[0]);
+        Assert.AreEqual(200, issueIds[1]);
+        Assert.AreEqual(300, issueIds[2]);
     }
 
     /// <summary>
@@ -288,6 +326,109 @@ public class GitHubGraphQLClientTests
             };
 
             return Task.FromResult(response);
+        }
+    }
+
+    /// <summary>
+    ///     Mock HTTP message handler for testing pagination.
+    /// </summary>
+    private sealed class PaginationMockHttpMessageHandler : HttpMessageHandler
+    {
+        /// <summary>
+        ///     Request count to track pagination.
+        /// </summary>
+        private int _requestCount;
+
+        /// <summary>
+        ///     Sends a mock HTTP response with pagination.
+        /// </summary>
+        /// <param name="request">HTTP request message.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Mock HTTP response.</returns>
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            // Read request body to determine which page to return
+            var requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            
+            string responseContent;
+            if (_requestCount == 0 || !requestBody.Contains("\"after\""))
+            {
+                // First page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""pullRequest"": {
+                                ""closingIssuesReferences"": {
+                                    ""nodes"": [
+                                        { ""number"": 100 }
+                                    ],
+                                    ""pageInfo"": {
+                                        ""hasNextPage"": true,
+                                        ""endCursor"": ""cursor1""
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+            else if (requestBody.Contains("\"cursor1\""))
+            {
+                // Second page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""pullRequest"": {
+                                ""closingIssuesReferences"": {
+                                    ""nodes"": [
+                                        { ""number"": 200 }
+                                    ],
+                                    ""pageInfo"": {
+                                        ""hasNextPage"": true,
+                                        ""endCursor"": ""cursor2""
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+            else
+            {
+                // Third (last) page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""pullRequest"": {
+                                ""closingIssuesReferences"": {
+                                    ""nodes"": [
+                                        { ""number"": 300 }
+                                    ],
+                                    ""pageInfo"": {
+                                        ""hasNextPage"": false,
+                                        ""endCursor"": null
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+
+            _requestCount++;
+
+            // Create response with content
+            // Note: The returned HttpResponseMessage will be disposed by HttpClient,
+            // which also disposes the Content. This is the expected pattern for HttpMessageHandler.
+            var content = new StringContent(responseContent, Encoding.UTF8, "application/json");
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = content
+            };
+
+            return response;
         }
     }
 }
