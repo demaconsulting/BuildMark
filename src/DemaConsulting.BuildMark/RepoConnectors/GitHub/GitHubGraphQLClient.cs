@@ -153,7 +153,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 hasNextPage = pageInfo?.HasNextPage ?? false;
                 afterCursor = pageInfo?.EndCursor;
             }
-            while (hasNextPage && afterCursor != null);
+            while (hasNextPage);
 
             // Return list of all linked issue numbers
             return allIssueNumbers;
