@@ -20,7 +20,7 @@
 
 using System.Net;
 using System.Text;
-using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 namespace DemaConsulting.BuildMark.Tests;
 
