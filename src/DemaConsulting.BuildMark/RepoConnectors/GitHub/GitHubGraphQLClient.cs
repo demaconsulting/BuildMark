@@ -102,7 +102,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            // Create GraphQL request
+            // Create GraphQL request to get closing issues for a pull request.
+            // Note: Limited to first 100 issues per GitHub API. In practice, PRs rarely have more than 100 linked issues.
             var request = new GraphQLRequest
             {
                 Query = @"
