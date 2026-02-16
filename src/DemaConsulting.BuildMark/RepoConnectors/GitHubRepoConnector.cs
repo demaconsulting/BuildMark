@@ -104,7 +104,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             : null;
 
         // Generate full changelog link for GitHub
-        var changelogLink = GenerateGitHubChangelogLink(owner, repo, fromVersion?.Tag, toVersion.Tag);
+        var changelogLink = GenerateGitHubChangelogLink(owner, repo, fromVersion?.Tag, toVersion.Tag, lookupData.BranchTagNames);
 
         // Create and return build information with all collected data
         return new BuildInformation(
@@ -135,7 +135,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         List<Release> BranchReleases,
         Dictionary<string, RepositoryTag> TagsByName,
         Dictionary<string, Release> TagToRelease,
-        List<Version> ReleaseVersions);
+        List<Version> ReleaseVersions,
+        HashSet<string> BranchTagNames);
 
     /// <summary>
     ///     Fetches all required data from GitHub API in parallel.
@@ -222,7 +223,8 @@ public class GitHubRepoConnector : RepoConnectorBase
             branchReleases,
             tagsByName,
             tagToRelease,
-            releaseVersions);
+            releaseVersions,
+            branchTagNames);
     }
 
     /// <summary>
@@ -731,11 +733,18 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="repo">Repository name.</param>
     /// <param name="oldTag">Old tag name (null if from beginning).</param>
     /// <param name="newTag">New tag name.</param>
-    /// <returns>WebLink to GitHub compare page, or null if no baseline tag.</returns>
-    internal static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag)
+    /// <param name="branchTagNames">Set of tag names on the current branch.</param>
+    /// <returns>WebLink to GitHub compare page, or null if no baseline tag or if tags not found in branch.</returns>
+    internal static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag, HashSet<string> branchTagNames)
     {
         // Cannot generate comparison link without a baseline tag
         if (oldTag == null)
+        {
+            return null;
+        }
+
+        // Suppress changelog link if either tag is not in the branch
+        if (!branchTagNames.Contains(oldTag) || !branchTagNames.Contains(newTag))
         {
             return null;
         }

@@ -288,8 +288,11 @@ public class GitHubRepoConnectorTests
     [TestMethod]
     public void GitHubRepoConnector_GenerateGitHubChangelogLink_ValidTags_ReturnsWebLink()
     {
+        // Arrange
+        var branchTagNames = new HashSet<string> { "v1.0.0", "v2.0.0" };
+
         // Act
-        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0");
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0", branchTagNames);
 
         // Assert
         Assert.IsNotNull(link);
@@ -303,8 +306,59 @@ public class GitHubRepoConnectorTests
     [TestMethod]
     public void GitHubRepoConnector_GenerateGitHubChangelogLink_NullOldTag_ReturnsNull()
     {
+        // Arrange
+        var branchTagNames = new HashSet<string> { "v2.0.0" };
+
         // Act
-        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", null, "v2.0.0");
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", null, "v2.0.0", branchTagNames);
+
+        // Assert
+        Assert.IsNull(link);
+    }
+
+    /// <summary>
+    ///     Test that GenerateGitHubChangelogLink returns null when oldTag is not in branch tags.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GenerateGitHubChangelogLink_OldTagNotInBranch_ReturnsNull()
+    {
+        // Arrange
+        var branchTagNames = new HashSet<string> { "v2.0.0" };
+
+        // Act
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0", branchTagNames);
+
+        // Assert
+        Assert.IsNull(link);
+    }
+
+    /// <summary>
+    ///     Test that GenerateGitHubChangelogLink returns null when newTag is not in branch tags.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GenerateGitHubChangelogLink_NewTagNotInBranch_ReturnsNull()
+    {
+        // Arrange
+        var branchTagNames = new HashSet<string> { "v1.0.0" };
+
+        // Act
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0", branchTagNames);
+
+        // Assert
+        Assert.IsNull(link);
+    }
+
+    /// <summary>
+    ///     Test that GenerateGitHubChangelogLink returns null when neither tag is in branch tags.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_GenerateGitHubChangelogLink_NoTagsInBranch_ReturnsNull()
+    {
+        // Arrange
+        var branchTagNames = new HashSet<string>();
+
+        // Act
+        var link = GitHubRepoConnector.GenerateGitHubChangelogLink("owner", "repo", "v1.0.0", "v2.0.0", branchTagNames);
 
         // Assert
         Assert.IsNull(link);
@@ -320,6 +374,7 @@ public class GitHubRepoConnectorTests
         var version = Version.Create("v1.0.0");
         var currentHash = "abc123";
         var lookupData = new GitHubRepoConnector.LookupData(
+            [],
             [],
             [],
             [],
@@ -344,6 +399,7 @@ public class GitHubRepoConnectorTests
         // Arrange
         var currentHash = "abc123";
         var lookupData = new GitHubRepoConnector.LookupData(
+            [],
             [],
             [],
             [],
@@ -381,6 +437,7 @@ public class GitHubRepoConnectorTests
         // Arrange
         var toVersion = Version.Create("v1.0.0");
         var lookupData = new GitHubRepoConnector.LookupData(
+            [],
             [],
             [],
             [],
