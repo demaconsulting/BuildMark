@@ -592,7 +592,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         return releaseTagNames.Select(tagName =>
         {
             var json = $$"""{"tag_name":"{{tagName}}"}""";
-            return System.Text.Json.JsonSerializer.Deserialize<Release>(json) ?? throw new InvalidOperationException($"Failed to create Release object for tag {tagName}");
+            return Newtonsoft.Json.JsonConvert.DeserializeObject<Release>(json) ?? throw new InvalidOperationException($"Failed to create Release object for tag {tagName}");
         }).ToList();
     }
 
