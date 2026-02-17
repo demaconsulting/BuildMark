@@ -109,3 +109,33 @@ internal record CommitHistoryData(
 /// <param name="Oid">Git object ID (SHA).</param>
 internal record CommitNode(
     string? Oid);
+
+/// <summary>
+///     Response for getting releases from a repository.
+/// </summary>
+/// <param name="Repository">Repository data containing release information.</param>
+internal record GetReleasesResponse(
+    ReleaseRepositoryData? Repository);
+
+/// <summary>
+///     Repository data containing releases information.
+/// </summary>
+/// <param name="Releases">Releases connection data.</param>
+internal record ReleaseRepositoryData(
+    ReleasesConnectionData? Releases);
+
+/// <summary>
+///     Releases connection data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Release nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record ReleasesConnectionData(
+    List<ReleaseNode>? Nodes,
+    PageInfo? PageInfo);
+
+/// <summary>
+///     Release node containing release information.
+/// </summary>
+/// <param name="TagName">Tag name associated with the release.</param>
+internal record ReleaseNode(
+    string? TagName);

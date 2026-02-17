@@ -131,7 +131,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     internal sealed record GitHubData(
         IReadOnlyList<Commit> Commits,
-        IReadOnlyList<Release> Releases,
+        IReadOnlyList<ReleaseNode> Releases,
         IReadOnlyList<RepositoryTag> Tags,
         IReadOnlyList<PullRequest> PullRequests,
         IReadOnlyList<Issue> Issues);
@@ -142,9 +142,9 @@ public class GitHubRepoConnector : RepoConnectorBase
     internal sealed record LookupData(
         Dictionary<int, Issue> IssueById,
         Dictionary<string, PullRequest> CommitHashToPr,
-        List<Release> BranchReleases,
+        List<ReleaseNode> BranchReleases,
         Dictionary<string, RepositoryTag> TagsByName,
-        Dictionary<string, Release> TagToRelease,
+        Dictionary<string, ReleaseNode> TagToRelease,
         List<Version> ReleaseVersions,
         HashSet<string> BranchTagNames);
 
@@ -166,7 +166,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     {
         // Fetch all data from GitHub in parallel
         var commitsTask = GetAllCommitsAsync(graphqlClient, owner, repo, branch);
-        var releasesTask = client.Repository.Release.GetAll(owner, repo);
+        var releasesTask = GetAllReleasesAsync(graphqlClient, owner, repo);
         var tagsTask = client.Repository.GetAllTags(owner, repo);
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
@@ -214,7 +214,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Build an ordered list of releases on the current branch.
         // This is used to select the prior release version for identifying changes in the build.
         var branchReleases = data.Releases
-            .Where(r => !string.IsNullOrEmpty(r.TagName) && branchTagNames.Contains(r.TagName))
+            .Where(r => r.TagName != null && branchTagNames.Contains(r.TagName))
             .ToList();
 
         // Build a mapping from tag name to tag object for quick lookup.
@@ -570,6 +570,22 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Convert SHAs to Commit objects and return
         return commitShas.Select(sha => new Commit(sha)).ToList();
+    }
+
+    /// <summary>
+    ///     Gets all releases for a repository using GraphQL pagination.
+    /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of all releases.</returns>
+    private static async Task<IReadOnlyList<ReleaseNode>> GetAllReleasesAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo)
+    {
+        // Fetch all releases for the repository using GraphQL
+        return await graphqlClient.GetReleasesAsync(owner, repo);
     }
 
     /// <summary>
