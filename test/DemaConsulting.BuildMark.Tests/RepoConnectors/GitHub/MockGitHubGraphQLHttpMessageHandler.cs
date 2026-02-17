@@ -24,6 +24,64 @@ using System.Text;
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>
+///     Represents a mock commit for testing.
+/// </summary>
+/// <param name="Sha">Commit SHA.</param>
+public record MockCommit(string Sha);
+
+/// <summary>
+///     Represents a mock release for testing.
+/// </summary>
+/// <param name="TagName">Release tag name.</param>
+/// <param name="PublishedAt">Published date/time in ISO 8601 format.</param>
+public record MockRelease(
+    string TagName,
+    string PublishedAt);
+
+/// <summary>
+///     Represents a mock tag for testing.
+/// </summary>
+/// <param name="Name">Tag name.</param>
+/// <param name="TargetOid">Target commit OID.</param>
+public record MockTag(
+    string Name,
+    string TargetOid);
+
+/// <summary>
+///     Represents a mock pull request for testing.
+/// </summary>
+/// <param name="Number">Pull request number.</param>
+/// <param name="Title">Pull request title.</param>
+/// <param name="Url">Pull request URL.</param>
+/// <param name="Merged">Whether the PR is merged.</param>
+/// <param name="MergeCommitSha">Merge commit SHA (null if not merged).</param>
+/// <param name="HeadRefOid">Head reference OID.</param>
+/// <param name="Labels">List of label names.</param>
+public record MockPullRequest(
+    int Number,
+    string Title,
+    string Url,
+    bool Merged,
+    string? MergeCommitSha,
+    string? HeadRefOid,
+    List<string> Labels);
+
+/// <summary>
+///     Represents a mock issue for testing.
+/// </summary>
+/// <param name="Number">Issue number.</param>
+/// <param name="Title">Issue title.</param>
+/// <param name="Url">Issue URL.</param>
+/// <param name="State">Issue state (OPEN, CLOSED).</param>
+/// <param name="Labels">List of label names.</param>
+public record MockIssue(
+    int Number,
+    string Title,
+    string Url,
+    string State,
+    List<string> Labels);
+
+/// <summary>
 ///     Mock HTTP message handler for testing GitHub GraphQL API interactions.
 /// </summary>
 /// <remarks>
@@ -120,19 +178,19 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetReleasesAsync with a collection of releases.
     /// </summary>
-    /// <param name="releases">Collection of (tagName, publishedAt) tuples to return.</param>
+    /// <param name="releases">Collection of mock releases to return.</param>
     /// <param name="hasNextPage">Whether there are more pages (default false).</param>
     /// <param name="endCursor">End cursor for pagination (default null).</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddReleasesResponse(
-        IEnumerable<(string tagName, string publishedAt)> releases,
+        IEnumerable<MockRelease> releases,
         bool hasNextPage = false,
         string? endCursor = null)
     {
         var releaseNodes = string.Join(",\n                            ",
             releases.Select(r => $@"{{
-                                ""tagName"": ""{r.tagName}"",
-                                ""publishedAt"": ""{r.publishedAt}""
+                                ""tagName"": ""{r.TagName}"",
+                                ""publishedAt"": ""{r.PublishedAt}""
                             }}"));
 
         var response = $@"{{
@@ -156,20 +214,20 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetAllTagsAsync with a collection of tags.
     /// </summary>
-    /// <param name="tags">Collection of (tagName, targetOid) tuples to return.</param>
+    /// <param name="tags">Collection of mock tags to return.</param>
     /// <param name="hasNextPage">Whether there are more pages (default false).</param>
     /// <param name="endCursor">End cursor for pagination (default null).</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddTagsResponse(
-        IEnumerable<(string tagName, string targetOid)> tags,
+        IEnumerable<MockTag> tags,
         bool hasNextPage = false,
         string? endCursor = null)
     {
         var tagNodes = string.Join(",\n                            ",
             tags.Select(t => $@"{{
-                                ""name"": ""{t.tagName}"",
+                                ""name"": ""{t.Name}"",
                                 ""target"": {{
-                                    ""oid"": ""{t.targetOid}""
+                                    ""oid"": ""{t.TargetOid}""
                                 }}
                             }}"));
 
@@ -352,37 +410,3 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         };
     }
 }
-
-/// <summary>
-///     Represents a mock pull request for testing.
-/// </summary>
-/// <param name="Number">Pull request number.</param>
-/// <param name="Title">Pull request title.</param>
-/// <param name="Url">Pull request URL.</param>
-/// <param name="Merged">Whether the PR is merged.</param>
-/// <param name="MergeCommitSha">Merge commit SHA (null if not merged).</param>
-/// <param name="HeadRefOid">Head reference OID.</param>
-/// <param name="Labels">List of label names.</param>
-public record MockPullRequest(
-    int Number,
-    string Title,
-    string Url,
-    bool Merged,
-    string? MergeCommitSha,
-    string? HeadRefOid,
-    List<string> Labels);
-
-/// <summary>
-///     Represents a mock issue for testing.
-/// </summary>
-/// <param name="Number">Issue number.</param>
-/// <param name="Title">Issue title.</param>
-/// <param name="Url">Issue URL.</param>
-/// <param name="State">Issue state (OPEN, CLOSED).</param>
-/// <param name="Labels">List of label names.</param>
-public record MockIssue(
-    int Number,
-    string Title,
-    string Url,
-    string State,
-    List<string> Labels);

@@ -461,10 +461,10 @@ public class GitHubRepoConnectorTests
         // Arrange - Create mock responses using helper methods
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddCommitsResponse(new[] { "abc123def456" })
-            .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
             .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
             .AddIssuesResponse(Array.Empty<MockIssue>())
-            .AddTagsResponse(new[] { ("v1.0.0", "abc123def456") });
+            .AddTagsResponse(new[] { new MockTag("v1.0.0", "abc123def456") });
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -498,17 +498,17 @@ public class GitHubRepoConnectorTests
             .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
             .AddReleasesResponse(new[]
             {
-                ("v2.0.0", "2024-03-01T00:00:00Z"),
-                ("v1.1.0", "2024-02-01T00:00:00Z"),
-                ("v1.0.0", "2024-01-01T00:00:00Z")
+                new MockRelease("v2.0.0", "2024-03-01T00:00:00Z"),
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
             })
             .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
             .AddIssuesResponse(Array.Empty<MockIssue>())
             .AddTagsResponse(new[]
             {
-                ("v2.0.0", "commit3"),
-                ("v1.1.0", "commit2"),
-                ("v1.0.0", "commit1")
+                new MockTag("v2.0.0", "commit3"),
+                new MockTag("v1.1.0", "commit2"),
+                new MockTag("v1.0.0", "commit1")
             });
 
         using var mockHttpClient = new HttpClient(mockHandler);
@@ -550,8 +550,8 @@ public class GitHubRepoConnectorTests
             .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
             .AddReleasesResponse(new[]
             {
-                ("v1.1.0", "2024-02-01T00:00:00Z"),
-                ("v1.0.0", "2024-01-01T00:00:00Z")
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
             })
             .AddPullRequestsResponse(new[]
             {
@@ -575,8 +575,8 @@ public class GitHubRepoConnectorTests
             .AddIssuesResponse(Array.Empty<MockIssue>())
             .AddTagsResponse(new[]
             {
-                ("v1.1.0", "commit3"),
-                ("v1.0.0", "commit1")
+                new MockTag("v1.1.0", "commit3"),
+                new MockTag("v1.0.0", "commit1")
             })
             // Mock the linked issues query to return empty (PRs are treated as standalone changes)
             .AddResponse("closingIssuesReferences", @"{""data"":{""repository"":{""pullRequest"":{""closingIssuesReferences"":{""nodes"":[],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}}");
@@ -622,7 +622,7 @@ public class GitHubRepoConnectorTests
         // Arrange - Create mock responses with open and closed issues
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddCommitsResponse(new[] { "commit1" })
-            .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
             .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
             .AddIssuesResponse(new[]
             {
@@ -645,7 +645,7 @@ public class GitHubRepoConnectorTests
                     State: "CLOSED",
                     Labels: new List<string> { "bug" })
             })
-            .AddTagsResponse(new[] { ("v1.0.0", "commit1") });
+            .AddTagsResponse(new[] { new MockTag("v1.0.0", "commit1") });
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
