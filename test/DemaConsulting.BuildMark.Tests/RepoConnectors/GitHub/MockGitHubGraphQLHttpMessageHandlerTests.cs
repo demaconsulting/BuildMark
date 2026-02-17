@@ -36,8 +36,8 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
     {
         // Arrange - Use helper methods for standard responses
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "commit1" })
-            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") });
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);
@@ -98,7 +98,7 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
     {
         // Arrange
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "commit1", "commit2", "commit3" });
+            .AddCommitsResponse("commit1", "commit2", "commit3");
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);
@@ -121,12 +121,10 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
     {
         // Arrange
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddReleasesResponse(new[]
-            {
+            .AddReleasesResponse(
                 new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"),
                 new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
-                new MockRelease("v2.0.0", "2024-03-01T00:00:00Z")
-            });
+                new MockRelease("v2.0.0", "2024-03-01T00:00:00Z"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);
