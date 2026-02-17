@@ -820,14 +820,14 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.HasCount(3, releaseTagNames);
-        Assert.AreEqual("v1.0.0", releaseTagNames[0]);
-        Assert.AreEqual("v0.9.0", releaseTagNames[1]);
-        Assert.AreEqual("v0.8.5", releaseTagNames[2]);
+        Assert.IsNotNull(releaseNodes);
+        Assert.HasCount(3, releaseNodes);
+        Assert.AreEqual("v1.0.0", releaseNodes[0].TagName);
+        Assert.AreEqual("v0.9.0", releaseNodes[1].TagName);
+        Assert.AreEqual("v0.8.5", releaseNodes[2].TagName);
     }
 
     /// <summary>
@@ -855,11 +855,11 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.IsEmpty(releaseTagNames);
+        Assert.IsNotNull(releaseNodes);
+        Assert.IsEmpty(releaseNodes);
     }
 
     /// <summary>
@@ -879,11 +879,11 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.IsEmpty(releaseTagNames);
+        Assert.IsNotNull(releaseNodes);
+        Assert.IsEmpty(releaseNodes);
     }
 
     /// <summary>
@@ -899,11 +899,11 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.IsEmpty(releaseTagNames);
+        Assert.IsNotNull(releaseNodes);
+        Assert.IsEmpty(releaseNodes);
     }
 
     /// <summary>
@@ -919,11 +919,11 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.IsEmpty(releaseTagNames);
+        Assert.IsNotNull(releaseNodes);
+        Assert.IsEmpty(releaseNodes);
     }
 
     /// <summary>
@@ -953,12 +953,12 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.HasCount(1, releaseTagNames);
-        Assert.AreEqual("v2.0.0-beta1", releaseTagNames[0]);
+        Assert.IsNotNull(releaseNodes);
+        Assert.HasCount(1, releaseNodes);
+        Assert.AreEqual("v2.0.0-beta1", releaseNodes[0].TagName);
     }
 
     /// <summary>
@@ -990,13 +990,13 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.HasCount(2, releaseTagNames);
-        Assert.AreEqual("v1.0.0", releaseTagNames[0]);
-        Assert.AreEqual("v0.9.0", releaseTagNames[1]);
+        Assert.IsNotNull(releaseNodes);
+        Assert.HasCount(2, releaseNodes);
+        Assert.AreEqual("v1.0.0", releaseNodes[0].TagName);
+        Assert.AreEqual("v0.9.0", releaseNodes[1].TagName);
     }
 
     /// <summary>
@@ -1011,14 +1011,14 @@ public class GitHubGraphQLClientTests
         using var client = new GitHubGraphQLClient(httpClient);
 
         // Act
-        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+        var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseTagNames);
-        Assert.HasCount(3, releaseTagNames);
-        Assert.AreEqual("v3.0.0", releaseTagNames[0]);
-        Assert.AreEqual("v2.0.0", releaseTagNames[1]);
-        Assert.AreEqual("v1.0.0", releaseTagNames[2]);
+        Assert.IsNotNull(releaseNodes);
+        Assert.HasCount(3, releaseNodes);
+        Assert.AreEqual("v3.0.0", releaseNodes[0].TagName);
+        Assert.AreEqual("v2.0.0", releaseNodes[1].TagName);
+        Assert.AreEqual("v1.0.0", releaseNodes[2].TagName);
     }
 
     /// <summary>

@@ -177,14 +177,14 @@ internal sealed class GitHubGraphQLClient : IDisposable
     /// </summary>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
-    /// <returns>List of release tag names.</returns>
-    public async Task<List<string>> GetReleasesAsync(
+    /// <returns>List of release nodes.</returns>
+    public async Task<List<ReleaseNode>> GetReleasesAsync(
         string owner,
         string repo)
     {
         try
         {
-            var allReleaseTagNames = new List<string>();
+            var allReleaseNodes = new List<ReleaseNode>();
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -219,13 +219,12 @@ internal sealed class GitHubGraphQLClient : IDisposable
                 // Execute GraphQL query
                 var response = await _graphqlClient.SendQueryAsync<GetReleasesResponse>(request);
 
-                // Extract release tag names from the GraphQL response, filtering out null or invalid values
-                var pageReleaseTagNames = response.Data?.Repository?.Releases?.Nodes?
+                // Extract release nodes from the GraphQL response, filtering out null or invalid values
+                var pageReleaseNodes = response.Data?.Repository?.Releases?.Nodes?
                     .Where(n => !string.IsNullOrEmpty(n.TagName))
-                    .Select(n => n.TagName!)
                     .ToList() ?? [];
 
-                allReleaseTagNames.AddRange(pageReleaseTagNames);
+                allReleaseNodes.AddRange(pageReleaseNodes);
 
                 // Check if there are more pages
                 var pageInfo = response.Data?.Repository?.Releases?.PageInfo;
@@ -234,8 +233,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
             }
             while (hasNextPage);
 
-            // Return list of all release tag names
-            return allReleaseTagNames;
+            // Return list of all release nodes
+            return allReleaseNodes;
         }
         catch
         {

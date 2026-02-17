@@ -127,17 +127,11 @@ public class GitHubRepoConnector : RepoConnectorBase
         string Sha);
 
     /// <summary>
-    ///     Simple release representation containing only the tag name.
-    /// </summary>
-    internal sealed record Release(
-        string TagName);
-
-    /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
     internal sealed record GitHubData(
         IReadOnlyList<Commit> Commits,
-        IReadOnlyList<Release> Releases,
+        IReadOnlyList<ReleaseNode> Releases,
         IReadOnlyList<RepositoryTag> Tags,
         IReadOnlyList<PullRequest> PullRequests,
         IReadOnlyList<Issue> Issues);
@@ -148,9 +142,9 @@ public class GitHubRepoConnector : RepoConnectorBase
     internal sealed record LookupData(
         Dictionary<int, Issue> IssueById,
         Dictionary<string, PullRequest> CommitHashToPr,
-        List<Release> BranchReleases,
+        List<ReleaseNode> BranchReleases,
         Dictionary<string, RepositoryTag> TagsByName,
-        Dictionary<string, Release> TagToRelease,
+        Dictionary<string, ReleaseNode> TagToRelease,
         List<Version> ReleaseVersions,
         HashSet<string> BranchTagNames);
 
@@ -220,7 +214,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Build an ordered list of releases on the current branch.
         // This is used to select the prior release version for identifying changes in the build.
         var branchReleases = data.Releases
-            .Where(r => branchTagNames.Contains(r.TagName))
+            .Where(r => r.TagName != null && branchTagNames.Contains(r.TagName))
             .ToList();
 
         // Build a mapping from tag name to tag object for quick lookup.
@@ -229,12 +223,12 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Build a mapping from tag name to release for version lookup.
         // This is used to match version objects back to their releases.
-        var tagToRelease = branchReleases.ToDictionary(r => r.TagName, r => r);
+        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
 
         // Parse release tags into Version objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
-            .Select(r => Version.TryCreate(r.TagName))
+            .Select(r => Version.TryCreate(r.TagName!))
             .Where(v => v != null)
             .Cast<Version>()
             .ToList();
@@ -283,7 +277,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Use the most recent release (first in list since releases are newest to oldest)
         var latestRelease = lookupData.BranchReleases[0];
         var latestReleaseVersion = lookupData.ReleaseVersions[0];
-        var latestTagCommit = lookupData.TagsByName[latestRelease.TagName];
+        var latestTagCommit = lookupData.TagsByName[latestRelease.TagName!];
 
         // Check if current commit matches latest release tag
         if (latestTagCommit.Commit.Sha == toHash)
@@ -325,7 +319,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Get commit hash for baseline version if one was found
         if (fromVersion != null &&
             lookupData.TagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
-            lookupData.TagsByName.TryGetValue(fromRelease.TagName, out var fromTagCommit))
+            lookupData.TagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
         {
             return (fromVersion, fromTagCommit.Commit.Sha);
         }
@@ -585,16 +579,13 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <returns>List of all releases.</returns>
-    private static async Task<IReadOnlyList<Release>> GetAllReleasesAsync(
+    private static async Task<IReadOnlyList<ReleaseNode>> GetAllReleasesAsync(
         GitHubGraphQLClient graphqlClient,
         string owner,
         string repo)
     {
-        // Fetch all release tag names for the repository using GraphQL
-        var releaseTagNames = await graphqlClient.GetReleasesAsync(owner, repo);
-
-        // Convert tag names to Release objects
-        return releaseTagNames.Select(tagName => new Release(tagName)).ToList();
+        // Fetch all releases for the repository using GraphQL
+        return await graphqlClient.GetReleasesAsync(owner, repo);
     }
 
     /// <summary>
