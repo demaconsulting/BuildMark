@@ -139,3 +139,42 @@ internal record ReleasesConnectionData(
 /// <param name="TagName">Tag name associated with the release.</param>
 internal record ReleaseNode(
     string? TagName);
+
+/// <summary>
+///     Response for getting tags from a repository.
+/// </summary>
+/// <param name="Repository">Repository data containing tags information.</param>
+internal record GetAllTagsResponse(
+    TagRepositoryData? Repository);
+
+/// <summary>
+///     Repository data containing tags information.
+/// </summary>
+/// <param name="Refs">Git references connection data.</param>
+internal record TagRepositoryData(
+    TagsConnectionData? Refs);
+
+/// <summary>
+///     Tags connection data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Tag nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record TagsConnectionData(
+    List<TagNode>? Nodes,
+    PageInfo? PageInfo);
+
+/// <summary>
+///     Tag node containing tag information.
+/// </summary>
+/// <param name="Name">Tag name.</param>
+/// <param name="Target">Target commit information.</param>
+internal record TagNode(
+    string? Name,
+    TagTargetData? Target);
+
+/// <summary>
+///     Target data for a tag containing commit SHA.
+/// </summary>
+/// <param name="Oid">Git object ID (SHA) of the commit.</param>
+internal record TagTargetData(
+    string? Oid);

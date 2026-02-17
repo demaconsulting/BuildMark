@@ -127,12 +127,25 @@ public class GitHubRepoConnector : RepoConnectorBase
         string Sha);
 
     /// <summary>
+    ///     Tag representation with name and commit information.
+    /// </summary>
+    internal sealed record Tag(
+        string Name,
+        TagCommit Commit);
+
+    /// <summary>
+    ///     Tag commit information containing the SHA hash.
+    /// </summary>
+    internal sealed record TagCommit(
+        string Sha);
+
+    /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
     internal sealed record GitHubData(
         IReadOnlyList<Commit> Commits,
         IReadOnlyList<ReleaseNode> Releases,
-        IReadOnlyList<RepositoryTag> Tags,
+        IReadOnlyList<Tag> Tags,
         IReadOnlyList<PullRequest> PullRequests,
         IReadOnlyList<Issue> Issues);
 
@@ -143,7 +156,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         Dictionary<int, Issue> IssueById,
         Dictionary<string, PullRequest> CommitHashToPr,
         List<ReleaseNode> BranchReleases,
-        Dictionary<string, RepositoryTag> TagsByName,
+        Dictionary<string, Tag> TagsByName,
         Dictionary<string, ReleaseNode> TagToRelease,
         List<Version> ReleaseVersions,
         HashSet<string> BranchTagNames);
@@ -167,7 +180,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Fetch all data from GitHub in parallel
         var commitsTask = GetAllCommitsAsync(graphqlClient, owner, repo, branch);
         var releasesTask = GetAllReleasesAsync(graphqlClient, owner, repo);
-        var tagsTask = client.Repository.GetAllTags(owner, repo);
+        var tagsTask = GetAllTagsAsync(graphqlClient, owner, repo);
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
 
@@ -586,6 +599,28 @@ public class GitHubRepoConnector : RepoConnectorBase
     {
         // Fetch all releases for the repository using GraphQL
         return await graphqlClient.GetReleasesAsync(owner, repo);
+    }
+
+    /// <summary>
+    ///     Gets all tags for a repository using GraphQL pagination.
+    /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of all tags.</returns>
+    private static async Task<IReadOnlyList<Tag>> GetAllTagsAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo)
+    {
+        // Fetch all tags for the repository using GraphQL
+        var tagNodes = await graphqlClient.GetAllTagsAsync(owner, repo);
+
+        // Convert TagNode objects to Tag objects with nested commit structure
+        return tagNodes
+            .Where(t => t.Name != null && t.Target?.Oid != null)
+            .Select(t => new Tag(t.Name!, new TagCommit(t.Target!.Oid!)))
+            .ToList();
     }
 
     /// <summary>
