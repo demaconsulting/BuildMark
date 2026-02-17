@@ -321,6 +321,80 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
+    ///     Gets all tags for a repository using GraphQL with pagination.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of tag nodes.</returns>
+    public async Task<List<TagNode>> GetAllTagsAsync(
+        string owner,
+        string repo)
+    {
+        try
+        {
+            var allTagNodes = new List<TagNode>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all tags
+            do
+            {
+                // Create GraphQL request to get tags for a repository with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                refs(refPrefix: ""refs/tags/"", first: 100, after: $after) {
+                                    nodes {
+                                        name
+                                        target {
+                                            oid
+                                        }
+                                    }
+                                    pageInfo {
+                                        hasNextPage
+                                        endCursor
+                                    }
+                                }
+                            }
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        after = afterCursor
+                    }
+                };
+
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<GetAllTagsResponse>(request);
+
+                // Extract tag nodes from the GraphQL response, filtering out null or invalid values
+                var pageTagNodes = response.Data?.Repository?.Refs?.Nodes?
+                    .Where(n => !string.IsNullOrEmpty(n.Name))
+                    .ToList() ?? [];
+
+                allTagNodes.AddRange(pageTagNodes);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.Refs?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage);
+
+            // Return list of all tag nodes
+            return allTagNodes;
+        }
+        catch
+        {
+            // If GraphQL query fails, return empty list
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Disposes the GraphQL client if owned by this instance.
     /// </summary>
     public void Dispose()
