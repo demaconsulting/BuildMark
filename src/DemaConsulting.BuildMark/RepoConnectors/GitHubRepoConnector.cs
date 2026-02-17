@@ -98,7 +98,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             lookupData,
             owner,
             repo,
-            token);
+            graphqlClient);
 
         // Collect known issues
         var knownIssues = CollectKnownIssues(gitHubData.Issues, allChangeIds);
@@ -464,23 +464,20 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="lookupData">Lookup data structures.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
-    /// <param name="token">GitHub token.</param>
+    /// <param name="graphqlClient">GitHub GraphQL client for API operations.</param>
     /// <returns>Tuple of (bugs, nonBugChanges, allChangeIds).</returns>
-    private async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
+    private static async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
         CollectChangesFromPullRequestsAsync(
             List<Commit> commitsInRange,
             LookupData lookupData,
             string owner,
             string repo,
-            string token)
+            GitHubGraphQLClient graphqlClient)
     {
         // Initialize collections for tracking changes
         var allChangeIds = new HashSet<string>();
         var bugs = new List<ItemInfo>();
         var nonBugChanges = new List<ItemInfo>();
-
-        // Create GraphQL client for finding linked issues (reused across multiple PR queries)
-        using var graphqlClient = CreateGraphQLClient(token);
 
         // Process each commit that has an associated PR
         foreach (var pr in commitsInRange
