@@ -451,4 +451,225 @@ public class GitHubRepoConnectorTests
         Assert.IsNull(fromVersion);
         Assert.IsNull(fromHash);
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync works with mocked data.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation()
+    {
+        // Arrange - Create mock responses using helper methods
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(new[] { "abc123def456" })
+            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
+            .AddIssuesResponse(Array.Empty<MockIssue>())
+            .AddTagsResponse(new[] { new MockTag("v1.0.0", "abc123def456") });
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123def456");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.Changes);
+        Assert.IsNotNull(buildInfo.Bugs);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync correctly selects previous version and generates changelog link.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink()
+    {
+        // Arrange - Create mock responses with multiple versions
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
+            .AddReleasesResponse(new[]
+            {
+                new MockRelease("v2.0.0", "2024-03-01T00:00:00Z"),
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
+            })
+            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
+            .AddIssuesResponse(Array.Empty<MockIssue>())
+            .AddTagsResponse(new[]
+            {
+                new MockTag("v2.0.0", "commit3"),
+                new MockTag("v1.1.0", "commit2"),
+                new MockTag("v1.0.0", "commit1")
+            });
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit3");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("commit3", buildInfo.CurrentVersionTag.CommitHash);
+        
+        // Should have selected v1.1.0 as baseline (previous non-prerelease)
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
+
+        // Should have changelog link
+        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.IsTrue(buildInfo.CompleteChangelogLink.TargetUrl.Contains("v1.1.0...v2.0.0"));
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync correctly gathers changes from PRs with labels.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly()
+    {
+        // Arrange - Create mock responses with PRs containing different label types
+        // We need commits in range between v1.0.0 and v1.1.0
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
+            .AddReleasesResponse(new[]
+            {
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
+            })
+            .AddPullRequestsResponse(new[]
+            {
+                new MockPullRequest(
+                    Number: 101,
+                    Title: "Add new feature",
+                    Url: "https://github.com/test/repo/pull/101",
+                    Merged: true,
+                    MergeCommitSha: "commit3",
+                    HeadRefOid: "feature-branch",
+                    Labels: new List<string> { "feature", "enhancement" }),
+                new MockPullRequest(
+                    Number: 100,
+                    Title: "Fix critical bug",
+                    Url: "https://github.com/test/repo/pull/100",
+                    Merged: true,
+                    MergeCommitSha: "commit2",
+                    HeadRefOid: "bugfix-branch",
+                    Labels: new List<string> { "bug" })
+            })
+            .AddIssuesResponse(Array.Empty<MockIssue>())
+            .AddTagsResponse(new[]
+            {
+                new MockTag("v1.1.0", "commit3"),
+                new MockTag("v1.0.0", "commit1")
+            })
+            // Mock the linked issues query to return empty (PRs are treated as standalone changes)
+            .AddResponse("closingIssuesReferences", @"{""data"":{""repository"":{""pullRequest"":{""closingIssuesReferences"":{""nodes"":[],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}}");
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit3");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.1.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+
+        // PRs without linked issues are treated based on their labels
+        // PR 100 with "bug" label should be in bugs
+        Assert.IsNotNull(buildInfo.Bugs);
+        Assert.IsTrue(buildInfo.Bugs.Count >= 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
+        Assert.IsNotNull(bugPR, "PR 100 should be categorized as a bug");
+        Assert.AreEqual("Fix critical bug", bugPR.Title);
+
+        // PR 101 with "feature" label should be in changes
+        Assert.IsNotNull(buildInfo.Changes);
+        Assert.IsTrue(buildInfo.Changes.Count >= 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
+        Assert.IsNotNull(featurePR, "PR 101 should be categorized as a change");
+        Assert.AreEqual("Add new feature", featurePR.Title);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync correctly identifies known issues.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues()
+    {
+        // Arrange - Create mock responses with open and closed issues
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(new[] { "commit1" })
+            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
+            .AddIssuesResponse(new[]
+            {
+                new MockIssue(
+                    Number: 201,
+                    Title: "Known bug in feature X",
+                    Url: "https://github.com/test/repo/issues/201",
+                    State: "OPEN",
+                    Labels: new List<string> { "bug" }),
+                new MockIssue(
+                    Number: 202,
+                    Title: "Feature request for Y",
+                    Url: "https://github.com/test/repo/issues/202",
+                    State: "OPEN",
+                    Labels: new List<string> { "feature" }),
+                new MockIssue(
+                    Number: 203,
+                    Title: "Fixed bug",
+                    Url: "https://github.com/test/repo/issues/203",
+                    State: "CLOSED",
+                    Labels: new List<string> { "bug" })
+            })
+            .AddTagsResponse(new[] { new MockTag("v1.0.0", "commit1") });
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        
+        // Known issues are open issues that aren't linked to any changes in this release
+        Assert.IsNotNull(buildInfo.KnownIssues);
+        // Since we have no PRs, all open issues should be known issues
+        Assert.IsTrue(buildInfo.KnownIssues.Count >= 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        
+        // Verify at least one known issue is present
+        var knownIssueTitles = buildInfo.KnownIssues.Select(i => i.Title).ToList();
+        Assert.IsTrue(knownIssueTitles.Any(t => t.Contains("Known bug") || t.Contains("Feature request")), 
+            "Should have at least one of the open issues as a known issue");
+    }
 }
