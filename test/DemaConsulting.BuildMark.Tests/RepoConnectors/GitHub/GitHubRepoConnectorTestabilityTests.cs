@@ -95,7 +95,7 @@ public class GitHubRepoConnectorTestabilityTests
     public void GitHubRepoConnector_CreateGraphQLClient_CanBeOverridden()
     {
         // Arrange
-        using var mockHandler = new MockGraphQLHttpMessageHandler();
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler();
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
 
@@ -112,105 +112,13 @@ public class GitHubRepoConnectorTestabilityTests
     [TestMethod]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_UsesOverriddenCreateGraphQLClient()
     {
-        // Arrange - Create mock responses for all required GraphQL queries
-        using var mockHandler = new MockGraphQLHttpMessageHandler();
-        mockHandler.AddResponse(
-            "ref(qualifiedName:",
-            @"{
-                ""data"": {
-                    ""repository"": {
-                        ""ref"": {
-                            ""target"": {
-                                ""history"": {
-                                    ""nodes"": [
-                                        { ""oid"": ""commit123"" }
-                                    ],
-                                    ""pageInfo"": {
-                                        ""hasNextPage"": false,
-                                        ""endCursor"": null
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }");
-
-        mockHandler.AddResponse(
-            "releases(",
-            @"{
-                ""data"": {
-                    ""repository"": {
-                        ""releases"": {
-                            ""nodes"": [
-                                {
-                                    ""tagName"": ""v1.0.0"",
-                                    ""publishedAt"": ""2024-01-01T00:00:00Z""
-                                }
-                            ],
-                            ""pageInfo"": {
-                                ""hasNextPage"": false,
-                                ""endCursor"": null
-                            }
-                        }
-                    }
-                }
-            }");
-
-        mockHandler.AddResponse(
-            "pullRequests(",
-            @"{
-                ""data"": {
-                    ""repository"": {
-                        ""pullRequests"": {
-                            ""nodes"": [],
-                            ""pageInfo"": {
-                                ""hasNextPage"": false,
-                                ""endCursor"": null
-                            }
-                        }
-                    }
-                }
-            }");
-
-        mockHandler.AddResponse(
-            "issues(",
-            @"{
-                ""data"": {
-                    ""repository"": {
-                        ""issues"": {
-                            ""nodes"": [],
-                            ""pageInfo"": {
-                                ""hasNextPage"": false,
-                                ""endCursor"": null
-                            }
-                        }
-                    }
-                }
-            }");
-
-        mockHandler.AddResponse(
-            "refs(refPrefix:",
-            @"{
-                ""data"": {
-                    ""repository"": {
-                        ""refs"": {
-                            ""nodes"": [
-                                {
-                                    ""name"": ""v1.0.0"",
-                                    ""target"": {
-                                        ""oid"": ""commit123""
-                                    }
-                                }
-                            ],
-                            ""pageInfo"": {
-                                ""hasNextPage"": false,
-                                ""endCursor"": null
-                            }
-                        }
-                    }
-                }
-            }");
+        // Arrange - Create mock responses using helper methods
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit123")
+            .AddReleasesResponse("v1.0.0")
+            .AddEmptyPullRequestsResponse()
+            .AddEmptyIssuesResponse()
+            .AddTagsResponse("v1.0.0", "commit123");
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -231,19 +139,15 @@ public class GitHubRepoConnectorTestabilityTests
     }
 
     /// <summary>
-    ///     Test that MockGraphQLHttpMessageHandler can be configured with multiple responses.
+    ///     Test that MockGitHubGraphQLHttpMessageHandler can be configured with multiple responses.
     /// </summary>
     [TestMethod]
-    public async Task MockGraphQLHttpMessageHandler_MultipleResponses_ReturnsCorrectResponse()
+    public async Task MockGitHubGraphQLHttpMessageHandler_MultipleResponses_ReturnsCorrectResponse()
     {
-        // Arrange
-        using var mockHandler = new MockGraphQLHttpMessageHandler();
-        mockHandler.AddResponse(
-            "ref(qualifiedName:",
-            @"{""data"":{""repository"":{""ref"":{""target"":{""history"":{""nodes"":[{""oid"":""commit1""}],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}}}")
-            .AddResponse(
-                "releases(",
-                @"{""data"":{""repository"":{""releases"":{""nodes"":[{""tagName"":""v1.0.0"",""publishedAt"":""2024-01-01T00:00:00Z""}],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}");
+        // Arrange - Use helper methods for standard responses
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse("v1.0.0");
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);
@@ -260,14 +164,14 @@ public class GitHubRepoConnectorTestabilityTests
     }
 
     /// <summary>
-    ///     Test that MockGraphQLHttpMessageHandler returns default response when no pattern matches.
+    ///     Test that MockGitHubGraphQLHttpMessageHandler returns default response when no pattern matches.
     /// </summary>
     [TestMethod]
-    public async Task MockGraphQLHttpMessageHandler_NoPatternMatches_ReturnsDefaultResponse()
+    public async Task MockGitHubGraphQLHttpMessageHandler_NoPatternMatches_ReturnsDefaultResponse()
     {
-        // Arrange
-        using var mockHandler = new MockGraphQLHttpMessageHandler();
-        mockHandler.SetDefaultResponse(@"{""data"":{""repository"":null}}");
+        // Arrange - Use helper method for empty repository response
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddEmptyRepositoryResponse();
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);
@@ -281,13 +185,13 @@ public class GitHubRepoConnectorTestabilityTests
     }
 
     /// <summary>
-    ///     Test that MockGraphQLHttpMessageHandler supports method chaining.
+    ///     Test that MockGitHubGraphQLHttpMessageHandler supports method chaining.
     /// </summary>
     [TestMethod]
-    public void MockGraphQLHttpMessageHandler_MethodChaining_WorksCorrectly()
+    public void MockGitHubGraphQLHttpMessageHandler_MethodChaining_WorksCorrectly()
     {
         // Arrange & Act - Chain multiple AddResponse calls
-        using var mockHandler = new MockGraphQLHttpMessageHandler()
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddResponse("pattern1", "response1")
             .AddResponse("pattern2", "response2")
             .SetDefaultResponse("default");
