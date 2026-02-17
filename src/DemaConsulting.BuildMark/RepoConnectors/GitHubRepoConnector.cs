@@ -42,6 +42,20 @@ public class GitHubRepoConnector : RepoConnectorBase
     };
 
     /// <summary>
+    ///     Creates a GitHub GraphQL client for API operations.
+    /// </summary>
+    /// <param name="token">GitHub personal access token for authentication.</param>
+    /// <returns>A new GitHubGraphQLClient instance.</returns>
+    /// <remarks>
+    ///     This method is virtual to allow derived classes to override it for testing purposes.
+    ///     Tests can provide a client configured with a mock HttpClient for controlled responses.
+    /// </remarks>
+    internal virtual GitHubGraphQLClient CreateGraphQLClient(string token)
+    {
+        return new GitHubGraphQLClient(token);
+    }
+
+    /// <summary>
     ///     Gets build information for a release.
     /// </summary>
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
@@ -61,7 +75,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var token = await GetGitHubTokenAsync();
 
         // Create GraphQL client
-        using var graphqlClient = new GitHubGraphQLClient(token);
+        using var graphqlClient = CreateGraphQLClient(token);
 
         // Fetch all data from GitHub
         var gitHubData = await FetchGitHubDataAsync(graphqlClient, owner, repo, branch.Trim());
@@ -452,7 +466,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="repo">Repository name.</param>
     /// <param name="token">GitHub token.</param>
     /// <returns>Tuple of (bugs, nonBugChanges, allChangeIds).</returns>
-    private static async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
+    private async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
         CollectChangesFromPullRequestsAsync(
             List<Commit> commitsInRange,
             LookupData lookupData,
@@ -466,7 +480,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var nonBugChanges = new List<ItemInfo>();
 
         // Create GraphQL client for finding linked issues (reused across multiple PR queries)
-        using var graphqlClient = new GitHubGraphQLClient(token);
+        using var graphqlClient = CreateGraphQLClient(token);
 
         // Process each commit that has an associated PR
         foreach (var pr in commitsInRange
