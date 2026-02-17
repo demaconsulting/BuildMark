@@ -350,7 +350,9 @@ public class GitHubGraphQLClientTests
             CancellationToken cancellationToken)
         {
             // Read request body to determine which page to return
-            var requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            var requestBody = request.Content != null
+                ? await request.Content.ReadAsStringAsync(cancellationToken)
+                : string.Empty;
             
             string responseContent;
             if (_requestCount == 0 || !requestBody.Contains("\"after\""))
@@ -699,7 +701,9 @@ public class GitHubGraphQLClientTests
             CancellationToken cancellationToken)
         {
             // Read request body to determine which page to return
-            var requestBody = await request.Content!.ReadAsStringAsync(cancellationToken);
+            var requestBody = request.Content != null
+                ? await request.Content.ReadAsStringAsync(cancellationToken)
+                : string.Empty;
             
             string responseContent;
             if (_requestCount == 0 || !requestBody.Contains("\"after\""))

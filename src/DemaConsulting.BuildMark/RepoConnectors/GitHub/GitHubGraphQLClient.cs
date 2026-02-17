@@ -93,7 +93,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     /// </summary>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
-    /// <param name="branch">Branch name.</param>
+    /// <param name="branch">Branch name (e.g., 'main'). Will be automatically converted to fully qualified ref name.</param>
     /// <returns>List of commit SHAs on the branch.</returns>
     public async Task<List<string>> GetCommitsAsync(
         string owner,
@@ -105,6 +105,9 @@ internal sealed class GitHubGraphQLClient : IDisposable
             var allCommitShas = new List<string>();
             string? afterCursor = null;
             bool hasNextPage;
+
+            // Convert branch name to fully qualified ref name if needed
+            var qualifiedBranch = branch.StartsWith("refs/") ? branch : $"refs/heads/{branch}";
 
             // Paginate through all commits on the branch
             do
@@ -136,7 +139,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                     {
                         owner,
                         repo,
-                        branch,
+                        branch = qualifiedBranch,
                         after = afterCursor
                     }
                 };
