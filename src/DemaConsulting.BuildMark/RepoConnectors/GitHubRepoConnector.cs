@@ -140,13 +140,31 @@ public class GitHubRepoConnector : RepoConnectorBase
         string Sha);
 
     /// <summary>
+    ///     Pull request information.
+    /// </summary>
+    internal sealed record PullRequestInfo(
+        int Number,
+        string Title,
+        string HtmlUrl,
+        bool Merged,
+        string? MergeCommitSha,
+        string? HeadSha,
+        IReadOnlyList<PullRequestLabelInfo> Labels);
+
+    /// <summary>
+    ///     Pull request label information.
+    /// </summary>
+    internal sealed record PullRequestLabelInfo(
+        string Name);
+
+    /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
     internal sealed record GitHubData(
         IReadOnlyList<Commit> Commits,
         IReadOnlyList<ReleaseNode> Releases,
         IReadOnlyList<Tag> Tags,
-        IReadOnlyList<PullRequest> PullRequests,
+        IReadOnlyList<PullRequestInfo> PullRequests,
         IReadOnlyList<Issue> Issues);
 
     /// <summary>
@@ -154,7 +172,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     internal sealed record LookupData(
         Dictionary<int, Issue> IssueById,
-        Dictionary<string, PullRequest> CommitHashToPr,
+        Dictionary<string, PullRequestInfo> CommitHashToPr,
         List<ReleaseNode> BranchReleases,
         Dictionary<string, Tag> TagsByName,
         Dictionary<string, ReleaseNode> TagToRelease,
@@ -181,7 +199,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var commitsTask = GetAllCommitsAsync(graphqlClient, owner, repo, branch);
         var releasesTask = GetAllReleasesAsync(graphqlClient, owner, repo);
         var tagsTask = GetAllTagsAsync(graphqlClient, owner, repo);
-        var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
+        var pullRequestsTask = GetAllPullRequestsAsync(graphqlClient, owner, repo);
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
 
         // Wait for all parallel fetches to complete
@@ -211,8 +229,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         // This is used to associate commits with their pull requests for change tracking.
         // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
         var commitHashToPr = data.PullRequests
-            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.Head?.Sha != null))
-            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.Head.Sha, p => p);
+            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.HeadSha != null))
+            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.HeadSha!, p => p);
 
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
@@ -480,7 +498,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     private static void ProcessLinkedIssues(
         IReadOnlyList<int> linkedIssueIds,
         Dictionary<int, Issue> issueById,
-        PullRequest pr,
+        PullRequestInfo pr,
         HashSet<string> allChangeIds,
         List<ItemInfo> bugs,
         List<ItemInfo> nonBugChanges)
@@ -523,7 +541,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="bugs">List of bug changes (modified in place).</param>
     /// <param name="nonBugChanges">List of non-bug changes (modified in place).</param>
     private static void ProcessPullRequestWithoutIssues(
-        PullRequest pr,
+        PullRequestInfo pr,
         HashSet<string> allChangeIds,
         List<ItemInfo> bugs,
         List<ItemInfo> nonBugChanges)
@@ -624,6 +642,38 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets all pull requests for a repository using GraphQL pagination.
+    /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of all pull requests.</returns>
+    private static async Task<IReadOnlyList<PullRequestInfo>> GetAllPullRequestsAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo)
+    {
+        // Fetch all pull requests for the repository using GraphQL
+        var prNodes = await graphqlClient.GetPullRequestsAsync(owner, repo);
+
+        // Convert PullRequestNode objects to PullRequestInfo objects
+        return prNodes
+            .Where(pr => pr.Number.HasValue && !string.IsNullOrEmpty(pr.Title))
+            .Select(pr => new PullRequestInfo(
+                pr.Number!.Value,
+                pr.Title!,
+                pr.Url ?? string.Empty,
+                pr.Merged,
+                pr.MergeCommit?.Oid,
+                pr.HeadRefOid,
+                pr.Labels?.Nodes?
+                    .Where(l => !string.IsNullOrEmpty(l.Name))
+                    .Select(l => new PullRequestLabelInfo(l.Name!))
+                    .ToList() ?? []))
+            .ToList();
+    }
+
+    /// <summary>
     ///     Gets commits in the range from fromHash (exclusive) to toHash (inclusive).
     /// </summary>
     /// <param name="commits">All commits.</param>
@@ -687,7 +737,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="pr">GitHub pull request.</param>
     /// <returns>ItemInfo instance.</returns>
-    internal static ItemInfo CreateItemInfoFromPullRequest(PullRequest pr)
+    internal static ItemInfo CreateItemInfoFromPullRequest(PullRequestInfo pr)
     {
         // Determine item type from PR labels
         var type = GetTypeFromLabels(pr.Labels);
@@ -707,6 +757,25 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="labels">List of labels.</param>
     /// <returns>Item type string.</returns>
     internal static string GetTypeFromLabels(IReadOnlyList<Label> labels)
+    {
+        // Find first matching label type by checking label names against the type map
+        var matchingType = labels
+            .Select(label => label.Name.ToLowerInvariant())
+            .SelectMany(lowerLabel => LabelTypeMap
+                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Select(kvp => kvp.Value))
+            .FirstOrDefault();
+
+        // Return matched type or default to "other"
+        return matchingType ?? "other";
+    }
+
+    /// <summary>
+    ///     Determines item type from pull request labels.
+    /// </summary>
+    /// <param name="labels">List of pull request labels.</param>
+    /// <returns>Item type string.</returns>
+    internal static string GetTypeFromLabels(IReadOnlyList<PullRequestLabelInfo> labels)
     {
         // Find first matching label type by checking label names against the type map
         var matchingType = labels
