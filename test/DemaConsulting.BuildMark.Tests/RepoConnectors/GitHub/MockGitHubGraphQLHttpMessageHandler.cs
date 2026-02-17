@@ -95,7 +95,7 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Dictionary mapping request patterns to response content.
     /// </summary>
-    private readonly Dictionary<string, (string content, HttpStatusCode statusCode)> _responses = new();
+    private readonly Dictionary<string, (string content, HttpStatusCode statusCode)> _responses = [];
 
     /// <summary>
     ///     Default response content to return when no pattern matches.
@@ -304,7 +304,7 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         var prNodes = string.Join(",\n                            ",
             pullRequests.Select(pr =>
             {
-                var labelsJson = pr.Labels.Any()
+                var labelsJson = pr.Labels.Count > 0
                     ? string.Join(",\n                                        ", pr.Labels.Select(l => $@"{{ ""name"": ""{l}"" }}"))
                     : string.Empty;
 
@@ -364,7 +364,7 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         var issueNodes = string.Join(",\n                            ",
             issues.Select(issue =>
             {
-                var labelsJson = issue.Labels.Any()
+                var labelsJson = issue.Labels.Count > 0
                     ? string.Join(",\n                                        ", issue.Labels.Select(l => $@"{{ ""name"": ""{l}"" }}"))
                     : string.Empty;
 

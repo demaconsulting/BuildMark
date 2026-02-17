@@ -136,7 +136,7 @@ public class GitHubRepoConnectorTests
 
         // Should have changelog link
         Assert.IsNotNull(buildInfo.CompleteChangelogLink);
-        Assert.IsTrue(buildInfo.CompleteChangelogLink.TargetUrl.Contains("v1.1.0...v2.0.0"));
+        Assert.Contains("v1.1.0...v2.0.0", buildInfo.CompleteChangelogLink.TargetUrl);
     }
 
     /// <summary>
@@ -160,7 +160,7 @@ public class GitHubRepoConnectorTests
                     Merged: true,
                     MergeCommitSha: "commit3",
                     HeadRefOid: "feature-branch",
-                    Labels: new List<string> { "feature", "enhancement" }),
+                    Labels: ["feature", "enhancement"]),
                 new MockPullRequest(
                     Number: 100,
                     Title: "Fix critical bug",
@@ -168,7 +168,7 @@ public class GitHubRepoConnectorTests
                     Merged: true,
                     MergeCommitSha: "commit2",
                     HeadRefOid: "bugfix-branch",
-                    Labels: new List<string> { "bug" }))
+                    Labels: ["bug"]))
             .AddIssuesResponse()
             .AddTagsResponse(
                 new MockTag("v1.1.0", "commit3"),
@@ -195,14 +195,14 @@ public class GitHubRepoConnectorTests
         // PRs without linked issues are treated based on their labels
         // PR 100 with "bug" label should be in bugs
         Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsTrue(buildInfo.Bugs.Count >= 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.Bugs.Count, 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
         Assert.IsNotNull(bugPR, "PR 100 should be categorized as a bug");
         Assert.AreEqual("Fix critical bug", bugPR.Title);
 
         // PR 101 with "feature" label should be in changes
         Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsTrue(buildInfo.Changes.Count >= 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.Changes.Count, 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
         var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
         Assert.IsNotNull(featurePR, "PR 101 should be categorized as a change");
         Assert.AreEqual("Add new feature", featurePR.Title);
@@ -225,19 +225,19 @@ public class GitHubRepoConnectorTests
                     Title: "Known bug in feature X",
                     Url: "https://github.com/test/repo/issues/201",
                     State: "OPEN",
-                    Labels: new List<string> { "bug" }),
+                    Labels: ["bug"]),
                 new MockIssue(
                     Number: 202,
                     Title: "Feature request for Y",
                     Url: "https://github.com/test/repo/issues/202",
                     State: "OPEN",
-                    Labels: new List<string> { "feature" }),
+                    Labels: ["feature"]),
                 new MockIssue(
                     Number: 203,
                     Title: "Fixed bug",
                     Url: "https://github.com/test/repo/issues/203",
                     State: "CLOSED",
-                    Labels: new List<string> { "bug" }))
+                    Labels: ["bug"]))
             .AddTagsResponse(new MockTag("v1.0.0", "commit1"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
@@ -258,11 +258,11 @@ public class GitHubRepoConnectorTests
         // Known issues are open issues that aren't linked to any changes in this release
         Assert.IsNotNull(buildInfo.KnownIssues);
         // Since we have no PRs, all open issues should be known issues
-        Assert.IsTrue(buildInfo.KnownIssues.Count >= 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.KnownIssues.Count, 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
         
         // Verify at least one known issue is present
         var knownIssueTitles = buildInfo.KnownIssues.Select(i => i.Title).ToList();
-        Assert.IsTrue(knownIssueTitles.Any(t => t.Contains("Known bug") || t.Contains("Feature request")), 
-            "Should have at least one of the open issues as a known issue");
+        var hasExpectedIssue = knownIssueTitles.Exists(t => t.Contains("Known bug") || t.Contains("Feature request"));
+        Assert.IsTrue(hasExpectedIssue, "Should have at least one of the open issues as a known issue");
     }
 }
