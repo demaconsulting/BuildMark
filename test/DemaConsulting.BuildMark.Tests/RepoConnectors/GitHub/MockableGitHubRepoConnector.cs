@@ -35,7 +35,7 @@ internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
     /// <summary>
     ///     Mock responses for RunCommandAsync.
     /// </summary>
-    private readonly Dictionary<string, string> _commandResponses = new();
+    private readonly Dictionary<string, string> _commandResponses = [];
 
     /// <summary>
     ///     Mock HttpClient for GraphQL requests.
