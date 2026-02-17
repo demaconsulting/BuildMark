@@ -695,7 +695,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Fetch all issues for the repository using GraphQL
         var issueNodes = await graphqlClient.GetAllIssuesAsync(owner, repo);
 
-        // Convert IssueNodeData objects to IssueInfo objects
+        // Convert IssueNode objects to IssueInfo objects
         return issueNodes
             .Where(issue => issue.Number.HasValue && !string.IsNullOrEmpty(issue.Title))
             .Select(issue => new IssueInfo(
