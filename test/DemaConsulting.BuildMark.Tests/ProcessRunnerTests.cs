@@ -155,7 +155,8 @@ public class ProcessRunnerTests
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "sh";
         var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c 'exit 1'";
 
-        // Act & Assert - Verify exception is thrown
+        // Act - Execute and capture exception
+        InvalidOperationException? exception = null;
         try
         {
             await ProcessRunner.RunAsync(command, arguments);
@@ -163,9 +164,12 @@ public class ProcessRunnerTests
         }
         catch (InvalidOperationException ex)
         {
-            // Assert - Verify exception message contains useful information
-            Assert.IsTrue(ex.Message.Contains("failed with exit code"),
-                "Exception message should include exit code information");
+            exception = ex;
         }
+
+        // Assert - Verify exception was thrown and contains useful information
+        Assert.IsNotNull(exception, "InvalidOperationException should have been thrown");
+        Assert.IsTrue(exception.Message.Contains("failed with exit code"),
+            "Exception message should include exit code information");
     }
 }
