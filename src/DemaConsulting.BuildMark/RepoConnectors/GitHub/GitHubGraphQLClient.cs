@@ -395,6 +395,89 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
+    ///     Gets all pull requests for a repository using GraphQL with pagination.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of pull request nodes.</returns>
+    public async Task<List<PullRequestNode>> GetPullRequestsAsync(
+        string owner,
+        string repo)
+    {
+        try
+        {
+            var allPullRequestNodes = new List<PullRequestNode>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all pull requests
+            do
+            {
+                // Create GraphQL request to get pull requests for a repository with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                pullRequests(first: 100, after: $after) {
+                                    nodes {
+                                        number
+                                        title
+                                        url
+                                        merged
+                                        mergeCommit {
+                                            oid
+                                        }
+                                        headRefOid
+                                        labels(first: 100) {
+                                            nodes {
+                                                name
+                                            }
+                                        }
+                                    }
+                                    pageInfo {
+                                        hasNextPage
+                                        endCursor
+                                    }
+                                }
+                            }
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        after = afterCursor
+                    }
+                };
+
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<GetPullRequestsResponse>(request);
+
+                // Extract pull request nodes from the GraphQL response, filtering out null or invalid values
+                var pagePullRequestNodes = response.Data?.Repository?.PullRequests?.Nodes?
+                    .Where(n => n.Number.HasValue && !string.IsNullOrEmpty(n.Title))
+                    .ToList() ?? [];
+
+                allPullRequestNodes.AddRange(pagePullRequestNodes);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.PullRequests?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage);
+
+            // Return list of all pull request nodes
+            return allPullRequestNodes;
+        }
+        catch
+        {
+            // If GraphQL query fails, return empty list
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Disposes the GraphQL client if owned by this instance.
     /// </summary>
     public void Dispose()

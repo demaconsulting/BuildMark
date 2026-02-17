@@ -178,3 +178,66 @@ internal record TagNode(
 /// <param name="Oid">Git object ID (SHA) of the commit.</param>
 internal record TagTargetData(
     string? Oid);
+
+/// <summary>
+///     Response for getting pull requests from a repository.
+/// </summary>
+/// <param name="Repository">Repository data containing pull requests information.</param>
+internal record GetPullRequestsResponse(
+    PullRequestRepositoryData? Repository);
+
+/// <summary>
+///     Repository data containing pull requests information.
+/// </summary>
+/// <param name="PullRequests">Pull requests connection data.</param>
+internal record PullRequestRepositoryData(
+    PullRequestsConnectionData? PullRequests);
+
+/// <summary>
+///     Pull requests connection data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Pull request nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record PullRequestsConnectionData(
+    List<PullRequestNode>? Nodes,
+    PageInfo? PageInfo);
+
+/// <summary>
+///     Pull request node containing pull request information.
+/// </summary>
+/// <param name="Number">Pull request number.</param>
+/// <param name="Title">Pull request title.</param>
+/// <param name="Url">Pull request HTML URL.</param>
+/// <param name="Merged">Whether the pull request is merged.</param>
+/// <param name="MergeCommit">Merge commit information.</param>
+/// <param name="HeadRefOid">Head reference commit SHA.</param>
+/// <param name="Labels">Labels assigned to the pull request.</param>
+internal record PullRequestNode(
+    int? Number,
+    string? Title,
+    string? Url,
+    bool Merged,
+    PullRequestMergeCommit? MergeCommit,
+    string? HeadRefOid,
+    PullRequestLabelsConnection? Labels);
+
+/// <summary>
+///     Pull request merge commit information.
+/// </summary>
+/// <param name="Oid">Commit SHA of the merge commit.</param>
+internal record PullRequestMergeCommit(
+    string? Oid);
+
+/// <summary>
+///     Pull request labels connection containing nodes.
+/// </summary>
+/// <param name="Nodes">Label nodes.</param>
+internal record PullRequestLabelsConnection(
+    List<PullRequestLabel>? Nodes);
+
+/// <summary>
+///     Pull request label information.
+/// </summary>
+/// <param name="Name">Label name.</param>
+internal record PullRequestLabel(
+    string? Name);
