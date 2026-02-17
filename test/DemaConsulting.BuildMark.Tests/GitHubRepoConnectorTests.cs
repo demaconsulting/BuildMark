@@ -462,8 +462,8 @@ public class GitHubRepoConnectorTests
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddCommitsResponse(new[] { "abc123def456" })
             .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") })
-            .AddPullRequestsResponse(Array.Empty<object>())
-            .AddIssuesResponse(Array.Empty<object>())
+            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
+            .AddIssuesResponse(Array.Empty<MockIssue>())
             .AddTagsResponse(new[] { ("v1.0.0", "abc123def456") });
 
         using var mockHttpClient = new HttpClient(mockHandler);

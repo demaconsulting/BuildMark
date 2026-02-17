@@ -199,18 +199,37 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <param name="endCursor">End cursor for pagination (default null).</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddPullRequestsResponse(
-        IEnumerable<object> pullRequests,
+        IEnumerable<MockPullRequest> pullRequests,
         bool hasNextPage = false,
         string? endCursor = null)
     {
-        // For now, support empty collections - can be extended later with actual PR data
-        var prNodes = pullRequests.Any() ? "/* PR data not yet implemented */" : string.Empty;
-        
+        var prNodes = string.Join(",\n                            ",
+            pullRequests.Select(pr =>
+            {
+                var labelsJson = pr.Labels.Any()
+                    ? string.Join(",\n                                        ", pr.Labels.Select(l => $@"{{ ""name"": ""{l}"" }}"))
+                    : string.Empty;
+
+                return $@"{{
+                                ""number"": {pr.Number},
+                                ""title"": ""{pr.Title}"",
+                                ""url"": ""{pr.Url}"",
+                                ""merged"": {pr.Merged.ToString().ToLowerInvariant()},
+                                ""mergeCommit"": {(pr.MergeCommitSha != null ? $@"{{ ""oid"": ""{pr.MergeCommitSha}"" }}" : "null")},
+                                ""headRefOid"": {(pr.HeadRefOid != null ? $@"""{pr.HeadRefOid}""" : "null")},
+                                ""labels"": {{
+                                    ""nodes"": [{labelsJson}]
+                                }}
+                            }}";
+            }));
+
         var response = $@"{{
             ""data"": {{
                 ""repository"": {{
                     ""pullRequests"": {{
-                        ""nodes"": [{prNodes}],
+                        ""nodes"": [
+                            {prNodes}
+                        ],
                         ""pageInfo"": {{
                             ""hasNextPage"": {hasNextPage.ToString().ToLowerInvariant()},
                             ""endCursor"": {(endCursor != null ? $@"""{endCursor}""" : "null")}
@@ -230,18 +249,35 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <param name="endCursor">End cursor for pagination (default null).</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddIssuesResponse(
-        IEnumerable<object> issues,
+        IEnumerable<MockIssue> issues,
         bool hasNextPage = false,
         string? endCursor = null)
     {
-        // For now, support empty collections - can be extended later with actual issue data
-        var issueNodes = issues.Any() ? "/* Issue data not yet implemented */" : string.Empty;
-        
+        var issueNodes = string.Join(",\n                            ",
+            issues.Select(issue =>
+            {
+                var labelsJson = issue.Labels.Any()
+                    ? string.Join(",\n                                        ", issue.Labels.Select(l => $@"{{ ""name"": ""{l}"" }}"))
+                    : string.Empty;
+
+                return $@"{{
+                                ""number"": {issue.Number},
+                                ""title"": ""{issue.Title}"",
+                                ""url"": ""{issue.Url}"",
+                                ""state"": ""{issue.State}"",
+                                ""labels"": {{
+                                    ""nodes"": [{labelsJson}]
+                                }}
+                            }}";
+            }));
+
         var response = $@"{{
             ""data"": {{
                 ""repository"": {{
                     ""issues"": {{
-                        ""nodes"": [{issueNodes}],
+                        ""nodes"": [
+                            {issueNodes}
+                        ],
                         ""pageInfo"": {{
                             ""hasNextPage"": {hasNextPage.ToString().ToLowerInvariant()},
                             ""endCursor"": {(endCursor != null ? $@"""{endCursor}""" : "null")}
@@ -316,3 +352,37 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         };
     }
 }
+
+/// <summary>
+///     Represents a mock pull request for testing.
+/// </summary>
+/// <param name="Number">Pull request number.</param>
+/// <param name="Title">Pull request title.</param>
+/// <param name="Url">Pull request URL.</param>
+/// <param name="Merged">Whether the PR is merged.</param>
+/// <param name="MergeCommitSha">Merge commit SHA (null if not merged).</param>
+/// <param name="HeadRefOid">Head reference OID.</param>
+/// <param name="Labels">List of label names.</param>
+public record MockPullRequest(
+    int Number,
+    string Title,
+    string Url,
+    bool Merged,
+    string? MergeCommitSha,
+    string? HeadRefOid,
+    List<string> Labels);
+
+/// <summary>
+///     Represents a mock issue for testing.
+/// </summary>
+/// <param name="Number">Issue number.</param>
+/// <param name="Title">Issue title.</param>
+/// <param name="Url">Issue URL.</param>
+/// <param name="State">Issue state (OPEN, CLOSED).</param>
+/// <param name="Labels">List of label names.</param>
+public record MockIssue(
+    int Number,
+    string Title,
+    string Url,
+    string State,
+    List<string> Labels);
