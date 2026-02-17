@@ -451,4 +451,39 @@ public class GitHubRepoConnectorTests
         Assert.IsNull(fromVersion);
         Assert.IsNull(fromHash);
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync works with mocked data.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation()
+    {
+        // Arrange - Create mock responses using helper methods
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(new[] { "abc123def456" })
+            .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddPullRequestsResponse(Array.Empty<object>())
+            .AddIssuesResponse(Array.Empty<object>())
+            .AddTagsResponse(new[] { ("v1.0.0", "abc123def456") });
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123def456");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.Changes);
+        Assert.IsNotNull(buildInfo.Bugs);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+    }
 }
