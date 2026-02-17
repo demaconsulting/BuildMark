@@ -483,13 +483,13 @@ internal sealed class GitHubGraphQLClient : IDisposable
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <returns>List of issue nodes.</returns>
-    public async Task<List<IssueNodeData>> GetAllIssuesAsync(
+    public async Task<List<IssueNode>> GetAllIssuesAsync(
         string owner,
         string repo)
     {
         try
         {
-            var allIssueNodes = new List<IssueNodeData>();
+            var allIssueNodes = new List<IssueNode>();
             string? afterCursor = null;
             bool hasNextPage;
 

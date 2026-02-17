@@ -44,17 +44,17 @@ internal record PullRequestData(
 /// <summary>
 ///     Closing issues references data containing nodes and page info.
 /// </summary>
-/// <param name="Nodes">Issue nodes.</param>
+/// <param name="Nodes">Linked issue references.</param>
 /// <param name="PageInfo">Pagination information.</param>
 internal record ClosingIssuesReferencesData(
-    List<IssueNode>? Nodes,
+    List<LinkedIssueReference>? Nodes,
     PageInfo? PageInfo);
 
 /// <summary>
-///     Issue node containing issue number.
+///     Linked issue reference containing minimal issue information.
 /// </summary>
 /// <param name="Number">Issue number.</param>
-internal record IssueNode(
+internal record LinkedIssueReference(
     int? Number);
 
 /// <summary>
@@ -262,7 +262,7 @@ internal record IssueRepositoryData(
 /// <param name="Nodes">Issue nodes.</param>
 /// <param name="PageInfo">Pagination information.</param>
 internal record IssuesConnectionData(
-    List<IssueNodeData>? Nodes,
+    List<IssueNode>? Nodes,
     PageInfo? PageInfo);
 
 /// <summary>
@@ -273,7 +273,7 @@ internal record IssuesConnectionData(
 /// <param name="Url">Issue HTML URL.</param>
 /// <param name="State">Issue state (OPEN or CLOSED).</param>
 /// <param name="Labels">Labels assigned to the issue.</param>
-internal record IssueNodeData(
+internal record IssueNode(
     int? Number,
     string? Title,
     string? Url,
