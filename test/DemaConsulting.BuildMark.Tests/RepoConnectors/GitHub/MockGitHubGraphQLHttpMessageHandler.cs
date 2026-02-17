@@ -141,14 +141,24 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetCommitsAsync with a collection of commits.
     /// </summary>
+    /// <param name="commitShas">Commit SHAs to return.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockGitHubGraphQLHttpMessageHandler AddCommitsResponse(params string[] commitShas)
+    {
+        return AddCommitsResponse(commitShas, false, null);
+    }
+
+    /// <summary>
+    ///     Adds a mock response for GetCommitsAsync with a collection of commits and pagination.
+    /// </summary>
     /// <param name="commitShas">Collection of commit SHAs to return.</param>
-    /// <param name="hasNextPage">Whether there are more pages (default false).</param>
-    /// <param name="endCursor">End cursor for pagination (default null).</param>
+    /// <param name="hasNextPage">Whether there are more pages.</param>
+    /// <param name="endCursor">End cursor for pagination.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddCommitsResponse(
         IEnumerable<string> commitShas,
-        bool hasNextPage = false,
-        string? endCursor = null)
+        bool hasNextPage,
+        string? endCursor)
     {
         var commitNodes = string.Join(",\n                                    ", 
             commitShas.Select(sha => $@"{{ ""oid"": ""{sha}"" }}"));
@@ -178,14 +188,24 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetReleasesAsync with a collection of releases.
     /// </summary>
+    /// <param name="releases">Mock releases to return.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockGitHubGraphQLHttpMessageHandler AddReleasesResponse(params MockRelease[] releases)
+    {
+        return AddReleasesResponse(releases, false, null);
+    }
+
+    /// <summary>
+    ///     Adds a mock response for GetReleasesAsync with a collection of releases and pagination.
+    /// </summary>
     /// <param name="releases">Collection of mock releases to return.</param>
-    /// <param name="hasNextPage">Whether there are more pages (default false).</param>
-    /// <param name="endCursor">End cursor for pagination (default null).</param>
+    /// <param name="hasNextPage">Whether there are more pages.</param>
+    /// <param name="endCursor">End cursor for pagination.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddReleasesResponse(
         IEnumerable<MockRelease> releases,
-        bool hasNextPage = false,
-        string? endCursor = null)
+        bool hasNextPage,
+        string? endCursor)
     {
         var releaseNodes = string.Join(",\n                            ",
             releases.Select(r => $@"{{
@@ -214,14 +234,24 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetAllTagsAsync with a collection of tags.
     /// </summary>
+    /// <param name="tags">Mock tags to return.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockGitHubGraphQLHttpMessageHandler AddTagsResponse(params MockTag[] tags)
+    {
+        return AddTagsResponse(tags, false, null);
+    }
+
+    /// <summary>
+    ///     Adds a mock response for GetAllTagsAsync with a collection of tags and pagination.
+    /// </summary>
     /// <param name="tags">Collection of mock tags to return.</param>
-    /// <param name="hasNextPage">Whether there are more pages (default false).</param>
-    /// <param name="endCursor">End cursor for pagination (default null).</param>
+    /// <param name="hasNextPage">Whether there are more pages.</param>
+    /// <param name="endCursor">End cursor for pagination.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddTagsResponse(
         IEnumerable<MockTag> tags,
-        bool hasNextPage = false,
-        string? endCursor = null)
+        bool hasNextPage,
+        string? endCursor)
     {
         var tagNodes = string.Join(",\n                            ",
             tags.Select(t => $@"{{
@@ -252,14 +282,24 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetPullRequestsAsync with a collection of pull requests.
     /// </summary>
-    /// <param name="pullRequests">Collection of pull request data to return (empty for no PRs).</param>
-    /// <param name="hasNextPage">Whether there are more pages (default false).</param>
-    /// <param name="endCursor">End cursor for pagination (default null).</param>
+    /// <param name="pullRequests">Pull request data to return.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockGitHubGraphQLHttpMessageHandler AddPullRequestsResponse(params MockPullRequest[] pullRequests)
+    {
+        return AddPullRequestsResponse(pullRequests, false, null);
+    }
+
+    /// <summary>
+    ///     Adds a mock response for GetPullRequestsAsync with a collection of pull requests and pagination.
+    /// </summary>
+    /// <param name="pullRequests">Collection of pull request data to return.</param>
+    /// <param name="hasNextPage">Whether there are more pages.</param>
+    /// <param name="endCursor">End cursor for pagination.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddPullRequestsResponse(
         IEnumerable<MockPullRequest> pullRequests,
-        bool hasNextPage = false,
-        string? endCursor = null)
+        bool hasNextPage,
+        string? endCursor)
     {
         var prNodes = string.Join(",\n                            ",
             pullRequests.Select(pr =>
@@ -302,14 +342,24 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for GetAllIssuesAsync with a collection of issues.
     /// </summary>
-    /// <param name="issues">Collection of issue data to return (empty for no issues).</param>
-    /// <param name="hasNextPage">Whether there are more pages (default false).</param>
-    /// <param name="endCursor">End cursor for pagination (default null).</param>
+    /// <param name="issues">Issue data to return.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockGitHubGraphQLHttpMessageHandler AddIssuesResponse(params MockIssue[] issues)
+    {
+        return AddIssuesResponse(issues, false, null);
+    }
+
+    /// <summary>
+    ///     Adds a mock response for GetAllIssuesAsync with a collection of issues and pagination.
+    /// </summary>
+    /// <param name="issues">Collection of issue data to return.</param>
+    /// <param name="hasNextPage">Whether there are more pages.</param>
+    /// <param name="endCursor">End cursor for pagination.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockGitHubGraphQLHttpMessageHandler AddIssuesResponse(
         IEnumerable<MockIssue> issues,
-        bool hasNextPage = false,
-        string? endCursor = null)
+        bool hasNextPage,
+        string? endCursor)
     {
         var issueNodes = string.Join(",\n                            ",
             issues.Select(issue =>

@@ -65,11 +65,11 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create mock responses using helper methods
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "abc123def456" })
-            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
-            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
-            .AddIssuesResponse(Array.Empty<MockIssue>())
-            .AddTagsResponse(new[] { new MockTag("v1.0.0", "abc123def456") });
+            .AddCommitsResponse("abc123def456")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(new MockTag("v1.0.0", "abc123def456"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -100,21 +100,17 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create mock responses with multiple versions
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
-            .AddReleasesResponse(new[]
-            {
+            .AddCommitsResponse("commit3", "commit2", "commit1")
+            .AddReleasesResponse(
                 new MockRelease("v2.0.0", "2024-03-01T00:00:00Z"),
                 new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
-                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
-            })
-            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
-            .AddIssuesResponse(Array.Empty<MockIssue>())
-            .AddTagsResponse(new[]
-            {
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
                 new MockTag("v2.0.0", "commit3"),
                 new MockTag("v1.1.0", "commit2"),
-                new MockTag("v1.0.0", "commit1")
-            });
+                new MockTag("v1.0.0", "commit1"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -152,14 +148,11 @@ public class GitHubRepoConnectorTests
         // Arrange - Create mock responses with PRs containing different label types
         // We need commits in range between v1.0.0 and v1.1.0
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "commit3", "commit2", "commit1" })
-            .AddReleasesResponse(new[]
-            {
+            .AddCommitsResponse("commit3", "commit2", "commit1")
+            .AddReleasesResponse(
                 new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
-                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z")
-            })
-            .AddPullRequestsResponse(new[]
-            {
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse(
                 new MockPullRequest(
                     Number: 101,
                     Title: "Add new feature",
@@ -175,14 +168,11 @@ public class GitHubRepoConnectorTests
                     Merged: true,
                     MergeCommitSha: "commit2",
                     HeadRefOid: "bugfix-branch",
-                    Labels: new List<string> { "bug" })
-            })
-            .AddIssuesResponse(Array.Empty<MockIssue>())
-            .AddTagsResponse(new[]
-            {
+                    Labels: new List<string> { "bug" }))
+            .AddIssuesResponse()
+            .AddTagsResponse(
                 new MockTag("v1.1.0", "commit3"),
-                new MockTag("v1.0.0", "commit1")
-            })
+                new MockTag("v1.0.0", "commit1"))
             // Mock the linked issues query to return empty (PRs are treated as standalone changes)
             .AddResponse("closingIssuesReferences", @"{""data"":{""repository"":{""pullRequest"":{""closingIssuesReferences"":{""nodes"":[],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}}");
 
@@ -226,11 +216,10 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create mock responses with open and closed issues
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse(new[] { "commit1" })
-            .AddReleasesResponse(new[] { new MockRelease("v1.0.0", "2024-01-01T00:00:00Z") })
-            .AddPullRequestsResponse(Array.Empty<MockPullRequest>())
-            .AddIssuesResponse(new[]
-            {
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse(
                 new MockIssue(
                     Number: 201,
                     Title: "Known bug in feature X",
@@ -248,9 +237,8 @@ public class GitHubRepoConnectorTests
                     Title: "Fixed bug",
                     Url: "https://github.com/test/repo/issues/203",
                     State: "CLOSED",
-                    Labels: new List<string> { "bug" })
-            })
-            .AddTagsResponse(new[] { new MockTag("v1.0.0", "commit1") });
+                    Labels: new List<string> { "bug" }))
+            .AddTagsResponse(new MockTag("v1.0.0", "commit1"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
