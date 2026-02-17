@@ -591,7 +591,7 @@ public class GitHubGraphQLClientTests
                         ""target"": {
                             ""history"": {
                                 ""nodes"": [
-                                    { ""oid"": ""singlecommit123"" }
+                                    { ""oid"": ""abc123def456"" }
                                 ],
                                 ""pageInfo"": {
                                     ""hasNextPage"": false,
@@ -613,7 +613,7 @@ public class GitHubGraphQLClientTests
         // Assert
         Assert.IsNotNull(commitShas);
         Assert.HasCount(1, commitShas);
-        Assert.AreEqual("singlecommit123", commitShas[0]);
+        Assert.AreEqual("abc123def456", commitShas[0]);
     }
 
     /// <summary>
