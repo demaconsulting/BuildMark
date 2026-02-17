@@ -65,3 +65,47 @@ internal record IssueNode(
 internal record PageInfo(
     bool HasNextPage,
     string? EndCursor);
+
+/// <summary>
+///     Response for getting commits from a repository.
+/// </summary>
+/// <param name="Repository">Repository data containing commit information.</param>
+internal record GetCommitsResponse(
+    CommitRepositoryData? Repository);
+
+/// <summary>
+///     Repository data containing ref information for commits.
+/// </summary>
+/// <param name="Ref">Git reference data.</param>
+internal record CommitRepositoryData(
+    RefData? Ref);
+
+/// <summary>
+///     Git reference data containing commit history.
+/// </summary>
+/// <param name="Target">Target commit information.</param>
+internal record RefData(
+    TargetData? Target);
+
+/// <summary>
+///     Target commit data containing history.
+/// </summary>
+/// <param name="History">Commit history with pagination.</param>
+internal record TargetData(
+    CommitHistoryData? History);
+
+/// <summary>
+///     Commit history data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Commit nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record CommitHistoryData(
+    List<CommitNode>? Nodes,
+    PageInfo? PageInfo);
+
+/// <summary>
+///     Commit node containing commit SHA.
+/// </summary>
+/// <param name="Oid">Git object ID (SHA).</param>
+internal record CommitNode(
+    string? Oid);

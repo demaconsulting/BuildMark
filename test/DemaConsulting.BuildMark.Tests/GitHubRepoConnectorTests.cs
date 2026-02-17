@@ -273,7 +273,7 @@ public class GitHubRepoConnectorTests
     public void GitHubRepoConnector_GetCommitsInRange_ToHashNotFound_ReturnsEmptyList()
     {
         // Arrange - empty list of commits
-        var commits = new List<GitHubCommit>();
+        var commits = new List<GitHubRepoConnector.Commit>();
 
         // Act
         var result = GitHubRepoConnector.GetCommitsInRange(commits, "hash1", "hash4");
