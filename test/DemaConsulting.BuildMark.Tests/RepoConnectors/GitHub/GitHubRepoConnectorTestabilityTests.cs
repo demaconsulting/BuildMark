@@ -114,11 +114,11 @@ public class GitHubRepoConnectorTestabilityTests
     {
         // Arrange - Create mock responses using helper methods
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse("commit123")
-            .AddReleasesResponse("v1.0.0")
-            .AddEmptyPullRequestsResponse()
-            .AddEmptyIssuesResponse()
-            .AddTagsResponse("v1.0.0", "commit123");
+            .AddCommitsResponse(new[] { "commit123" })
+            .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") })
+            .AddPullRequestsResponse(Array.Empty<object>())
+            .AddIssuesResponse(Array.Empty<object>())
+            .AddTagsResponse(new[] { ("v1.0.0", "commit123") });
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -146,8 +146,8 @@ public class GitHubRepoConnectorTestabilityTests
     {
         // Arrange - Use helper methods for standard responses
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse("commit1")
-            .AddReleasesResponse("v1.0.0");
+            .AddCommitsResponse(new[] { "commit1" })
+            .AddReleasesResponse(new[] { ("v1.0.0", "2024-01-01T00:00:00Z") });
 
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new GitHubGraphQLClient(mockHttpClient);

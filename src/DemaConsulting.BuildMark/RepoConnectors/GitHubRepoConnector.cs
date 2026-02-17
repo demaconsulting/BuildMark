@@ -94,11 +94,11 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Collect changes from PRs
         var (bugs, nonBugChanges, allChangeIds) = await CollectChangesFromPullRequestsAsync(
+            graphqlClient,
             commitsInRange,
             lookupData,
             owner,
-            repo,
-            graphqlClient);
+            repo);
 
         // Collect known issues
         var knownIssues = CollectKnownIssues(gitHubData.Issues, allChangeIds);
@@ -460,19 +460,19 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Collects changes from pull requests in the commit range.
     /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client for API operations.</param>
     /// <param name="commitsInRange">Commits in range.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
-    /// <param name="graphqlClient">GitHub GraphQL client for API operations.</param>
     /// <returns>Tuple of (bugs, nonBugChanges, allChangeIds).</returns>
     private static async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
         CollectChangesFromPullRequestsAsync(
+            GitHubGraphQLClient graphqlClient,
             List<Commit> commitsInRange,
             LookupData lookupData,
             string owner,
-            string repo,
-            GitHubGraphQLClient graphqlClient)
+            string repo)
     {
         // Initialize collections for tracking changes
         var allChangeIds = new HashSet<string>();
