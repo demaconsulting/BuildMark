@@ -241,3 +241,55 @@ internal record PullRequestLabelsConnection(
 /// <param name="Name">Label name.</param>
 internal record PullRequestLabel(
     string? Name);
+
+/// <summary>
+///     Response for getting all issues from a repository.
+/// </summary>
+/// <param name="Repository">Repository data containing issues information.</param>
+internal record GetAllIssuesResponse(
+    IssueRepositoryData? Repository);
+
+/// <summary>
+///     Repository data containing issues information.
+/// </summary>
+/// <param name="Issues">Issues connection data.</param>
+internal record IssueRepositoryData(
+    IssuesConnectionData? Issues);
+
+/// <summary>
+///     Issues connection data containing nodes and page info.
+/// </summary>
+/// <param name="Nodes">Issue nodes.</param>
+/// <param name="PageInfo">Pagination information.</param>
+internal record IssuesConnectionData(
+    List<IssueNodeData>? Nodes,
+    PageInfo? PageInfo);
+
+/// <summary>
+///     Issue node containing issue information.
+/// </summary>
+/// <param name="Number">Issue number.</param>
+/// <param name="Title">Issue title.</param>
+/// <param name="Url">Issue HTML URL.</param>
+/// <param name="State">Issue state (OPEN or CLOSED).</param>
+/// <param name="Labels">Labels assigned to the issue.</param>
+internal record IssueNodeData(
+    int? Number,
+    string? Title,
+    string? Url,
+    string? State,
+    IssueLabelsConnection? Labels);
+
+/// <summary>
+///     Issue labels connection containing nodes.
+/// </summary>
+/// <param name="Nodes">Label nodes.</param>
+internal record IssueLabelsConnection(
+    List<IssueLabel>? Nodes);
+
+/// <summary>
+///     Issue label information.
+/// </summary>
+/// <param name="Name">Label name.</param>
+internal record IssueLabel(
+    string? Name);

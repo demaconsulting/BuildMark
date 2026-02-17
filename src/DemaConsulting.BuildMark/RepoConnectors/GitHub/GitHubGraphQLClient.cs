@@ -478,6 +478,85 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
+    ///     Gets all issues for a repository using GraphQL with pagination.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of issue nodes.</returns>
+    public async Task<List<IssueNodeData>> GetAllIssuesAsync(
+        string owner,
+        string repo)
+    {
+        try
+        {
+            var allIssueNodes = new List<IssueNodeData>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all issues
+            do
+            {
+                // Create GraphQL request to get issues for a repository with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                issues(first: 100, after: $after) {
+                                    nodes {
+                                        number
+                                        title
+                                        url
+                                        state
+                                        labels(first: 100) {
+                                            nodes {
+                                                name
+                                            }
+                                        }
+                                    }
+                                    pageInfo {
+                                        hasNextPage
+                                        endCursor
+                                    }
+                                }
+                            }
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        after = afterCursor
+                    }
+                };
+
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<GetAllIssuesResponse>(request);
+
+                // Extract issue nodes from the GraphQL response, filtering out null or invalid values
+                var pageIssueNodes = response.Data?.Repository?.Issues?.Nodes?
+                    .Where(n => n.Number.HasValue && !string.IsNullOrEmpty(n.Title))
+                    .ToList() ?? [];
+
+                allIssueNodes.AddRange(pageIssueNodes);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.Issues?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage);
+
+            // Return list of all issue nodes
+            return allIssueNodes;
+        }
+        catch
+        {
+            // If GraphQL query fails, return empty list
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Disposes the GraphQL client if owned by this instance.
     /// </summary>
     public void Dispose()
