@@ -89,6 +89,90 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
+    ///     Gets all commits for a branch using GraphQL with pagination.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <param name="branch">Branch name (e.g., 'main'). Will be automatically converted to fully qualified ref name.</param>
+    /// <returns>List of commit SHAs on the branch.</returns>
+    public async Task<List<string>> GetCommitsAsync(
+        string owner,
+        string repo,
+        string branch)
+    {
+        try
+        {
+            var allCommitShas = new List<string>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Convert branch name to fully qualified ref name if needed
+            var qualifiedBranch = branch.StartsWith("refs/") ? branch : $"refs/heads/{branch}";
+
+            // Paginate through all commits on the branch
+            do
+            {
+                // Create GraphQL request to get commits for a branch with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $branch: String!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                ref(qualifiedName: $branch) {
+                                    target {
+                                        ... on Commit {
+                                            history(first: 100, after: $after) {
+                                                nodes {
+                                                    oid
+                                                }
+                                                pageInfo {
+                                                    hasNextPage
+                                                    endCursor
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        branch = qualifiedBranch,
+                        after = afterCursor
+                    }
+                };
+
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<GetCommitsResponse>(request);
+
+                // Extract commit SHAs from the GraphQL response, filtering out null or invalid values
+                var pageCommitShas = response.Data?.Repository?.Ref?.Target?.History?.Nodes?
+                    .Where(n => !string.IsNullOrEmpty(n.Oid))
+                    .Select(n => n.Oid!)
+                    .ToList() ?? [];
+
+                allCommitShas.AddRange(pageCommitShas);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.Ref?.Target?.History?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage);
+
+            // Return list of all commit SHAs
+            return allCommitShas;
+        }
+        catch
+        {
+            // If GraphQL query fails, return empty list
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Finds issue IDs linked to a pull request via closingIssuesReferences.
     /// </summary>
     /// <param name="owner">Repository owner.</param>

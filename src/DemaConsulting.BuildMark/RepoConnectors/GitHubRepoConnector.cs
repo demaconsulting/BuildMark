@@ -67,8 +67,11 @@ public class GitHubRepoConnector : RepoConnectorBase
             Credentials = new Credentials(token)
         };
 
+        // Create GraphQL client
+        using var graphqlClient = new GitHubGraphQLClient(token);
+
         // Fetch all data from GitHub
-        var gitHubData = await FetchGitHubDataAsync(client, owner, repo, branch.Trim());
+        var gitHubData = await FetchGitHubDataAsync(client, graphqlClient, owner, repo, branch.Trim());
 
         // Build lookup dictionaries and mappings
         var lookupData = BuildLookupData(gitHubData);
@@ -118,10 +121,16 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Simple commit representation containing only the SHA hash.
+    /// </summary>
+    internal sealed record Commit(
+        string Sha);
+
+    /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
     internal sealed record GitHubData(
-        IReadOnlyList<GitHubCommit> Commits,
+        IReadOnlyList<Commit> Commits,
         IReadOnlyList<Release> Releases,
         IReadOnlyList<RepositoryTag> Tags,
         IReadOnlyList<PullRequest> PullRequests,
@@ -143,14 +152,20 @@ public class GitHubRepoConnector : RepoConnectorBase
     ///     Fetches all required data from GitHub API in parallel.
     /// </summary>
     /// <param name="client">GitHub client.</param>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <param name="branch">Branch name.</param>
     /// <returns>Container with all fetched GitHub data.</returns>
-    private static async Task<GitHubData> FetchGitHubDataAsync(GitHubClient client, string owner, string repo, string branch)
+    private static async Task<GitHubData> FetchGitHubDataAsync(
+        GitHubClient client,
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo,
+        string branch)
     {
         // Fetch all data from GitHub in parallel
-        var commitsTask = GetAllCommitsAsync(client, owner, repo, branch);
+        var commitsTask = GetAllCommitsAsync(graphqlClient, owner, repo, branch);
         var releasesTask = client.Repository.Release.GetAll(owner, repo);
         var tagsTask = client.Repository.GetAllTags(owner, repo);
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
@@ -401,7 +416,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Tuple of (bugs, nonBugChanges, allChangeIds).</returns>
     private static async Task<(List<ItemInfo> bugs, List<ItemInfo> nonBugChanges, HashSet<string> allChangeIds)>
         CollectChangesFromPullRequestsAsync(
-            List<GitHubCommit> commitsInRange,
+            List<Commit> commitsInRange,
             LookupData lookupData,
             string owner,
             string repo,
@@ -537,20 +552,24 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Gets all commits for a branch using pagination.
+    ///     Gets all commits for a branch using GraphQL pagination.
     /// </summary>
-    /// <param name="client">GitHub client.</param>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <param name="branch">Branch name.</param>
     /// <returns>List of all commits.</returns>
-    private static async Task<IReadOnlyList<GitHubCommit>> GetAllCommitsAsync(GitHubClient client, string owner, string repo, string branch)
+    private static async Task<IReadOnlyList<Commit>> GetAllCommitsAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo,
+        string branch)
     {
-        // Create request for branch commits
-        var request = new CommitRequest { Sha = branch };
+        // Fetch all commit SHAs for the branch using GraphQL
+        var commitShas = await graphqlClient.GetCommitsAsync(owner, repo, branch);
 
-        // Fetch and return all commits for the branch
-        return await client.Repository.Commit.GetAll(owner, repo, request);
+        // Convert SHAs to Commit objects and return
+        return commitShas.Select(sha => new Commit(sha)).ToList();
     }
 
     /// <summary>
@@ -560,10 +579,10 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="fromHash">Starting commit hash (exclusive - not included in results; null for start of history).</param>
     /// <param name="toHash">Ending commit hash (inclusive - included in results).</param>
     /// <returns>List of commits in range, excluding fromHash but including toHash.</returns>
-    internal static List<GitHubCommit> GetCommitsInRange(IReadOnlyList<GitHubCommit> commits, string? fromHash, string toHash)
+    internal static List<Commit> GetCommitsInRange(IReadOnlyList<Commit> commits, string? fromHash, string toHash)
     {
         // Initialize collection and state tracking
-        var result = new List<GitHubCommit>();
+        var result = new List<Commit>();
         var foundTo = false;
 
         // Iterate through commits from newest to oldest
