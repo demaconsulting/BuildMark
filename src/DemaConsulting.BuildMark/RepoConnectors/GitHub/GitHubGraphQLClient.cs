@@ -1,4 +1,4 @@
-// Copyright (c) 2024-2025 Dema Consulting
+// Copyright (c) 2026 DEMA Consulting
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -19,10 +19,11 @@
 // SOFTWARE.
 
 using System.Net.Http.Headers;
-using System.Text;
-using System.Text.Json;
+using GraphQL;
+using GraphQL.Client.Http;
+using GraphQL.Client.Serializer.SystemTextJson;
 
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Helper class for executing GitHub GraphQL queries.
@@ -35,19 +36,14 @@ internal sealed class GitHubGraphQLClient : IDisposable
     private const string DefaultGitHubGraphQLEndpoint = "https://api.github.com/graphql";
 
     /// <summary>
-    ///     HTTP client for making GraphQL requests.
+    ///     GraphQL HTTP client for making GraphQL requests.
     /// </summary>
-    private readonly HttpClient _httpClient;
+    private readonly GraphQLHttpClient _graphqlClient;
 
     /// <summary>
-    ///     Indicates whether this instance owns the HTTP client and should dispose it.
+    ///     Indicates whether this instance owns the GraphQL client and should dispose it.
     /// </summary>
-    private readonly bool _ownsHttpClient;
-
-    /// <summary>
-    ///     GraphQL endpoint URL.
-    /// </summary>
-    private readonly string _graphqlEndpoint;
+    private readonly bool _ownsGraphQLClient;
 
     /// <summary>
     ///     Initializes a new instance of the <see cref="GitHubGraphQLClient"/> class.
@@ -57,13 +53,19 @@ internal sealed class GitHubGraphQLClient : IDisposable
     public GitHubGraphQLClient(string token, string? graphqlEndpoint = null)
     {
         // Initialize HTTP client with authentication and user agent headers
-        _httpClient = new HttpClient();
-        _httpClient.DefaultRequestHeaders.Authorization =
+        var httpClient = new HttpClient();
+        httpClient.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", token);
-        _httpClient.DefaultRequestHeaders.UserAgent.Add(
+        httpClient.DefaultRequestHeaders.UserAgent.Add(
             new ProductInfoHeaderValue("BuildMark", "1.0"));
-        _graphqlEndpoint = graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint;
-        _ownsHttpClient = true;
+
+        // Create GraphQL HTTP client with the configured HTTP client
+        var options = new GraphQLHttpClientOptions
+        {
+            EndPoint = new Uri(graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint)
+        };
+        _graphqlClient = new GraphQLHttpClient(options, new SystemTextJsonSerializer(), httpClient);
+        _ownsGraphQLClient = true;
     }
 
     /// <summary>
@@ -78,9 +80,12 @@ internal sealed class GitHubGraphQLClient : IDisposable
     internal GitHubGraphQLClient(HttpClient httpClient, string? graphqlEndpoint = null)
     {
         // Use provided HTTP client (typically a mocked one for testing)
-        _httpClient = httpClient;
-        _graphqlEndpoint = graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint;
-        _ownsHttpClient = false;
+        var options = new GraphQLHttpClientOptions
+        {
+            EndPoint = new Uri(graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint)
+        };
+        _graphqlClient = new GraphQLHttpClient(options, new SystemTextJsonSerializer(), httpClient);
+        _ownsGraphQLClient = false;
     }
 
     /// <summary>
@@ -97,59 +102,61 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            // GraphQL query to get closing issues for a pull request
-            var graphqlQuery = new
+            var allIssueNumbers = new List<int>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all closing issues
+            do
             {
-                query = @"
-                    query($owner: String!, $repo: String!, $prNumber: Int!) {
-                        repository(owner: $owner, name: $repo) {
-                            pullRequest(number: $prNumber) {
-                                closingIssuesReferences(first: 100) {
-                                    nodes {
-                                        number
+                // Create GraphQL request to get closing issues for a pull request with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $prNumber: Int!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                pullRequest(number: $prNumber) {
+                                    closingIssuesReferences(first: 100, after: $after) {
+                                        nodes {
+                                            number
+                                        }
+                                        pageInfo {
+                                            hasNextPage
+                                            endCursor
+                                        }
                                     }
                                 }
                             }
-                        }
-                    }",
-                variables = new
-                {
-                    owner,
-                    repo,
-                    prNumber
-                }
-            };
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        prNumber,
+                        after = afterCursor
+                    }
+                };
 
-            // Serialize query and send POST request to GraphQL endpoint
-            var jsonContent = JsonSerializer.Serialize(graphqlQuery);
-            using var content = new StringContent(jsonContent, Encoding.UTF8, "application/json");
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<FindIssueIdsResponse>(request);
 
-            // Execute GraphQL query and ensure success
-            var response = await _httpClient.PostAsync(_graphqlEndpoint, content);
-            response.EnsureSuccessStatusCode();
+                // Extract issue numbers from the GraphQL response, filtering out null or invalid values
+                var pageIssueNumbers = response.Data?.Repository?.PullRequest?.ClosingIssuesReferences?.Nodes?
+                    .Where(n => n.Number.HasValue)
+                    .Select(n => n.Number!.Value)
+                    .ToList() ?? [];
 
-            // Parse response JSON
-            var responseBody = await response.Content.ReadAsStringAsync();
-            var jsonDoc = JsonDocument.Parse(responseBody);
+                allIssueNumbers.AddRange(pageIssueNumbers);
 
-            // Extract issue numbers from the GraphQL response
-            var issueNumbers = new List<int>();
-            if (jsonDoc.RootElement.TryGetProperty("data", out var data) &&
-                data.TryGetProperty("repository", out var repository) &&
-                repository.TryGetProperty("pullRequest", out var pullRequest) &&
-                pullRequest.TryGetProperty("closingIssuesReferences", out var closingIssues) &&
-                closingIssues.TryGetProperty("nodes", out var nodes))
-            {
-                // Enumerate all issue nodes and extract their numbers
-                foreach (var node in nodes.EnumerateArray().Where(n => n.TryGetProperty("number", out _)))
-                {
-                    node.TryGetProperty("number", out var number);
-                    issueNumbers.Add(number.GetInt32());
-                }
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.PullRequest?.ClosingIssuesReferences?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
             }
+            while (hasNextPage);
 
-            // Return list of linked issue numbers
-            return issueNumbers;
+            // Return list of all linked issue numbers
+            return allIssueNumbers;
         }
         catch
         {
@@ -159,14 +166,14 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
-    ///     Disposes the HTTP client if owned by this instance.
+    ///     Disposes the GraphQL client if owned by this instance.
     /// </summary>
     public void Dispose()
     {
-        // Clean up HTTP client resources only if we own it
-        if (_ownsHttpClient)
+        // Clean up GraphQL client resources only if we own it
+        if (_ownsGraphQLClient)
         {
-            _httpClient.Dispose();
+            _graphqlClient.Dispose();
         }
     }
 }
