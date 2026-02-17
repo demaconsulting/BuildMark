@@ -78,19 +78,11 @@ public class MockRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that GetBuildInformationAsync throws exception when no version provided and no tags exist.
+    ///     Test that GetBuildInformationAsync resolves version from tags and returns correct baseline.
     /// </summary>
     /// <remarks>
-    ///     What is being tested: MockRepoConnector error handling for missing version information
-    ///     What the assertions prove: Appropriate exception is thrown with helpful message when version cannot be determined
-    ///     
-    ///     Note: This test cannot be implemented with the current MockRepoConnector design
-    ///     because it always has predefined tags. The private GetTagHistoryAsync always returns
-    ///     tags from the _tagHashes dictionary. To test the "no tags" scenario would require
-    ///     refactoring MockRepoConnector to allow configuration of its tag data.
-    ///     
-    ///     This represents a design limitation rather than a testing gap - the MockRepoConnector
-    ///     is designed for testing happy paths with known data, not for testing error conditions.
+    ///     What is being tested: MockRepoConnector's ability to resolve version information from tags
+    ///     What the assertions prove: Build information is correctly generated with version from tag data
     /// </remarks>
     [TestMethod]
     public async Task MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline()
