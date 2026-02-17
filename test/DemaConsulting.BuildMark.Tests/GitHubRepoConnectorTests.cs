@@ -195,14 +195,14 @@ public class GitHubRepoConnectorTests
         // PRs without linked issues are treated based on their labels
         // PR 100 with "bug" label should be in bugs
         Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsGreaterThanOrEqualTo(buildInfo.Bugs.Count, 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Bugs.Count, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
         Assert.IsNotNull(bugPR, "PR 100 should be categorized as a bug");
         Assert.AreEqual("Fix critical bug", bugPR.Title);
 
         // PR 101 with "feature" label should be in changes
         Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsGreaterThanOrEqualTo(buildInfo.Changes.Count, 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Changes.Count, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
         var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
         Assert.IsNotNull(featurePR, "PR 101 should be categorized as a change");
         Assert.AreEqual("Add new feature", featurePR.Title);
@@ -258,7 +258,7 @@ public class GitHubRepoConnectorTests
         // Known issues are open issues that aren't linked to any changes in this release
         Assert.IsNotNull(buildInfo.KnownIssues);
         // Since we have no PRs, all open issues should be known issues
-        Assert.IsGreaterThanOrEqualTo(buildInfo.KnownIssues.Count, 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.KnownIssues.Count, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
         
         // Verify at least one known issue is present
         var knownIssueTitles = buildInfo.KnownIssues.Select(i => i.Title).ToList();
