@@ -591,8 +591,11 @@ public class GitHubRepoConnector : RepoConnectorBase
         // This creates minimal Release objects with only TagName populated
         return releaseTagNames.Select(tagName =>
         {
-            var json = $$"""{"tag_name":"{{tagName}}"}""";
-            return Newtonsoft.Json.JsonConvert.DeserializeObject<Release>(json) ?? throw new InvalidOperationException($"Failed to create Release object for tag {tagName}");
+            // Use JsonConvert with a proper object to avoid JSON injection
+            var releaseData = new { tag_name = tagName };
+            var json = Newtonsoft.Json.JsonConvert.SerializeObject(releaseData);
+            var release = Newtonsoft.Json.JsonConvert.DeserializeObject<Release>(json);
+            return release ?? throw new InvalidOperationException($"Failed to create Release object for tag {tagName}");
         }).ToList();
     }
 
