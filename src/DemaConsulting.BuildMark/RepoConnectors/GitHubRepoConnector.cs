@@ -166,7 +166,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     {
         // Fetch all data from GitHub in parallel
         var commitsTask = GetAllCommitsAsync(graphqlClient, owner, repo, branch);
-        var releasesTask = client.Repository.Release.GetAll(owner, repo);
+        var releasesTask = GetAllReleasesAsync(graphqlClient, owner, repo);
         var tagsTask = client.Repository.GetAllTags(owner, repo);
         var pullRequestsTask = client.PullRequest.GetAllForRepository(owner, repo, new PullRequestRequest { State = ItemStateFilter.All });
         var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
@@ -570,6 +570,30 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Convert SHAs to Commit objects and return
         return commitShas.Select(sha => new Commit(sha)).ToList();
+    }
+
+    /// <summary>
+    ///     Gets all releases for a repository using GraphQL pagination.
+    /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of all releases.</returns>
+    private static async Task<IReadOnlyList<Release>> GetAllReleasesAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo)
+    {
+        // Fetch all release tag names for the repository using GraphQL
+        var releaseTagNames = await graphqlClient.GetReleasesAsync(owner, repo);
+
+        // Convert tag names to Release objects using JSON deserialization
+        // This creates minimal Release objects with only TagName populated
+        return releaseTagNames.Select(tagName =>
+        {
+            var json = $$"""{"tag_name":"{{tagName}}"}""";
+            return System.Text.Json.JsonSerializer.Deserialize<Release>(json) ?? throw new InvalidOperationException($"Failed to create Release object for tag {tagName}");
+        }).ToList();
     }
 
     /// <summary>

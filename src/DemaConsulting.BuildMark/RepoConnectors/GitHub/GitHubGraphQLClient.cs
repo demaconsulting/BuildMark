@@ -173,6 +173,78 @@ internal sealed class GitHubGraphQLClient : IDisposable
     }
 
     /// <summary>
+    ///     Gets all releases for a repository using GraphQL with pagination.
+    /// </summary>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of release tag names.</returns>
+    public async Task<List<string>> GetReleasesAsync(
+        string owner,
+        string repo)
+    {
+        try
+        {
+            var allReleaseTagNames = new List<string>();
+            string? afterCursor = null;
+            bool hasNextPage;
+
+            // Paginate through all releases
+            do
+            {
+                // Create GraphQL request to get releases for a repository with pagination support
+                var request = new GraphQLRequest
+                {
+                    Query = @"
+                        query($owner: String!, $repo: String!, $after: String) {
+                            repository(owner: $owner, name: $repo) {
+                                releases(first: 100, after: $after, orderBy: {field: CREATED_AT, direction: DESC}) {
+                                    nodes {
+                                        tagName
+                                    }
+                                    pageInfo {
+                                        hasNextPage
+                                        endCursor
+                                    }
+                                }
+                            }
+                        }",
+                    Variables = new
+                    {
+                        owner,
+                        repo,
+                        after = afterCursor
+                    }
+                };
+
+                // Execute GraphQL query
+                var response = await _graphqlClient.SendQueryAsync<GetReleasesResponse>(request);
+
+                // Extract release tag names from the GraphQL response, filtering out null or invalid values
+                var pageReleaseTagNames = response.Data?.Repository?.Releases?.Nodes?
+                    .Where(n => !string.IsNullOrEmpty(n.TagName))
+                    .Select(n => n.TagName!)
+                    .ToList() ?? [];
+
+                allReleaseTagNames.AddRange(pageReleaseTagNames);
+
+                // Check if there are more pages
+                var pageInfo = response.Data?.Repository?.Releases?.PageInfo;
+                hasNextPage = pageInfo?.HasNextPage ?? false;
+                afterCursor = pageInfo?.EndCursor;
+            }
+            while (hasNextPage);
+
+            // Return list of all release tag names
+            return allReleaseTagNames;
+        }
+        catch
+        {
+            // If GraphQL query fails, return empty list
+            return [];
+        }
+    }
+
+    /// <summary>
     ///     Finds issue IDs linked to a pull request via closingIssuesReferences.
     /// </summary>
     /// <param name="owner">Repository owner.</param>

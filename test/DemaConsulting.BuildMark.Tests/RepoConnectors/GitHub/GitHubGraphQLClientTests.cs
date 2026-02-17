@@ -790,4 +790,333 @@ public class GitHubGraphQLClientTests
             return response;
         }
     }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns expected release tag names with valid response.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames()
+    {
+        // Arrange
+        var mockResponse = @"{
+            ""data"": {
+                ""repository"": {
+                    ""releases"": {
+                        ""nodes"": [
+                            { ""tagName"": ""v1.0.0"" },
+                            { ""tagName"": ""v0.9.0"" },
+                            { ""tagName"": ""v0.8.5"" }
+                        ],
+                        ""pageInfo"": {
+                            ""hasNextPage"": false,
+                            ""endCursor"": null
+                        }
+                    }
+                }
+            }
+        }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.HasCount(3, releaseTagNames);
+        Assert.AreEqual("v1.0.0", releaseTagNames[0]);
+        Assert.AreEqual("v0.9.0", releaseTagNames[1]);
+        Assert.AreEqual("v0.8.5", releaseTagNames[2]);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns empty list when no releases are found.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_NoReleases_ReturnsEmptyList()
+    {
+        // Arrange
+        var mockResponse = @"{
+            ""data"": {
+                ""repository"": {
+                    ""releases"": {
+                        ""nodes"": [],
+                        ""pageInfo"": {
+                            ""hasNextPage"": false,
+                            ""endCursor"": null
+                        }
+                    }
+                }
+            }
+        }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.IsEmpty(releaseTagNames);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns empty list when response has missing data.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_MissingData_ReturnsEmptyList()
+    {
+        // Arrange
+        var mockResponse = @"{
+            ""data"": {
+                ""repository"": null
+            }
+        }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.IsEmpty(releaseTagNames);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns empty list on HTTP error.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList()
+    {
+        // Arrange
+        var mockResponse = @"{ ""message"": ""Not Found"" }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.NotFound);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.IsEmpty(releaseTagNames);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns empty list on invalid JSON.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList()
+    {
+        // Arrange
+        var mockResponse = "This is not valid JSON";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.IsEmpty(releaseTagNames);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync returns single release tag correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_SingleRelease_ReturnsOneTagName()
+    {
+        // Arrange
+        var mockResponse = @"{
+            ""data"": {
+                ""repository"": {
+                    ""releases"": {
+                        ""nodes"": [
+                            { ""tagName"": ""v2.0.0-beta1"" }
+                        ],
+                        ""pageInfo"": {
+                            ""hasNextPage"": false,
+                            ""endCursor"": null
+                        }
+                    }
+                }
+            }
+        }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.HasCount(1, releaseTagNames);
+        Assert.AreEqual("v2.0.0-beta1", releaseTagNames[0]);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync handles nodes with missing tagName property.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_MissingTagNameProperty_SkipsInvalidNodes()
+    {
+        // Arrange
+        var mockResponse = @"{
+            ""data"": {
+                ""repository"": {
+                    ""releases"": {
+                        ""nodes"": [
+                            { ""tagName"": ""v1.0.0"" },
+                            { ""name"": ""Missing tag name"" },
+                            { ""tagName"": ""v0.9.0"" }
+                        ],
+                        ""pageInfo"": {
+                            ""hasNextPage"": false,
+                            ""endCursor"": null
+                        }
+                    }
+                }
+            }
+        }";
+
+        using var httpClient = CreateMockHttpClient(mockResponse, HttpStatusCode.OK);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.HasCount(2, releaseTagNames);
+        Assert.AreEqual("v1.0.0", releaseTagNames[0]);
+        Assert.AreEqual("v0.9.0", releaseTagNames[1]);
+    }
+
+    /// <summary>
+    ///     Test that GetReleasesAsync handles pagination correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases()
+    {
+        // Arrange - Create mock handler that returns different responses for different pages
+        var mockHandler = new ReleasePaginationMockHttpMessageHandler();
+        using var httpClient = new HttpClient(mockHandler);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var releaseTagNames = await client.GetReleasesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(releaseTagNames);
+        Assert.HasCount(3, releaseTagNames);
+        Assert.AreEqual("v3.0.0", releaseTagNames[0]);
+        Assert.AreEqual("v2.0.0", releaseTagNames[1]);
+        Assert.AreEqual("v1.0.0", releaseTagNames[2]);
+    }
+
+    /// <summary>
+    ///     Mock HTTP message handler for testing release pagination.
+    /// </summary>
+    private sealed class ReleasePaginationMockHttpMessageHandler : HttpMessageHandler
+    {
+        /// <summary>
+        ///     Request count to track pagination.
+        /// </summary>
+        private int _requestCount;
+
+        /// <summary>
+        ///     Sends a mock HTTP response with pagination.
+        /// </summary>
+        /// <param name="request">HTTP request message.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>Mock HTTP response.</returns>
+        protected override async Task<HttpResponseMessage> SendAsync(
+            HttpRequestMessage request,
+            CancellationToken cancellationToken)
+        {
+            // Read request body to determine which page to return
+            var requestBody = request.Content != null
+                ? await request.Content.ReadAsStringAsync(cancellationToken)
+                : string.Empty;
+            
+            string responseContent;
+            if (_requestCount == 0 || !requestBody.Contains("\"after\""))
+            {
+                // First page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""releases"": {
+                                ""nodes"": [
+                                    { ""tagName"": ""v3.0.0"" }
+                                ],
+                                ""pageInfo"": {
+                                    ""hasNextPage"": true,
+                                    ""endCursor"": ""cursor1""
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+            else if (requestBody.Contains("\"cursor1\""))
+            {
+                // Second page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""releases"": {
+                                ""nodes"": [
+                                    { ""tagName"": ""v2.0.0"" }
+                                ],
+                                ""pageInfo"": {
+                                    ""hasNextPage"": true,
+                                    ""endCursor"": ""cursor2""
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+            else
+            {
+                // Third (last) page
+                responseContent = @"{
+                    ""data"": {
+                        ""repository"": {
+                            ""releases"": {
+                                ""nodes"": [
+                                    { ""tagName"": ""v1.0.0"" }
+                                ],
+                                ""pageInfo"": {
+                                    ""hasNextPage"": false,
+                                    ""endCursor"": null
+                                }
+                            }
+                        }
+                    }
+                }";
+            }
+
+            _requestCount++;
+
+            // Create response with content
+            // Note: The returned HttpResponseMessage will be disposed by HttpClient,
+            // which also disposes the Content. This is the expected pattern for HttpMessageHandler.
+            var content = new StringContent(responseContent, Encoding.UTF8, "application/json");
+            var response = new HttpResponseMessage(HttpStatusCode.OK)
+            {
+                Content = content
+            };
+
+            return response;
+        }
+    }
 }
