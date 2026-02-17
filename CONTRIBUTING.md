@@ -147,6 +147,34 @@ Examples:
   - `Assert.DoesNotContain(item, collection)`
 - Always clean up resources (use `try/finally` for console redirection)
 
+### Mocking and Testing Patterns
+
+When testing classes that depend on external services (like GitHub GraphQL API):
+
+1. **Use virtual methods for dependency creation**: Classes expose internal virtual methods
+   (e.g., `CreateGraphQLClient`) that can be overridden in derived test classes
+2. **Mock HTTP responses**: Use `MockGraphQLHttpMessageHandler` to simulate GitHub API responses
+3. **Pattern-based matching**: Configure mock responses based on GraphQL query patterns
+
+Example:
+
+```csharp
+// Create a mock HTTP handler with pre-configured responses
+using var mockHandler = new MockGraphQLHttpMessageHandler();
+mockHandler.AddResponse(
+    "ref(qualifiedName:",  // Pattern to match in GraphQL query
+    @"{""data"":{""repository"":{...}}}");  // Mock response
+
+// Create HttpClient and inject into GitHubGraphQLClient
+using var mockHttpClient = new HttpClient(mockHandler);
+using var client = new GitHubGraphQLClient(mockHttpClient);
+
+// Now the client will use mock responses instead of real API calls
+var commits = await client.GetCommitsAsync("owner", "repo", "branch");
+```
+
+See `GitHubRepoConnectorTestabilityTests.cs` for complete examples.
+
 ### Running Tests
 
 ```bash
