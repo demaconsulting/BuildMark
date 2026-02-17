@@ -153,17 +153,17 @@ When testing classes that depend on external services (like GitHub GraphQL API):
 
 1. **Use virtual methods for dependency creation**: Classes expose internal virtual methods
    (e.g., `CreateGraphQLClient`) that can be overridden in derived test classes
-2. **Mock HTTP responses**: Use `MockGraphQLHttpMessageHandler` to simulate GitHub API responses
-3. **Pattern-based matching**: Configure mock responses based on GraphQL query patterns
+2. **Mock HTTP responses**: Use `MockGitHubGraphQLHttpMessageHandler` to simulate GitHub API responses
+3. **Helper methods**: Use built-in helper methods for common responses
 
 Example:
 
 ```csharp
-// Create a mock HTTP handler with pre-configured responses
-using var mockHandler = new MockGraphQLHttpMessageHandler();
-mockHandler.AddResponse(
-    "ref(qualifiedName:",  // Pattern to match in GraphQL query
-    @"{""data"":{""repository"":{...}}}");  // Mock response
+// Create a mock HTTP handler using helper methods
+using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+    .AddCommitsResponse("commit123")
+    .AddReleasesResponse("v1.0.0")
+    .AddEmptyPullRequestsResponse();
 
 // Create HttpClient and inject into GitHubGraphQLClient
 using var mockHttpClient = new HttpClient(mockHandler);
