@@ -19,12 +19,11 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
-using Octokit;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
-///     GitHub repository connector implementation using Octokit.Net.
+///     GitHub repository connector implementation using GraphQL.
 /// </summary>
 public class GitHubRepoConnector : RepoConnectorBase
 {
@@ -61,17 +60,11 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Get GitHub token
         var token = await GetGitHubTokenAsync();
 
-        // Create Octokit client
-        var client = new GitHubClient(new Octokit.ProductHeaderValue("BuildMark"))
-        {
-            Credentials = new Credentials(token)
-        };
-
         // Create GraphQL client
         using var graphqlClient = new GitHubGraphQLClient(token);
 
         // Fetch all data from GitHub
-        var gitHubData = await FetchGitHubDataAsync(client, graphqlClient, owner, repo, branch.Trim());
+        var gitHubData = await FetchGitHubDataAsync(graphqlClient, owner, repo, branch.Trim());
 
         // Build lookup dictionaries and mappings
         var lookupData = BuildLookupData(gitHubData);
@@ -158,6 +151,22 @@ public class GitHubRepoConnector : RepoConnectorBase
         string Name);
 
     /// <summary>
+    ///     Issue information.
+    /// </summary>
+    internal sealed record IssueInfo(
+        int Number,
+        string Title,
+        string HtmlUrl,
+        string State,
+        IReadOnlyList<IssueLabelInfo> Labels);
+
+    /// <summary>
+    ///     Issue label information.
+    /// </summary>
+    internal sealed record IssueLabelInfo(
+        string Name);
+
+    /// <summary>
     ///     Container for GitHub data fetched from the API.
     /// </summary>
     internal sealed record GitHubData(
@@ -165,13 +174,13 @@ public class GitHubRepoConnector : RepoConnectorBase
         IReadOnlyList<ReleaseNode> Releases,
         IReadOnlyList<Tag> Tags,
         IReadOnlyList<PullRequestInfo> PullRequests,
-        IReadOnlyList<Issue> Issues);
+        IReadOnlyList<IssueInfo> Issues);
 
     /// <summary>
     ///     Container for lookup data structures built from GitHub data.
     /// </summary>
     internal sealed record LookupData(
-        Dictionary<int, Issue> IssueById,
+        Dictionary<int, IssueInfo> IssueById,
         Dictionary<string, PullRequestInfo> CommitHashToPr,
         List<ReleaseNode> BranchReleases,
         Dictionary<string, Tag> TagsByName,
@@ -182,14 +191,12 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Fetches all required data from GitHub API in parallel.
     /// </summary>
-    /// <param name="client">GitHub client.</param>
     /// <param name="graphqlClient">GitHub GraphQL client.</param>
     /// <param name="owner">Repository owner.</param>
     /// <param name="repo">Repository name.</param>
     /// <param name="branch">Branch name.</param>
     /// <returns>Container with all fetched GitHub data.</returns>
     private static async Task<GitHubData> FetchGitHubDataAsync(
-        GitHubClient client,
         GitHubGraphQLClient graphqlClient,
         string owner,
         string repo,
@@ -200,7 +207,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var releasesTask = GetAllReleasesAsync(graphqlClient, owner, repo);
         var tagsTask = GetAllTagsAsync(graphqlClient, owner, repo);
         var pullRequestsTask = GetAllPullRequestsAsync(graphqlClient, owner, repo);
-        var issuesTask = client.Issue.GetAllForRepository(owner, repo, new RepositoryIssueRequest { State = ItemStateFilter.All });
+        var issuesTask = GetAllIssuesAsync(graphqlClient, owner, repo);
 
         // Wait for all parallel fetches to complete
         await Task.WhenAll(commitsTask, releasesTask, tagsTask, pullRequestsTask, issuesTask);
@@ -497,7 +504,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="nonBugChanges">List of non-bug changes (modified in place).</param>
     private static void ProcessLinkedIssues(
         IReadOnlyList<int> linkedIssueIds,
-        Dictionary<int, Issue> issueById,
+        Dictionary<int, IssueInfo> issueById,
         PullRequestInfo pr,
         HashSet<string> allChangeIds,
         List<ItemInfo> bugs,
@@ -571,10 +578,10 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="issues">All issues from GitHub.</param>
     /// <param name="allChangeIds">Set of all change IDs already processed.</param>
     /// <returns>List of known issues.</returns>
-    private static List<ItemInfo> CollectKnownIssues(IReadOnlyList<Issue> issues, HashSet<string> allChangeIds)
+    private static List<ItemInfo> CollectKnownIssues(IReadOnlyList<IssueInfo> issues, HashSet<string> allChangeIds)
     {
         return issues
-            .Where(i => i.State == ItemState.Open)
+            .Where(i => i.State == "OPEN")
             .Select(issue => (issue, issueId: issue.Number.ToString()))
             .Where(tuple => !allChangeIds.Contains(tuple.issueId))
             .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
@@ -674,6 +681,36 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets all issues for a repository using GraphQL.
+    /// </summary>
+    /// <param name="graphqlClient">GitHub GraphQL client.</param>
+    /// <param name="owner">Repository owner.</param>
+    /// <param name="repo">Repository name.</param>
+    /// <returns>List of all issues.</returns>
+    private static async Task<IReadOnlyList<IssueInfo>> GetAllIssuesAsync(
+        GitHubGraphQLClient graphqlClient,
+        string owner,
+        string repo)
+    {
+        // Fetch all issues for the repository using GraphQL
+        var issueNodes = await graphqlClient.GetAllIssuesAsync(owner, repo);
+
+        // Convert IssueNodeData objects to IssueInfo objects
+        return issueNodes
+            .Where(issue => issue.Number.HasValue && !string.IsNullOrEmpty(issue.Title))
+            .Select(issue => new IssueInfo(
+                issue.Number!.Value,
+                issue.Title!,
+                issue.Url ?? string.Empty,
+                issue.State ?? "UNKNOWN",
+                issue.Labels?.Nodes?
+                    .Where(l => !string.IsNullOrEmpty(l.Name))
+                    .Select(l => new IssueLabelInfo(l.Name!))
+                    .ToList() ?? []))
+            .ToList();
+    }
+
+    /// <summary>
     ///     Gets commits in the range from fromHash (exclusive) to toHash (inclusive).
     /// </summary>
     /// <param name="commits">All commits.</param>
@@ -718,7 +755,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="issue">GitHub issue.</param>
     /// <param name="index">Index for sorting.</param>
     /// <returns>ItemInfo instance.</returns>
-    internal static ItemInfo CreateItemInfoFromIssue(Issue issue, int index)
+    internal static ItemInfo CreateItemInfoFromIssue(IssueInfo issue, int index)
     {
         // Determine item type from issue labels
         var type = GetTypeFromLabels(issue.Labels);
@@ -752,11 +789,11 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Determines item type from labels.
+    ///     Determines item type from issue labels.
     /// </summary>
-    /// <param name="labels">List of labels.</param>
+    /// <param name="labels">List of issue labels.</param>
     /// <returns>Item type string.</returns>
-    internal static string GetTypeFromLabels(IReadOnlyList<Label> labels)
+    internal static string GetTypeFromLabels(IReadOnlyList<IssueLabelInfo> labels)
     {
         // Find first matching label type by checking label names against the type map
         var matchingType = labels

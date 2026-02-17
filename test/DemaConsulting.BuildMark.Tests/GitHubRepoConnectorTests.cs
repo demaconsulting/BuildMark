@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.RepoConnectors;
-using Octokit;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -257,7 +256,7 @@ public class GitHubRepoConnectorTests
     public void GitHubRepoConnector_GetTypeFromLabels_EmptyLabels_ReturnsOther()
     {
         // Arrange
-        var labels = new List<Label>();
+        var labels = new List<GitHubRepoConnector.IssueLabelInfo>();
 
         // Act
         var type = GitHubRepoConnector.GetTypeFromLabels(labels);
