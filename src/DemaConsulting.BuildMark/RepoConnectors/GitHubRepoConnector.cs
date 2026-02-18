@@ -87,7 +87,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var (toVersion, toHash) = DetermineTargetVersion(version, currentCommitHash.Trim(), lookupData);
 
         // Determine the starting release for comparing changes
-        var (fromVersion, fromHash) = DetermineBaselineVersion(toVersion, lookupData);
+        var (fromVersion, fromHash) = DetermineBaselineVersion(toVersion, toHash, lookupData);
 
         // Get commits in range
         var commitsInRange = GetCommitsInRange(gitHubData.Commits, fromHash, toHash);
@@ -348,10 +348,12 @@ public class GitHubRepoConnector : RepoConnectorBase
     ///     Determines the baseline version for comparing changes.
     /// </summary>
     /// <param name="toVersion">Target version.</param>
+    /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (fromVersion, fromHash).</returns>
     private static (Version? fromVersion, string? fromHash) DetermineBaselineVersion(
         Version toVersion,
+        string toHash,
         LookupData lookupData)
     {
         // Return null baseline if no releases exist
@@ -365,7 +367,7 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Determine baseline version based on whether target is pre-release
         var fromVersion = toVersion.IsPreRelease
-            ? DetermineBaselineForPreRelease(toIndex, lookupData.ReleaseVersions)
+            ? DetermineBaselineForPreRelease(toIndex, toHash, lookupData)
             : DetermineBaselineForRelease(toIndex, lookupData.ReleaseVersions);
 
         // Get commit hash for baseline version if one was found
@@ -382,26 +384,56 @@ public class GitHubRepoConnector : RepoConnectorBase
 
     /// <summary>
     ///     Determines the baseline version for a pre-release.
+    ///     Pre-release versions pick the previous tag (release or pre-release) that isn't the same commit-hash.
     /// </summary>
     /// <param name="toIndex">Index of target version in release history.</param>
-    /// <param name="releaseVersions">List of release versions.</param>
+    /// <param name="toHash">Commit hash of target version.</param>
+    /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Baseline version or null.</returns>
-    private static Version? DetermineBaselineForPreRelease(int toIndex, List<Version> releaseVersions)
+    private static Version? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
     {
-        // Pre-release versions use the immediately previous (older) release as baseline
+        var releaseVersions = lookupData.ReleaseVersions;
+        
+        // Determine starting index for search
+        int startIndex;
         if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
         {
-            // Target version exists in history, use next older release (higher index)
-            return releaseVersions[toIndex + 1];
+            // Target exists, start from next older release
+            startIndex = toIndex + 1;
         }
-
-        // Target version not in history, use most recent release as baseline
-        if (toIndex == -1 && releaseVersions.Count > 0)
+        else if (toIndex == -1 && releaseVersions.Count > 0)
         {
-            return releaseVersions[0];
+            // Target not in history, start from most recent
+            startIndex = 0;
+        }
+        else
+        {
+            // No valid starting point
+            startIndex = -1;
         }
 
-        // If toIndex is last in list, this is the oldest release, no baseline
+        // If no valid starting point, return null
+        if (startIndex < 0)
+        {
+            return null;
+        }
+
+        // Search forward through older releases (incrementing index) for previous version with different commit hash
+        for (var i = startIndex; i < releaseVersions.Count; i++)
+        {
+            var candidateVersion = releaseVersions[i];
+            
+            // Get commit hash for candidate version
+            if (lookupData.TagToRelease.TryGetValue(candidateVersion.Tag, out var candidateRelease) &&
+                lookupData.TagsByName.TryGetValue(candidateRelease.TagName!, out var candidateTag) &&
+                candidateTag.Commit.Sha != toHash)
+            {
+                // Found a version with a different commit hash - use it
+                return candidateVersion;
+            }
+        }
+
+        // No version with different commit hash found
         return null;
     }
 

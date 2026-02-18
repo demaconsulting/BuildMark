@@ -265,4 +265,191 @@ public class GitHubRepoConnectorTests
         var hasExpectedIssue = knownIssueTitles.Exists(t => t.Contains("Known bug") || t.Contains("Feature request"));
         Assert.IsTrue(hasExpectedIssue, "Should have at least one of the open issues as a known issue");
     }
+
+    /// <summary>
+    ///     Test that pre-release baseline selection skips tags with the same commit hash.
+    ///     Example: 1.1.2-rc.1 (hash a1b2c3d4) and 1.1.2-beta.2 (hash a1b2c3d4) are re-tags.
+    ///     When processing 1.1.2-rc.1, it should skip 1.1.2-beta.2 and use 1.1.2-beta.1 (hash 734713bc).
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash()
+    {
+        // Arrange - Create mock responses with multiple pre-releases on same and different hashes
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("a1b2c3d4", "734713bc", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("1.1.2-rc.1", "2024-03-03T00:00:00Z"),     // Same hash as beta.2
+                new MockRelease("1.1.2-beta.2", "2024-03-02T00:00:00Z"),   // Same hash as rc.1
+                new MockRelease("1.1.2-beta.1", "2024-03-01T00:00:00Z"),   // Different hash
+                new MockRelease("v1.1.1", "2024-02-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("1.1.2-rc.1", "a1b2c3d4"),      // rc.1 and beta.2 on same hash
+                new MockTag("1.1.2-beta.2", "a1b2c3d4"),    // Same hash as rc.1
+                new MockTag("1.1.2-beta.1", "734713bc"),    // Different hash
+                new MockTag("v1.1.1", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "a1b2c3d4");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act - Process 1.1.2-rc.1
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-rc.1"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("a1b2c3d4", buildInfo.CurrentVersionTag.CommitHash);
+        
+        // Should have skipped 1.1.2-beta.2 (same hash) and selected 1.1.2-beta.1 (different hash)
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("734713bc", buildInfo.BaselineVersionTag.CommitHash);
+
+        // Should have changelog link between beta.1 and rc.1
+        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.Contains("1.1.2-beta.1...1.1.2-rc.1", buildInfo.CompleteChangelogLink.TargetUrl);
+    }
+
+    /// <summary>
+    ///     Test that release baseline selection skips all pre-release versions.
+    ///     Example: 1.1.2 should skip 1.1.2-rc.1, 1.1.2-beta.2, 1.1.2-beta.1 and use 1.1.1.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases()
+    {
+        // Arrange - Create mock responses with release and multiple pre-releases
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit5", "commit4", "commit3", "commit2", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("1.1.2", "2024-03-05T00:00:00Z"),
+                new MockRelease("1.1.2-rc.1", "2024-03-04T00:00:00Z"),
+                new MockRelease("1.1.2-beta.2", "2024-03-03T00:00:00Z"),
+                new MockRelease("1.1.2-beta.1", "2024-03-02T00:00:00Z"),
+                new MockRelease("v1.1.1", "2024-02-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("1.1.2", "commit5"),
+                new MockTag("1.1.2-rc.1", "commit4"),
+                new MockTag("1.1.2-beta.2", "commit3"),
+                new MockTag("1.1.2-beta.1", "commit2"),
+                new MockTag("v1.1.1", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit5");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act - Process 1.1.2
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.1.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("commit5", buildInfo.CurrentVersionTag.CommitHash);
+        
+        // Should have skipped all pre-releases and selected 1.1.1
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.1.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("commit1", buildInfo.BaselineVersionTag.CommitHash);
+
+        // Should have changelog link between 1.1.1 and 1.1.2
+        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.Contains("v1.1.1...1.1.2", buildInfo.CompleteChangelogLink.TargetUrl);
+    }
+
+    /// <summary>
+    ///     Test that pre-release baseline selection works correctly when target is not in release history.
+    ///     This happens when generating build notes for a version that hasn't been tagged yet.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash()
+    {
+        // Arrange - Create mock responses where target version doesn't exist yet
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("new-hash-123", "commit2", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("1.1.2-beta.1", "2024-03-01T00:00:00Z"),
+                new MockRelease("v1.1.1", "2024-02-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("1.1.2-beta.1", "commit2"),
+                new MockTag("v1.1.1", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "new-hash-123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act - Process 1.1.2-beta.2 which doesn't exist in releases yet
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-beta.2"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
+        
+        // Should use most recent release with different hash
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
+    }
+
+    /// <summary>
+    ///     Test that pre-release baseline selection returns null when all previous versions have the same hash.
+    ///     This is an edge case where all previous tags are re-tags of the current commit.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline()
+    {
+        // Arrange - Create mock responses where all versions are on the same commit
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("same-hash-123")
+            .AddReleasesResponse(
+                new MockRelease("1.1.2-rc.1", "2024-03-03T00:00:00Z"),
+                new MockRelease("1.1.2-beta.2", "2024-03-02T00:00:00Z"),
+                new MockRelease("1.1.2-beta.1", "2024-03-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("1.1.2-rc.1", "same-hash-123"),
+                new MockTag("1.1.2-beta.2", "same-hash-123"),
+                new MockTag("1.1.2-beta.1", "same-hash-123"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "same-hash-123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act - Process 1.1.2-rc.1
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-rc.1"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
+        
+        // Should have null baseline since all previous versions are on the same hash
+        Assert.IsNull(buildInfo.BaselineVersionTag);
+    }
 }
