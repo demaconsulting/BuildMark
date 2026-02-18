@@ -378,7 +378,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create mock responses where target version doesn't exist yet
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse("newhash123", "commit2", "commit1")
+            .AddCommitsResponse("new-hash-123", "commit2", "commit1")
             .AddReleasesResponse(
                 new MockRelease("1.1.2-beta.1", "2024-03-01T00:00:00Z"),
                 new MockRelease("v1.1.1", "2024-02-01T00:00:00Z"))
@@ -394,7 +394,7 @@ public class GitHubRepoConnectorTests
         // Set up mock command responses
         connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
         connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
-        connector.SetCommandResponse("git rev-parse HEAD", "newhash123");
+        connector.SetCommandResponse("git rev-parse HEAD", "new-hash-123");
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-beta.2 which doesn't exist in releases yet
@@ -403,7 +403,7 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
-        Assert.AreEqual("newhash123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.AreEqual("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
         
         // Should use most recent release with different hash
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
@@ -420,7 +420,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create mock responses where all versions are on the same commit
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
-            .AddCommitsResponse("samehash123")
+            .AddCommitsResponse("same-hash-123")
             .AddReleasesResponse(
                 new MockRelease("1.1.2-rc.1", "2024-03-03T00:00:00Z"),
                 new MockRelease("1.1.2-beta.2", "2024-03-02T00:00:00Z"),
@@ -428,9 +428,9 @@ public class GitHubRepoConnectorTests
             .AddPullRequestsResponse()
             .AddIssuesResponse()
             .AddTagsResponse(
-                new MockTag("1.1.2-rc.1", "samehash123"),
-                new MockTag("1.1.2-beta.2", "samehash123"),
-                new MockTag("1.1.2-beta.1", "samehash123"));
+                new MockTag("1.1.2-rc.1", "same-hash-123"),
+                new MockTag("1.1.2-beta.2", "same-hash-123"),
+                new MockTag("1.1.2-beta.1", "same-hash-123"));
 
         using var mockHttpClient = new HttpClient(mockHandler);
         var connector = new MockableGitHubRepoConnector(mockHttpClient);
@@ -438,7 +438,7 @@ public class GitHubRepoConnectorTests
         // Set up mock command responses
         connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
         connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
-        connector.SetCommandResponse("git rev-parse HEAD", "samehash123");
+        connector.SetCommandResponse("git rev-parse HEAD", "same-hash-123");
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-rc.1
@@ -447,7 +447,7 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
-        Assert.AreEqual("samehash123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.AreEqual("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
         
         // Should have null baseline since all previous versions are on the same hash
         Assert.IsNull(buildInfo.BaselineVersionTag);
