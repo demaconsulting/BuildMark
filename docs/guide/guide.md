@@ -399,6 +399,82 @@ buildmark --validate --results validation-results.trx
 buildmark --validate --results validation-results.xml
 ```
 
+# Version Selection Rules
+
+BuildMark automatically determines which previous version to use as the baseline when generating build notes. This
+section explains how BuildMark selects the baseline version for different scenarios.
+
+## Pre-Release Versions
+
+For pre-release versions (e.g., `1.2.3-beta.1`, `1.2.3-rc.1`), BuildMark picks the **previous tag (release or
+pre-release) that has a different commit hash**.
+
+This behavior handles cases where multiple pre-release tags point to the same commit (re-tagging scenarios), ensuring
+the generated changelog shows actual code changes rather than an empty diff.
+
+### Example: Pre-Release with Re-Tagged Commits
+
+Consider the following tags:
+
+- `1.1.2-rc.1` (commit hash: `a1b2c3d4`)
+- `1.1.2-beta.2` (commit hash: `a1b2c3d4`)
+- `1.1.2-beta.1` (commit hash: `734713bc`)
+
+When generating build notes for `1.1.2-rc.1`:
+
+1. BuildMark identifies that `1.1.2-beta.2` has the same commit hash (`a1b2c3d4`)
+2. BuildMark skips `1.1.2-beta.2` since it would result in an empty changelog
+3. BuildMark selects `1.1.2-beta.1` as the baseline (different commit hash: `734713bc`)
+
+The generated build notes will show changes between `1.1.2-beta.1` and `1.1.2-rc.1`.
+
+## Release Versions
+
+For release versions (e.g., `1.2.3`), BuildMark picks the **previous release tag**, skipping all pre-release versions.
+
+This ensures release notes compare against the previous stable release, showing the complete set of changes since the
+last production release.
+
+### Example: Release Skipping Pre-Releases
+
+Consider the following tags:
+
+- `1.1.2` (release)
+- `1.1.2-rc.1` (pre-release)
+- `1.1.2-beta.2` (pre-release)
+- `1.1.2-beta.1` (pre-release)
+- `1.1.1` (release)
+
+When generating build notes for `1.1.2`:
+
+1. BuildMark identifies `1.1.2` as a release version (no pre-release suffix)
+2. BuildMark skips all pre-release tags (`1.1.2-rc.1`, `1.1.2-beta.2`, `1.1.2-beta.1`)
+3. BuildMark selects `1.1.1` as the baseline (the previous release)
+
+The generated build notes will show all changes between `1.1.1` and `1.1.2`, including changes from all the
+pre-release versions.
+
+## No Previous Version
+
+If no previous version is found (e.g., generating build notes for the first release), BuildMark will build the
+history from the beginning of the repository, showing all commits up to the specified version.
+
+## Version Tag Format
+
+BuildMark recognizes version tags with various formats:
+
+- Simple format: `1.2.3`
+- V-prefix: `v1.2.3`
+- Custom prefixes: `ver-1.2.3`, `release_1.2.3`
+- Pre-release suffixes: `-alpha.1`, `-beta.2`, `-rc.1`, `.pre.1`
+- Build metadata: `+build.123`, `+linux.x64`
+
+Examples of recognized version tags:
+
+- `1.0.0`, `v1.0.0`, `ver-1.0.0`
+- `2.0.0-beta.1`, `v2.0.0-rc.2`
+- `1.2.3+build.456`, `v2.0.0-rc.1+linux`
+
 # Best Practices
 
 ## Version Tagging
