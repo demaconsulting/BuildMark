@@ -393,7 +393,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     private static Version? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
     {
         var releaseVersions = lookupData.ReleaseVersions;
-        
+
         // Determine starting index for search
         int startIndex;
         if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
@@ -422,7 +422,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         for (var i = startIndex; i < releaseVersions.Count; i++)
         {
             var candidateVersion = releaseVersions[i];
-            
+
             // Get commit hash for candidate version
             if (lookupData.TagToRelease.TryGetValue(candidateVersion.Tag, out var candidateRelease) &&
                 lookupData.TagsByName.TryGetValue(candidateRelease.TagName!, out var candidateTag) &&

@@ -160,9 +160,9 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         bool hasNextPage,
         string? endCursor)
     {
-        var commitNodes = string.Join(",\n                                    ", 
+        var commitNodes = string.Join(",\n                                    ",
             commitShas.Select(sha => $@"{{ ""oid"": ""{sha}"" }}"));
-        
+
         var response = $@"{{
             ""data"": {{
                 ""repository"": {{

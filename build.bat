@@ -1,16 +1,16 @@
 @echo off
 setlocal
 
-REM Restore dependencies
-dotnet restore
-if errorlevel 1 exit /b 1
-
-REM Build the project
+echo Building BuildMark...
 dotnet build --configuration Release
 if errorlevel 1 exit /b 1
 
-REM Run tests
+echo Running unit tests...
 dotnet test --configuration Release
 if errorlevel 1 exit /b 1
 
-echo Build completed successfully!
+echo Running self-validation...
+dotnet run --project src/DemaConsulting.BuildMark --configuration Release --framework net10.0 --no-build -- --validate
+if errorlevel 1 exit /b 1
+
+echo Build, tests, and validation completed successfully!

@@ -350,11 +350,10 @@ The self-validation suite includes the following tests that verify core function
 
 | Test Name | Description |
 | :-------- | :---------- |
-| `BuildMark_VersionTagParsing` | Verifies parsing and comparing version tags from Git repositories |
-| `BuildMark_BuildInformationExtraction` | Verifies extracting build information from Git history |
 | `BuildMark_MarkdownReportGeneration` | Verifies generating markdown build notes reports |
-| `BuildMark_GitHubRepositoryConnector` | Verifies integration with GitHub API for issue and PR retrieval |
-| `BuildMark_MockRepositoryConnector` | Verifies mock repository connector for testing |
+| `BuildMark_GitIntegration` | Verifies git integration for version and commit information |
+| `BuildMark_IssueTracking` | Verifies issue tracking for changes and bugs |
+| `BuildMark_KnownIssuesReporting` | Verifies known issues reporting functionality |
 
 These tests provide evidence of the tool's functionality and are particularly useful for:
 
@@ -374,16 +373,23 @@ Example output:
 BuildMark version 1.0.0
 Copyright (c) DEMA Consulting
 
-# BuildMark Self-Validation Tests
+# DEMA Consulting BuildMark Self-validation
 
-[PASS] Version Tag Parsing
-[PASS] Build Information Extraction
-[PASS] Markdown Report Generation
-[PASS] GitHub Repository Connector
-[PASS] Mock Repository Connector
+| Information         | Value                                              |
+| :------------------ | :------------------------------------------------- |
+| BuildMark Version   | 1.0.0                                              |
+| Machine Name        | my-machine                                         |
+| OS Version          | Ubuntu 24.04.3 LTS                                 |
+| DotNet Runtime      | .NET 10.0.3                                        |
+| Time Stamp          | 2026-01-15 10:30:00 UTC                              |
 
-Total Tests: 5
-Passed: 5
+✓ Markdown Report Generation Test - PASSED
+✓ Git Integration Test - PASSED
+✓ Issue Tracking Test - PASSED
+✓ Known Issues Reporting Test - PASSED
+
+Total Tests: 4
+Passed: 4
 Failed: 0
 ```
 
