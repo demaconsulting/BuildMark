@@ -128,7 +128,7 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
         Assert.AreEqual("commit3", buildInfo.CurrentVersionTag.CommitHash);
-        
+
         // Should have selected v1.1.0 as baseline (previous non-prerelease)
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
         Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
@@ -254,12 +254,12 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        
+
         // Known issues are open issues that aren't linked to any changes in this release
         Assert.IsNotNull(buildInfo.KnownIssues);
         // Since we have no PRs, all open issues should be known issues
         Assert.IsGreaterThanOrEqualTo(1, buildInfo.KnownIssues.Count, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
-        
+
         // Verify at least one known issue is present
         var knownIssueTitles = buildInfo.KnownIssues.Select(i => i.Title).ToList();
         var hasExpectedIssue = knownIssueTitles.Exists(t => t.Contains("Known bug") || t.Contains("Feature request"));
@@ -306,7 +306,7 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
         Assert.AreEqual("a1b2c3d4", buildInfo.CurrentVersionTag.CommitHash);
-        
+
         // Should have skipped 1.1.2-beta.2 (same hash) and selected 1.1.2-beta.1 (different hash)
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
         Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
@@ -358,7 +358,7 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
         Assert.AreEqual("commit5", buildInfo.CurrentVersionTag.CommitHash);
-        
+
         // Should have skipped all pre-releases and selected 1.1.1
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
         Assert.AreEqual("1.1.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
@@ -404,7 +404,7 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
         Assert.AreEqual("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
-        
+
         // Should use most recent release with different hash
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
         Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
@@ -448,7 +448,7 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
         Assert.AreEqual("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
-        
+
         // Should have null baseline since all previous versions are on the same hash
         Assert.IsNull(buildInfo.BaselineVersionTag);
     }

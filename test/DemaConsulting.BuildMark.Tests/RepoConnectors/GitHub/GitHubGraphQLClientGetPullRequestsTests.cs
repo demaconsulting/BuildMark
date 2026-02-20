@@ -89,7 +89,7 @@ public class GitHubGraphQLClientGetPullRequestsTests
         // Assert
         Assert.IsNotNull(pullRequests);
         Assert.HasCount(2, pullRequests);
-        
+
         Assert.AreEqual(1, pullRequests[0].Number);
         Assert.AreEqual("Add feature A", pullRequests[0].Title);
         Assert.AreEqual("https://github.com/owner/repo/pull/1", pullRequests[0].Url);

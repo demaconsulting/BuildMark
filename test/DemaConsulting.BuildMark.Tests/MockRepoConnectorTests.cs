@@ -148,7 +148,7 @@ public class MockRepoConnectorTests
         // - Issue #3 is documentation (type "documentation")
         var allItems = buildInfo.Changes.Concat(buildInfo.Bugs).ToList();
         Assert.IsGreaterThan(0, allItems.Count, "Should have at least one change");
-        
+
         // Verify bugs only contain items with type "bug"
         foreach (var bug in buildInfo.Bugs)
         {

@@ -48,7 +48,7 @@ public class ProcessRunnerTests
 
         // Assert - Verify output is returned and contains expected text
         Assert.IsNotNull(result, "TryRunAsync should return output for successful command");
-        Assert.IsTrue(result.Contains("test", StringComparison.OrdinalIgnoreCase), 
+        Assert.IsTrue(result.Contains("test", StringComparison.OrdinalIgnoreCase),
             "Output should contain the echoed text");
     }
 

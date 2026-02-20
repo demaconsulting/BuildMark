@@ -84,7 +84,7 @@ public class GitHubGraphQLClientGetAllIssuesTests
         // Assert
         Assert.IsNotNull(issues);
         Assert.HasCount(2, issues);
-        
+
         Assert.AreEqual(1, issues[0].Number);
         Assert.AreEqual("Bug: Application crashes on startup", issues[0].Title);
         Assert.AreEqual("https://github.com/owner/repo/issues/1", issues[0].Url);
