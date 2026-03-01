@@ -44,6 +44,30 @@ public class PathHelpersTests
     }
 
     /// <summary>
+    ///     Test that SafePathCombine throws ArgumentNullException for null basePath.
+    /// </summary>
+    [TestMethod]
+    public void PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() =>
+            PathHelpers.SafePathCombine(null!, "subfolder/file.txt"));
+        Assert.AreEqual("basePath", exception.ParamName);
+    }
+
+    /// <summary>
+    ///     Test that SafePathCombine throws ArgumentNullException for null relativePath.
+    /// </summary>
+    [TestMethod]
+    public void PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException()
+    {
+        // Act & Assert
+        var exception = Assert.Throws<ArgumentNullException>(() =>
+            PathHelpers.SafePathCombine("/home/user/project", null!));
+        Assert.AreEqual("relativePath", exception.ParamName);
+    }
+
+    /// <summary>
     ///     Test that SafePathCombine throws ArgumentException for path traversal with double dots.
     /// </summary>
     [TestMethod]
