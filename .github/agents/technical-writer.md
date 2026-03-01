@@ -31,8 +31,10 @@ Invoke the technical-writer for:
 
 #### Markdown Style
 
-- **README.md ONLY**: Use absolute URLs in the links (shipped in NuGet package)
-- **All other markdown files**: Use reference-style links
+- **All markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
+- **Exceptions**:
+  - **README.md**: Use absolute URLs in the links (shipped in NuGet package)
+  - **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent context
 - Max 120 characters per line
 - Lists require blank lines (MD032)
 
