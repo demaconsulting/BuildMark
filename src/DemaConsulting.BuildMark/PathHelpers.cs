@@ -34,6 +34,10 @@ internal static class PathHelpers
     /// <exception cref="ArgumentException">Thrown when relativePath contains invalid characters or path traversal sequences.</exception>
     internal static string SafePathCombine(string basePath, string relativePath)
     {
+        // Validate inputs
+        ArgumentNullException.ThrowIfNull(basePath);
+        ArgumentNullException.ThrowIfNull(relativePath);
+
         // Ensure the relative path doesn't contain path traversal sequences
         if (relativePath.Contains("..") || Path.IsPathRooted(relativePath))
         {
