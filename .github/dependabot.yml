@@ -11,6 +11,10 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    groups:
+      github-actions-dependencies:
+        patterns:
+          - "*"
 
   # NuGet dependencies
   - package-ecosystem: "nuget"
