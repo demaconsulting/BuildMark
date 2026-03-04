@@ -325,6 +325,7 @@ jobs:
       contents: read
 
     steps:
+      # === CHECKOUT AND INSTALL DEPENDENCIES ===
       - name: Checkout
         uses: actions/checkout@v6
 
@@ -379,6 +380,7 @@ jobs:
           pattern: 'version-capture-*'
         continue-on-error: true
 
+      # === GENERATE MARKDOWN REPORTS ===
       - name: Generate Requirements Report and Trace Matrix
         run: >
           dotnet reqstream
@@ -462,6 +464,7 @@ jobs:
           echo "=== Build Notes Report ==="
           cat docs/buildnotes.md
 
+      # === GENERATE HTML AND PDF DOCUMENTS ===
       - name: Generate Build Notes HTML with Pandoc
         shell: bash
         run: >
@@ -475,6 +478,7 @@ jobs:
       - name: Convert Build Notes HTML to PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/buildnotes/buildnotes.html
           "docs/BuildMark Build Notes.pdf"
 
@@ -491,6 +495,7 @@ jobs:
       - name: Convert User Guide HTML to PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/guide/guide.html
           "docs/BuildMark User Guide.pdf"
 
@@ -507,6 +512,7 @@ jobs:
       - name: Generate Requirements PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/requirements/requirements.html
           "docs/BuildMark Requirements.pdf"
 
@@ -523,6 +529,7 @@ jobs:
       - name: Generate Trace Matrix PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/tracematrix/tracematrix.html
           "docs/BuildMark Trace Matrix.pdf"
 
@@ -539,6 +546,7 @@ jobs:
       - name: Convert Requirements Justifications HTML to PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/justifications/justifications.html
           "docs/BuildMark Requirements Justifications.pdf"
 
@@ -555,9 +563,11 @@ jobs:
       - name: Convert Code Quality HTML to PDF with Weasyprint
         run: >
           dotnet weasyprint
+          --pdf-variant pdf/a-3u
           docs/quality/quality.html
           "docs/BuildMark Code Quality.pdf"
 
+      # === UPLOAD ARTIFACTS ===
       - name: Upload Document Artifacts
         uses: actions/upload-artifact@v7
         with:
