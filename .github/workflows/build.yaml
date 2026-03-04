@@ -474,7 +474,7 @@ jobs:
         run: dotnet reqstream --validate --results artifacts/reqstream-self-validation.trx
 
       - name: Run BuildMark self-validation
-        run: dotnet buildmark --validate --results artifacts/buildmark-self-validation.trx
+        run: buildmark --validate --results artifacts/buildmark-self-validation.trx
 
       - name: Run VersionMark self-validation
         run: dotnet versionmark --validate --results artifacts/versionmark-self-validation.trx
