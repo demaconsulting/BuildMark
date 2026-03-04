@@ -419,7 +419,7 @@ jobs:
       - name: Download packages artifact
         uses: actions/download-artifact@v8
         with:
-          name: packages-windows-latest
+          name: packages-ubuntu-latest
           path: packages
 
       # === INSTALL DEPENDENCIES ===
