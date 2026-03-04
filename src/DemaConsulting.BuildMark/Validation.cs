@@ -111,7 +111,6 @@ internal static class Validation
             context,
             testResults,
             "BuildMark_MarkdownReportGeneration",
-            "Markdown Report Generation Test",
             mockFactory,
             "build-report.md",
             (logContent, reportContent) =>
@@ -148,7 +147,6 @@ internal static class Validation
             context,
             testResults,
             "BuildMark_GitIntegration",
-            "Git Integration Test",
             mockFactory,
             null,
             (logContent, _) =>
@@ -179,7 +177,6 @@ internal static class Validation
             context,
             testResults,
             "BuildMark_IssueTracking",
-            "Issue Tracking Test",
             mockFactory,
             null,
             (logContent, _) =>
@@ -209,7 +206,6 @@ internal static class Validation
             context,
             testResults,
             "BuildMark_KnownIssuesReporting",
-            "Known Issues Reporting Test",
             mockFactory,
             "known-issues-report.md",
             (logContent, reportContent) =>
@@ -235,7 +231,6 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     /// <param name="testName">The name of the test.</param>
-    /// <param name="displayName">The display name for console output.</param>
     /// <param name="mockFactory">The mock connector factory.</param>
     /// <param name="reportFileName">Optional report file name to generate.</param>
     /// <param name="validator">Function to validate test results. Returns null on success or error message on failure.</param>
@@ -243,7 +238,6 @@ internal static class Validation
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
         string testName,
-        string displayName,
         Func<IRepoConnector> mockFactory,
         string? reportFileName,
         Func<string, string?, string?> validator)
@@ -300,26 +294,26 @@ internal static class Validation
                 if (errorMessage == null)
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                    context.WriteLine($"✓ {displayName} - Passed");
+                    context.WriteLine($"✓ {testName} - Passed");
                 }
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                     test.ErrorMessage = errorMessage;
-                    context.WriteError($"✗ {displayName} - Failed: {errorMessage}");
+                    context.WriteError($"✗ {testName} - Failed: {errorMessage}");
                 }
             }
             else
             {
                 test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                 test.ErrorMessage = $"Program exited with code {exitCode}";
-                context.WriteError($"✗ {displayName} - Failed: Exit code {exitCode}");
+                context.WriteError($"✗ {testName} - Failed: Exit code {exitCode}");
             }
         }
         // Generic catch is justified here to handle any exception during test execution
         catch (Exception ex)
         {
-            HandleTestException(test, context, displayName, ex);
+            HandleTestException(test, context, testName, ex);
         }
 
         FinalizeTestResult(test, startTime, testResults);

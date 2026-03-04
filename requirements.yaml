@@ -4,7 +4,7 @@ sections:
     sections:
       - title: Command-Line Interface
         requirements:
-          - id: CLI-001
+          - id: BuildMark-Cmd-Cli
             title: The tool shall provide a command-line interface.
             justification: |
               A command-line interface is essential for BuildMark to integrate seamlessly into
@@ -15,7 +15,7 @@ sections:
               - IntegrationTest_VersionFlag_OutputsVersion
               - IntegrationTest_HelpFlag_OutputsUsageInformation
 
-          - id: CLI-002
+          - id: BuildMark-Cmd-Version
             title: The tool shall display version information when requested.
             justification: |
               Version information helps users identify which version of BuildMark they are running,
@@ -24,7 +24,7 @@ sections:
             tests:
               - IntegrationTest_VersionFlag_OutputsVersion
 
-          - id: CLI-003
+          - id: BuildMark-Cmd-Help
             title: The tool shall display help information when requested.
             justification: |
               Help information provides users with immediate access to usage instructions, available
@@ -33,7 +33,7 @@ sections:
             tests:
               - IntegrationTest_HelpFlag_OutputsUsageInformation
 
-          - id: CLI-004
+          - id: BuildMark-Cmd-Silent
             title: The tool shall support silent mode to suppress console output.
             justification: |
               Silent mode is essential for automated build environments where excessive console
@@ -42,7 +42,7 @@ sections:
             tests:
               - IntegrationTest_SilentFlag_SuppressesOutput
 
-          - id: CLI-005
+          - id: BuildMark-Cmd-Log
             title: The tool shall support writing output to a log file.
             justification: |
               Log file support enables persistent storage of BuildMark output for audit trails,
@@ -51,7 +51,7 @@ sections:
             tests:
               - IntegrationTest_LogParameter_IsAccepted
 
-          - id: CLI-006
+          - id: BuildMark-Cmd-BuildVersion
             title: The tool shall support specifying a build version.
             justification: |
               Specifying a build version allows users to override or supplement version information
@@ -60,7 +60,7 @@ sections:
             tests:
               - IntegrationTest_BuildVersionParameter_IsAccepted
 
-          - id: CLI-007
+          - id: BuildMark-Cmd-InvalidArgs
             title: The tool shall validate command-line arguments.
             justification: |
               Argument validation prevents misuse of the tool and provides clear error messages
@@ -78,7 +78,7 @@ sections:
               - Context_Create_ResultsWithoutValue_ThrowsArgumentException
               - Context_Create_LogWithoutValue_ThrowsArgumentException
 
-          - id: CLI-008
+          - id: BuildMark-Cmd-FilePaths
             title: The tool shall handle invalid file paths gracefully.
             justification: |
               Graceful handling of invalid file paths prevents cryptic error messages and ensures
@@ -87,7 +87,7 @@ sections:
             tests:
               - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
 
-          - id: CLI-009
+          - id: BuildMark-Cmd-ExitCode
             title: The tool shall return appropriate exit codes.
             justification: |
               Standard exit codes enable build automation systems and scripts to detect success
@@ -99,7 +99,7 @@ sections:
 
       - title: GitHub Integration
         requirements:
-          - id: GH-001
+          - id: BuildMark-GitHub-BuildNotes
             title: The tool shall generate build notes from GitHub repositories.
             justification: |
               Generating build notes from GitHub repositories automates the documentation of
@@ -110,7 +110,7 @@ sections:
               - BuildMark_GitIntegration
               - BuildMark_MarkdownReportGeneration
 
-          - id: GH-002
+          - id: BuildMark-GitHub-IssueTracking
             title: The tool shall track issues and pull requests from GitHub.
             justification: |
               Tracking issues and pull requests provides traceability between code changes and
@@ -119,7 +119,7 @@ sections:
             tests:
               - BuildMark_IssueTracking
 
-          - id: GH-003
+          - id: BuildMark-GitHub-VersionTags
             title: The tool shall identify changes between version tags.
             justification: |
               Identifying changes between version tags enables differential release notes that
@@ -130,7 +130,7 @@ sections:
 
       - title: Report Generation
         requirements:
-          - id: RPT-001
+          - id: BuildMark-Report-Markdown
             title: The tool shall generate markdown reports.
             justification: |
               Markdown is a widely-adopted, human-readable format that works seamlessly with
@@ -141,7 +141,7 @@ sections:
               - BuildMark_MarkdownReportGeneration
               - IntegrationTest_ReportParameter_IsAccepted
 
-          - id: RPT-002
+          - id: BuildMark-Report-Depth
             title: The tool shall support configurable report depth.
             justification: |
               Configurable report depth allows BuildMark output to be embedded within existing
@@ -151,7 +151,7 @@ sections:
               - IntegrationTest_ReportDepthParameter_IsAccepted
               - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
 
-          - id: RPT-003
+          - id: BuildMark-Report-VersionInfo
             title: The tool shall report version information in build notes.
             justification: |
               Version information clearly identifies which release the build notes describe,
@@ -160,7 +160,7 @@ sections:
             tests:
               - BuildMark_MarkdownReportGeneration
 
-          - id: RPT-004
+          - id: BuildMark-Report-Changes
             title: The tool shall report changes in build notes.
             justification: |
               Reporting changes documents new features and enhancements introduced in each
@@ -170,7 +170,7 @@ sections:
               - BuildMark_MarkdownReportGeneration
               - BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
 
-          - id: RPT-005
+          - id: BuildMark-Report-BugFixes
             title: The tool shall report bug fixes in build notes.
             justification: |
               Documenting bug fixes informs users about resolved issues, demonstrates ongoing
@@ -180,7 +180,7 @@ sections:
               - BuildMark_MarkdownReportGeneration
               - BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
 
-          - id: RPT-006
+          - id: BuildMark-Report-KnownIssues
             title: The tool shall support including known issues in build notes.
             justification: |
               Disclosing known issues in release notes promotes transparency, helps users avoid
@@ -189,7 +189,7 @@ sections:
             tests:
               - BuildMark_KnownIssuesReporting
 
-          - id: RPT-007
+          - id: BuildMark-Report-VersionRange
             title: The tool shall support filtering build notes by version range.
             justification: |
               Version range filtering enables generation of cumulative release notes covering
@@ -198,7 +198,7 @@ sections:
             tests:
               - BuildMark_MarkdownReportGeneration
 
-          - id: RPT-008
+          - id: BuildMark-Report-Hyperlinks
             title: The tool shall include hyperlinks to issues and pull requests.
             justification: |
               Hyperlinks provide direct navigation to detailed information about changes,
@@ -209,7 +209,7 @@ sections:
               - BuildInformation_ToMarkdown_IncludesIssueLinks
               - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
 
-          - id: RPT-009
+          - id: BuildMark-Report-Structure
             title: The tool shall format build notes with proper markdown structure.
             justification: |
               Proper markdown structure ensures reports render correctly across different
@@ -224,7 +224,7 @@ sections:
 
       - title: Validation and Testing
         requirements:
-          - id: VAL-001
+          - id: BuildMark-Validate-SelfValidation
             title: The tool shall support self-validation mode.
             justification: |
               Self-validation mode allows users to validate the tool's functionality in their
@@ -233,7 +233,7 @@ sections:
             tests:
               - IntegrationTest_ValidateFlag_RunsSelfValidation
 
-          - id: VAL-002
+          - id: BuildMark-Validate-ResultsFiles
             title: The tool shall write validation results to test result files.
             justification: |
               Writing validation results to files enables integration with testing frameworks,
@@ -242,7 +242,7 @@ sections:
             tests:
               - IntegrationTest_ResultsParameter_IsAccepted
 
-          - id: VAL-003
+          - id: BuildMark-Validate-TrxFormat
             title: The tool shall support TRX format for test results.
             justification: |
               TRX format support enables integration with Microsoft test tooling and Visual
@@ -251,7 +251,7 @@ sections:
             tests:
               - IntegrationTest_ResultsParameter_IsAccepted
 
-          - id: VAL-004
+          - id: BuildMark-Validate-JUnitFormat
             title: The tool shall support JUnit format for test results.
             justification: |
               JUnit format is a widely-supported standard across many CI/CD platforms and
@@ -262,7 +262,7 @@ sections:
 
       - title: Platform Support
         requirements:
-          - id: PLT-001
+          - id: BuildMark-Platform-Windows
             title: The tool shall run on Windows operating systems.
             justification: |
               Windows support is essential for .NET developers working in Windows-centric
@@ -279,7 +279,7 @@ sections:
               - windows@BuildMark_IssueTracking
               - windows@BuildMark_KnownIssuesReporting
 
-          - id: PLT-002
+          - id: BuildMark-Platform-Linux
             title: The tool shall run on Linux operating systems.
             justification: |
               Linux support is critical for modern DevOps practices and cloud-native development
@@ -296,7 +296,7 @@ sections:
               - ubuntu@BuildMark_IssueTracking
               - ubuntu@BuildMark_KnownIssuesReporting
 
-          - id: PLT-003
+          - id: BuildMark-Platform-Net8
             title: The tool shall support .NET 8.0 runtime.
             justification: |
               .NET 8.0 is a Long-Term Support (LTS) release with support through November 2026.
@@ -310,7 +310,7 @@ sections:
               - dotnet8.x@BuildMark_IssueTracking
               - dotnet8.x@BuildMark_KnownIssuesReporting
 
-          - id: PLT-004
+          - id: BuildMark-Platform-Net9
             title: The tool shall support .NET 9.0 runtime.
             justification: |
               .NET 9.0 is a Standard Term Support (STS) release with support through May 2026.
@@ -324,7 +324,7 @@ sections:
               - dotnet9.x@BuildMark_IssueTracking
               - dotnet9.x@BuildMark_KnownIssuesReporting
 
-          - id: PLT-005
+          - id: BuildMark-Platform-Net10
             title: The tool shall support .NET 10.0 runtime.
             justification: |
               .NET 10.0 is the next Long-Term Support (LTS) release planned for November 2025.
