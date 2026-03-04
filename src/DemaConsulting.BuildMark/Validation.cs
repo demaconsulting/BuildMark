@@ -300,20 +300,20 @@ internal static class Validation
                 if (errorMessage == null)
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Passed;
-                    context.WriteLine($"✓ {displayName} - PASSED");
+                    context.WriteLine($"✓ {displayName} - Passed");
                 }
                 else
                 {
                     test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                     test.ErrorMessage = errorMessage;
-                    context.WriteError($"✗ {displayName} - FAILED: {errorMessage}");
+                    context.WriteError($"✗ {displayName} - Failed: {errorMessage}");
                 }
             }
             else
             {
                 test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
                 test.ErrorMessage = $"Program exited with code {exitCode}";
-                context.WriteError($"✗ {displayName} - FAILED: Exit code {exitCode}");
+                context.WriteError($"✗ {displayName} - Failed: Exit code {exitCode}");
             }
         }
         // Generic catch is justified here to handle any exception during test execution
@@ -412,7 +412,7 @@ internal static class Validation
     {
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
-        context.WriteError($"✗ {displayName} - FAILED: {ex.Message}");
+        context.WriteError($"✗ {displayName} - Failed: {ex.Message}");
     }
 
     /// <summary>

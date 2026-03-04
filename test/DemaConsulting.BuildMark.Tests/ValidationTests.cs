@@ -153,26 +153,26 @@ public class ValidationTests
             var unsupportedFile = Path.Combine(tempDir, "results.json");
             var args = new[] { "--validate", "--results", unsupportedFile };
 
-            using var outputWriter = new StringWriter();
+            using var errorWriter = new StringWriter();
 
+            var originalError = Console.Error;
             try
             {
-                // Capture console output
-                Console.SetOut(outputWriter);
+                // Capture console error output
+                Console.SetError(errorWriter);
 
                 // Act
                 using var context = Context.Create(args, () => new MockRepoConnector());
                 Validation.Run(context);
 
-                // Assert - Verify error message in output (WriteError writes to Console.WriteLine)
-                var output = outputWriter.ToString();
+                // Assert - Verify error message in error output (WriteError writes to Console.Error)
+                var output = errorWriter.ToString();
                 Assert.Contains("Unsupported results file format", output);
             }
             finally
             {
-                // Restore console output
-                var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-                Console.SetOut(standardOutput);
+                // Restore console error output
+                Console.SetError(originalError);
             }
         }
         finally
@@ -195,26 +195,26 @@ public class ValidationTests
         var invalidPath = Path.Combine("/invalid_path_that_does_not_exist_12345678", "results.trx");
         var args = new[] { "--validate", "--results", invalidPath };
 
-        using var outputWriter = new StringWriter();
+        using var errorWriter = new StringWriter();
 
+        var originalError = Console.Error;
         try
         {
-            // Capture console output
-            Console.SetOut(outputWriter);
+            // Capture console error output
+            Console.SetError(errorWriter);
 
             // Act
             using var context = Context.Create(args, () => new MockRepoConnector());
             Validation.Run(context);
 
-            // Assert - Verify error message in output (WriteError writes to Console.WriteLine)
-            var output = outputWriter.ToString();
+            // Assert - Verify error message in error output (WriteError writes to Console.Error)
+            var output = errorWriter.ToString();
             Assert.Contains("Failed to write results file", output);
         }
         finally
         {
-            // Restore console output
-            var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-            Console.SetOut(standardOutput);
+            // Restore console error output
+            Console.SetError(originalError);
         }
     }
 }

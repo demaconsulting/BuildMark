@@ -184,26 +184,62 @@ buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues
 
 ## Self-Validation
 
-### `--validate`
+Self-validation produces a report demonstrating that BuildMark is functioning correctly. This is useful in
+regulated industries where tool validation evidence is required.
 
-Run built-in self-validation tests. These tests verify BuildMark functionality without requiring access to a real
-Git repository or GitHub.
+### Running Validation
+
+To perform self-validation:
 
 ```bash
 buildmark --validate
 ```
 
-### `--results <file>`
-
-Write validation results to a file. Supports TRX (`.trx`) and JUnit XML (`.xml`) formats. Requires `--validate`.
+To save validation results to a file:
 
 ```bash
-# TRX format
-buildmark --validate --results validation-results.trx
-
-# JUnit XML format
-buildmark --validate --results validation-results.xml
+buildmark --validate --results results.trx
 ```
+
+The results file format is determined by the file extension: `.trx` for TRX (MSTest) format,
+or `.xml` for JUnit format.
+
+### Validation Report
+
+The validation report contains the tool version, machine name, operating system version,
+.NET runtime version, timestamp, and test results.
+
+Example validation report:
+
+```text
+# DEMA Consulting BuildMark Self-validation
+
+| Information         | Value                                              |
+| :------------------ | :------------------------------------------------- |
+| BuildMark Version   | 1.0.0                                              |
+| Machine Name        | BUILD-SERVER                                       |
+| OS Version          | Ubuntu 22.04.3 LTS                                 |
+| DotNet Runtime      | .NET 10.0.0                                        |
+| Time Stamp          | 2024-01-15 10:30:00 UTC                            |
+
+✓ BuildMark_MarkdownReportGeneration - Passed
+✓ BuildMark_GitIntegration - Passed
+✓ BuildMark_IssueTracking - Passed
+✓ BuildMark_KnownIssuesReporting - Passed
+
+Total Tests: 4
+Passed: 4
+Failed: 0
+```
+
+### Validation Tests
+
+Each test proves specific functionality works correctly:
+
+- **`BuildMark_MarkdownReportGeneration`** - Markdown report is correctly generated from mock data.
+- **`BuildMark_GitIntegration`** - Git repository connector reads version tags and commits.
+- **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
+- **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
 
 # Common Use Cases
 
