@@ -95,7 +95,7 @@ This project enforces code style through `.editorconfig`. Key requirements:
 
 - **Indentation**: 4 spaces for C#, 2 spaces for YAML/JSON/XML
 - **Line Endings**: LF (Unix-style)
-- **Encoding**: UTF-8 with BOM
+- **Encoding**: UTF-8
 - **Namespaces**: Use file-scoped namespace declarations
 - **Braces**: Required for all control statements
 - **Naming Conventions**:
@@ -142,7 +142,7 @@ Examples:
 
 - Write tests that are clear and focused
 - Use modern MSTest v4 assertions:
-  - `Assert.HasCount(collection, expectedCount)`
+  - `Assert.HasCount(expectedCount, collection)`
   - `Assert.IsEmpty(collection)`
   - `Assert.DoesNotContain(item, collection)`
 - Always clean up resources (use `try/finally` for console redirection)
@@ -188,6 +188,14 @@ dotnet test --filter "FullyQualifiedName~YourTestName"
 dotnet test --collect "XPlat Code Coverage"
 ```
 
+### Self-Validation Tests
+
+```bash
+# Run self-validation tests
+dotnet run --project src/DemaConsulting.BuildMark \
+  --configuration Release --framework net10.0 --no-build -- --validate
+```
+
 ## Documentation
 
 ### Markdown Guidelines
@@ -199,6 +207,7 @@ All markdown files must follow these rules (enforced by markdownlint):
 - Lists must be surrounded by blank lines
 - Use reference-style links: `[text][ref]` with `[ref]: url` at document end
 - **Exception**: `README.md` uses absolute URLs (it's included in the NuGet package)
+- **Exception**: `.github/agents/*.md` files use inline links so URLs are visible in agent context
 
 ### Spell Checking
 
@@ -253,6 +262,31 @@ Maintain code coverage above 80%:
 dotnet test --collect "XPlat Code Coverage"
 ```
 
+## Requirements Management
+
+BuildMark uses [DemaConsulting.ReqStream][reqstream] for requirements traceability:
+
+- All requirements are defined in `requirements.yaml`
+- Each requirement must be linked to at least one test case
+- Run `dotnet reqstream` to generate the requirements documentation
+- Use the `--enforce` flag in CI to ensure all requirements are covered
+
+When adding new features:
+
+1. Add the requirement to `requirements.yaml`
+2. Write tests that validate the requirement
+3. Link the tests to the requirement in `requirements.yaml`
+
+## Release Process
+
+Releases follow this process:
+
+1. Create a release issue to track the release
+2. Update version references as needed
+3. Create a pull request with the release changes
+4. Merge the pull request after review
+5. Create a GitHub release with the new version tag — CI/CD will automatically build and publish the NuGet package
+
 ## Pull Request Process
 
 1. **Update Documentation**: Ensure all documentation is updated to reflect your changes
@@ -266,12 +300,17 @@ dotnet test --collect "XPlat Code Coverage"
 
 If you need help or have questions:
 
-- **GitHub Issues**: For bug reports and feature requests
-- **GitHub Discussions**: For general questions and discussions
+- **GitHub Issues**: For bug reports and feature requests — [open an issue][issues]
+- **GitHub Discussions**: For general questions and discussions — [start a discussion][discussions]
 - **Pull Request Comments**: For questions about specific code changes
+- **Security Vulnerabilities**: Please review the [Security Policy][security] before reporting
 
 Thank you for contributing to BuildMark!
 
 [code-of-conduct]: https://github.com/demaconsulting/BuildMark/blob/main/CODE_OF_CONDUCT.md
 [dotnet-download]: https://dotnet.microsoft.com/download
-[csharp-conventions]: https://docs.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+[csharp-conventions]: https://learn.microsoft.com/en-us/dotnet/csharp/fundamentals/coding-style/coding-conventions
+[reqstream]: https://github.com/demaconsulting/ReqStream
+[discussions]: https://github.com/demaconsulting/BuildMark/discussions
+[issues]: https://github.com/demaconsulting/BuildMark/issues
+[security]: https://github.com/demaconsulting/BuildMark/blob/main/SECURITY.md

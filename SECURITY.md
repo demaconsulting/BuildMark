@@ -7,7 +7,6 @@ BuildMark follows semantic versioning. Security updates are provided for the fol
 | Version | Supported          |
 | ------- | ------------------ |
 | Latest  | :white_check_mark: |
-| Previous| :white_check_mark: |
 | Older   | :x:                |
 
 We recommend always using the latest version to ensure you have the most recent security updates.
@@ -20,7 +19,9 @@ If you discover a security vulnerability in BuildMark, please help us by reporti
 
 **Do not** report security vulnerabilities through public GitHub issues.
 
-Instead, please report security issues by creating a private security advisory on GitHub.
+**Preferred method**: Use [GitHub's private vulnerability reporting][github-security-advisories] to
+submit a security advisory directly in the repository. This keeps the report private until a fix
+is available.
 
 ### What to Include
 
@@ -44,6 +45,26 @@ When reporting a vulnerability, please include:
 - Fixes will be prepared and tested before public disclosure
 - Credit will be given to reporters unless they prefer to remain anonymous
 - Public disclosure will occur after a fix is available
+
+## Security Disclosure Policy
+
+We follow a coordinated disclosure process:
+
+1. **Report**: Submit vulnerability report via GitHub Security Advisories
+2. **Acknowledgment**: We acknowledge receipt within 48 hours
+3. **Assessment**: We assess the vulnerability and determine severity within 7 days
+4. **Resolution**: We develop and test a fix, then release a patch version
+5. **Disclosure**: We publicly disclose the vulnerability after the fix is released
+
+## Third-Party Dependencies
+
+BuildMark uses third-party NuGet packages. To check for vulnerable dependencies:
+
+```bash
+dotnet list package --vulnerable
+```
+
+We use Dependabot to automatically monitor and update dependencies with known vulnerabilities.
 
 ## Security Best Practices
 
@@ -82,3 +103,13 @@ Security updates will be:
 
 For security concerns or questions about this policy, please use GitHub's security advisory feature or contact
 the project maintainers through the repository.
+
+## Additional Resources
+
+- [OWASP Top Ten][owasp-top-ten]
+- [.NET Security Best Practices][dotnet-security]
+- [GitHub Security Advisories][github-security-advisories]
+
+[github-security-advisories]: https://github.com/demaconsulting/BuildMark/security/advisories/new
+[owasp-top-ten]: https://owasp.org/www-project-top-ten/
+[dotnet-security]: https://learn.microsoft.com/en-us/dotnet/standard/security/

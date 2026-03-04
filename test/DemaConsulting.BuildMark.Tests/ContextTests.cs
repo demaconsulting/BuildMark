@@ -616,23 +616,23 @@ public class ContextTests
         // Create context without silent flag
         using var context = Context.Create([]);
 
-        // Capture console output
+        // Capture console error output
         using var output = new StringWriter();
-        var originalOut = Console.Out;
+        var originalError = Console.Error;
         try
         {
-            Console.SetOut(output);
+            Console.SetError(output);
 
             // Write an error
             context.WriteError("Error message");
 
-            // Verify message was written to console
+            // Verify message was written to error console
             Assert.AreEqual("Error message" + Environment.NewLine, output.ToString());
         }
         finally
         {
-            // Restore console output
-            Console.SetOut(originalOut);
+            // Restore console error output
+            Console.SetError(originalError);
         }
     }
 

@@ -13,13 +13,13 @@ Project-specific guidance for agents working on BuildMark - a .NET CLI tool for 
 
 ## Tech Stack
 
-- C# 12, .NET 8.0/9.0/10.0, MSTest, dotnet CLI, NuGet
+- C# (latest), .NET 8.0/9.0/10.0, MSTest, dotnet CLI, NuGet
 
 ## Key Files
 
 - **`requirements.yaml`** - All requirements with test linkage (enforced via `dotnet reqstream --enforce`)
-- **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8+BOM, LF endings)
-- **`.cspell.json`, `.markdownlint.json`, `.yamllint.yaml`** - Linting configs
+- **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8, LF endings)
+- **`.cspell.json`, `.markdownlint-cli2.jsonc`, `.yamllint.yaml`** - Linting configs
 
 ## Requirements
 
@@ -107,3 +107,13 @@ When agents need to write report files to communicate with each other or the use
   - Excluded from git (via .gitignore)
   - Excluded from markdown linting
   - Excluded from spell checking
+
+## Markdown Link Style
+
+- **AI agent markdown files** (`.github/agents/*.md`): Use inline links `[text](url)` so URLs are visible in agent context
+- **README.md**: Use absolute URLs (shipped in NuGet package)
+- **All other markdown files**: Use reference-style links `[text][ref]` with `[ref]: url` at document end
+
+## Notable Absent Files
+
+- **CHANGELOG.md**: Not present - changes are captured in the auto-generated build notes

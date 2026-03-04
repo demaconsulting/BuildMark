@@ -146,25 +146,42 @@ buildmark --validate
 buildmark --validate --results validation-results.trx
 ```
 
-### Self-Validation Tests
+## Self Validation
 
-BuildMark includes built-in self-validation tests that verify the tool's functionality without requiring external
-repositories or services. These tests use mock data to validate core features and generate test result files in TRX
-or JUnit format.
+Running self-validation produces a report containing the following information:
 
-The self-validation suite includes tests that verify:
+```text
+# DEMA Consulting BuildMark Self-validation
 
-- Version tag parsing and comparison
-- Build information extraction from repositories
-- Markdown report generation
-- GitHub repository connector functionality
-- Mock repository connector functionality
+| Information         | Value                                              |
+| :------------------ | :------------------------------------------------- |
+| BuildMark Version   | <version>                                          |
+| Machine Name        | <machine-name>                                     |
+| OS Version          | <os-version>                                       |
+| DotNet Runtime      | <dotnet-runtime-version>                           |
+| Time Stamp          | <timestamp> UTC                                    |
 
-These tests provide evidence of the tool's functionality and are particularly useful for:
+✓ BuildMark_MarkdownReportGeneration - Passed
+✓ BuildMark_GitIntegration - Passed
+✓ BuildMark_IssueTracking - Passed
+✓ BuildMark_KnownIssuesReporting - Passed
 
-- Verifying the installation is working correctly
-- Running automated tests in CI/CD pipelines without requiring repository access
-- Generating test evidence for compliance and traceability requirements
+Total Tests: 4
+Passed: 4
+Failed: 0
+```
+
+Each test in the report proves:
+
+- **`BuildMark_MarkdownReportGeneration`** - Markdown report is correctly generated from mock data.
+- **`BuildMark_GitIntegration`** - Git repository connector reads version tags and commits.
+- **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
+- **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
+
+See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/guide/guide.md) for more details
+on the self-validation tests.
+
+On validation failure the tool will exit with a non-zero exit code.
 
 ## Report Format
 
@@ -218,6 +235,8 @@ For bug reports, feature requests, and questions, please use
 
 This project is licensed under the MIT License - see the
 [LICENSE](https://github.com/demaconsulting/BuildMark/blob/main/LICENSE) file for details.
+
+By contributing to this project, you agree that your contributions will be licensed under the MIT License.
 
 ## Support
 

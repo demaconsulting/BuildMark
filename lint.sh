@@ -1,11 +1,17 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# Lint BuildMark
+set -e  # Exit on error
 
-# Run markdown linter
+echo "🎨 Checking code formatting..."
+dotnet format --verify-no-changes
+
+echo "📝 Checking markdown..."
 npx markdownlint-cli2 "**/*.md"
 
-# Run spell checker
+echo "🔤 Checking spelling..."
 npx cspell "**/*.{md,cs}"
 
-# Run YAML linter
+echo "📋 Checking YAML..."
 yamllint .
+
+echo "✨ All linting passed!"

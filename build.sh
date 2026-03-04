@@ -1,5 +1,6 @@
-#!/bin/bash
-set -e
+#!/usr/bin/env bash
+# Build and test BuildMark
+set -e  # Exit on error
 
 echo "🔧 Building BuildMark..."
 dotnet build --configuration Release
