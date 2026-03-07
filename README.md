@@ -24,9 +24,14 @@ making it easy to integrate release documentation into your CI/CD pipelines and 
 - 🐛 **Issue Tracking** - Extract bug fixes and changes from GitHub issues and pull requests
 - 🎯 **Customizable Output** - Configure report depth and version ranges
 - 🚀 **CI/CD Integration** - Automate build notes generation in your pipelines
-- 🌐 **Multi-Platform** - Support for .NET 8, 9, and 10
+- 🌐 **Multi-Platform** - Support for Windows, Linux, macOS with .NET 8, 9, and 10
 - ✅ **Self-Validation** - Built-in tests without requiring external tools
 - 📊 **Detailed Reporting** - Track changes, bug fixes, and known issues between versions
+- 🔍 **Linting Enforcement** - markdownlint, cspell, and yamllint enforced on every CI run
+- 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
+  following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
+- ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
+- 🔗 **Requirements Traceability** - Requirements linked to passing tests with auto-generated trace matrix
 
 ## Installation
 

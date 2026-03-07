@@ -17,6 +17,20 @@ making it easy to integrate release documentation into your CI/CD pipelines and 
 - **Self-Validation**: Built-in tests without requiring external tools
 - **Detailed Reporting**: Track changes, bug fixes, and known issues between versions
 
+# Continuous Compliance
+
+BuildMark follows the [Continuous Compliance][continuous-compliance] methodology, which ensures
+compliance evidence is generated automatically on every CI run.
+
+## Key Practices
+
+- **Requirements Traceability**: Every requirement is linked to passing tests, and a trace matrix is
+  auto-generated on each release
+- **Linting Enforcement**: markdownlint, cspell, and yamllint are enforced before any build proceeds
+- **Automated Audit Documentation**: Each release ships with generated requirements, justifications,
+  trace matrix, and quality reports
+- **CodeQL and SonarCloud**: Security and quality analysis runs on every build
+
 # Installation
 
 ## Prerequisites
@@ -561,3 +575,4 @@ fi
 [security]: https://github.com/demaconsulting/BuildMark/blob/main/SECURITY.md
 [contributing]: https://github.com/demaconsulting/BuildMark/blob/main/CONTRIBUTING.md
 [nuget]: https://www.nuget.org/packages/DemaConsulting.BuildMark
+[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
