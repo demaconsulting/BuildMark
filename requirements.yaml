@@ -296,6 +296,23 @@ sections:
               - ubuntu@BuildMark_IssueTracking
               - ubuntu@BuildMark_KnownIssuesReporting
 
+          - id: BuildMark-Plt-MacOS
+            title: The tool shall run on macOS operating systems.
+            justification: |
+              macOS support is essential for developers working on Apple platforms. This ensures
+              BuildMark serves the full spectrum of .NET development scenarios including macOS-based
+              CI/CD agents and developer workstations.
+            # Test source pattern "macos@" ensures these tests ran on macOS.
+            # This filtering is necessary to prove macOS functionality.
+            tests:
+              - macos@IntegrationTest_VersionFlag_OutputsVersion
+              - macos@IntegrationTest_HelpFlag_OutputsUsageInformation
+              - macos@IntegrationTest_ReportParameter_IsAccepted
+              - macos@BuildMark_MarkdownReportGeneration
+              - macos@BuildMark_GitIntegration
+              - macos@BuildMark_IssueTracking
+              - macos@BuildMark_KnownIssuesReporting
+
           - id: BuildMark-Plt-Net8
             title: The tool shall support .NET 8.0 runtime.
             justification: |
