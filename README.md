@@ -17,6 +17,9 @@ BuildMark is a .NET command-line tool that generates comprehensive markdown buil
 history and GitHub issues. It analyzes commits, pull requests, and issues to create human-readable build notes,
 making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
+For a detailed explanation of how BuildMark works internally, see the
+[Theory of Operations](https://github.com/demaconsulting/BuildMark/blob/main/THEORY-OF-OPERATIONS.md).
+
 ## Features
 
 - 📄 **Git Integration** - Analyze Git repository history and tags
