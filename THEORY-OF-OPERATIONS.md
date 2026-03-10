@@ -82,8 +82,9 @@ BuildMark also runs `git rev-parse --abbrev-ref HEAD` to determine the current b
 ##### 2. Authenticate with GitHub
 
 BuildMark reads an authentication token from environment variables. It checks `GH_TOKEN` first,
-then falls back to `GITHUB_TOKEN`. If no token is found, unauthenticated requests are made, which
-are subject to lower API rate limits (60 requests per hour versus 5,000 with a token).
+then falls back to `GITHUB_TOKEN`. If neither environment variable is set, BuildMark attempts to
+obtain a token by running `gh auth token` (the GitHub CLI). If no token can be obtained from any
+of these sources, BuildMark fails with an error.
 
 ##### 3. Fetch repository data
 
