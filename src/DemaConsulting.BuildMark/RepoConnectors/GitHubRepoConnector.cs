@@ -875,8 +875,15 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>GitHub token.</returns>
     private async Task<string> GetGitHubTokenAsync()
     {
-        // Try to get token from environment variable first
+        // Try GH_TOKEN environment variable first
         var token = Environment.GetEnvironmentVariable("GH_TOKEN");
+        if (!string.IsNullOrEmpty(token))
+        {
+            return token;
+        }
+
+        // Try GITHUB_TOKEN environment variable next
+        token = Environment.GetEnvironmentVariable("GITHUB_TOKEN");
         if (!string.IsNullOrEmpty(token))
         {
             return token;
@@ -889,7 +896,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
         catch (InvalidOperationException)
         {
-            throw new InvalidOperationException("Unable to get GitHub token. Set GH_TOKEN environment variable or authenticate with 'gh auth login'.");
+            throw new InvalidOperationException("Unable to get GitHub token. Set GH_TOKEN or GITHUB_TOKEN environment variable or authenticate with 'gh auth login'.");
         }
     }
 
