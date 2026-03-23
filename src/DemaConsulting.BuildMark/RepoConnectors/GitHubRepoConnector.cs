@@ -249,9 +249,11 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Build a mapping from commit SHA to pull request.
         // This is used to associate commits with their pull requests for change tracking.
         // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
+        // Duplicate commit SHAs are handled gracefully by keeping the first PR in collection order per SHA.
         var commitHashToPr = data.PullRequests
             .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.HeadSha != null))
-            .ToDictionary(p => p.Merged ? p.MergeCommitSha! : p.HeadSha!, p => p);
+            .GroupBy(p => p.Merged ? p.MergeCommitSha! : p.HeadSha!)
+            .ToDictionary(g => g.Key, g => g.First());
 
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
