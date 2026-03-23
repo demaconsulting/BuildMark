@@ -452,4 +452,59 @@ public class GitHubRepoConnectorTests
         // Should have null baseline since all previous versions are on the same hash
         Assert.IsNull(buildInfo.BaselineVersionTag);
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync does not throw when two merged pull requests share
+    ///     the same merge commit SHA. This is a regression test for the key collision bug where
+    ///     <c>ToDictionary</c> would throw <see cref="ArgumentException"/> on duplicate keys.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow()
+    {
+        // Arrange - Create mock responses where two merged PRs share the same merge commit SHA.
+        // The SHA below is the exact key from the bug report (demaconsulting/BuildMark#45).
+        const string sharedMergeCommitSha = "c85989fd08aee2b768557f6b90011ec325b3bdea";
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse(sharedMergeCommitSha)
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(
+                    Number: 1,
+                    Title: "First PR with shared merge commit",
+                    Url: "https://github.com/test/repo/pull/1",
+                    Merged: true,
+                    MergeCommitSha: sharedMergeCommitSha,
+                    HeadRefOid: "head-sha-1",
+                    Labels: []),
+                new MockPullRequest(
+                    Number: 2,
+                    Title: "Second PR with same merge commit SHA",
+                    Url: "https://github.com/test/repo/pull/2",
+                    Merged: true,
+                    MergeCommitSha: sharedMergeCommitSha,
+                    HeadRefOid: "head-sha-2",
+                    Labels: []))
+            .AddIssuesResponse()
+            .AddTagsResponse(new MockTag("v1.0.0", sharedMergeCommitSha));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", sharedMergeCommitSha);
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act - This must not throw ArgumentException due to duplicate dictionary key
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert - Build info should be valid and not null
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual(sharedMergeCommitSha, buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.Changes);
+        Assert.IsNotNull(buildInfo.Bugs);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+    }
 }
