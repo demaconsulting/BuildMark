@@ -49,6 +49,7 @@
     "reviewmark",
     "ReviewMark",
     "SarifMark",
+    "Sarif",
     "SBOM",
     "sbom",
     "Semgrep",
@@ -86,6 +87,6 @@
     "package-lock.json",
     "yarn.lock",
     "AGENT_REPORT_*.md",
-    "**/.agent-logs/**"
+    ".agent-logs/**"
   ]
 }
