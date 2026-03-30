@@ -226,7 +226,7 @@ stored in source control:
   run: |
     buildmark \
       --build-version ${{ inputs.version }} \
-      --report docs/build_notes/build-notes.md
+      --report docs/build_notes.md
 ```
 
 The generated report can then be uploaded as a build artifact, committed back to the repository, or
