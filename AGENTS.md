@@ -159,7 +159,8 @@ integration, see the Requirements and Test Source Filters sections below.
 
 ## Key Files
 
-- **`requirements.yaml`** - All requirements with test linkage (enforced via `dotnet reqstream --enforce`)
+- **`requirements.yaml`** - Root requirements file using `includes:` to reference `docs/reqstream/` files
+- **`docs/reqstream/`** - Per-software-unit, platform, and OTS requirements YAML files
 - **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8, LF endings)
 - **`.cspell.yaml`, `.markdownlint-cli2.yaml`, `.yamllint.yaml`** - Linting configs
 
@@ -208,6 +209,16 @@ ensures the CI evidence comes specifically from the required environment.
 
 ## Project Structure
 
+- `docs/` - Documentation and compliance artifacts
+  - `reqstream/` - Per-software-unit, platform, and OTS requirements YAML files (included by root `requirements.yaml`)
+  - Auto-generated reports (requirements, justifications, trace matrix)
+- `src/` - Source code files
+- `test/` - Test files
+- `.github/workflows/` - CI/CD pipeline definitions (`build.yaml`, `build_on_push.yaml`, `release.yaml`)
+- Configuration files: `.editorconfig`, `.reviewmark.yaml`, `.cspell.yaml`, `.yamllint.yaml`, etc.
+
+### Key Source Files
+
 - **Context.cs**: Handles command-line argument parsing, logging, and output
 - **Program.cs**: Main entry point with version/help/validation routing
 - **Validation.cs**: Self-validation tests with TRX/JUnit output support
@@ -230,7 +241,7 @@ build.bat     # Windows
 ## Documentation
 
 - **User Guide**: `docs/guide/guide.md`
-- **Requirements**: `requirements.yaml` -> auto-generated docs
+- **Requirements**: `requirements.yaml` includes `docs/reqstream/` files → auto-generated docs
 - **Build Notes**: Auto-generated via BuildMark
 - **Code Quality**: Auto-generated via CodeQL and SonarMark
 - **Trace Matrix**: Auto-generated via ReqStream

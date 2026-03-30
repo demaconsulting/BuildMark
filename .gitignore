@@ -63,13 +63,13 @@ __pycache__/
 docs/**/*.html
 docs/**/*.pdf
 !docs/template/**
-docs/requirements/requirements.md
-docs/tracematrix/tracematrix.md
-docs/justifications/justifications.md
-docs/quality/sonar-quality.md
-docs/quality/codeql-quality.md
-docs/buildnotes.md
-docs/buildnotes/versions.md
+docs/requirements_doc/requirements.md
+docs/requirements_doc/justifications.md
+docs/requirements_report/trace_matrix.md
+docs/code_quality/sonar-quality.md
+docs/code_quality/codeql-quality.md
+docs/build_notes.md
+docs/build_notes/versions.md
 
 # VersionMark captures (generated during CI/CD)
 versionmark-*.json

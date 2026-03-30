@@ -43,9 +43,7 @@ Before submitting this pull request, ensure you have completed the following:
 
 Please run the following checks before submitting:
 
-- [ ] **Spell checker passes**: `cspell "**/*.{md,cs}"`
-- [ ] **Markdown linter passes**: `markdownlint "**/*.md"`
-- [ ] **YAML linter passes**: `yamllint '**/*.{yml,yaml}'`
+- [ ] **All linters pass**: `./lint.sh` (Unix/macOS) or `cmd /c lint.bat` / `./lint.bat` (Windows)
 
 ### Testing
 

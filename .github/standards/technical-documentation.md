@@ -114,9 +114,9 @@ for consistency and professional presentation:
 **NEVER modify auto-generated markdown files** because changes will be
 overwritten and break compliance automation:
 
-- **Read-Only Files**: Generated reports under `docs/requirements/`,
-  `docs/justifications/`, `docs/tracematrix/`, `docs/quality/`, and
-  `docs/buildnotes/` are regenerated on every build
+- **Read-Only Files**: Generated reports under `docs/requirements_doc/`,
+  `docs/requirements_report/`, `docs/code_quality/`, and
+  `docs/build_notes/` are regenerated on every build
 - **Source Modification**: Update source files (requirements YAML, code
   comments) instead of generated output
 - **Tool Integration**: Generated content integrates with CI/CD pipelines and

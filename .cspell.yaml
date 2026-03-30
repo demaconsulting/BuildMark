@@ -18,7 +18,7 @@ words:
   - Blockquotes
   - buildmark
   - BuildMark
-  - buildnotes
+  - build_notes
   - camelcase
   - Checkmarx
   - codeql
@@ -59,6 +59,11 @@ words:
   - Qube
   - reqstream
   - ReqStream
+  - code_quality
+  - code_review_plan
+  - code_review_report
+  - requirements_doc
+  - requirements_report
   - reviewmark
   - ReviewMark
   - Sarif
@@ -75,7 +80,7 @@ words:
   - spdx
   - streetsidesoftware
   - TMPL
-  - tracematrix
+  - trace_matrix
   - triaging
   - Trivy
   - trx
