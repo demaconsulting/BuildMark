@@ -46,6 +46,8 @@
     "Pylint",
     "Qube",
     "reqstream",
+    "reviewmark",
+    "ReviewMark",
     "SarifMark",
     "SBOM",
     "sbom",
@@ -83,6 +85,7 @@
     "*.spdx.json",
     "package-lock.json",
     "yarn.lock",
-    "AGENT_REPORT_*.md"
+    "AGENT_REPORT_*.md",
+    "**/.agent-logs/**"
   ]
 }
