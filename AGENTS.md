@@ -27,10 +27,6 @@ Delegate to specialized agents only for specific scenarios:
 - **Formal bug resolution** (complex debugging, systematic fixes) → Call the `@implementation` agent
 - **Formal reviews** (compliance verification, detailed analysis) → Call @code-review agent
 - **Template consistency** (downstream repository alignment) → Call @repo-consistency agent
-- **Production code and self-validation tests** → Call **software-developer** agent
-- **Requirements management** → Call **Requirements Agent**
-- **Documentation updates** → Call **Technical Writer**
-- **Unit/integration tests** → Call **Test Developer**
 
 ## Available Specialized Agents
 
@@ -44,11 +40,6 @@ Delegate to specialized agents only for specific scenarios:
   Consulting standards and Continuous Compliance practices
 - **repo-consistency** - Ensures BuildMark remains consistent with the
   TemplateDotNetTool template patterns and best practices
-- **software-developer** - Writes production code and self-validation tests - targets
-  design-for-testability and literate programming style
-- **Requirements Agent** - Develops requirements and ensures test coverage linkage
-- **Technical Writer** - Creates accurate documentation following regulatory best practices
-- **Test Developer** - Creates unit and integration tests following AAA pattern
 
 ## Quality Gate Enforcement (ALL Agents Must Verify)
 
@@ -170,7 +161,6 @@ integration, call the @developer agent with requirements management context.
 - Not all tests need to be linked to requirements (tests may exist for corner cases, design testing, failure-testing, etc.)
 - Enforced in CI: `dotnet reqstream --requirements requirements.yaml --tests "test-results/**/*.trx" --enforce`
 - When adding features: add requirement + link to test
-- See Requirements Agent for detailed test coverage strategy
 
 ## Test Source Filters
 
