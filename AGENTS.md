@@ -81,7 +81,7 @@ compliance gates on every CI/CD run instead of as a last-mile activity.
 ### Linting Tools (ALL Must Pass)
 
 - **markdownlint-cli2**: Markdown style and formatting enforcement
-- **cspell**: Spell-checking across all text files (use `.cspell.json` for technical terms)
+- **cspell**: Spell-checking across all text files (use `.cspell.yaml` for technical terms)
 - **yamllint**: YAML structure and formatting validation
 - **Language-specific linters**: Based on repository technology stack
 
@@ -104,8 +104,8 @@ compliance gates on every CI/CD run instead of as a last-mile activity.
 
 - **`lint.sh` / `lint.bat`** - Cross-platform comprehensive linting scripts
 - **`.editorconfig`** - Code formatting rules
-- **`.cspell.json`** - Spell-check configuration and technical term dictionary
-- **`.markdownlint-cli2.jsonc`** - Markdown linting rules
+- **`.cspell.yaml`** - Spell-check configuration and technical term dictionary
+- **`.markdownlint-cli2.yaml`** - Markdown linting rules
 - **`.yamllint.yaml`** - YAML linting configuration
 - **`package.json`** - Node.js dependencies for linting tools
 
@@ -161,7 +161,7 @@ integration, see the Requirements and Test Source Filters sections below.
 
 - **`requirements.yaml`** - All requirements with test linkage (enforced via `dotnet reqstream --enforce`)
 - **`.editorconfig`** - Code style (file-scoped namespaces, 4-space indent, UTF-8, LF endings)
-- **`.cspell.json`, `.markdownlint-cli2.jsonc`, `.yamllint.yaml`** - Linting configs
+- **`.cspell.yaml`, `.markdownlint-cli2.yaml`, `.yamllint.yaml`** - Linting configs
 
 ## Requirements
 

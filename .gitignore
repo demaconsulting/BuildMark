@@ -57,6 +57,7 @@ package-lock.json
 # Python
 __pycache__/
 *.py[cod]
+.venv/
 
 # Generated documentation
 docs/**/*.html

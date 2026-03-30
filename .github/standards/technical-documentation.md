@@ -93,7 +93,7 @@ Write technical documentation for clarity and compliance verification:
 # Markdown Format Requirements
 
 Markdown documentation in this repository must follow the formatting standards
-defined in `.markdownlint-cli2.jsonc` (subject to any exclusions configured there)
+defined in `.markdownlint-cli2.yaml` (subject to any exclusions configured there)
 for consistency and professional presentation:
 
 - **120 Character Line Limit**: Keep lines 120 characters or fewer for readability.
