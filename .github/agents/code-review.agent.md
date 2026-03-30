@@ -1,6 +1,7 @@
 ---
 name: code-review
 description: Agent for performing formal reviews
+tools: [read, search, edit, execute, github, web, agent]
 user-invocable: true
 ---
 

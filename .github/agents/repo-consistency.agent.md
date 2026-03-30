@@ -3,6 +3,7 @@ name: repo-consistency
 description: >
   Ensures downstream repositories remain consistent with the TemplateDotNetTool
   template patterns and best practices.
+tools: [read, search, edit, execute, github, agent]
 user-invocable: true
 ---
 

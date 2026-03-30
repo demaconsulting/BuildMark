@@ -1,6 +1,7 @@
 ---
 name: Technical Writer
 description: Ensures documentation is accurate and complete - knowledgeable about regulatory documentation and special document types
+tools: [read, search, edit, execute, github, agent]
 ---
 
 # Technical Writer - BuildMark

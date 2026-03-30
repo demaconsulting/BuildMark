@@ -151,7 +151,7 @@ Continuous Compliance <https://github.com/demaconsulting/ContinuousCompliance>.
 - **Source filters are critical** - Platform/framework requirements need specific test evidence
 
 For detailed requirements format, test linkage patterns, and ReqStream
-integration, see the Requirements and Test Source Filters sections below.
+integration, call the @developer agent with requirements management context.
 
 ## Tech Stack
 
@@ -207,7 +207,7 @@ ensures the CI evidence comes specifically from the required environment.
 - **String Formatting**: Use interpolated strings ($"") for clarity
 - **No code duplication**: Extract to properties/methods
 
-## Project Structure
+## Project Structure Template
 
 - `docs/` - Documentation and compliance artifacts
   - `reqstream/` - Per-software-unit, platform, and OTS requirements YAML files (included by root `requirements.yaml`)

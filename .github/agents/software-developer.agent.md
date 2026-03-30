@@ -1,6 +1,7 @@
 ---
 name: Software Developer
 description: Writes production code and self-validation tests - targets design-for-testability and literate programming style
+tools: [read, search, edit, execute, github, agent]
 ---
 
 # Software Developer - BuildMark
