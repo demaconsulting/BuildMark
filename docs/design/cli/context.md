@@ -55,9 +55,9 @@ during testing. The factory is stored on `ConnectorFactory` and used by
 
 ### `OpenLogFile(string logFile)`
 
-Opens the specified file for append with `AutoFlush` enabled. If the directory
-does not exist, the method throws `InvalidOperationException`.
-
+Opens the specified file for writing in overwrite mode (truncating any existing
+file) with `AutoFlush` enabled. If the directory does not exist, the method
+throws `InvalidOperationException`.
 ### `WriteLine(string message)`
 
 Writes `message` to standard output (unless `Silent` is set) and to the log file
