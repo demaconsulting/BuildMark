@@ -14,6 +14,19 @@ sections:
             tests:
               - IntegrationTest_VersionFlag_OutputsVersion
               - IntegrationTest_HelpFlag_OutputsUsageInformation
+            children:
+              - BuildMark-Cli-Context
+              - BuildMark-Cli-Version
+              - BuildMark-Cli-Help
+              - BuildMark-Cli-Silent
+              - BuildMark-Cli-BuildVersion
+              - BuildMark-Cli-Report
+              - BuildMark-Cli-Log
+              - BuildMark-Cli-Validate
+              - BuildMark-Cli-Results
+              - BuildMark-Cli-ErrorOutput
+              - BuildMark-Cli-InvalidArgs
+              - BuildMark-Cli-ExitCode
 
           - id: BuildMark-Cmd-Version
             title: The tool shall display version information when requested.
@@ -23,6 +36,8 @@ sections:
               updates across different environments.
             tests:
               - IntegrationTest_VersionFlag_OutputsVersion
+            children:
+              - BuildMark-Cli-Version
 
           - id: BuildMark-Cmd-Help
             title: The tool shall display help information when requested.
@@ -32,6 +47,8 @@ sections:
               learning curve for new users without requiring external documentation.
             tests:
               - IntegrationTest_HelpFlag_OutputsUsageInformation
+            children:
+              - BuildMark-Cli-Help
 
           - id: BuildMark-Cmd-Silent
             title: The tool shall support silent mode to suppress console output.
@@ -41,6 +58,8 @@ sections:
               to control verbosity based on their specific use case.
             tests:
               - IntegrationTest_SilentFlag_SuppressesOutput
+            children:
+              - BuildMark-Cli-Silent
 
           - id: BuildMark-Cmd-Log
             title: The tool shall support writing output to a log file.
@@ -50,6 +69,8 @@ sections:
               environments where console output may not be easily accessible.
             tests:
               - IntegrationTest_LogParameter_IsAccepted
+            children:
+              - BuildMark-Cli-Log
 
           - id: BuildMark-Cmd-BuildVersion
             title: The tool shall support specifying a build version.
@@ -59,6 +80,8 @@ sections:
               scenarios where version numbers are determined externally.
             tests:
               - IntegrationTest_BuildVersionParameter_IsAccepted
+            children:
+              - BuildMark-Cli-BuildVersion
 
           - id: BuildMark-Cmd-InvalidArgs
             title: The tool shall validate command-line arguments.
@@ -68,15 +91,8 @@ sections:
               configuration errors early, and prevents unexpected behavior in automated workflows.
             tests:
               - IntegrationTest_InvalidArgument_ShowsError
-              - Context_Create_UnsupportedArgument_ThrowsArgumentException
-              - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
-              - Context_Create_ReportWithoutValue_ThrowsArgumentException
-              - Context_Create_ReportDepthWithoutValue_ThrowsArgumentException
-              - Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException
-              - Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException
-              - Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException
-              - Context_Create_ResultsWithoutValue_ThrowsArgumentException
-              - Context_Create_LogWithoutValue_ThrowsArgumentException
+            children:
+              - BuildMark-Cli-InvalidArgs
 
           - id: BuildMark-Cmd-FilePaths
             title: The tool shall handle invalid file paths gracefully.
@@ -85,7 +101,9 @@ sections:
               the tool fails safely when given incorrect paths. This improves user experience and
               makes troubleshooting easier in production environments.
             tests:
-              - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
+              - IntegrationTest_InvalidArgument_ShowsError
+            children:
+              - BuildMark-Cli-InvalidArgs
 
           - id: BuildMark-Cmd-ExitCode
             title: The tool shall return appropriate exit codes.
@@ -94,8 +112,9 @@ sections:
               or failure conditions programmatically. This is fundamental for proper integration
               into CI/CD pipelines and automated workflows.
             tests:
-              - Context_ExitCode_NoErrors_RemainsZero
-              - Context_WriteError_SetsExitCodeToOne
+              - IntegrationTest_InvalidArgument_ShowsError
+            children:
+              - BuildMark-Cli-ExitCode
 
       - title: GitHub Integration
         requirements:
@@ -109,6 +128,8 @@ sections:
             tests:
               - BuildMark_GitIntegration
               - BuildMark_MarkdownReportGeneration
+            children:
+              - BuildMark-RepoConnectors-GitHubConnector
 
           - id: BuildMark-GH-IssueTracking
             title: The tool shall track issues and pull requests from GitHub.
@@ -118,6 +139,8 @@ sections:
               improvements to their corresponding GitHub issues and pull requests.
             tests:
               - BuildMark_IssueTracking
+            children:
+              - BuildMark-RepoConnectors-GitHubConnector
 
           - id: BuildMark-GH-VersionTags
             title: The tool shall identify changes between version tags.
@@ -127,6 +150,8 @@ sections:
               versioning workflows and helps users understand the scope of changes between releases.
             tests:
               - BuildMark_GitIntegration
+            children:
+              - BuildMark-RepoConnectors-GitHubConnector
 
       - title: Report Generation
         requirements:
@@ -140,6 +165,8 @@ sections:
             tests:
               - BuildMark_MarkdownReportGeneration
               - IntegrationTest_ReportParameter_IsAccepted
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Depth
             title: The tool shall support configurable report depth.
@@ -150,6 +177,8 @@ sections:
             tests:
               - IntegrationTest_ReportDepthParameter_IsAccepted
               - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-VersionInfo
             title: The tool shall report version information in build notes.
@@ -159,6 +188,8 @@ sections:
               organization of release documentation.
             tests:
               - BuildMark_MarkdownReportGeneration
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Changes
             title: The tool shall report changes in build notes.
@@ -169,6 +200,8 @@ sections:
             tests:
               - BuildMark_MarkdownReportGeneration
               - BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-BugFixes
             title: The tool shall report bug fixes in build notes.
@@ -179,6 +212,8 @@ sections:
             tests:
               - BuildMark_MarkdownReportGeneration
               - BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-KnownIssues
             title: The tool shall support including known issues in build notes.
@@ -188,6 +223,8 @@ sections:
               user trust and reduces support burden.
             tests:
               - BuildMark_KnownIssuesReporting
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-VersionRange
             title: The tool shall support filtering build notes by version range.
@@ -197,6 +234,8 @@ sections:
               various documentation scenarios and user needs.
             tests:
               - BuildMark_MarkdownReportGeneration
+            children:
+              - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Hyperlinks
             title: The tool shall include hyperlinks to issues and pull requests.
@@ -208,6 +247,8 @@ sections:
               - BuildMark_MarkdownReportGeneration
               - BuildInformation_ToMarkdown_IncludesIssueLinks
               - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+            children:
+              - BuildMark-RepoConnectors-GitHubConnector
 
           - id: BuildMark-Rpt-Structure
             title: The tool shall format build notes with proper markdown structure.
@@ -221,6 +262,8 @@ sections:
               - BuildInformation_ToMarkdown_UsesBulletLists
               - BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
               - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
+            children:
+              - BuildMark-Program-Report
 
       - title: Validation and Testing
         requirements:
@@ -232,6 +275,8 @@ sections:
               unexpected behaviors, and giving users evidence they can rely on the tool's output.
             tests:
               - IntegrationTest_ValidateFlag_RunsSelfValidation
+            children:
+              - BuildMark-SelfTest-Qualification
 
           - id: BuildMark-Val-ResultsFiles
             title: The tool shall write validation results to test result files.
@@ -241,6 +286,8 @@ sections:
               to be tracked, analyzed, and reported alongside other test metrics.
             tests:
               - IntegrationTest_ResultsParameter_IsAccepted
+            children:
+              - BuildMark-SelfTest-ResultsOutput
 
           - id: BuildMark-Val-TrxFormat
             title: The tool shall support TRX format for test results.
@@ -250,6 +297,8 @@ sections:
               and Azure DevOps pipelines.
             tests:
               - IntegrationTest_ResultsParameter_IsAccepted
+            children:
+              - BuildMark-SelfTest-ResultsOutput
 
           - id: BuildMark-Val-JUnitFormat
             title: The tool shall support JUnit format for test results.
@@ -259,3 +308,5 @@ sections:
               toolchains beyond the Microsoft ecosystem.
             tests:
               - IntegrationTest_ResultsParameter_IsAccepted
+            children:
+              - BuildMark-SelfTest-ResultsOutput

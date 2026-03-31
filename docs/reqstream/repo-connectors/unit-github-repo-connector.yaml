@@ -1,4 +1,49 @@
 ---
-# GitHubRepoConnector unit requirements
-# System-level requirements for the GitHubRepoConnector unit are in buildmark-system.yaml
-sections: []
+# Software Unit Requirements for the GitHubRepoConnector Class
+#
+# The GitHubRepoConnector class connects to GitHub using the GraphQL API to
+# retrieve commits, releases, tags, pull requests, and issues, assembling them
+# into structured BuildInformation for report generation.
+
+sections:
+  - title: GitHubRepoConnector Unit Requirements
+    requirements:
+      - id: BuildMark-GitHub-BuildInformation
+        title: The GitHubRepoConnector class shall retrieve build information from a GitHub repository.
+        justification: |
+          The primary purpose of the GitHubRepoConnector is to assemble BuildInformation
+          from GitHub repository data. It must correctly identify the current version tag,
+          the baseline (previous) version tag, and the changes between them, correctly
+          handling pre-release tags and version selection edge cases.
+        tests:
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
+          - GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
+          - GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues
+          - GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
+          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
+          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
+          - GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow
+          - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+
+      - id: BuildMark-GitHub-GraphQLClient
+        title: The GitHubRepoConnector class shall use a GraphQL client for GitHub API interactions.
+        justification: |
+          The GitHub GraphQL API provides efficient access to repository data including
+          commits, releases, tags, pull requests, and issues with minimal API calls.
+          The GraphQL client handles pagination, error handling, and response parsing
+          to provide reliable data retrieval from the GitHub API.
+        tests:
+          - GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
+          - GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits
+          - GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames
+          - GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases
+          - GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
+          - GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags
+          - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - GitHubGraphQLClient_GetPullRequestsAsync_WithPagination_ReturnsAllPullRequests
+          - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssues
+          - GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues
