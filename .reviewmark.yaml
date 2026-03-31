@@ -54,7 +54,16 @@ reviews:
       - "src/**/GitHub/GitHubRepoConnector.cs"
       - "src/**/GitHub/GitHubGraphQLClient.cs"
       - "src/**/GitHub/GitHubGraphQLTypes.cs"
-      - "test/**/GitHubRepoConnectorTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubRepoConnectorTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientFindIssueIdsTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetAllIssuesTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetAllTagsTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetCommitsTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetPullRequestsTests.cs"
+      - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetReleasesTests.cs"
+      - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandler.cs"
+      - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandlerTests.cs"
+      - "test/**/RepoConnectors/GitHub/MockableGitHubRepoConnector.cs"
 
   # Subsystem reviews
   - id: BuildMark-Cli
@@ -82,9 +91,17 @@ reviews:
   - id: BuildMark-RepoConnectors
     title: Review of BuildMark RepoConnectors subsystem (repository connectors)
     paths:
-      - "docs/reqstream/repo-connectors/subsystem-repo-connectors.yaml"
-      - "docs/design/repo-connectors/repo-connectors.md"
-      - "docs/design/repo-connectors/github-repo-connector.md"
+      - "docs/reqstream/repo-connectors/subsystem-repo-connectors.yaml"   # subsystem requirements
+      - "docs/design/repo-connectors/repo-connectors.md"                  # subsystem design
+      - "docs/design/repo-connectors/github-repo-connector.md"            # GitHubRepoConnector unit design
+      - "src/**/RepoConnectors/IRepoConnector.cs"                         # connector interface
+      - "src/**/RepoConnectors/RepoConnectorBase.cs"                      # connector base class
+      - "src/**/RepoConnectors/RepoConnectorFactory.cs"                   # connector factory
+      - "src/**/RepoConnectors/MockRepoConnector.cs"                      # mock connector
+      - "src/**/RepoConnectors/ProcessRunner.cs"                          # process runner
+      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"                # mock connector tests
+      - "test/**/RepoConnectors/ProcessRunnerTests.cs"                    # process runner tests
+      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"             # factory tests
 
   # System review
   - id: BuildMark-System
