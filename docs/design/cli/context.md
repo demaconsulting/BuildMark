@@ -58,6 +58,7 @@ during testing. The factory is stored on `ConnectorFactory` and used by
 Opens the specified file for writing in overwrite mode (truncating any existing
 file) with `AutoFlush` enabled. If the directory does not exist, the method
 throws `InvalidOperationException`.
+
 ### `WriteLine(string message)`
 
 Writes `message` to standard output (unless `Silent` is set) and to the log file

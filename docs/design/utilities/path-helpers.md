@@ -18,7 +18,7 @@ static method.
 
 ### `SafePathCombine(string basePath, string relativePath) → string`
 
-Combines `basePath` and `relativePath` into a single absolute path, validating
+Combines `basePath` and `relativePath` using `Path.Combine`, validating
 that the result remains within `basePath`.
 
 **Preconditions (each violation throws an exception):**
@@ -36,10 +36,10 @@ that the result remains within `basePath`.
 1. Validate `basePath` and `relativePath` for null.
 2. Reject `relativePath` values containing `..` (fast-path traversal block).
 3. Reject `relativePath` values where `Path.IsPathRooted` returns `true`.
-4. Combine the paths using `Path.GetFullPath(Path.Combine(basePath, relativePath))`.
-5. Compute `Path.GetRelativePath(basePath, combined)`.
+4. Combine the paths using `Path.Combine(basePath, relativePath)`.
+5. Compute `Path.GetRelativePath(Path.GetFullPath(basePath), Path.GetFullPath(combinedPath))`.
 6. If the relative result starts with `..`, throw `ArgumentException`.
-7. Return the combined full path.
+7. Return the combined path (result of `Path.Combine`).
 
 ## Interactions
 
