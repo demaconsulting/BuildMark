@@ -1,0 +1,13 @@
+---
+title: BuildMark Software Design Document
+subtitle: A .NET CLI Tool for Generating Build Notes from GitHub
+author: DEMA Consulting
+description: Detailed design document for the BuildMark tool
+lang: en-US
+keywords:
+  - BuildMark
+  - .NET
+  - Command-Line Tool
+  - Design
+  - Software Design Document
+---

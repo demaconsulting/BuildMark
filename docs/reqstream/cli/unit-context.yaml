@@ -1,0 +1,89 @@
+---
+# Software Unit Requirements for the Context Class
+#
+# The Context class handles command-line argument parsing and program output.
+# It is the primary interface between the user's command-line invocation and
+# the tool's internal logic.
+
+sections:
+  - title: Context Unit Requirements
+    requirements:
+      - id: BuildMark-Context-ArgumentParsing
+        title: The Context class shall parse command-line arguments into structured properties.
+        justification: |
+          Provides a standardized approach to command-line argument parsing across all
+          DEMA Consulting DotNet Tools. Each recognized flag or value is stored as a
+          typed property so that the rest of the tool can read intent without re-parsing.
+        tests:
+          - Context_Create_EmptyArguments_CreatesValidContext
+          - Context_Create_LongVersionFlag_SetsVersionProperty
+          - Context_Create_ShortVersionFlag_SetsVersionProperty
+          - Context_Create_LongHelpFlag_SetsHelpProperty
+          - Context_Create_ShortHelpFlag_SetsHelpProperty
+          - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
+          - Context_Create_SilentFlag_SetsSilentProperty
+          - Context_Create_ValidateFlag_SetsValidateProperty
+          - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
+          - Context_Create_ReportArgument_SetsReportFileProperty
+          - Context_Create_ReportDepthArgument_SetsReportDepthProperty
+          - Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
+          - Context_Create_ResultsArgument_SetsResultsFileProperty
+          - Context_Create_LogArgument_CreatesLogFile
+          - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
+
+      - id: BuildMark-Context-InvalidArgs
+        title: The Context class shall reject unknown or malformed command-line arguments with a descriptive error.
+        justification: |
+          Providing clear feedback for invalid arguments helps users quickly correct
+          mistakes and prevents silent misconfiguration.
+        tests:
+          - Context_Create_UnsupportedArgument_ThrowsArgumentException
+          - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
+          - Context_Create_ReportWithoutValue_ThrowsArgumentException
+          - Context_Create_ReportDepthWithoutValue_ThrowsArgumentException
+          - Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException
+          - Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException
+          - Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException
+          - Context_Create_ResultsWithoutValue_ThrowsArgumentException
+          - Context_Create_LogWithoutValue_ThrowsArgumentException
+          - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
+
+      - id: BuildMark-Context-Output
+        title: The Context class shall write output to the console and optionally to a log file.
+        justification: |
+          Provides persistent logging for debugging and audit trails, while also
+          allowing console output to be suppressed in automated environments.
+        tests:
+          - Context_WriteLine_NotSilent_WritesToConsole
+          - Context_WriteLine_Silent_DoesNotWriteToConsole
+          - Context_WriteLine_WithLogFile_WritesToLogFile
+          - Context_WriteError_WithLogFile_WritesToLogFile
+          - Context_Dispose_ClosesLogFileProperly
+
+      - id: BuildMark-Context-Silent
+        title: The Context class shall suppress console output when the silent flag is set.
+        justification: |
+          Enables automated scripts and CI/CD pipelines to run the tool without
+          cluttering output logs.
+        tests:
+          - Context_Create_SilentFlag_SetsSilentProperty
+          - Context_WriteLine_Silent_DoesNotWriteToConsole
+          - Context_WriteError_Silent_DoesNotWriteToConsole
+
+      - id: BuildMark-Context-ErrorOutput
+        title: The Context class shall write error messages to stderr.
+        justification: |
+          Error messages must be written to stderr so they remain visible to the user
+          without polluting stdout, which consumers may pipe or redirect for data capture.
+        tests:
+          - Context_WriteError_NotSilent_WritesToConsole
+          - Context_WriteError_SetsExitCodeToOne
+
+      - id: BuildMark-Context-ExitCode
+        title: The Context class shall track errors and expose a non-zero exit code when errors have occurred.
+        justification: |
+          Callers (scripts, CI/CD pipelines) must be able to detect failure conditions
+          programmatically via the process exit code.
+        tests:
+          - Context_ExitCode_NoErrors_RemainsZero
+          - Context_WriteError_SetsExitCodeToOne

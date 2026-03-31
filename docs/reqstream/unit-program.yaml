@@ -1,0 +1,48 @@
+---
+# Software Unit Requirements for the Program Class
+#
+# The Program class is the main entry point for BuildMark. It creates a Context
+# from command-line arguments, dispatches to the appropriate logic based on the
+# flags (version, help, validate, report), and returns the exit code.
+
+sections:
+  - title: Program Unit Requirements
+    requirements:
+      - id: BuildMark-Program-Version
+        title: The Program class shall support -v and --version flags to display version information.
+        justification: |
+          Users need to quickly identify the version of the tool they are using for
+          troubleshooting and compatibility verification.
+        tests:
+          - Program_Run_VersionFlag_OutputsVersionToConsole
+          - Program_Version_ReturnsValidVersion
+          - IntegrationTest_VersionFlag_OutputsVersion
+
+      - id: BuildMark-Program-Help
+        title: The Program class shall support -?, -h, and --help flags to display usage information.
+        justification: |
+          Users need access to command-line usage documentation without requiring
+          external resources.
+        tests:
+          - Program_Run_HelpFlag_OutputsHelpMessage
+          - IntegrationTest_HelpFlag_OutputsUsageInformation
+
+      - id: BuildMark-Program-Validate
+        title: The Program class shall support --validate flag to invoke the self-validation framework.
+        justification: |
+          Provides a built-in mechanism to verify the tool is functioning correctly
+          in the deployment environment.
+        tests:
+          - Program_Run_ValidateFlag_OutputsValidationMessage
+          - IntegrationTest_ValidateFlag_RunsSelfValidation
+
+      - id: BuildMark-Program-Report
+        title: The Program class shall generate build notes markdown reports when --report is specified.
+        justification: |
+          Report generation is the primary purpose of the BuildMark tool. The Program
+          class orchestrates the repository connector, gathering of build information,
+          and generation of the output markdown report.
+        tests:
+          - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+          - BuildMark_MarkdownReportGeneration
+          - IntegrationTest_ReportParameter_IsAccepted

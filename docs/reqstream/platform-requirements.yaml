@@ -1,0 +1,96 @@
+---
+sections:
+  - title: Platform Support
+    requirements:
+      - id: BuildMark-Plt-Windows
+        title: The tool shall run on Windows operating systems.
+        justification: |
+          Windows support is essential for .NET developers working in Windows-centric
+          environments, including enterprise settings and teams using Visual Studio. This
+          ensures BuildMark serves the full spectrum of .NET development scenarios.
+        # Test source pattern "windows@" ensures these tests ran on Windows.
+        # This filtering is necessary to prove Windows OS functionality.
+        tests:
+          - windows@IntegrationTest_VersionFlag_OutputsVersion
+          - windows@IntegrationTest_HelpFlag_OutputsUsageInformation
+          - windows@IntegrationTest_ReportParameter_IsAccepted
+          - windows@BuildMark_MarkdownReportGeneration
+          - windows@BuildMark_GitIntegration
+          - windows@BuildMark_IssueTracking
+          - windows@BuildMark_KnownIssuesReporting
+
+      - id: BuildMark-Plt-Linux
+        title: The tool shall run on Linux operating systems.
+        justification: |
+          Linux support is critical for modern DevOps practices and cloud-native development
+          where Linux-based CI/CD systems and containerized environments dominate. This
+          ensures BuildMark works seamlessly in contemporary .NET deployment scenarios.
+        # Test source pattern "ubuntu@" ensures these tests ran on Linux.
+        # This filtering is necessary to prove Linux OS functionality.
+        tests:
+          - ubuntu@IntegrationTest_VersionFlag_OutputsVersion
+          - ubuntu@IntegrationTest_HelpFlag_OutputsUsageInformation
+          - ubuntu@IntegrationTest_ReportParameter_IsAccepted
+          - ubuntu@BuildMark_MarkdownReportGeneration
+          - ubuntu@BuildMark_GitIntegration
+          - ubuntu@BuildMark_IssueTracking
+          - ubuntu@BuildMark_KnownIssuesReporting
+
+      - id: BuildMark-Plt-MacOS
+        title: The tool shall run on macOS operating systems.
+        justification: |
+          macOS support is essential for developers working on Apple platforms. This ensures
+          BuildMark serves the full spectrum of .NET development scenarios including macOS-based
+          CI/CD agents and developer workstations.
+        # Test source pattern "macos@" ensures these tests ran on macOS.
+        # This filtering is necessary to prove macOS functionality.
+        tests:
+          - macos@IntegrationTest_VersionFlag_OutputsVersion
+          - macos@IntegrationTest_HelpFlag_OutputsUsageInformation
+          - macos@IntegrationTest_ReportParameter_IsAccepted
+          - macos@BuildMark_MarkdownReportGeneration
+          - macos@BuildMark_GitIntegration
+          - macos@BuildMark_IssueTracking
+          - macos@BuildMark_KnownIssuesReporting
+
+      - id: BuildMark-Plt-Net8
+        title: The tool shall support .NET 8.0 runtime.
+        justification: |
+          .NET 8.0 is a Long-Term Support (LTS) release with support through November 2026.
+          Supporting this version ensures BuildMark remains usable for organizations following
+          Microsoft's LTS support lifecycle and requiring stability guarantees.
+        # Test source pattern "dotnet8.x@" ensures these tests ran on .NET 8.0.
+        # This filtering is necessary to prove .NET 8.0 runtime support.
+        tests:
+          - dotnet8.x@BuildMark_MarkdownReportGeneration
+          - dotnet8.x@BuildMark_GitIntegration
+          - dotnet8.x@BuildMark_IssueTracking
+          - dotnet8.x@BuildMark_KnownIssuesReporting
+
+      - id: BuildMark-Plt-Net9
+        title: The tool shall support .NET 9.0 runtime.
+        justification: |
+          .NET 9.0 is a Standard Term Support (STS) release with support through May 2026.
+          Supporting this version provides users access to the latest .NET features and
+          performance improvements for teams who prefer newer releases.
+        # Test source pattern "dotnet9.x@" ensures these tests ran on .NET 9.0.
+        # This filtering is necessary to prove .NET 9.0 runtime support.
+        tests:
+          - dotnet9.x@BuildMark_MarkdownReportGeneration
+          - dotnet9.x@BuildMark_GitIntegration
+          - dotnet9.x@BuildMark_IssueTracking
+          - dotnet9.x@BuildMark_KnownIssuesReporting
+
+      - id: BuildMark-Plt-Net10
+        title: The tool shall support .NET 10.0 runtime.
+        justification: |
+          .NET 10.0 is the next Long-Term Support (LTS) release planned for November 2025.
+          Early support ensures BuildMark remains current as users transition to this new
+          LTS version and provides forward compatibility guarantees.
+        # Test source pattern "dotnet10.x@" ensures these tests ran on .NET 10.0.
+        # This filtering is necessary to prove .NET 10.0 runtime support.
+        tests:
+          - dotnet10.x@BuildMark_MarkdownReportGeneration
+          - dotnet10.x@BuildMark_GitIntegration
+          - dotnet10.x@BuildMark_IssueTracking
+          - dotnet10.x@BuildMark_KnownIssuesReporting
