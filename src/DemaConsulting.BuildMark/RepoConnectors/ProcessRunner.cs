@@ -111,11 +111,13 @@ internal static class ProcessRunner
             // Execute process and capture output
             using var process = new Process { StartInfo = startInfo };
             process.Start();
-            var output = await process.StandardOutput.ReadToEndAsync();
+            var outputTask = process.StandardOutput.ReadToEndAsync();
+            var errorTask = process.StandardError.ReadToEndAsync();
+            await Task.WhenAll(outputTask, errorTask);
             await process.WaitForExitAsync();
 
             // Return output only if command succeeded
-            return process.ExitCode == 0 ? output : null;
+            return process.ExitCode == 0 ? outputTask.Result : null;
         }
         catch
         {

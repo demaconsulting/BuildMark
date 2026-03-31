@@ -645,12 +645,12 @@ public class ContextTests
         // Create context with silent flag
         using var context = Context.Create(["--silent"]);
 
-        // Capture console output
+        // Capture console error output
         using var output = new StringWriter();
-        var originalOut = Console.Out;
+        var originalError = Console.Error;
         try
         {
-            Console.SetOut(output);
+            Console.SetError(output);
 
             // Write an error
             context.WriteError("Error message");
@@ -660,8 +660,8 @@ public class ContextTests
         }
         finally
         {
-            // Restore console output
-            Console.SetOut(originalOut);
+            // Restore console error output
+            Console.SetError(originalError);
         }
     }
 

@@ -277,7 +277,9 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Build a mapping from tag name to release for version lookup.
         // This is used to match version objects back to their releases.
-        var tagToRelease = branchReleases.ToDictionary(r => r.TagName!, r => r);
+        var tagToRelease = branchReleases
+            .GroupBy(r => r.TagName!)
+            .ToDictionary(g => g.Key, g => g.First());
 
         // Parse release tags into Version objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
