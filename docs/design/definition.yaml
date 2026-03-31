@@ -1,0 +1,24 @@
+---
+resource-path:
+  - docs/design
+  - docs/design/cli
+  - docs/design/self-test
+  - docs/design/utilities
+  - docs/design/repo-connectors
+  - docs/template
+
+input-files:
+  - docs/design/title.txt
+  - docs/design/introduction.md
+  - docs/design/program.md
+  - docs/design/cli/cli.md
+  - docs/design/cli/context.md
+  - docs/design/self-test/self-test.md
+  - docs/design/self-test/validation.md
+  - docs/design/utilities/utilities.md
+  - docs/design/utilities/path-helpers.md
+  - docs/design/repo-connectors/repo-connectors.md
+  - docs/design/repo-connectors/github-repo-connector.md
+template: template.html
+table-of-contents: true
+number-sections: true

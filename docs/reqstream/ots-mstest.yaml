@@ -1,0 +1,21 @@
+---
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: MSTest
+        requirements:
+          - id: BuildMark-OTS-MSTest
+            title: MSTest shall execute unit tests and report results.
+            justification: |
+              MSTest (MSTest.TestFramework and MSTest.TestAdapter) is the unit-testing framework
+              used by the project. It discovers and runs all test methods and writes TRX result
+              files that feed into coverage reporting and requirements traceability. Passing tests
+              confirm the framework is functioning correctly.
+            tags: [ots]
+            tests:
+              - Context_Create_EmptyArguments_CreatesValidContext
+              - Context_Create_ShortVersionFlag_SetsVersionProperty
+              - Context_Create_LongVersionFlag_SetsVersionProperty
+              - Context_Create_SilentFlag_SetsSilentProperty
+              - Context_Create_ValidateFlag_SetsValidateProperty
+              - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
