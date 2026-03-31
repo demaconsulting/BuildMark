@@ -42,9 +42,9 @@ file, and verifies the file contains expected version and content markers.
 
 ### `RunGitIntegration`
 
-Runs the tool against the local Git repository to verify that version, commit
-hash, and previous version can be extracted correctly. Validates the output
-against expected patterns.
+Uses `MockRepoConnector` to verify that the tool correctly extracts and displays
+version, commit hash, and previous version information from repository data.
+Validates the output against expected patterns.
 
 ### `RunIssueTracking`
 

@@ -72,8 +72,8 @@ src/DemaConsulting.BuildMark/
     ├── RepoConnectorFactory.cs              — repository connector factory
     ├── MockRepoConnector.cs                 — mock repository connector for testing
     ├── ProcessRunner.cs                     — process runner for Git commands
+    ├── GitHubRepoConnector.cs               — GitHub API integration
     └── GitHub/
-        ├── GitHubRepoConnector.cs           — GitHub API integration
         ├── GitHubGraphQLClient.cs           — GraphQL API client
         └── GitHubGraphQLTypes.cs            — GraphQL type definitions
 ```

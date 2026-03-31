@@ -19,7 +19,7 @@ GraphQL API to retrieve issues, pull requests, tags, and commits.
 | `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector       |
 | `MockRepoConnector`    | `RepoConnectors/MockRepoConnector.cs`          | In-memory connector for testing         |
 | `ProcessRunner`        | `RepoConnectors/ProcessRunner.cs`              | Runs Git commands via the shell         |
-| `GitHubRepoConnector`  | `RepoConnectors/GitHub/GitHubRepoConnector.cs` | GitHub GraphQL API connector            |
+| `GitHubRepoConnector`  | `RepoConnectors/GitHubRepoConnector.cs`        | GitHub GraphQL API connector            |
 
 ## Interfaces
 
