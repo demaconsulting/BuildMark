@@ -23,13 +23,13 @@ that the result remains within `basePath`.
 
 **Preconditions (each violation throws an exception):**
 
-| Check                        | Exception               | Message                          |
-|------------------------------|-------------------------|----------------------------------|
-| `basePath` is null           | `ArgumentNullException` | `paramName: "basePath"`          |
-| `relativePath` is null       | `ArgumentNullException` | `paramName: "relativePath"`      |
-| `relativePath` contains `..` | `ArgumentException`     | Path traversal detected          |
-| `relativePath` is rooted     | `ArgumentException`     | Absolute paths are not permitted |
-| Result is outside `basePath` | `ArgumentException`     | Path traversal detected          |
+| Check                        | Exception               | Message                                  |
+|------------------------------|-------------------------|------------------------------------------|
+| `basePath` is null           | `ArgumentNullException` | `paramName: "basePath"`                  |
+| `relativePath` is null       | `ArgumentNullException` | `paramName: "relativePath"`              |
+| `relativePath` contains `..` | `ArgumentException`     | Invalid path component: `{relativePath}` |
+| `relativePath` is rooted     | `ArgumentException`     | Invalid path component: `{relativePath}` |
+| Result is outside `basePath` | `ArgumentException`     | Invalid path component: `{relativePath}` |
 
 **Algorithm:**
 
