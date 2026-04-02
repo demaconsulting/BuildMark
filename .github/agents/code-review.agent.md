@@ -1,7 +1,6 @@
 ---
 name: code-review
 description: Agent for performing formal reviews
-tools: [read, search, edit, execute, github, web, agent]
 user-invocable: true
 ---
 
@@ -18,7 +17,7 @@ Formal reviews are a quality enforcement mechanism, and as such MUST be performe
    to get the checklist to fill in
 2. Use `dotnet reviewmark --elaborate [review-set]` to get the files to review
 3. Review the files all together
-4. Populate the checklist with the findings to `.agent-logs/reviews/review-report-[review-set].md` of the project.
+4. Populate the checklist with the findings to `.agent-logs/reviews/review-report-{review-set}.md` of the project.
 
 # Don't Do These Things
 
@@ -32,13 +31,13 @@ Formal reviews are a quality enforcement mechanism, and as such MUST be performe
 
 # Reporting
 
-Upon completion create a summary in `.agent-logs/[agent-name]-[subject]-[unique-id].md`
+Upon completion create a summary in `.agent-logs/{agent-name}-{subject}-{unique-id}.md`
 of the project consisting of:
 
 ```markdown
 # Code Review Report
 
-**Result**: <SUCCEEDED/FAILED>
+**Result**: (SUCCEEDED|FAILED)
 
 ## Review Summary
 

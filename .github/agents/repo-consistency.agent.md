@@ -3,7 +3,6 @@ name: repo-consistency
 description: >
   Ensures downstream repositories remain consistent with the TemplateDotNetTool
   template patterns and best practices.
-tools: [read, search, edit, execute, github, agent]
 user-invocable: true
 ---
 
@@ -43,13 +42,13 @@ benefit from template evolution while respecting project-specific customizations
 
 # Reporting
 
-Upon completion create a summary in `.agent-logs/[agent-name]-[subject]-[unique-id].md`
+Upon completion create a summary in `.agent-logs/{agent-name}-{subject}-{unique-id}.md`
 of the project consisting of:
 
 ```markdown
 # Repo Consistency Report
 
-**Result**: <SUCCEEDED/FAILED>
+**Result**: (SUCCEEDED|FAILED)
 
 ## Consistency Analysis
 
