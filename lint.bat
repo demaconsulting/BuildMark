@@ -2,7 +2,7 @@
 setlocal
 
 REM Comprehensive Linting Script
-REM
+REM 
 REM PURPOSE:
 REM - Run ALL lint checks when executed (no options or modes)
 REM - Output lint failures directly for agent parsing

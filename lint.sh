@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Comprehensive Linting Script
-#
+# 
 # PURPOSE:
 # - Run ALL lint checks when executed (no options or modes)
 # - Output lint failures directly for agent parsing
