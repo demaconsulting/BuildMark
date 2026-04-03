@@ -60,7 +60,7 @@ BuildMark is composed of four subsystems and a top-level entry point:
 
 ## System-Wide Design Constraints
 
-- **Target framework**: .NET 8 and .NET 9
+- **Target framework**: .NET 8, .NET 9, and .NET 10
 - **Platform support**: Windows, Linux, macOS
 - **Packaging**: Published as a .NET global tool (`dotnet tool install`)
 - **Authentication**: GitHub token supplied via `GH_TOKEN` environment variable,
