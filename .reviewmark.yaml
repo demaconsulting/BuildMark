@@ -17,7 +17,7 @@ reviews:
   - id: BuildMark-Program
     title: Review of BuildMark Program Unit
     paths:
-      - "docs/reqstream/unit-program.yaml"
+      - "docs/reqstream/program.yaml"
       - "docs/design/program.md"
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
@@ -25,7 +25,7 @@ reviews:
   - id: BuildMark-Context
     title: Review of BuildMark Context Unit
     paths:
-      - "docs/reqstream/cli/unit-context.yaml"
+      - "docs/reqstream/cli/context.yaml"
       - "docs/design/cli/context.md"
       - "src/**/Cli/Context.cs"
       - "test/**/Cli/ContextTests.cs"
@@ -33,7 +33,7 @@ reviews:
   - id: BuildMark-Validation
     title: Review of BuildMark Validation Unit
     paths:
-      - "docs/reqstream/self-test/unit-validation.yaml"
+      - "docs/reqstream/self-test/validation.yaml"
       - "docs/design/self-test/validation.md"
       - "src/**/SelfTest/Validation.cs"
       - "test/**/SelfTest/ValidationTests.cs"
@@ -41,7 +41,7 @@ reviews:
   - id: BuildMark-PathHelpers
     title: Review of BuildMark PathHelpers Unit
     paths:
-      - "docs/reqstream/utilities/unit-path-helpers.yaml"
+      - "docs/reqstream/utilities/path-helpers.yaml"
       - "docs/design/utilities/path-helpers.md"
       - "src/**/Utilities/PathHelpers.cs"
       - "test/**/Utilities/PathHelpersTests.cs"
@@ -49,11 +49,11 @@ reviews:
   - id: BuildMark-GitHubRepoConnector
     title: Review of BuildMark GitHubRepoConnector Unit
     paths:
-      - "docs/reqstream/repo-connectors/unit-github-repo-connector.yaml"
+      - "docs/reqstream/repo-connectors/github-repo-connector.yaml"
       - "docs/design/repo-connectors/github-repo-connector.md"
-      - "src/**/GitHub/GitHubRepoConnector.cs"
-      - "src/**/GitHub/GitHubGraphQLClient.cs"
-      - "src/**/GitHub/GitHubGraphQLTypes.cs"
+      - "src/**/RepoConnectors/GitHubRepoConnector.cs"
+      - "src/**/RepoConnectors/GitHub/GitHubGraphQLClient.cs"
+      - "src/**/RepoConnectors/GitHub/GitHubGraphQLTypes.cs"
       - "test/**/RepoConnectors/GitHub/GitHubRepoConnectorTests.cs"
       - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientFindIssueIdsTests.cs"
       - "test/**/RepoConnectors/GitHub/GitHubGraphQLClientGetAllIssuesTests.cs"
@@ -69,7 +69,7 @@ reviews:
   - id: BuildMark-Cli
     title: Review of BuildMark Cli subsystem (command-line interface)
     paths:
-      - "docs/reqstream/cli/subsystem-cli.yaml"
+      - "docs/reqstream/cli/cli.yaml"
       - "docs/design/cli/cli.md"
       - "docs/design/cli/context.md"
       - "docs/design/program.md"
@@ -77,39 +77,40 @@ reviews:
   - id: BuildMark-SelfTest
     title: Review of BuildMark SelfTest subsystem (self-validation)
     paths:
-      - "docs/reqstream/self-test/subsystem-self-test.yaml"
+      - "docs/reqstream/self-test/self-test.yaml"
       - "docs/design/self-test/self-test.md"
       - "docs/design/self-test/validation.md"
 
   - id: BuildMark-Utilities
     title: Review of BuildMark Utilities subsystem (shared utilities)
     paths:
-      - "docs/reqstream/utilities/subsystem-utilities.yaml"
+      - "docs/reqstream/utilities/utilities.yaml"
       - "docs/design/utilities/utilities.md"
       - "docs/design/utilities/path-helpers.md"
 
   - id: BuildMark-RepoConnectors
     title: Review of BuildMark RepoConnectors subsystem (repository connectors)
     paths:
-      - "docs/reqstream/repo-connectors/subsystem-repo-connectors.yaml"   # subsystem requirements
-      - "docs/design/repo-connectors/repo-connectors.md"                  # subsystem design
-      - "docs/design/repo-connectors/github-repo-connector.md"            # GitHubRepoConnector unit design
-      - "src/**/RepoConnectors/IRepoConnector.cs"                         # connector interface
-      - "src/**/RepoConnectors/RepoConnectorBase.cs"                      # connector base class
-      - "src/**/RepoConnectors/RepoConnectorFactory.cs"                   # connector factory
-      - "src/**/RepoConnectors/MockRepoConnector.cs"                      # mock connector
-      - "src/**/RepoConnectors/ProcessRunner.cs"                          # process runner
-      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"                # mock connector tests
-      - "test/**/RepoConnectors/ProcessRunnerTests.cs"                    # process runner tests
-      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"             # factory tests
+      - "docs/reqstream/repo-connectors/repo-connectors.yaml"                  # subsystem requirements
+      - "docs/design/repo-connectors/repo-connectors.md"                       # subsystem design
+      - "docs/design/repo-connectors/github-repo-connector.md"                 # GitHubRepoConnector unit design
+      - "src/**/RepoConnectors/IRepoConnector.cs"                              # connector interface
+      - "src/**/RepoConnectors/RepoConnectorBase.cs"                           # connector base class
+      - "src/**/RepoConnectors/RepoConnectorFactory.cs"                        # connector factory
+      - "src/**/RepoConnectors/MockRepoConnector.cs"                           # mock connector
+      - "src/**/RepoConnectors/ProcessRunner.cs"                               # process runner
+      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"                     # mock connector tests
+      - "test/**/RepoConnectors/ProcessRunnerTests.cs"                         # process runner tests
+      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"                  # factory tests
 
   # System review
   - id: BuildMark-System
     title: Review of BuildMark system-level behavior and integration
     paths:
-      - "docs/reqstream/buildmark-system.yaml"
+      - "docs/reqstream/system.yaml"
       - "docs/reqstream/platform-requirements.yaml"
       - "docs/design/introduction.md"
+      - "docs/design/system.md"
       - "test/**/IntegrationTests.cs"
       - "test/**/Runner.cs"
       - "test/**/AssemblyInfo.cs"
@@ -125,14 +126,3 @@ reviews:
     paths:
       - "requirements.yaml"
       - "docs/reqstream/**/*.yaml"
-
-  # OTS dependency reviews
-  - id: OTS-Dependencies
-    title: Review of Off-The-Shelf Software Dependencies
-    paths:
-      - "docs/reqstream/ots-mstest.yaml"
-      - "docs/reqstream/ots-reqstream.yaml"
-      - "docs/reqstream/ots-buildmark.yaml"
-      - "docs/reqstream/ots-versionmark.yaml"
-      - "docs/reqstream/ots-sarifmark.yaml"
-      - "docs/reqstream/ots-sonarmark.yaml"
