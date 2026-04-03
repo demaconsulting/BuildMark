@@ -186,7 +186,7 @@ Each test in the report proves:
 - **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
 
-See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/guide/guide.md) for more details
+See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md) for more details
 on the self-validation tests.
 
 On validation failure the tool will exit with a non-zero exit code.

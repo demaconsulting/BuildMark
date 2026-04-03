@@ -20,6 +20,7 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.TestResults.IO;
 
 namespace DemaConsulting.BuildMark;
