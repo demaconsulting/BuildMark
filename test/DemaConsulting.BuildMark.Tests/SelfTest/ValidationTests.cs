@@ -46,6 +46,8 @@ public class ValidationTests
             using var outputWriter = new StringWriter();
             using var errorWriter = new StringWriter();
 
+            var originalOut = Console.Out;
+            var originalError = Console.Error;
             try
             {
                 // Capture console output
@@ -67,10 +69,8 @@ public class ValidationTests
             finally
             {
                 // Restore console output
-                var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-                Console.SetOut(standardOutput);
-                var standardError = new StreamWriter(Console.OpenStandardError()) { AutoFlush = true };
-                Console.SetError(standardError);
+                Console.SetOut(originalOut);
+                Console.SetError(originalError);
             }
         }
         finally
@@ -101,6 +101,8 @@ public class ValidationTests
             using var outputWriter = new StringWriter();
             using var errorWriter = new StringWriter();
 
+            var originalOut = Console.Out;
+            var originalError = Console.Error;
             try
             {
                 // Capture console output
@@ -122,10 +124,8 @@ public class ValidationTests
             finally
             {
                 // Restore console output
-                var standardOutput = new StreamWriter(Console.OpenStandardOutput()) { AutoFlush = true };
-                Console.SetOut(standardOutput);
-                var standardError = new StreamWriter(Console.OpenStandardError()) { AutoFlush = true };
-                Console.SetError(standardError);
+                Console.SetOut(originalOut);
+                Console.SetError(originalError);
             }
         }
         finally

@@ -54,18 +54,26 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         // Initialize HTTP client with authentication and user agent headers
         var httpClient = new HttpClient();
-        httpClient.DefaultRequestHeaders.Authorization =
-            new AuthenticationHeaderValue("Bearer", token);
-        httpClient.DefaultRequestHeaders.UserAgent.Add(
-            new ProductInfoHeaderValue("BuildMark", "1.0"));
-
-        // Create GraphQL HTTP client with the configured HTTP client
-        var options = new GraphQLHttpClientOptions
+        try
         {
-            EndPoint = new Uri(graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint)
-        };
-        _graphqlClient = new GraphQLHttpClient(options, new SystemTextJsonSerializer(), httpClient);
-        _ownsGraphQLClient = true;
+            httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue("Bearer", token);
+            httpClient.DefaultRequestHeaders.UserAgent.Add(
+                new ProductInfoHeaderValue("BuildMark", "1.0"));
+
+            // Create GraphQL HTTP client with the configured HTTP client
+            var options = new GraphQLHttpClientOptions
+            {
+                EndPoint = new Uri(graphqlEndpoint ?? DefaultGitHubGraphQLEndpoint)
+            };
+            _graphqlClient = new GraphQLHttpClient(options, new SystemTextJsonSerializer(), httpClient);
+            _ownsGraphQLClient = true;
+        }
+        catch
+        {
+            httpClient.Dispose();
+            throw;
+        }
     }
 
     /// <summary>
