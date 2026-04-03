@@ -29,6 +29,20 @@ sections:
           - BuildMark-GitHub-BuildInformation
           - BuildMark-GitHub-GraphQLClient
 
+      - id: BuildMark-RepoConnectors-ConnectorBase
+        title: >-
+          The RepoConnectors subsystem shall provide a common interface and base class for all repository connectors.
+        justification: |
+          A shared interface and base class ensure that all connector implementations
+          are interchangeable and benefit from common utilities such as process
+          execution delegation and version-list search.
+        tests:
+          - MockRepoConnector_ImplementsInterface
+          - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+        children:
+          - BuildMark-RepoConnectorBase-Interface
+          - BuildMark-RepoConnectorBase-CommandExecution
+
       - id: BuildMark-RepoConnectors-MockConnector
         title: The RepoConnectors subsystem shall provide a mock connector for testing and development.
         justification: |
@@ -40,6 +54,8 @@ sections:
           - MockRepoConnector_ImplementsInterface
           - MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion
           - MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
+        children:
+          - BuildMark-MockRepoConnector-Deterministic
 
       - id: BuildMark-RepoConnectors-ProcessRunner
         title: The RepoConnectors subsystem shall provide a process execution utility for running shell commands.
@@ -54,6 +70,8 @@ sections:
           - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
           - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
           - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+        children:
+          - BuildMark-ProcessRunner-RunAsync
 
       - id: BuildMark-RepoConnectors-Factory
         title: The RepoConnectors subsystem shall provide a factory for creating the appropriate repository connector.
@@ -64,3 +82,5 @@ sections:
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+        children:
+          - BuildMark-RepoConnectorFactory-Create

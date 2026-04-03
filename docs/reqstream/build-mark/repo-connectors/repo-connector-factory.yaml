@@ -1,0 +1,19 @@
+---
+# Software Unit Requirements for the RepoConnectorFactory Class
+#
+# RepoConnectorFactory creates the appropriate IRepoConnector implementation
+# based on the runtime environment (GitHub Actions environment variables,
+# or git remote URL inspection).
+
+sections:
+  - title: RepoConnectorFactory Unit Requirements
+    requirements:
+      - id: BuildMark-RepoConnectorFactory-Create
+        title: The RepoConnectorFactory class shall create the appropriate repository connector for the environment.
+        justification: |
+          The factory encapsulates connector selection logic so that the Program class
+          does not need to know which connector to use. The correct connector is chosen
+          automatically based on GitHub Actions environment variables or git remote URL.
+        tests:
+          - RepoConnectorFactory_Create_ReturnsConnector
+          - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
