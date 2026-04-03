@@ -1,11 +1,11 @@
 ---
 resource-path:
-  - docs/guide
+  - docs/user_guide
   - docs/template
 
 input-files:
-  - docs/guide/title.txt
-  - docs/guide/guide.md
+  - docs/user_guide/title.txt
+  - docs/user_guide/introduction.md
 
 template: template.html
 

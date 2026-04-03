@@ -6,7 +6,7 @@ needs-review:
   - "docs/reqstream/**/*.yaml"
   - "docs/design/**/*.md"
   - "README.md"
-  - "docs/guide/**/*.md"
+  - "docs/user_guide/**/*.md"
   - "!**/obj/**"
   - "!**/bin/**"
 
@@ -15,7 +15,6 @@ evidence-source:
   location: https://raw.githubusercontent.com/demaconsulting/BuildMark/reviews/index.json
 
 reviews:
-  # Software unit reviews - [System]-[Unit] and [System]-[Subsystem]-[Unit] patterns
   - id: BuildMark-Program
     title: Review of BuildMark Program Unit
     paths:
@@ -67,7 +66,6 @@ reviews:
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandlerTests.cs"
       - "test/**/RepoConnectors/GitHub/MockableGitHubRepoConnector.cs"
 
-  # Subsystem reviews - [System]-[Subsystem] pattern
   - id: BuildMark-Cli
     title: Review of BuildMark Cli subsystem (command-line interface)
     paths:
@@ -75,6 +73,7 @@ reviews:
       - "docs/design/build-mark/cli/cli.md"
       - "docs/design/build-mark/cli/context.md"
       - "docs/design/build-mark/program.md"
+      - "test/**/Cli/ContextTests.cs"
 
   - id: BuildMark-SelfTest
     title: Review of BuildMark SelfTest subsystem (self-validation)
@@ -82,6 +81,7 @@ reviews:
       - "docs/reqstream/build-mark/self-test/self-test.yaml"
       - "docs/design/build-mark/self-test/self-test.md"
       - "docs/design/build-mark/self-test/validation.md"
+      - "test/**/SelfTest/ValidationTests.cs"
 
   - id: BuildMark-Utilities
     title: Review of BuildMark Utilities subsystem (shared utilities)
@@ -89,6 +89,7 @@ reviews:
       - "docs/reqstream/build-mark/utilities/utilities.yaml"
       - "docs/design/build-mark/utilities/utilities.md"
       - "docs/design/build-mark/utilities/path-helpers.md"
+      - "test/**/Utilities/PathHelpersTests.cs"
 
   - id: BuildMark-RepoConnectors
     title: Review of BuildMark RepoConnectors subsystem (repository connectors)
@@ -105,7 +106,6 @@ reviews:
       - "test/**/RepoConnectors/ProcessRunnerTests.cs"                             # process runner tests
       - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"                      # factory tests
 
-  # System architecture review - [System]-Architecture pattern
   - id: BuildMark-Architecture
     title: Review of BuildMark system-level behavior and integration
     paths:
@@ -117,13 +117,12 @@ reviews:
       - "test/**/Runner.cs"
       - "test/**/AssemblyInfo.cs"
 
-  # Design review - [System]-Design pattern
   - id: BuildMark-Design
     title: Review of BuildMark Software Design Document
     paths:
+      - "README.md"
       - "docs/design/**/*.md"
 
-  # All-requirements review - [System]-AllRequirements pattern
   - id: BuildMark-AllRequirements
     title: Review of all BuildMark requirements files
     paths:
