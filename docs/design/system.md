@@ -36,7 +36,7 @@ BuildMark is composed of four subsystems and a top-level entry point:
 [Command Line Args]
         │
         ▼
-  Context (Cli)          ← parses flags, opens log/report files
+  Context (Cli)          ← parses flags, opens log file
         │
         ▼
   Program.Run()
