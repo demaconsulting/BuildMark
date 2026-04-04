@@ -509,7 +509,7 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that a PR with a label that is a superstring of a known type is not incorrectly classified.
+    ///     Test that a PR with a label whose name contains a known type as a substring is not incorrectly classified.
     /// </summary>
     [TestMethod]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug()
@@ -549,7 +549,7 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
-    ///     Test that an open issue with a label that is a superstring of a known type is not a known issue.
+    ///     Test that an open issue with a label whose name contains a known type as a substring is not a known issue.
     /// </summary>
     [TestMethod]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue()

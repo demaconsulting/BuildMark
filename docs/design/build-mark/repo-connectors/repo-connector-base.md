@@ -18,18 +18,18 @@ shared utilities used by concrete connectors.
 
 `RepoConnectorBase` provides:
 
-| Member                                       | Kind              | Description                                               |
-|----------------------------------------------|-------------------|-----------------------------------------------------------|
-| `RunCommandAsync(command, arguments)`        | Protected virtual | Delegates to `ProcessRunner.RunAsync` for shell commands  |
-| `FindVersionIndex(versions, normalized)`     | Protected static  | Locates a version in a list by normalized version string  |
+| Member                                   | Kind              | Description                                          |
+|------------------------------------------|-------------------|------------------------------------------------------|
+| `RunCommandAsync(command, arguments)`    | Protected virtual | Delegates shell commands to `ProcessRunner.RunAsync` |
+| `FindVersionIndex(versions, normalized)` | Protected static  | Locates a version by normalized version string       |
 
 The `RunCommandAsync` method is `virtual` so that test subclasses can override it
 with mock implementations that return fixed strings without spawning real processes.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                              |
-|---------------------|---------------------------------------------------|
-| `ProcessRunner`     | Used by `RunCommandAsync` to execute shell commands |
-| `GitHubRepoConnector` | Concrete implementation that inherits this base  |
-| `MockRepoConnector` | Test implementation that overrides `RunCommandAsync` |
+| Unit / Subsystem      | Role                                                 |
+|-----------------------|------------------------------------------------------|
+| `ProcessRunner`       | Used by `RunCommandAsync` to execute shell commands  |
+| `GitHubRepoConnector` | Concrete implementation that inherits this base      |
+| `MockRepoConnector`   | Test implementation that overrides `RunCommandAsync` |

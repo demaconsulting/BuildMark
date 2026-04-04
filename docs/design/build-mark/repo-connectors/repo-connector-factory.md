@@ -20,9 +20,9 @@ If none of the above conditions are met the factory defaults to returning a new
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                          |
-|---------------------|---------------------------------------------------------------|
-| `IRepoConnector`    | Return type of `Create`                                       |
+| Unit / Subsystem      | Role                                                        |
+|-----------------------|-------------------------------------------------------------|
+| `IRepoConnector`      | Return type of `Create`                                     |
 | `GitHubRepoConnector` | The concrete connector returned by `Create`                 |
-| `ProcessRunner`     | Used via `TryRunAsync` to inspect the git remote URL          |
-| `Program`           | Calls `RepoConnectorFactory.Create()` to obtain a connector   |
+| `ProcessRunner`       | Used via `TryRunAsync` to inspect the git remote URL        |
+| `Program`             | Calls `RepoConnectorFactory.Create()` to obtain a connector |

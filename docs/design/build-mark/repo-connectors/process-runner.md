@@ -22,8 +22,8 @@ exceptions to its callers.
 
 ## Interactions
 
-| Unit / Subsystem  | Role                                                    |
-|-------------------|---------------------------------------------------------|
-| `RepoConnectorBase` | Delegates `RunCommandAsync` to `ProcessRunner.RunAsync` |
-| `RepoConnectorFactory` | Uses `TryRunAsync` to inspect the git remote URL    |
-| `GitHubRepoConnector` | Calls `RunCommandAsync` (via base) for git and gh CLI |
+| Unit / Subsystem       | Role                                                    |
+|------------------------|---------------------------------------------------------|
+| `RepoConnectorBase`    | Delegates `RunCommandAsync` to `ProcessRunner.RunAsync` |
+| `RepoConnectorFactory` | Uses `TryRunAsync` to inspect the git remote URL        |
+| `GitHubRepoConnector`  | Calls `RunCommandAsync` (via base) for git and gh CLI   |
