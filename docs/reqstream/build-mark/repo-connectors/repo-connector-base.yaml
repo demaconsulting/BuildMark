@@ -1,0 +1,29 @@
+---
+# Software Unit Requirements for the IRepoConnector Interface and RepoConnectorBase Class
+#
+# IRepoConnector defines the contract for all repository connectors.
+# RepoConnectorBase provides a common base implementation including process
+# execution delegation and version-list search utilities.
+
+sections:
+  - title: RepoConnectorBase Unit Requirements
+    requirements:
+      - id: BuildMark-RepoConnectorBase-Interface
+        title: The IRepoConnector interface shall define the contract for all repository connectors.
+        justification: |
+          A common interface ensures that all repository connectors are interchangeable,
+          enabling the factory and program to work with any connector implementation
+          without depending on concrete types.
+        tests:
+          - MockRepoConnector_ImplementsInterface
+          - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+
+      - id: BuildMark-RepoConnectorBase-CommandExecution
+        title: The RepoConnectorBase class shall provide a virtual command execution method for shell commands.
+        justification: |
+          Abstracting command execution behind a virtual method allows test subclasses
+          to override it with mock implementations, enabling deterministic unit tests
+          that do not spawn real processes.
+        tests:
+          - MockRepoConnector_Constructor_CreatesInstance
+          - GitHubRepoConnector_Constructor_CreatesInstance

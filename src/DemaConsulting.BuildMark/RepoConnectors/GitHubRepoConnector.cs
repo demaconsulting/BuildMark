@@ -846,7 +846,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var matchingType = labels
             .Select(label => label.Name.ToLowerInvariant())
             .SelectMany(lowerLabel => LabelTypeMap
-                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Where(kvp => lowerLabel == kvp.Key)
                 .Select(kvp => kvp.Value))
             .FirstOrDefault();
 
@@ -865,7 +865,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         var matchingType = labels
             .Select(label => label.Name.ToLowerInvariant())
             .SelectMany(lowerLabel => LabelTypeMap
-                .Where(kvp => lowerLabel.Contains(kvp.Key))
+                .Where(kvp => lowerLabel == kvp.Key)
                 .Select(kvp => kvp.Value))
             .FirstOrDefault();
 

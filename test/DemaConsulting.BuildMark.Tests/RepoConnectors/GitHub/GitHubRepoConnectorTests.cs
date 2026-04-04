@@ -507,4 +507,81 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(buildInfo.Bugs);
         Assert.IsNotNull(buildInfo.KnownIssues);
     }
+
+    /// <summary>
+    ///     Test that a PR with a label whose name contains a known type as a substring is not incorrectly classified.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug()
+    {
+        // Arrange - PR with label "debugging" (contains "bug" as substring but is not "bug")
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(
+                    Number: 100,
+                    Title: "Add debug logging",
+                    Url: "https://github.com/test/repo/pull/100",
+                    Merged: true,
+                    MergeCommitSha: "commit1",
+                    HeadRefOid: "debug-branch",
+                    Labels: ["debugging"]))
+            .AddIssuesResponse()
+            .AddTagsResponse(new MockTag("v1.0.0", "commit1"))
+            .AddResponse("closingIssuesReferences", @"{""data"":{""repository"":{""pullRequest"":{""closingIssuesReferences"":{""nodes"":[],""pageInfo"":{""hasNextPage"":false,""endCursor"":null}}}}}}");
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert - PR with "debugging" label must NOT be classified as a bug
+        Assert.IsNotNull(buildInfo);
+        var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
+        Assert.IsNull(bugPR, "PR with 'debugging' label must not be classified as a bug");
+    }
+
+    /// <summary>
+    ///     Test that an open issue with a label whose name contains a known type as a substring is not a known issue.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue()
+    {
+        // Arrange - Open issue with label "debugging" (contains "bug" as substring but is not "bug")
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse(
+                new MockIssue(
+                    Number: 201,
+                    Title: "Improve debug output",
+                    Url: "https://github.com/test/repo/issues/201",
+                    State: "OPEN",
+                    Labels: ["debugging"]))
+            .AddTagsResponse(new MockTag("v1.0.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert - Open issue with "debugging" label must NOT be classified as a known issue
+        Assert.IsNotNull(buildInfo);
+        var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Index == 201);
+        Assert.IsNull(knownIssue, "Issue with 'debugging' label must not be classified as a known issue");
+    }
 }

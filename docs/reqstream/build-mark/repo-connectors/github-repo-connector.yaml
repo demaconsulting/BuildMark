@@ -26,6 +26,8 @@ sections:
           - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
           - GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow
           - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+          - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
+          - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
 
       - id: BuildMark-GitHub-GraphQLClient
         title: The GitHubRepoConnector class shall use a GraphQL client for GitHub API interactions.
