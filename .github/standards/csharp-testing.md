@@ -25,8 +25,8 @@ public void ServiceName_MethodName_Scenario_ExpectedBehavior()
 
 Use descriptive test names because test names appear in requirements traceability matrices and compliance reports.
 
-- **System tests**: `IntegrationTest_{Functionality}_{Scenario}_{ExpectedBehavior}`
-- **Subsystem tests**: `{SubsystemName}_{Functionality}_{Scenario}_{ExpectedBehavior}`
+- **System tests**: `{SystemName}_{Functionality}_{Scenario}_{ExpectedBehavior}`
+- **Subsystem tests**: `{SubsystemName}_{Functionality}_{Scenario}_{ExpectedBehavior}`  
 - **Unit tests**: `{ClassName}_{MethodUnderTest}_{Scenario}_{ExpectedBehavior}`
 - **Descriptive Scenarios**: Clearly describe the input condition being tested
 - **Expected Behavior**: State the expected outcome or exception
