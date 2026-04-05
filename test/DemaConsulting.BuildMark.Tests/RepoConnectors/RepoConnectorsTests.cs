@@ -119,7 +119,7 @@ public class RepoConnectorsTests
     }
 
     /// <summary>
-    ///     Test that the GitHub connector correctly categorises pull requests into changes and bugs.
+    ///     Test that the GitHub connector correctly categorizes pull requests into changes and bugs.
     /// </summary>
     [TestMethod]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges()
