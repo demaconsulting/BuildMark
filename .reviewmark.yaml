@@ -120,8 +120,8 @@ reviews:
       - "test/**/Utilities/PathHelpersTests.cs"
 
   # Unit reviews - RepoConnectors subsystem
-  - id: BuildMark-RepoConnectors-ConnectorBase
-    title: Review that BuildMark RepoConnectors ConnectorBase Unit Implementation is Correct
+  - id: BuildMark-RepoConnectors-RepoConnectorBase
+    title: Review that BuildMark RepoConnectors RepoConnectorBase Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml"
       - "docs/design/build-mark/repo-connectors/repo-connector-base.md"

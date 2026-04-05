@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
@@ -253,5 +254,171 @@ public class IntegrationTests
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
+    }
+
+    /// <summary>
+    ///     Test that the report generates a markdown file with version information.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_Report_GeneratesMarkdownWithVersionInformation()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with mock connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report file contains markdown title and version information
+            Assert.AreEqual(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("# Build Report", content);
+            Assert.Contains("## Version Information", content);
+            Assert.Contains("2.0.0", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the report contains changes and bug fixes with hyperlinks.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with mock connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report contains changes and bug fixes sections with linked items
+            Assert.AreEqual(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("## Changes", content);
+            Assert.Contains("## Bugs Fixed", content);
+            Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the report shows the version range from the previous release.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with mock connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report identifies the previous version as the baseline of the version range
+            Assert.AreEqual(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("Previous Version", content);
+            Assert.Contains("ver-1.1.0", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the report includes known issues when the flag is set.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with mock connector and include-known-issues flag
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report includes a known issues section
+            Assert.AreEqual(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("## Known Issues", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that report-depth 2 uses level-two headings in the report.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with mock connector and report depth 2
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--report-depth", "2", "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report uses level-two heading for the title and level-three for sections
+            Assert.AreEqual(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("## Build Report", content);
+            Assert.Contains("### Version Information", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
     }
 }
