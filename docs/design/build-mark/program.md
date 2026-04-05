@@ -33,16 +33,17 @@ arguments and delegates to `Run`. Any `ArgumentException` or
 `Context.WriteError`, and results in an exit code of 1. Any other exception is
 re-thrown after logging so the runtime can report an unhandled exception.
 
-### `Run(Context context) → int`
+### `Run(Context context) → void`
 
 Executes the main program logic against an already-constructed `Context`. The
 method applies the following priority order:
 
-1. If `context.Version` is set, print the version string and return 0.
-2. If `context.Help` is set, print the usage message and return 0.
-3. If `context.Validate` is set, delegate to `Validation.Run(context)` and return
-   the context exit code.
+1. If `context.Version` is set, print the version string and return.
+2. If `context.Help` is set, print the usage message and return.
+3. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
 4. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
+
+The exit code is managed through `context.ExitCode` rather than as a return value.
 
 ### `ProcessBuildNotes(Context context)`
 
