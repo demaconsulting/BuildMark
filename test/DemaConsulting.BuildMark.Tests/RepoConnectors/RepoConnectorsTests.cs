@@ -266,8 +266,9 @@ public class RepoConnectorsTests
         // Arrange: create a MockRepoConnector
         var connector = new MockRepoConnector();
 
-        // Assert: MockRepoConnector derives from the base class and satisfies the interface
+        // Assert: MockRepoConnector derives from the base class and satisfies the shared interface
         Assert.IsInstanceOfType<RepoConnectorBase>(connector);
+        Assert.IsInstanceOfType<IRepoConnector>(connector);
         Assert.IsInstanceOfType<MockRepoConnector>(connector);
     }
 
@@ -280,8 +281,9 @@ public class RepoConnectorsTests
         // Arrange: create a GitHubRepoConnector
         var connector = new GitHubRepoConnector();
 
-        // Assert: GitHubRepoConnector derives from the base class and satisfies the interface
+        // Assert: GitHubRepoConnector derives from the base class and satisfies the shared interface
         Assert.IsInstanceOfType<RepoConnectorBase>(connector);
+        Assert.IsInstanceOfType<IRepoConnector>(connector);
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
 

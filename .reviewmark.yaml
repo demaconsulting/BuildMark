@@ -82,6 +82,7 @@ reviews:
       - "test/**/RepoConnectors/MockRepoConnectorTests.cs"
       - "test/**/RepoConnectors/ProcessRunnerTests.cs"
       - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
+      - "test/**/RepoConnectors/RepoConnectorsTests.cs"
 
   # Top-level unit reviews
   - id: BuildMark-Program
