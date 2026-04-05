@@ -126,8 +126,7 @@ sections:
               ensures consistency in release documentation by deriving information directly from
               source control history.
             tests:
-              - BuildMark_GitIntegration
-              - BuildMark_MarkdownReportGeneration
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-RepoConnectors-GitHubConnector
 
@@ -138,7 +137,7 @@ sections:
               work items, enabling comprehensive release notes that link features, bug fixes, and
               improvements to their corresponding GitHub issues and pull requests.
             tests:
-              - BuildMark_IssueTracking
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-RepoConnectors-GitHubConnector
 
@@ -149,7 +148,7 @@ sections:
               accurately capture what changed in each version. This is essential for semantic
               versioning workflows and helps users understand the scope of changes between releases.
             tests:
-              - BuildMark_GitIntegration
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-RepoConnectors-GitHubConnector
 
@@ -163,7 +162,6 @@ sections:
               markdown format ensures broad compatibility and easy integration into existing
               documentation workflows.
             tests:
-              - BuildMark_MarkdownReportGeneration
               - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
@@ -176,7 +174,6 @@ sections:
               reports integrate properly regardless of the document hierarchy.
             tests:
               - IntegrationTest_ReportDepthParameter_IsAccepted
-              - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
             children:
               - BuildMark-Program-Report
 
@@ -187,7 +184,7 @@ sections:
               providing essential context for users reviewing changes and enabling proper
               organization of release documentation.
             tests:
-              - BuildMark_MarkdownReportGeneration
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 
@@ -198,8 +195,7 @@ sections:
               release, helping users understand the evolution of the software and make informed
               decisions about upgrading.
             tests:
-              - BuildMark_MarkdownReportGeneration
-              - BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 
@@ -210,8 +206,7 @@ sections:
               maintenance, and helps users determine if specific problems they encountered have
               been addressed in newer versions.
             tests:
-              - BuildMark_MarkdownReportGeneration
-              - BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 
@@ -222,7 +217,7 @@ sections:
               known pitfalls, and manages expectations about current limitations. This improves
               user trust and reduces support burden.
             tests:
-              - BuildMark_KnownIssuesReporting
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 
@@ -233,7 +228,7 @@ sections:
               multiple versions or focused notes for specific releases. This flexibility supports
               various documentation scenarios and user needs.
             tests:
-              - BuildMark_MarkdownReportGeneration
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 
@@ -244,9 +239,7 @@ sections:
               enabling users to investigate specific items of interest and maintaining
               traceability between release notes and source repository work items.
             tests:
-              - BuildMark_MarkdownReportGeneration
-              - BuildInformation_ToMarkdown_IncludesIssueLinks
-              - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-RepoConnectors-GitHubConnector
 
@@ -257,11 +250,7 @@ sections:
               markdown processors and documentation platforms. Well-structured documents are
               more readable, professional, and maintainable.
             tests:
-              - BuildMark_MarkdownReportGeneration
-              - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
-              - BuildInformation_ToMarkdown_UsesBulletLists
-              - BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
-              - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
+              - IntegrationTest_ReportParameter_IsAccepted
             children:
               - BuildMark-Program-Report
 

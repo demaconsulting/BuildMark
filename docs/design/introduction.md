@@ -42,6 +42,10 @@ BuildMark (System)
 ├── Utilities (Subsystem)
 │   └── PathHelpers (Unit)
 └── RepoConnectors (Subsystem)
+    ├── RepoConnectorBase (Unit)
+    ├── MockRepoConnector (Unit)
+    ├── ProcessRunner (Unit)
+    ├── RepoConnectorFactory (Unit)
     └── GitHubRepoConnector (Unit)
 ```
 

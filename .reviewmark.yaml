@@ -15,40 +15,145 @@ evidence-source:
   location: https://raw.githubusercontent.com/demaconsulting/BuildMark/reviews/index.json
 
 reviews:
+  # Purpose review - proves advertised features match system design
+  - id: Purpose
+    title: Review that Advertised Features Match System Design
+    paths:
+      - "README.md"
+      - "docs/user_guide/**/*.md"
+      - "docs/reqstream/build-mark/build-mark.yaml"
+      - "docs/design/introduction.md"
+      - "docs/design/build-mark/build-mark.md"
+
+  # System-level reviews
+  - id: BuildMark-Architecture
+    title: Review that BuildMark Architecture Satisfies Requirements
+    paths:
+      - "docs/reqstream/build-mark/build-mark.yaml"
+      - "docs/reqstream/build-mark/platform-requirements.yaml"
+      - "docs/design/introduction.md"
+      - "docs/design/build-mark/build-mark.md"
+      - "test/**/IntegrationTests.cs"
+      - "test/**/Runner.cs"
+      - "test/**/AssemblyInfo.cs"
+
+  - id: BuildMark-Design
+    title: Review that BuildMark Design is Consistent and Complete
+    paths:
+      - "docs/reqstream/build-mark/build-mark.yaml"
+      - "docs/reqstream/build-mark/platform-requirements.yaml"
+      - "docs/design/introduction.md"
+      - "docs/design/build-mark/**/*.md"
+
+  - id: BuildMark-AllRequirements
+    title: Review that All BuildMark Requirements are Complete
+    paths:
+      - "requirements.yaml"
+      - "docs/reqstream/build-mark/**/*.yaml"
+      - "docs/reqstream/ots/**/*.yaml"
+
+  # Subsystem reviews
+  - id: BuildMark-Cli
+    title: Review that BuildMark Cli Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/cli/cli.yaml"
+      - "docs/design/build-mark/cli/cli.md"
+      - "test/**/Cli/ContextTests.cs"
+
+  - id: BuildMark-SelfTest
+    title: Review that BuildMark SelfTest Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/self-test/self-test.yaml"
+      - "docs/design/build-mark/self-test/self-test.md"
+      - "test/**/SelfTest/ValidationTests.cs"
+
+  - id: BuildMark-Utilities
+    title: Review that BuildMark Utilities Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/utilities/utilities.yaml"
+      - "docs/design/build-mark/utilities/utilities.md"
+      - "test/**/Utilities/PathHelpersTests.cs"
+
+  - id: BuildMark-RepoConnectors
+    title: Review that BuildMark RepoConnectors Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml"
+      - "docs/design/build-mark/repo-connectors/repo-connectors.md"
+      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"
+      - "test/**/RepoConnectors/ProcessRunnerTests.cs"
+      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
+
+  # Top-level unit reviews
   - id: BuildMark-Program
-    title: Review of BuildMark Program Unit
+    title: Review that BuildMark Program Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/program.yaml"
       - "docs/design/build-mark/program.md"
       - "src/**/Program.cs"
       - "test/**/ProgramTests.cs"
 
+  # Unit reviews - Cli subsystem
   - id: BuildMark-Cli-Context
-    title: Review of BuildMark Cli/Context Unit
+    title: Review that BuildMark Cli Context Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/cli/context.yaml"
       - "docs/design/build-mark/cli/context.md"
       - "src/**/Cli/Context.cs"
       - "test/**/Cli/ContextTests.cs"
 
+  # Unit reviews - SelfTest subsystem
   - id: BuildMark-SelfTest-Validation
-    title: Review of BuildMark SelfTest/Validation Unit
+    title: Review that BuildMark SelfTest Validation Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/self-test/validation.yaml"
       - "docs/design/build-mark/self-test/validation.md"
       - "src/**/SelfTest/Validation.cs"
       - "test/**/SelfTest/ValidationTests.cs"
 
+  # Unit reviews - Utilities subsystem
   - id: BuildMark-Utilities-PathHelpers
-    title: Review of BuildMark Utilities/PathHelpers Unit
+    title: Review that BuildMark Utilities PathHelpers Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/utilities/path-helpers.yaml"
       - "docs/design/build-mark/utilities/path-helpers.md"
       - "src/**/Utilities/PathHelpers.cs"
       - "test/**/Utilities/PathHelpersTests.cs"
 
+  # Unit reviews - RepoConnectors subsystem
+  - id: BuildMark-RepoConnectors-ConnectorBase
+    title: Review that BuildMark RepoConnectors ConnectorBase Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml"
+      - "docs/design/build-mark/repo-connectors/repo-connector-base.md"
+      - "src/**/RepoConnectors/IRepoConnector.cs"
+      - "src/**/RepoConnectors/RepoConnectorBase.cs"
+
+  - id: BuildMark-RepoConnectors-MockRepoConnector
+    title: Review that BuildMark RepoConnectors MockRepoConnector Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/mock-repo-connector.yaml"
+      - "docs/design/build-mark/repo-connectors/mock-repo-connector.md"
+      - "src/**/RepoConnectors/MockRepoConnector.cs"
+      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"
+
+  - id: BuildMark-RepoConnectors-ProcessRunner
+    title: Review that BuildMark RepoConnectors ProcessRunner Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/process-runner.yaml"
+      - "docs/design/build-mark/repo-connectors/process-runner.md"
+      - "src/**/RepoConnectors/ProcessRunner.cs"
+      - "test/**/RepoConnectors/ProcessRunnerTests.cs"
+
+  - id: BuildMark-RepoConnectors-RepoConnectorFactory
+    title: Review that BuildMark RepoConnectors RepoConnectorFactory Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml"
+      - "docs/design/build-mark/repo-connectors/repo-connector-factory.md"
+      - "src/**/RepoConnectors/RepoConnectorFactory.cs"
+      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
+
   - id: BuildMark-RepoConnectors-GitHubRepoConnector
-    title: Review of BuildMark RepoConnectors/GitHubRepoConnector Unit
+    title: Review that BuildMark RepoConnectors GitHubRepoConnector Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/repo-connectors/github-repo-connector.yaml"
       - "docs/design/build-mark/repo-connectors/github-repo-connector.md"
@@ -65,88 +170,3 @@ reviews:
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandler.cs"
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandlerTests.cs"
       - "test/**/RepoConnectors/GitHub/MockableGitHubRepoConnector.cs"
-
-  - id: BuildMark-RepoConnectors-ConnectorBase
-    title: Review of BuildMark RepoConnectors/ConnectorBase Unit
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml"
-      - "docs/design/build-mark/repo-connectors/repo-connector-base.md"
-      - "src/**/RepoConnectors/IRepoConnector.cs"
-      - "src/**/RepoConnectors/RepoConnectorBase.cs"
-
-  - id: BuildMark-RepoConnectors-MockConnector
-    title: Review of BuildMark RepoConnectors/MockRepoConnector Unit
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/mock-repo-connector.yaml"
-      - "docs/design/build-mark/repo-connectors/mock-repo-connector.md"
-      - "src/**/RepoConnectors/MockRepoConnector.cs"
-      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"
-
-  - id: BuildMark-RepoConnectors-ProcessRunner
-    title: Review of BuildMark RepoConnectors/ProcessRunner Unit
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/process-runner.yaml"
-      - "docs/design/build-mark/repo-connectors/process-runner.md"
-      - "src/**/RepoConnectors/ProcessRunner.cs"
-      - "test/**/RepoConnectors/ProcessRunnerTests.cs"
-
-  - id: BuildMark-RepoConnectors-Factory
-    title: Review of BuildMark RepoConnectors/RepoConnectorFactory Unit
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml"
-      - "docs/design/build-mark/repo-connectors/repo-connector-factory.md"
-      - "src/**/RepoConnectors/RepoConnectorFactory.cs"
-      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
-
-  - id: BuildMark-Cli
-    title: Review of BuildMark Cli subsystem (command-line interface)
-    paths:
-      - "docs/reqstream/build-mark/cli/cli.yaml"
-      - "docs/design/build-mark/cli/cli.md"
-      - "test/**/Cli/ContextTests.cs"
-
-  - id: BuildMark-SelfTest
-    title: Review of BuildMark SelfTest subsystem (self-validation)
-    paths:
-      - "docs/reqstream/build-mark/self-test/self-test.yaml"
-      - "docs/design/build-mark/self-test/self-test.md"
-      - "test/**/SelfTest/ValidationTests.cs"
-
-  - id: BuildMark-Utilities
-    title: Review of BuildMark Utilities subsystem (shared utilities)
-    paths:
-      - "docs/reqstream/build-mark/utilities/utilities.yaml"
-      - "docs/design/build-mark/utilities/utilities.md"
-      - "test/**/Utilities/PathHelpersTests.cs"
-
-  - id: BuildMark-RepoConnectors
-    title: Review of BuildMark RepoConnectors subsystem (repository connectors)
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml"
-      - "docs/design/build-mark/repo-connectors/repo-connectors.md"
-      - "test/**/RepoConnectors/MockRepoConnectorTests.cs"
-      - "test/**/RepoConnectors/ProcessRunnerTests.cs"
-      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
-
-  - id: BuildMark-Architecture
-    title: Review of BuildMark system-level behavior and integration
-    paths:
-      - "docs/reqstream/build-mark/build-mark.yaml"
-      - "docs/reqstream/build-mark/platform-requirements.yaml"
-      - "docs/design/introduction.md"
-      - "docs/design/build-mark/build-mark.md"
-      - "test/**/IntegrationTests.cs"
-      - "test/**/Runner.cs"
-      - "test/**/AssemblyInfo.cs"
-
-  - id: BuildMark-Design
-    title: Review of BuildMark Software Design Document
-    paths:
-      - "README.md"
-      - "docs/design/**/*.md"
-
-  - id: BuildMark-AllRequirements
-    title: Review of all BuildMark requirements files
-    paths:
-      - "requirements.yaml"
-      - "docs/reqstream/**/*.yaml"
