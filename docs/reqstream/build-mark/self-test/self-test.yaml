@@ -22,7 +22,6 @@ sections:
         tests:
           - Validation_Run_WithTrxResultsFile_WritesTrxFile
           - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-          - IntegrationTest_ValidateFlag_RunsSelfValidation
         children:
           - BuildMark-Validation-Run
 
@@ -37,7 +36,6 @@ sections:
         tests:
           - Validation_Run_WithTrxResultsFile_WritesTrxFile
           - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-          - IntegrationTest_ResultsParameter_IsAccepted
         children:
           - BuildMark-Validation-TrxOutput
           - BuildMark-Validation-JUnitOutput

@@ -16,7 +16,6 @@ sections:
         tests:
           - Program_Run_VersionFlag_OutputsVersionToConsole
           - Program_Version_ReturnsValidVersion
-          - IntegrationTest_VersionFlag_OutputsVersion
 
       - id: BuildMark-Program-Help
         title: The Program class shall support -?, -h, and --help flags to display usage information.
@@ -25,7 +24,6 @@ sections:
           external resources.
         tests:
           - Program_Run_HelpFlag_OutputsHelpMessage
-          - IntegrationTest_HelpFlag_OutputsUsageInformation
 
       - id: BuildMark-Program-Validate
         title: The Program class shall support --validate flag to invoke the self-validation framework.
@@ -34,7 +32,6 @@ sections:
           in the deployment environment.
         tests:
           - Program_Run_ValidateFlag_OutputsValidationMessage
-          - IntegrationTest_ValidateFlag_RunsSelfValidation
 
       - id: BuildMark-Program-Report
         title: The Program class shall generate build notes markdown reports when --report is specified.
@@ -44,5 +41,3 @@ sections:
           and generation of the output markdown report.
         tests:
           - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
-          - BuildMark_MarkdownReportGeneration
-          - IntegrationTest_ReportParameter_IsAccepted

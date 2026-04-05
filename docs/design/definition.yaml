@@ -20,6 +20,10 @@ input-files:
   - docs/design/build-mark/utilities/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
   - docs/design/build-mark/repo-connectors/repo-connectors.md
+  - docs/design/build-mark/repo-connectors/repo-connector-base.md
+  - docs/design/build-mark/repo-connectors/mock-repo-connector.md
+  - docs/design/build-mark/repo-connectors/process-runner.md
+  - docs/design/build-mark/repo-connectors/repo-connector-factory.md
   - docs/design/build-mark/repo-connectors/github-repo-connector.md
 template: template.html
 table-of-contents: true

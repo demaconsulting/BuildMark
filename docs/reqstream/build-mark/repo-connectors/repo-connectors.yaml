@@ -20,11 +20,12 @@ sections:
           and issues, and assemble them into structured build information. The GitHub
           connector satisfies this need for teams using GitHub as their source repository.
         tests:
-          - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
-          - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
-          - GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
-          - GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues
-          - GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+          - RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
+          - RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
           - BuildMark-GitHub-BuildInformation
           - BuildMark-GitHub-GraphQLClient
@@ -37,8 +38,8 @@ sections:
           are interchangeable and benefit from common utilities such as process
           execution delegation and version-list search.
         tests:
-          - MockRepoConnector_ImplementsInterface
-          - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_ConnectorBase_MockConnector_ImplementsInterface
+          - RepoConnectors_ConnectorBase_GitHubConnector_ImplementsInterface
         children:
           - BuildMark-RepoConnectorBase-Interface
           - BuildMark-RepoConnectorBase-CommandExecution
@@ -50,10 +51,10 @@ sections:
           without requiring an actual GitHub repository connection, ensuring tests are
           fast, deterministic, and independent of external services.
         tests:
-          - MockRepoConnector_Constructor_CreatesInstance
-          - MockRepoConnector_ImplementsInterface
-          - MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion
-          - MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
+          - RepoConnectors_MockConnector_Constructor_CreatesInstance
+          - RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion
+          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
         children:
           - BuildMark-MockRepoConnector-Deterministic
 
@@ -65,11 +66,11 @@ sections:
           utility provides a consistent, testable interface for process execution with
           proper error handling.
         tests:
-          - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
-          - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
-          - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+          - RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
+          - RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
         children:
           - BuildMark-ProcessRunner-RunAsync
 
@@ -80,7 +81,7 @@ sections:
           the correct connector implementation, enabling future extensibility with additional
           repository connector types.
         tests:
-          - RepoConnectorFactory_Create_ReturnsConnector
-          - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectors_Factory_Create_ReturnsConnector
+          - RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo
         children:
           - BuildMark-RepoConnectorFactory-Create

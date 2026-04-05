@@ -38,9 +38,6 @@ sections:
         tests:
           - Context_Create_LongVersionFlag_SetsVersionProperty
           - Context_Create_ShortVersionFlag_SetsVersionProperty
-          - Program_Run_VersionFlag_OutputsVersionToConsole
-          - Program_Version_ReturnsValidVersion
-          - IntegrationTest_VersionFlag_OutputsVersion
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -53,8 +50,6 @@ sections:
           - Context_Create_LongHelpFlag_SetsHelpProperty
           - Context_Create_ShortHelpFlag_SetsHelpProperty
           - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
-          - Program_Run_HelpFlag_OutputsHelpMessage
-          - IntegrationTest_HelpFlag_OutputsUsageInformation
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -66,7 +61,6 @@ sections:
         tests:
           - Context_Create_SilentFlag_SetsSilentProperty
           - Context_WriteLine_Silent_DoesNotWriteToConsole
-          - IntegrationTest_SilentFlag_SuppressesOutput
         children:
           - BuildMark-Context-Silent
 
@@ -78,7 +72,6 @@ sections:
           version numbers are determined externally.
         tests:
           - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
-          - IntegrationTest_BuildVersionParameter_IsAccepted
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -90,8 +83,6 @@ sections:
         tests:
           - Context_Create_ReportArgument_SetsReportFileProperty
           - Context_Create_ReportDepthArgument_SetsReportDepthProperty
-          - IntegrationTest_ReportParameter_IsAccepted
-          - IntegrationTest_ReportDepthParameter_IsAccepted
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -105,7 +96,6 @@ sections:
           - Context_Create_LogWithoutValue_ThrowsArgumentException
           - Context_WriteError_WithLogFile_WritesToLogFile
           - Context_WriteLine_WithLogFile_WritesToLogFile
-          - IntegrationTest_LogParameter_IsAccepted
         children:
           - BuildMark-Context-Output
 
@@ -116,8 +106,6 @@ sections:
           in the deployment environment.
         tests:
           - Context_Create_ValidateFlag_SetsValidateProperty
-          - Program_Run_ValidateFlag_OutputsValidationMessage
-          - IntegrationTest_ValidateFlag_RunsSelfValidation
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -129,7 +117,6 @@ sections:
         tests:
           - Context_Create_ResultsArgument_SetsResultsFileProperty
           - Context_Create_ResultsWithoutValue_ThrowsArgumentException
-          - IntegrationTest_ResultsParameter_IsAccepted
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -140,7 +127,6 @@ sections:
           without polluting stdout, which consumers may pipe or redirect for data capture.
         tests:
           - Context_WriteError_NotSilent_WritesToConsole
-          - IntegrationTest_InvalidArgument_ShowsError
         children:
           - BuildMark-Context-ErrorOutput
 
@@ -160,7 +146,6 @@ sections:
           - Context_Create_ResultsWithoutValue_ThrowsArgumentException
           - Context_Create_LogWithoutValue_ThrowsArgumentException
           - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
-          - IntegrationTest_InvalidArgument_ShowsError
         children:
           - BuildMark-Context-InvalidArgs
 
@@ -172,6 +157,5 @@ sections:
         tests:
           - Context_ExitCode_NoErrors_RemainsZero
           - Context_WriteError_SetsExitCodeToOne
-          - IntegrationTest_InvalidArgument_ShowsError
         children:
           - BuildMark-Context-ExitCode
