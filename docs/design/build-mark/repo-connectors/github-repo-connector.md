@@ -34,6 +34,65 @@ GitHub issue and pull request labels are mapped to normalized types:
 
 Items labelled as `"bug"` are placed in the `Bugs` list; all others go to `Changes`.
 
+### ItemInfo Record
+
+Each issue and pull request that appears in a report section is represented by
+an `ItemInfo` record:
+
+```csharp
+public record ItemInfo(
+    string Id,
+    string Title,
+    string Url,
+    string Type,
+    int Index = 0,
+    VersionIntervalSet? AffectedVersions = null);
+```
+
+| Property           | Type                  | Description                                                   |
+|--------------------|-----------------------|---------------------------------------------------------------|
+| `Id`               | `string`              | Human-readable identifier (e.g., `#42`)                       |
+| `Title`            | `string`              | Issue or pull request title                                   |
+| `Url`              | `string`              | Link to the issue or pull request on GitHub                   |
+| `Type`             | `string`              | Normalized type: `"bug"`, `"feature"`, or a label name        |
+| `Index`            | `int`                 | Numeric issue/PR number used for deterministic sorting        |
+| `AffectedVersions` | `VersionIntervalSet?` | Interval set from the `affected-versions` field, or `null`    |
+
+### GraphQL Response Types
+
+The `GitHubGraphQLClient` returns `PullRequestNode` and `IssueNode` records that
+must include the `body` field so the connector can pass description text to
+`ItemControlsParser`:
+
+**`PullRequestNode`** (updated to include `Body`):
+
+```csharp
+internal record PullRequestNode(
+    int? Number,
+    string? Title,
+    string? Url,
+    bool Merged,
+    PullRequestMergeCommit? MergeCommit,
+    string? HeadRefOid,
+    PullRequestLabelsConnection? Labels,
+    string? Body);
+```
+
+**`IssueNode`** (updated to include `Body`):
+
+```csharp
+internal record IssueNode(
+    int? Number,
+    string? Title,
+    string? Url,
+    string? State,
+    IssueLabelsConnection? Labels,
+    string? Body);
+```
+
+Both `GetPullRequestsAsync` and `GetAllIssuesAsync` must include `body` in their
+GraphQL field selections.
+
 ### Item Controls Override
 
 After the label-derived type is determined, the connector calls

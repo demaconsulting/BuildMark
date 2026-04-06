@@ -46,6 +46,19 @@ sections:
           - GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
           - GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
 
+      - id: BuildMark-GitHub-DescriptionBody
+        title: >-
+          The GitHubGraphQLClient class shall include the description body field in
+          pull request and issue query responses.
+        justification: |
+          ItemControlsParser requires the full description text of each pull request
+          and issue to locate and extract a buildmark code block. Without the body
+          field being requested in the GraphQL query, the body will not be available
+          to the connector and item controls cannot be applied.
+        tests:
+          - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
+          - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
+
       - id: BuildMark-GitHub-GraphQLClient
         title: The GitHubRepoConnector class shall use a GraphQL client for GitHub API interactions.
         justification: |
