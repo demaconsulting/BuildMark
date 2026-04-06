@@ -19,6 +19,8 @@ This document covers the detailed design of the following software units:
 - **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
 - **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
 - **PathHelpers** — safe path combination utilities (`Utilities/PathHelpers.cs`)
+- **ItemControlsParser** — buildmark block parser (`ItemControls/ItemControlsParser.cs`)
+- **VersionInterval** — version interval model and parser (`ItemControls/VersionInterval.cs`)
 - **GitHubRepoConnector** — GitHub GraphQL API integration (`RepoConnectors/GitHub/GitHubRepoConnector.cs`)
 
 The following topics are out of scope:
@@ -41,6 +43,11 @@ BuildMark (System)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
 │   └── PathHelpers (Unit)
+├── ItemControls (Subsystem)
+│   ├── ItemControlsInfo (Unit)
+│   ├── ItemControlsParser (Unit)
+│   ├── VersionInterval (Unit)
+│   └── VersionIntervalSet (Unit)
 └── RepoConnectors (Subsystem)
     ├── RepoConnectorBase (Unit)
     ├── MockRepoConnector (Unit)
@@ -70,6 +77,11 @@ src/DemaConsulting.BuildMark/
 │   └── Validation.cs                        — self-validation test runner
 ├── Utilities/
 │   └── PathHelpers.cs                       — safe path combination utilities
+├── ItemControls/
+│   ├── ItemControlsInfo.cs                  — item controls data model
+│   ├── ItemControlsParser.cs                — buildmark block parser
+│   ├── VersionInterval.cs                   — single version interval model and parser
+│   └── VersionIntervalSet.cs                — ordered set of version intervals
 └── RepoConnectors/
     ├── IRepoConnector.cs                    — repository connector interface
     ├── RepoConnectorBase.cs                 — repository connector base class

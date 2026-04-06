@@ -9,7 +9,7 @@ markdown report suitable for embedding in release documentation.
 
 ## System Architecture
 
-BuildMark is composed of four subsystems and a top-level entry point:
+BuildMark is composed of five subsystems and a top-level entry point:
 
 | Component            | Kind      | Responsibility                                           |
 |----------------------|-----------|----------------------------------------------------------|
@@ -18,6 +18,7 @@ BuildMark is composed of four subsystems and a top-level entry point:
 | `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API |
 | `SelfTest`           | Subsystem | Built-in self-validation test framework                  |
 | `Utilities`          | Subsystem | Shared path combination helpers                          |
+| `ItemControls`       | Subsystem | Parsing of buildmark blocks and version interval sets    |
 
 ## External Interfaces
 
@@ -50,7 +51,12 @@ BuildMark is composed of four subsystems and a top-level entry point:
                               │
                               ▼
                    GitHubRepoConnector   ←─── GitHub GraphQL API
+                              │                (fetches body of issues and PRs)
                               │
+                              ▼
+                   ItemControlsParser (ItemControls)
+                              │  ← applied per-issue and per-PR
+                              │  ← overrides visibility, type, affected-versions
                               ▼
                    BuildInformation.ToMarkdown()
                               │
@@ -78,9 +84,30 @@ The connector retrieves:
 
 - All tags (for identifying version boundaries)
 - Commits in the requested range
-- Issues referenced by commits
-- Pull requests in the requested range
+- Issues referenced by commits (including description body)
+- Pull requests in the requested range (including description body)
 - Releases (for known-issues data)
+
+The `body` field of issues and pull requests is fetched so that `ItemControlsParser`
+can extract embedded `buildmark` blocks.
+
+### Item Controls
+
+When `GitHubRepoConnector` processes each issue or pull request, it passes the
+description body to `ItemControlsParser.Parse`. If a `buildmark` code block is
+present (including when hidden inside an HTML comment), the parser returns an
+`ItemControlsInfo` record that carries optional overrides for `Visibility`, `Type`,
+and `AffectedVersions`.
+
+The connector applies these overrides as follows:
+
+- `visibility: internal` — the item is excluded from all report sections
+- `visibility: public` — the item is included regardless of its label-derived type
+- `type: bug` or `type: feature` — overrides the label-derived type classification
+- `affected-versions` — stored on the `ItemInfo` record for downstream use
+
+When no `buildmark` block is present, the existing label-based rules apply
+unchanged.
 
 ### Self-Validation
 
