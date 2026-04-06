@@ -33,6 +33,26 @@ public static class ItemControlsParser
     private static readonly Regex HtmlCommentRegex = new(@"<!--.*?-->", RegexOptions.Singleline | RegexOptions.Compiled);
 
     /// <summary>
+    ///     Valid visibility value: public.
+    /// </summary>
+    private const string VisibilityPublic = "public";
+
+    /// <summary>
+    ///     Valid visibility value: internal.
+    /// </summary>
+    private const string VisibilityInternal = "internal";
+
+    /// <summary>
+    ///     Valid type value: bug.
+    /// </summary>
+    private const string TypeBug = "bug";
+
+    /// <summary>
+    ///     Valid type value: feature.
+    /// </summary>
+    private const string TypeFeature = "feature";
+
+    /// <summary>
     ///     Parses item controls from a description string.
     /// </summary>
     /// <param name="description">Issue or pull request description text.</param>
@@ -148,12 +168,12 @@ public static class ItemControlsParser
             var value = line[(colonIdx + 1)..].Trim();
 
             // Keys: "visibility" → "public"/"internal"
-            if (key == "visibility" && (value == "public" || value == "internal"))
+            if (key == "visibility" && (value == VisibilityPublic || value == VisibilityInternal))
             {
                 visibility = value;
             }
             // type → "bug"/"feature"
-            else if (key == "type" && (value == "bug" || value == "feature"))
+            else if (key == "type" && (value == TypeBug || value == TypeFeature))
             {
                 type = value;
             }

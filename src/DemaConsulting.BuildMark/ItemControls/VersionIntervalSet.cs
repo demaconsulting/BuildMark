@@ -67,7 +67,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
 
                     // Advance past closing bracket and any trailing comma/whitespace
                     pos++;
-                    while (pos < text.Length && (text[pos] == ',' || text[pos] == ' '))
+                    while (pos < text.Length && (text[pos] == ',' || char.IsWhiteSpace(text[pos])))
                     {
                         pos++;
                     }

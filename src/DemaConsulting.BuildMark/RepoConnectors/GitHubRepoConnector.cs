@@ -835,14 +835,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Override type if item controls specify one
-        if (controls?.Type == "bug")
-        {
-            type = "bug";
-        }
-        else if (controls?.Type == "feature")
-        {
-            type = "feature";
-        }
+        type = ApplyTypeOverride(type, controls);
 
         // Create and return item info with issue details and affected versions
         return new ItemInfo(
@@ -874,14 +867,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Override type if item controls specify one
-        if (controls?.Type == "bug")
-        {
-            type = "bug";
-        }
-        else if (controls?.Type == "feature")
-        {
-            type = "feature";
-        }
+        type = ApplyTypeOverride(type, controls);
 
         // Create and return item info with PR details and affected versions
         return new ItemInfo(
@@ -891,6 +877,28 @@ public class GitHubRepoConnector : RepoConnectorBase
             type,
             pr.Number,
             controls?.AffectedVersions);
+    }
+
+    /// <summary>
+    ///     Applies type override from item controls if specified.
+    /// </summary>
+    /// <param name="type">Current item type from labels.</param>
+    /// <param name="controls">Parsed item controls (may be null).</param>
+    /// <returns>Final item type string.</returns>
+    private static string ApplyTypeOverride(string type, ItemControlsInfo? controls)
+    {
+        // Override type if item controls specify "bug" or "feature"
+        if (controls?.Type == "bug")
+        {
+            return "bug";
+        }
+
+        if (controls?.Type == "feature")
+        {
+            return "feature";
+        }
+
+        return type;
     }
 
     /// <summary>
