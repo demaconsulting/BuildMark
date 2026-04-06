@@ -29,6 +29,23 @@ sections:
           - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
           - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
 
+      - id: BuildMark-GitHub-ItemControls
+        title: >-
+          The GitHubRepoConnector class shall apply item controls extracted from issue
+          and pull request description bodies to override visibility, type, and
+          affected-version metadata.
+        justification: |
+          The GitHub connector is responsible for translating raw GitHub data into the
+          BuildInformation model. Applying item controls at this layer ensures that
+          visibility and type overrides are consistently enforced regardless of labels,
+          and that affected-version data is captured and stored on each ItemInfo for
+          downstream use.
+        tests:
+          - GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+          - GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+          - GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+          - GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+
       - id: BuildMark-GitHub-GraphQLClient
         title: The GitHubRepoConnector class shall use a GraphQL client for GitHub API interactions.
         justification: |

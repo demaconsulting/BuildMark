@@ -31,8 +31,9 @@ GraphQL API to retrieve issues, pull requests, tags, and commits.
 
 ## Interactions
 
-| Unit / Subsystem   | Role                                                        |
-|--------------------|-------------------------------------------------------------|
-| `Program`          | Creates a connector via `RepoConnectorFactory` and calls it |
-| `Validation`       | Uses `MockRepoConnector` directly for self-tests            |
-| `BuildInformation` | The data record returned by connectors                      |
+| Unit / Subsystem      | Role                                                          |
+|-----------------------|---------------------------------------------------------------|
+| `Program`             | Creates a connector via `RepoConnectorFactory` and calls it   |
+| `Validation`          | Uses `MockRepoConnector` directly for self-tests              |
+| `ItemControlsParser`  | Called by `GitHubRepoConnector` on each description body      |
+| `BuildInformation`    | The data record returned by connectors                        |

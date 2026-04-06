@@ -9,6 +9,9 @@ includes:
   - docs/reqstream/build-mark/self-test/validation.yaml
   - docs/reqstream/build-mark/utilities/utilities.yaml
   - docs/reqstream/build-mark/utilities/path-helpers.yaml
+  - docs/reqstream/build-mark/item-controls/item-controls.yaml
+  - docs/reqstream/build-mark/item-controls/item-controls-parser.yaml
+  - docs/reqstream/build-mark/item-controls/version-interval.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml
   - docs/reqstream/build-mark/repo-connectors/mock-repo-connector.yaml

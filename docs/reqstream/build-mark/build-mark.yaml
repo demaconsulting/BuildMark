@@ -263,6 +263,9 @@ sections:
               developers to attach control metadata directly to issues and pull requests. This
               eliminates the need for custom GitHub labels or external configuration files and
               keeps all item-level controls co-located with the work item itself.
+            children:
+              - BuildMark-ItemControls-Parse
+              - BuildMark-ItemControlsParser-Parse
 
           - id: BuildMark-Ctrl-Visibility
             title: The tool shall support a visibility field in the buildmark block to override
@@ -271,6 +274,10 @@ sections:
               Developers may need to suppress internal housekeeping items from public release
               notes, or promote items that would otherwise be excluded. A visibility override
               gives fine-grained control without altering GitHub labels.
+            children:
+              - BuildMark-ItemControls-Parse
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-VisibilityPublic
             title: The tool shall include an item in the build notes when visibility is set to
@@ -279,6 +286,9 @@ sections:
               Some items lack the standard labels that trigger automatic inclusion. The public
               value ensures these items still appear in the generated notes when the developer
               explicitly requests it.
+            children:
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-VisibilityInternal
             title: The tool shall exclude an item from the build notes when visibility is set to
@@ -287,6 +297,9 @@ sections:
               Items such as dependency updates, internal refactoring, or CI configuration changes
               are often irrelevant to end-users. The internal value lets developers suppress such
               items without removing the labels that are used for other project-management purposes.
+            children:
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-Type
             title: The tool shall support a type field in the buildmark block to override the
@@ -295,6 +308,10 @@ sections:
               GitHub labels do not always map cleanly to the bug/feature distinction used in
               release notes. A type override lets developers correct the classification for any
               individual item without modifying project-wide label conventions.
+            children:
+              - BuildMark-ItemControls-Parse
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-TypeBug
             title: The tool shall classify an item as a bug fix when type is set to bug, placing
@@ -303,6 +320,9 @@ sections:
               Correct classification of bug fixes is important for end-users assessing whether a
               release addresses their reported problems. An explicit override ensures accuracy
               even when labels are missing or inconsistent.
+            children:
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-TypeFeature
             title: The tool shall classify an item as a feature or change when type is set to
@@ -310,6 +330,9 @@ sections:
             justification: |
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
+            children:
+              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-AffectedVersions
             title: The tool shall support an affected-versions field in the buildmark block to
@@ -318,6 +341,10 @@ sections:
               Encoding affected versions directly on the work item improves traceability and
               enables downstream tooling to filter or highlight relevant items for a given
               release without relying on external spreadsheets or manual documentation.
+            children:
+              - BuildMark-ItemControls-VersionInterval
+              - BuildMark-VersionInterval-Parse
+              - BuildMark-VersionIntervalSet-Parse
 
           - id: BuildMark-Ctrl-AffectedVersionsInterval
             title: The affected-versions field shall use mathematical interval notation with
@@ -327,6 +354,10 @@ sections:
               Supporting multiple ranges allows expression of disjoint sets of affected versions
               in a single field, covering scenarios such as a bug present in two separate
               release branches.
+            children:
+              - BuildMark-ItemControls-VersionInterval
+              - BuildMark-VersionInterval-Parse
+              - BuildMark-VersionIntervalSet-Parse
 
           - id: BuildMark-Ctrl-HiddenBlock
             title: The tool shall recognize a buildmark code block that is wrapped in an HTML
@@ -335,6 +366,9 @@ sections:
               Some teams prefer clean issue descriptions without visible metadata blocks. Allowing
               the block to be hidden in an HTML comment satisfies both the need to supply control
               data and the desire for a tidy rendered appearance.
+            children:
+              - BuildMark-ItemControls-Parse
+              - BuildMark-ItemControlsParser-HiddenBlock
 
       - title: Validation and Testing
         requirements:

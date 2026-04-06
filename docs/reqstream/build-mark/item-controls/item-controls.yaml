@@ -1,0 +1,55 @@
+---
+# ItemControls Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the BuildMark ItemControls subsystem
+# - The ItemControls subsystem spans ItemControlsParser.cs, ItemControlsInfo.cs,
+#   VersionInterval.cs, and VersionIntervalSet.cs
+# - Subsystem requirements describe the externally visible parsing behavior used
+#   by the RepoConnectors subsystem
+
+sections:
+  - title: ItemControls Subsystem Requirements
+    requirements:
+      - id: BuildMark-ItemControls-Parse
+        title: >-
+          The ItemControls subsystem shall parse a buildmark code block from an issue or
+          pull request description and expose the extracted controls as a structured record.
+        justification: |
+          The ItemControls subsystem is the single entry point for all extended item-control
+          logic. By centralizing block detection, key-value extraction, and data-model
+          creation in one subsystem, the rest of the system (in particular GitHubRepoConnector)
+          can consume controls without embedding parsing details at the connector level.
+          This separation ensures the parsing logic is independently testable and reusable.
+        tests:
+          - ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility
+          - ItemControls_Parse_WithVisibilityInternal_ReturnsInternalVisibility
+          - ItemControls_Parse_WithTypeBug_ReturnsBugType
+          - ItemControls_Parse_WithTypeFeature_ReturnsFeatureType
+          - ItemControls_Parse_WithAffectedVersions_ReturnsIntervalSet
+          - ItemControls_Parse_WithHiddenBlock_ReturnsControls
+          - ItemControls_Parse_WithNoBlock_ReturnsNull
+        children:
+          - BuildMark-ItemControlsParser-Parse
+          - BuildMark-ItemControlsParser-HiddenBlock
+
+      - id: BuildMark-ItemControls-VersionInterval
+        title: >-
+          The ItemControls subsystem shall parse the affected-versions field using
+          mathematical interval notation.
+        justification: |
+          Version intervals are a structured domain concept requiring dedicated parsing
+          and data-model support. Keeping interval logic inside the ItemControls subsystem
+          enforces a clean boundary: the rest of the system receives typed VersionIntervalSet
+          objects rather than raw strings, preventing duplication and parsing errors in
+          consuming code.
+        tests:
+          - ItemControls_VersionInterval_Parse_SingleInterval_ReturnsInterval
+          - ItemControls_VersionInterval_Parse_MultipleIntervals_ReturnsIntervalSet
+          - ItemControls_VersionInterval_Parse_InclusiveLowerBound_IsInclusive
+          - ItemControls_VersionInterval_Parse_ExclusiveUpperBound_IsExclusive
+          - ItemControls_VersionInterval_Parse_UnboundedLower_HasNullLowerBound
+          - ItemControls_VersionInterval_Parse_UnboundedUpper_HasNullUpperBound
+        children:
+          - BuildMark-VersionInterval-Parse
+          - BuildMark-VersionIntervalSet-Parse
