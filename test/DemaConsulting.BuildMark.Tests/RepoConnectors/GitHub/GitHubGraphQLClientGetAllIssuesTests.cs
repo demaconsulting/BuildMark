@@ -309,6 +309,35 @@ public class GitHubGraphQLClientGetAllIssuesTests
     }
 
     /// <summary>
+    ///     Test that GetAllIssuesAsync returns issues with body.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody()
+    {
+        // Arrange
+        var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddIssuesResponse(
+                new MockIssue(
+                    1,
+                    "Issue with body",
+                    "https://github.com/owner/repo/issues/1",
+                    "OPEN",
+                    ["bug"],
+                    "This is an issue.\n\n```buildmark\nvisibility: internal\n```"));
+
+        using var httpClient = new HttpClient(mockHandler);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var issues = await client.GetAllIssuesAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(issues);
+        Assert.HasCount(1, issues);
+        Assert.AreEqual("This is an issue.\n\n```buildmark\nvisibility: internal\n```", issues[0].Body);
+    }
+
+    /// <summary>
     ///     Mock HTTP message handler for pagination testing.
     /// </summary>
     private sealed class IssuePaginationMockHttpMessageHandler : HttpMessageHandler

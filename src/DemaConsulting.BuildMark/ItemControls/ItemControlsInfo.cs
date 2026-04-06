@@ -18,17 +18,15 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.ItemControls;
-
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.ItemControls;
 
 /// <summary>
-///     Represents an item in the build notes (change, bug, or known issue).
+///     Represents the item controls extracted from a buildmark code block.
 /// </summary>
-/// <param name="Id">Item ID.</param>
-/// <param name="Title">Item title.</param>
-/// <param name="Url">Item URL.</param>
-/// <param name="Type">Item type (bug, feature, etc.).</param>
-/// <param name="Index">Numeric index for sorting (PR number for PRs, issue number for issues).</param>
-/// <param name="AffectedVersions">Optional set of version intervals that this item affects.</param>
-public record ItemInfo(string Id, string Title, string Url, string Type, int Index = 0, VersionIntervalSet? AffectedVersions = null);
+/// <param name="Visibility">Item visibility ("public" or "internal"), or null if not specified.</param>
+/// <param name="Type">Item type override ("bug" or "feature"), or null if not specified.</param>
+/// <param name="AffectedVersions">Affected version intervals, or null if not specified.</param>
+public record ItemControlsInfo(
+    string? Visibility,
+    string? Type,
+    VersionIntervalSet? AffectedVersions);

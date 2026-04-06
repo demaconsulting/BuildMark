@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.ItemControls;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
@@ -156,7 +157,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         bool Merged,
         string? MergeCommitSha,
         string? HeadSha,
-        IReadOnlyList<PullRequestLabelInfo> Labels);
+        IReadOnlyList<PullRequestLabelInfo> Labels,
+        string? Body);
 
     /// <summary>
     ///     Pull request label information.
@@ -172,7 +174,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         string Title,
         string HtmlUrl,
         string State,
-        IReadOnlyList<IssueLabelInfo> Labels);
+        IReadOnlyList<IssueLabelInfo> Labels,
+        string? Body);
 
     /// <summary>
     ///     Issue label information.
@@ -574,6 +577,12 @@ public class GitHubRepoConnector : RepoConnectorBase
                 allChangeIds.Add(issueIdStr);
                 var itemInfo = CreateItemInfoFromIssue(issue, pr.Number);
 
+                // Skip item if controls indicate internal visibility
+                if (itemInfo == null)
+                {
+                    continue;
+                }
+
                 // Categorize by type
                 if (itemInfo.Type == "bug")
                 {
@@ -607,6 +616,12 @@ public class GitHubRepoConnector : RepoConnectorBase
             // Create item info from PR
             var itemInfo = CreateItemInfoFromPullRequest(pr);
 
+            // Skip item if controls indicate internal visibility
+            if (itemInfo == null)
+            {
+                return;
+            }
+
             // Categorize by type
             if (itemInfo.Type == "bug")
             {
@@ -632,7 +647,8 @@ public class GitHubRepoConnector : RepoConnectorBase
             .Select(issue => (issue, issueId: issue.Number.ToString()))
             .Where(tuple => !allChangeIds.Contains(tuple.issueId))
             .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
-            .Where(itemInfo => itemInfo.Type == "bug")
+            .Where(itemInfo => itemInfo != null && itemInfo.Type == "bug")
+            .Select(itemInfo => itemInfo!)
             .ToList();
     }
 
@@ -723,7 +739,8 @@ public class GitHubRepoConnector : RepoConnectorBase
                 pr.Labels?.Nodes?
                     .Where(l => !string.IsNullOrEmpty(l.Name))
                     .Select(l => new PullRequestLabelInfo(l.Name!))
-                    .ToList() ?? []))
+                    .ToList() ?? [],
+                pr.Body))
             .ToList();
     }
 
@@ -753,7 +770,8 @@ public class GitHubRepoConnector : RepoConnectorBase
                 issue.Labels?.Nodes?
                     .Where(l => !string.IsNullOrEmpty(l.Name))
                     .Select(l => new IssueLabelInfo(l.Name!))
-                    .ToList() ?? []))
+                    .ToList() ?? [],
+                issue.Body))
             .ToList();
     }
 
@@ -797,42 +815,82 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Creates an ItemInfo from an issue.
+    ///     Creates an ItemInfo from an issue, applying any item controls from the description.
     /// </summary>
     /// <param name="issue">GitHub issue.</param>
     /// <param name="index">Index for sorting.</param>
-    /// <returns>ItemInfo instance.</returns>
-    private static ItemInfo CreateItemInfoFromIssue(IssueInfo issue, int index)
+    /// <returns>ItemInfo instance, or null if the item controls indicate the item should be excluded.</returns>
+    private static ItemInfo? CreateItemInfoFromIssue(IssueInfo issue, int index)
     {
         // Determine item type from issue labels
         var type = GetTypeFromLabels(issue.Labels);
 
-        // Create and return item info with issue details
+        // Parse item controls from issue description body
+        var controls = ItemControlsParser.Parse(issue.Body);
+
+        // Exclude item if visibility is "internal"
+        if (controls?.Visibility == "internal")
+        {
+            return null;
+        }
+
+        // Override type if item controls specify one
+        if (controls?.Type == "bug")
+        {
+            type = "bug";
+        }
+        else if (controls?.Type == "feature")
+        {
+            type = "feature";
+        }
+
+        // Create and return item info with issue details and affected versions
         return new ItemInfo(
             issue.Number.ToString(),
             issue.Title,
             issue.HtmlUrl,
             type,
-            index);
+            index,
+            controls?.AffectedVersions);
     }
 
     /// <summary>
-    ///     Creates an ItemInfo from a pull request.
+    ///     Creates an ItemInfo from a pull request, applying any item controls from the description.
     /// </summary>
     /// <param name="pr">GitHub pull request.</param>
-    /// <returns>ItemInfo instance.</returns>
-    private static ItemInfo CreateItemInfoFromPullRequest(PullRequestInfo pr)
+    /// <returns>ItemInfo instance, or null if the item controls indicate the item should be excluded.</returns>
+    private static ItemInfo? CreateItemInfoFromPullRequest(PullRequestInfo pr)
     {
         // Determine item type from PR labels
         var type = GetTypeFromLabels(pr.Labels);
 
-        // Create and return item info with PR details
+        // Parse item controls from PR description body
+        var controls = ItemControlsParser.Parse(pr.Body);
+
+        // Exclude item if visibility is "internal"
+        if (controls?.Visibility == "internal")
+        {
+            return null;
+        }
+
+        // Override type if item controls specify one
+        if (controls?.Type == "bug")
+        {
+            type = "bug";
+        }
+        else if (controls?.Type == "feature")
+        {
+            type = "feature";
+        }
+
+        // Create and return item info with PR details and affected versions
         return new ItemInfo(
             $"#{pr.Number}",
             pr.Title,
             pr.HtmlUrl,
             type,
-            pr.Number);
+            pr.Number,
+            controls?.AffectedVersions);
     }
 
     /// <summary>

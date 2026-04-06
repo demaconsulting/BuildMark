@@ -442,6 +442,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                                                 name
                                             }
                                         }
+                                        body
                                     }
                                     pageInfo {
                                         hasNextPage
@@ -521,6 +522,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                                                 name
                                             }
                                         }
+                                        body
                                     }
                                     pageInfo {
                                         hasNextPage

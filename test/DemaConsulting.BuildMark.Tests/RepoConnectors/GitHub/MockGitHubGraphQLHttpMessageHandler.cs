@@ -57,6 +57,7 @@ public record MockTag(
 /// <param name="MergeCommitSha">Merge commit SHA (null if not merged).</param>
 /// <param name="HeadRefOid">Head reference OID.</param>
 /// <param name="Labels">List of label names.</param>
+/// <param name="Body">Pull request description body.</param>
 public record MockPullRequest(
     int Number,
     string Title,
@@ -64,7 +65,8 @@ public record MockPullRequest(
     bool Merged,
     string? MergeCommitSha,
     string? HeadRefOid,
-    List<string> Labels);
+    List<string> Labels,
+    string? Body = null);
 
 /// <summary>
 ///     Represents a mock issue for testing.
@@ -74,12 +76,14 @@ public record MockPullRequest(
 /// <param name="Url">Issue URL.</param>
 /// <param name="State">Issue state (OPEN, CLOSED).</param>
 /// <param name="Labels">List of label names.</param>
+/// <param name="Body">Issue description body.</param>
 public record MockIssue(
     int Number,
     string Title,
     string Url,
     string State,
-    List<string> Labels);
+    List<string> Labels,
+    string? Body = null);
 
 /// <summary>
 ///     Mock HTTP message handler for testing GitHub GraphQL API interactions.
@@ -317,7 +321,8 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
                                 ""headRefOid"": {(pr.HeadRefOid != null ? $@"""{pr.HeadRefOid}""" : "null")},
                                 ""labels"": {{
                                     ""nodes"": [{labelsJson}]
-                                }}
+                                }},
+                                ""body"": {(pr.Body != null ? $@"""{pr.Body.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "")}""" : "null")}
                             }}";
             }));
 
@@ -375,7 +380,8 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
                                 ""state"": ""{issue.State}"",
                                 ""labels"": {{
                                     ""nodes"": [{labelsJson}]
-                                }}
+                                }},
+                                ""body"": {(issue.Body != null ? $@"""{issue.Body.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "")}""" : "null")}
                             }}";
             }));
 
