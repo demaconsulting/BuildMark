@@ -453,7 +453,7 @@ into the report.
 
 When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels.
 
-### Example
+### Type Example
 
 Override a pull request so it appears in the **Bugs Fixed** section regardless of its labels:
 
