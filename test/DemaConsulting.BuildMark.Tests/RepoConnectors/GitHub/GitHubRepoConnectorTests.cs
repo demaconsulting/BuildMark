@@ -584,4 +584,136 @@ public class GitHubRepoConnectorTests
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Index == 201);
         Assert.IsNull(knownIssue, "Issue with 'debugging' label must not be classified as a known issue");
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync excludes items with visibility:internal in description.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem()
+    {
+        // Arrange
+        var internalBody = "This is internal.\n\n```buildmark\nvisibility: internal\n```";
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("abc123")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddTagsResponse(new MockTag("v1.0.0", "abc123"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(1, "Internal PR", "https://github.com/owner/repo/pull/1", true, "abc123", "abc123", ["feature"], internalBody))
+            .AddIssuesResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.IsEmpty(buildInfo.Changes);
+        Assert.IsEmpty(buildInfo.Bugs);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync includes items with visibility:public in description.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem()
+    {
+        // Arrange
+        var publicBody = "This is public.\n\n```buildmark\nvisibility: public\n```";
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("abc123")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddTagsResponse(new MockTag("v1.0.0", "abc123"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(1, "Public PR", "https://github.com/owner/repo/pull/1", true, "abc123", "abc123", [], publicBody))
+            .AddIssuesResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        // Item should be included in Changes (type "other" which is not bug)
+        Assert.HasCount(1, buildInfo.Changes);
+        Assert.AreEqual("Public PR", buildInfo.Changes[0].Title);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync classifies as bug when type:bug in description.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug()
+    {
+        // Arrange
+        var bugBody = "This is a bug.\n\n```buildmark\ntype: bug\n```";
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("abc123")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddTagsResponse(new MockTag("v1.0.0", "abc123"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(1, "Bug PR", "https://github.com/owner/repo/pull/1", true, "abc123", "abc123", [], bugBody))
+            .AddIssuesResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.HasCount(1, buildInfo.Bugs);
+        Assert.AreEqual("Bug PR", buildInfo.Bugs[0].Title);
+        Assert.IsEmpty(buildInfo.Changes);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync classifies as feature when type:feature in description.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature()
+    {
+        // Arrange
+        var featureBody = "This is a feature.\n\n```buildmark\ntype: feature\n```";
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("abc123")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddTagsResponse(new MockTag("v1.0.0", "abc123"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(1, "Feature PR", "https://github.com/owner/repo/pull/1", true, "abc123", "abc123", [], featureBody))
+            .AddIssuesResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.HasCount(1, buildInfo.Changes);
+        Assert.AreEqual("Feature PR", buildInfo.Changes[0].Title);
+        Assert.AreEqual("feature", buildInfo.Changes[0].Type);
+        Assert.IsEmpty(buildInfo.Bugs);
+    }
 }

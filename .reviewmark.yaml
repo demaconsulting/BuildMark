@@ -171,3 +171,31 @@ reviews:
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandler.cs"
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandlerTests.cs"
       - "test/**/RepoConnectors/GitHub/MockableGitHubRepoConnector.cs"
+
+  # ItemControls subsystem review
+  - id: BuildMark-ItemControls
+    title: Review that BuildMark ItemControls Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/item-controls/item-controls.yaml"
+      - "docs/design/build-mark/item-controls/item-controls.md"
+      - "test/**/ItemControls/ItemControlsTests.cs"
+
+  # Unit reviews - ItemControls subsystem
+  - id: BuildMark-ItemControls-ItemControlsParser
+    title: Review that BuildMark ItemControls ItemControlsParser Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/item-controls/item-controls-parser.yaml"
+      - "docs/design/build-mark/item-controls/item-controls-parser.md"
+      - "src/**/ItemControls/ItemControlsInfo.cs"
+      - "src/**/ItemControls/ItemControlsParser.cs"
+      - "test/**/ItemControls/ItemControlsParserTests.cs"
+
+  - id: BuildMark-ItemControls-VersionInterval
+    title: Review that BuildMark ItemControls VersionInterval Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/item-controls/version-interval.yaml"
+      - "docs/design/build-mark/item-controls/version-interval.md"
+      - "src/**/ItemControls/VersionInterval.cs"
+      - "src/**/ItemControls/VersionIntervalSet.cs"
+      - "test/**/ItemControls/VersionIntervalTests.cs"
+      - "test/**/ItemControls/VersionIntervalSetTests.cs"

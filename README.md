@@ -191,6 +191,67 @@ on the self-validation tests.
 
 On validation failure the tool will exit with a non-zero exit code.
 
+## Extended Item Controls
+
+BuildMark supports an optional `buildmark` code block in GitHub issue and pull request descriptions
+to control how each item appears in the generated build notes.
+
+### BuildMark Code Block
+
+Add a fenced `buildmark` block anywhere in an issue or PR description:
+
+````markdown
+```buildmark
+visibility: public
+type: feature
+affected-versions: (,1.0.1],[1.1.0,1.2.0)
+```
+````
+
+The block can be hidden using HTML comment syntax if desired:
+
+````markdown
+<!--
+```buildmark
+visibility: internal
+```
+-->
+````
+
+### Visibility Control
+
+The `visibility` field overrides the default visibility rules:
+
+- `public` - Force-include the item in build notes regardless of other settings
+- `internal` - Force-exclude the item from build notes regardless of labels or tags
+
+When `visibility` is not specified, the default rules apply: merged pull requests and linked
+issues are included in build notes. Standard issue labels (`bug`, `defect`, `feature`, etc.)
+are used to classify entries, but unlabeled or non-standard-labeled items may still be included.
+
+### Type Override
+
+The `type` field overrides the item classification used in build notes:
+
+- `bug` - Classify the item as a bug fix
+- `feature` - Classify the item as a new feature or change
+
+When `type` is not specified, BuildMark infers the type from GitHub issue labels.
+
+### Affected Versions
+
+The `affected-versions` field encodes which versions are affected by the change,
+using mathematical interval notation with comma-separated ranges:
+
+```text
+affected-versions: (,1.0.1],[1.1.0,1.2.0),(1.2.5,2.0.0],[3.0.0,)
+```
+
+- `[` / `]` — inclusive bound
+- `(` / `)` — exclusive bound
+- Empty lower bound — no minimum version (e.g., `(,1.0.1]` means up to and including `1.0.1`)
+- Empty upper bound — no maximum version (e.g., `[3.0.0,)` means `3.0.0` and later)
+
 ## Report Format
 
 The generated markdown report includes:

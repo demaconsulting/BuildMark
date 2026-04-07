@@ -212,6 +212,7 @@ internal record PullRequestsConnectionData(
 /// <param name="MergeCommit">Merge commit information.</param>
 /// <param name="HeadRefOid">Head reference commit SHA.</param>
 /// <param name="Labels">Labels assigned to the pull request.</param>
+/// <param name="Body">Pull request description body.</param>
 internal record PullRequestNode(
     int? Number,
     string? Title,
@@ -219,7 +220,8 @@ internal record PullRequestNode(
     bool Merged,
     PullRequestMergeCommit? MergeCommit,
     string? HeadRefOid,
-    PullRequestLabelsConnection? Labels);
+    PullRequestLabelsConnection? Labels,
+    string? Body);
 
 /// <summary>
 ///     Pull request merge commit information.
@@ -273,12 +275,14 @@ internal record IssuesConnectionData(
 /// <param name="Url">Issue HTML URL.</param>
 /// <param name="State">Issue state (OPEN or CLOSED).</param>
 /// <param name="Labels">Labels assigned to the issue.</param>
+/// <param name="Body">Issue description body.</param>
 internal record IssueNode(
     int? Number,
     string? Title,
     string? Url,
     string? State,
-    IssueLabelsConnection? Labels);
+    IssueLabelsConnection? Labels,
+    string? Body);
 
 /// <summary>
 ///     Issue labels connection containing nodes.

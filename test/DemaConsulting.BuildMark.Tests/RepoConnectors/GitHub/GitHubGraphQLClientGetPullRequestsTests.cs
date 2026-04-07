@@ -355,6 +355,37 @@ public class GitHubGraphQLClientGetPullRequestsTests
     }
 
     /// <summary>
+    ///     Test that GetPullRequestsAsync returns pull requests with body.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody()
+    {
+        // Arrange
+        var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddPullRequestsResponse(
+                new MockPullRequest(
+                    1,
+                    "PR with body",
+                    "https://github.com/owner/repo/pull/1",
+                    true,
+                    "merge123",
+                    "head123",
+                    ["bug"],
+                    "This PR fixes a bug.\n\n```buildmark\ntype: bug\n```"));
+
+        using var httpClient = new HttpClient(mockHandler);
+        using var client = new GitHubGraphQLClient(httpClient);
+
+        // Act
+        var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
+
+        // Assert
+        Assert.IsNotNull(pullRequests);
+        Assert.HasCount(1, pullRequests);
+        Assert.AreEqual("This PR fixes a bug.\n\n```buildmark\ntype: bug\n```", pullRequests[0].Body);
+    }
+
+    /// <summary>
     ///     Mock HTTP message handler for testing pull request pagination.
     /// </summary>
     private sealed class PullRequestPaginationMockHttpMessageHandler : HttpMessageHandler
