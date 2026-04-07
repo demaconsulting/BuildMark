@@ -32,7 +32,7 @@ public class ItemControlsParserTests
     ///     Test that Parse returns null for null description.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_NullDescription_ReturnsNull()
+    public void ItemControlsParser_Parse_WithNullDescription_ReturnsNull()
     {
         // Arrange - null input
 
@@ -47,7 +47,7 @@ public class ItemControlsParserTests
     ///     Test that Parse returns null for empty description.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_EmptyDescription_ReturnsNull()
+    public void ItemControlsParser_Parse_WithEmptyDescription_ReturnsNull()
     {
         // Arrange
         var description = string.Empty;
@@ -63,7 +63,7 @@ public class ItemControlsParserTests
     ///     Test that Parse returns null when there is no buildmark block.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_NoBuildmarkBlock_ReturnsNull()
+    public void ItemControlsParser_Parse_WithNoBlock_ReturnsNull()
     {
         // Arrange
         var description = "This is a regular description with no buildmark block.";
@@ -76,10 +76,10 @@ public class ItemControlsParserTests
     }
 
     /// <summary>
-    ///     Test that Parse returns correct visibility for public.
+    ///     Test that Parse returns "public" visibility when visibility is set to public.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_VisibilityPublic_ReturnsCorrectVisibility()
+    public void ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility()
     {
         // Arrange
         var description = "Some description\n\n```buildmark\nvisibility: public\n```\n";
@@ -93,10 +93,10 @@ public class ItemControlsParserTests
     }
 
     /// <summary>
-    ///     Test that Parse returns correct visibility for internal.
+    ///     Test that Parse returns "internal" visibility when visibility is set to internal.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_VisibilityInternal_ReturnsCorrectVisibility()
+    public void ItemControlsParser_Parse_WithVisibilityInternal_ReturnsInternalVisibility()
     {
         // Arrange
         var description = "Some description\n\n```buildmark\nvisibility: internal\n```\n";
@@ -110,10 +110,10 @@ public class ItemControlsParserTests
     }
 
     /// <summary>
-    ///     Test that Parse returns correct type for bug.
+    ///     Test that Parse returns "bug" type when type is set to bug.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_TypeBug_ReturnsCorrectType()
+    public void ItemControlsParser_Parse_WithTypeBug_ReturnsBugType()
     {
         // Arrange
         var description = "```buildmark\ntype: bug\n```";
@@ -127,10 +127,10 @@ public class ItemControlsParserTests
     }
 
     /// <summary>
-    ///     Test that Parse returns correct type for feature.
+    ///     Test that Parse returns "feature" type when type is set to feature.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_TypeFeature_ReturnsCorrectType()
+    public void ItemControlsParser_Parse_WithTypeFeature_ReturnsFeatureType()
     {
         // Arrange
         var description = "```buildmark\ntype: feature\n```";
@@ -147,7 +147,7 @@ public class ItemControlsParserTests
     ///     Test that Parse returns correct interval set for affected-versions.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_AffectedVersions_ReturnsCorrectIntervalSet()
+    public void ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet()
     {
         // Arrange
         var description = "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```";
@@ -164,34 +164,84 @@ public class ItemControlsParserTests
     }
 
     /// <summary>
-    ///     Test that a buildmark block hidden in an HTML comment is not parsed.
+    ///     Test that Parse recognizes a buildmark block hidden inside an HTML comment.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_HiddenInHtmlComment_ReturnsParsedInfo()
+    public void ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls()
     {
-        // Arrange - buildmark block hidden inside an HTML comment
+        // Arrange - buildmark block wrapped in an HTML comment to hide from GitHub rendered view
         var description = "<!-- ```buildmark\nvisibility: public\n``` -->";
 
         // Act
         var result = ItemControlsParser.Parse(description);
 
-        // Assert - HTML comment is stripped, so block is not found
-        Assert.IsNull(result);
+        // Assert - HTML comment delimiters are stripped, exposing the block
+        Assert.IsNotNull(result);
+        Assert.AreEqual("public", result.Visibility);
     }
 
     /// <summary>
-    ///     Test that Parse returns null when block contains only unknown keys.
+    ///     Test that Parse recognizes internal visibility from a block hidden inside an HTML comment.
     /// </summary>
     [TestMethod]
-    public void ItemControlsParser_Parse_UnknownKey_ReturnsNull()
+    public void ItemControlsParser_Parse_WithHiddenBlockVisibilityInternal_ReturnsInternalVisibility()
     {
-        // Arrange - block with only unknown keys
+        // Arrange - internal visibility block wrapped in HTML comment
+        var description = "Issue description.\n<!-- ```buildmark\nvisibility: internal\n``` -->";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert - hidden block is parsed and returns internal visibility
+        Assert.IsNotNull(result);
+        Assert.AreEqual("internal", result.Visibility);
+    }
+
+    /// <summary>
+    ///     Test that Parse ignores unknown keys and returns null when no recognized keys are found.
+    /// </summary>
+    [TestMethod]
+    public void ItemControlsParser_Parse_WithUnknownKey_IgnoresKey()
+    {
+        // Arrange - block with only unknown keys, which are silently ignored
         var description = "```buildmark\nunknown-key: some-value\nanother-key: other-value\n```";
 
         // Act
         var result = ItemControlsParser.Parse(description);
 
-        // Assert
+        // Assert - no recognized keys, so null is returned
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    ///     Test that Parse ignores an unrecognized visibility value and treats the field as absent.
+    /// </summary>
+    [TestMethod]
+    public void ItemControlsParser_Parse_WithUnrecognizedVisibilityValue_IgnoresValue()
+    {
+        // Arrange - visibility value is not "public" or "internal"
+        var description = "```buildmark\nvisibility: visible\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert - unrecognized value is ignored; no valid fields → null result
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    ///     Test that Parse ignores an unrecognized type value and treats the field as absent.
+    /// </summary>
+    [TestMethod]
+    public void ItemControlsParser_Parse_WithUnrecognizedTypeValue_IgnoresValue()
+    {
+        // Arrange - type value is not "bug" or "feature"
+        var description = "```buildmark\ntype: enhancement\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert - unrecognized value is ignored; no valid fields → null result
         Assert.IsNull(result);
     }
 

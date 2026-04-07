@@ -29,13 +29,13 @@ using DemaConsulting.BuildMark.ItemControls;
 public class VersionIntervalTests
 {
     /// <summary>
-    ///     Test that Parse returns interval with inclusive lower bound.
+    ///     Test that Parse returns LowerInclusive=true for '[' opening bracket.
     /// </summary>
     [TestMethod]
-    public void VersionInterval_Parse_InclusiveLowerBound_ReturnsParsedInterval()
+    public void VersionInterval_Parse_InclusiveLower_IsInclusive()
     {
         // Arrange
-        var text = "[1.0.0,2.0.0]";
+        var text = "[1.0.0,2.0.0)";
 
         // Act
         var result = VersionInterval.Parse(text);
@@ -44,15 +44,13 @@ public class VersionIntervalTests
         Assert.IsNotNull(result);
         Assert.AreEqual("1.0.0", result.LowerBound);
         Assert.IsTrue(result.LowerInclusive);
-        Assert.AreEqual("2.0.0", result.UpperBound);
-        Assert.IsTrue(result.UpperInclusive);
     }
 
     /// <summary>
-    ///     Test that Parse returns interval with exclusive lower bound.
+    ///     Test that Parse returns LowerInclusive=false for '(' opening bracket.
     /// </summary>
     [TestMethod]
-    public void VersionInterval_Parse_ExclusiveLowerBound_ReturnsParsedInterval()
+    public void VersionInterval_Parse_ExclusiveLower_IsExclusive()
     {
         // Arrange
         var text = "(1.0.0,2.0.0)";
@@ -64,15 +62,49 @@ public class VersionIntervalTests
         Assert.IsNotNull(result);
         Assert.AreEqual("1.0.0", result.LowerBound);
         Assert.IsFalse(result.LowerInclusive);
+    }
+
+    /// <summary>
+    ///     Test that Parse returns UpperInclusive=true for ']' closing bracket.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Parse_InclusiveUpper_IsInclusive()
+    {
+        // Arrange
+        var text = "[1.0.0,2.0.0]";
+
+        // Act
+        var result = VersionInterval.Parse(text);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("2.0.0", result.UpperBound);
+        Assert.IsTrue(result.UpperInclusive);
+    }
+
+    /// <summary>
+    ///     Test that Parse returns UpperInclusive=false for ')' closing bracket.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Parse_ExclusiveUpper_IsExclusive()
+    {
+        // Arrange
+        var text = "[1.0.0,2.0.0)";
+
+        // Act
+        var result = VersionInterval.Parse(text);
+
+        // Assert
+        Assert.IsNotNull(result);
         Assert.AreEqual("2.0.0", result.UpperBound);
         Assert.IsFalse(result.UpperInclusive);
     }
 
     /// <summary>
-    ///     Test that Parse returns interval with unbounded lower.
+    ///     Test that Parse returns LowerBound=null for empty lower bound.
     /// </summary>
     [TestMethod]
-    public void VersionInterval_Parse_UnboundedLower_ReturnsParsedInterval()
+    public void VersionInterval_Parse_UnboundedLower_HasNullLowerBound()
     {
         // Arrange
         var text = "(,1.0.1]";
@@ -89,10 +121,10 @@ public class VersionIntervalTests
     }
 
     /// <summary>
-    ///     Test that Parse returns interval with unbounded upper.
+    ///     Test that Parse returns UpperBound=null for empty upper bound.
     /// </summary>
     [TestMethod]
-    public void VersionInterval_Parse_UnboundedUpper_ReturnsParsedInterval()
+    public void VersionInterval_Parse_UnboundedUpper_HasNullUpperBound()
     {
         // Arrange
         var text = "[3.0.0,)";
@@ -109,6 +141,40 @@ public class VersionIntervalTests
     }
 
     /// <summary>
+    ///     Test that Parse returns an interval with both bounds present.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Parse_BothBoundsPresent_ReturnsInterval()
+    {
+        // Arrange
+        var text = "[1.0.0,2.0.0]";
+
+        // Act
+        var result = VersionInterval.Parse(text);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("1.0.0", result.LowerBound);
+        Assert.AreEqual("2.0.0", result.UpperBound);
+    }
+
+    /// <summary>
+    ///     Test that Parse returns null for invalid format (no brackets).
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Parse_InvalidFormat_ReturnsNull()
+    {
+        // Arrange
+        var text = "not-an-interval";
+
+        // Act
+        var result = VersionInterval.Parse(text);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
     ///     Test that Parse returns null for null input.
     /// </summary>
     [TestMethod]
@@ -118,22 +184,6 @@ public class VersionIntervalTests
 
         // Act
         var result = VersionInterval.Parse(null);
-
-        // Assert
-        Assert.IsNull(result);
-    }
-
-    /// <summary>
-    ///     Test that Parse returns null for invalid input.
-    /// </summary>
-    [TestMethod]
-    public void VersionInterval_Parse_InvalidInput_ReturnsNull()
-    {
-        // Arrange
-        var text = "not-an-interval";
-
-        // Act
-        var result = VersionInterval.Parse(text);
 
         // Assert
         Assert.IsNull(result);

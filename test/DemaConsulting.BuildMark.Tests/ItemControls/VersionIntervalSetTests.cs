@@ -29,10 +29,10 @@ using DemaConsulting.BuildMark.ItemControls;
 public class VersionIntervalSetTests
 {
     /// <summary>
-    ///     Test that Parse returns single interval for single interval text.
+    ///     Test that Parse returns one interval for a single interval token.
     /// </summary>
     [TestMethod]
-    public void VersionIntervalSet_Parse_SingleInterval_ReturnsSingleInterval()
+    public void VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval()
     {
         // Arrange
         var text = "[1.0.0,2.0.0)";
@@ -48,10 +48,10 @@ public class VersionIntervalSetTests
     }
 
     /// <summary>
-    ///     Test that Parse returns all intervals for multiple interval text.
+    ///     Test that Parse returns two intervals for two interval tokens separated by comma.
     /// </summary>
     [TestMethod]
-    public void VersionIntervalSet_Parse_MultipleIntervals_ReturnsAllIntervals()
+    public void VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals()
     {
         // Arrange
         var text = "(,1.0.1],[1.1.0,1.2.0)";
@@ -71,6 +71,27 @@ public class VersionIntervalSetTests
     }
 
     /// <summary>
+    ///     Test that a comma inside an interval is treated as a bound separator, not an interval separator.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly()
+    {
+        // Arrange - two intervals each containing an internal comma between bounds
+        var text = "[1.0.0,2.0.0),[3.0.0,4.0.0)";
+
+        // Act
+        var result = VersionIntervalSet.Parse(text);
+
+        // Assert - the internal commas must not split the intervals; two intervals expected
+        Assert.IsNotNull(result);
+        Assert.HasCount(2, result.Intervals);
+        Assert.AreEqual("1.0.0", result.Intervals[0].LowerBound);
+        Assert.AreEqual("2.0.0", result.Intervals[0].UpperBound);
+        Assert.AreEqual("3.0.0", result.Intervals[1].LowerBound);
+        Assert.AreEqual("4.0.0", result.Intervals[1].UpperBound);
+    }
+
+    /// <summary>
     ///     Test that Parse returns empty set for empty string.
     /// </summary>
     [TestMethod]
@@ -85,5 +106,24 @@ public class VersionIntervalSetTests
         // Assert
         Assert.IsNotNull(result);
         Assert.HasCount(0, result.Intervals);
+    }
+
+    /// <summary>
+    ///     Test that an invalid interval token (e.g., no comma) is silently discarded.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Parse_InvalidToken_DiscardedSilently()
+    {
+        // Arrange - second token has brackets but no comma, making it invalid
+        var text = "[1.0.0,2.0.0),[no-comma]";
+
+        // Act
+        var result = VersionIntervalSet.Parse(text);
+
+        // Assert - invalid token is discarded; only the valid interval remains
+        Assert.IsNotNull(result);
+        Assert.HasCount(1, result.Intervals);
+        Assert.AreEqual("1.0.0", result.Intervals[0].LowerBound);
+        Assert.AreEqual("2.0.0", result.Intervals[0].UpperBound);
     }
 }

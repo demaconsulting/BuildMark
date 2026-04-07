@@ -28,9 +28,11 @@ namespace DemaConsulting.BuildMark.ItemControls;
 public static class ItemControlsParser
 {
     /// <summary>
-    ///     Regex pattern for matching HTML comments.
+    ///     Regex pattern for matching HTML comment delimiters.
+    ///     Strips only the comment delimiters (not content), so that a buildmark block
+    ///     wrapped in an HTML comment is still visible to the parser after stripping.
     /// </summary>
-    private static readonly Regex HtmlCommentRegex = new(@"<!--.*?-->", RegexOptions.Singleline | RegexOptions.Compiled);
+    private static readonly Regex HtmlCommentDelimitersRegex = new(@"<!--|-->", RegexOptions.Compiled);
 
     /// <summary>
     ///     Valid visibility value: public.
@@ -65,8 +67,9 @@ public static class ItemControlsParser
             return null;
         }
 
-        // Strip all HTML comments (<!-- ... -->) using Regex
-        var stripped = HtmlCommentRegex.Replace(description, string.Empty);
+        // Strip HTML comment delimiters (<!-- and -->) so that a buildmark block
+        // wrapped in an HTML comment is exposed and can be detected by the parser
+        var stripped = HtmlCommentDelimitersRegex.Replace(description, string.Empty);
 
         // Locate buildmark code fence: line starting with 3+ backticks followed by "buildmark"
         // The fence delimiter is 3+ backticks followed immediately by "buildmark" (case-insensitive)

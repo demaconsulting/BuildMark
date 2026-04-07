@@ -647,8 +647,8 @@ public class GitHubRepoConnector : RepoConnectorBase
             .Select(issue => (issue, issueId: issue.Number.ToString()))
             .Where(tuple => !allChangeIds.Contains(tuple.issueId))
             .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
-            .Where(itemInfo => itemInfo != null && itemInfo.Type == "bug")
-            .Select(itemInfo => itemInfo!)
+            .OfType<ItemInfo>()
+            .Where(itemInfo => itemInfo.Type == "bug")
             .ToList();
     }
 

@@ -29,13 +29,13 @@ using DemaConsulting.BuildMark.ItemControls;
 public class ItemControlsTests
 {
     /// <summary>
-    ///     Test that visibility and type can both be parsed from a buildmark block.
+    ///     Test that the subsystem returns "public" visibility when specified.
     /// </summary>
     [TestMethod]
-    public void ItemControls_Parse_VisibilityAndTypeInBlock_ReturnsBothFields()
+    public void ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility()
     {
         // Arrange
-        var description = "Issue description.\n\n```buildmark\nvisibility: public\ntype: feature\n```\n";
+        var description = "Issue description.\n\n```buildmark\nvisibility: public\n```\n";
 
         // Act
         var result = ItemControlsParser.Parse(description);
@@ -43,17 +43,66 @@ public class ItemControlsTests
         // Assert
         Assert.IsNotNull(result);
         Assert.AreEqual("public", result.Visibility);
-        Assert.AreEqual("feature", result.Type);
-        Assert.IsNull(result.AffectedVersions);
     }
 
     /// <summary>
-    ///     Test that a buildmark block with multi-range affected-versions parses all intervals correctly.
+    ///     Test that the subsystem returns "internal" visibility when specified.
     /// </summary>
     [TestMethod]
-    public void ItemControls_Parse_HiddenBlockWithAffectedVersions_ReturnsIntervals()
+    public void ItemControls_Parse_WithVisibilityInternal_ReturnsInternalVisibility()
     {
-        // Arrange - block not in an HTML comment, but with multi-range affected-versions
+        // Arrange
+        var description = "Issue description.\n\n```buildmark\nvisibility: internal\n```\n";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("internal", result.Visibility);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem returns "bug" type when specified.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_Parse_WithTypeBug_ReturnsBugType()
+    {
+        // Arrange
+        var description = "Bug description.\n\n```buildmark\ntype: bug\n```\n";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("bug", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem returns "feature" type when specified.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_Parse_WithTypeFeature_ReturnsFeatureType()
+    {
+        // Arrange
+        var description = "Feature description.\n\n```buildmark\ntype: feature\n```\n";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.AreEqual("feature", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem parses an affected-versions interval set correctly.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_Parse_WithAffectedVersions_ReturnsIntervalSet()
+    {
+        // Arrange - multi-range affected-versions field
         var description = "Feature description.\n\n```buildmark\naffected-versions: (,1.0.1],[1.1.0,1.2.0)\n```\n";
 
         // Act
@@ -67,5 +116,150 @@ public class ItemControlsTests
         Assert.AreEqual("1.0.1", result.AffectedVersions.Intervals[0].UpperBound);
         Assert.AreEqual("1.1.0", result.AffectedVersions.Intervals[1].LowerBound);
         Assert.AreEqual("1.2.0", result.AffectedVersions.Intervals[1].UpperBound);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem recognizes a buildmark block hidden inside an HTML comment.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_Parse_WithHiddenBlock_ReturnsControls()
+    {
+        // Arrange - buildmark block wrapped in HTML comment to hide from GitHub rendered view
+        var description = "Description.\n<!-- ```buildmark\ntype: feature\n``` -->";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert - HTML comment delimiters are stripped, exposing and parsing the block
+        Assert.IsNotNull(result);
+        Assert.AreEqual("feature", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem returns null when no buildmark block is present.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_Parse_WithNoBlock_ReturnsNull()
+    {
+        // Arrange - description with no buildmark fenced block
+        var description = "A plain description with no controls block.";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNull(result);
+    }
+
+    /// <summary>
+    ///     Test that a single version interval in affected-versions is returned correctly.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_SingleInterval_ReturnsInterval()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(1, result.AffectedVersions.Intervals);
+    }
+
+    /// <summary>
+    ///     Test that multiple version intervals in affected-versions are returned correctly.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_MultipleIntervals_ReturnsIntervalSet()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: [1.0.0,2.0.0),[3.0.0,4.0.0)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(2, result.AffectedVersions.Intervals);
+    }
+
+    /// <summary>
+    ///     Test that LowerInclusive is true when '[' is used in affected-versions.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_InclusiveLowerBound_IsInclusive()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.IsTrue(result.AffectedVersions.Intervals[0].LowerInclusive);
+    }
+
+    /// <summary>
+    ///     Test that UpperInclusive is false when ')' is used in affected-versions.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_ExclusiveUpperBound_IsExclusive()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.IsFalse(result.AffectedVersions.Intervals[0].UpperInclusive);
+    }
+
+    /// <summary>
+    ///     Test that LowerBound is null when lower bound is empty in affected-versions.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_UnboundedLower_HasNullLowerBound()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: (,2.0.0)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.IsNull(result.AffectedVersions.Intervals[0].LowerBound);
+    }
+
+    /// <summary>
+    ///     Test that UpperBound is null when upper bound is empty in affected-versions.
+    /// </summary>
+    [TestMethod]
+    public void ItemControls_VersionInterval_Parse_UnboundedUpper_HasNullUpperBound()
+    {
+        // Arrange
+        var description = "```buildmark\naffected-versions: [1.0.0,)\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.IsNull(result.AffectedVersions.Intervals[0].UpperBound);
     }
 }
