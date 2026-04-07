@@ -423,9 +423,10 @@ The `visibility` field explicitly overrides the default visibility rules for an 
 | `public` | Force-include the item in build notes, overriding any default exclusion. |
 | `internal` | Force-exclude the item from build notes, overriding any default inclusion. |
 
-When the `visibility` field is absent, BuildMark applies the default rules: items carrying
-standard GitHub issue labels (`bug`, `defect`, `feature`, and similar) are included in the
-generated build notes.
+When the `visibility` field is absent, BuildMark applies its default rules: merged pull
+requests and linked issues are included in generated build notes by default. Standard GitHub
+issue labels (`bug`, `defect`, `feature`, and similar) are used to classify entries such as
+bug fixes versus changes, but unlabeled or non-standard-labeled items may still be included.
 
 ### Visibility Examples
 

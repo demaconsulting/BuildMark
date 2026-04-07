@@ -829,7 +829,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         var controls = ItemControlsParser.Parse(issue.Body);
 
         // Exclude item if visibility is "internal"
-        if (controls?.Visibility == "internal")
+        // Note: "public" explicitly force-includes the item, so it takes precedence
+        var forceInclude = controls?.Visibility == "public";
+        if (!forceInclude && controls?.Visibility == "internal")
         {
             return null;
         }
@@ -861,7 +863,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         var controls = ItemControlsParser.Parse(pr.Body);
 
         // Exclude item if visibility is "internal"
-        if (controls?.Visibility == "internal")
+        // Note: "public" explicitly force-includes the item, so it takes precedence
+        var forceInclude = controls?.Visibility == "public";
+        if (!forceInclude && controls?.Visibility == "internal")
         {
             return null;
         }

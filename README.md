@@ -225,8 +225,9 @@ The `visibility` field overrides the default visibility rules:
 - `public` - Force-include the item in build notes regardless of other settings
 - `internal` - Force-exclude the item from build notes regardless of labels or tags
 
-When `visibility` is not specified, the default rules apply: items with standard issue labels
-(`bug`, `defect`, `feature`, etc.) are included in build notes.
+When `visibility` is not specified, the default rules apply: merged pull requests and linked
+issues are included in build notes. Standard issue labels (`bug`, `defect`, `feature`, etc.)
+are used to classify entries, but unlabeled or non-standard-labeled items may still be included.
 
 ### Type Override
 

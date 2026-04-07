@@ -20,6 +20,7 @@
 
 using System.Net;
 using System.Text;
+using System.Text.Json;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -322,7 +323,7 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
                                 ""labels"": {{
                                     ""nodes"": [{labelsJson}]
                                 }},
-                                ""body"": {(pr.Body != null ? $@"""{pr.Body.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "")}""" : "null")}
+                                ""body"": {(pr.Body != null ? JsonSerializer.Serialize(pr.Body) : "null")}
                             }}";
             }));
 
@@ -381,7 +382,7 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
                                 ""labels"": {{
                                     ""nodes"": [{labelsJson}]
                                 }},
-                                ""body"": {(issue.Body != null ? $@"""{issue.Body.Replace("\\", "\\\\").Replace("\"", "\\\"").Replace("\n", "\\n").Replace("\r", "")}""" : "null")}
+                                ""body"": {(issue.Body != null ? JsonSerializer.Serialize(issue.Body) : "null")}
                             }}";
             }));
 

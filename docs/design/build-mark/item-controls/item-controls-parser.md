@@ -66,7 +66,8 @@ public record ItemControlsInfo(
 Entry point for the parser. Steps:
 
 1. Return `null` if `description` is null or empty.
-2. Strip all HTML comments from the description.
+2. Strip HTML comment wrappers (`<!--` / `-->`) from the description while
+   preserving the enclosed content.
 3. Locate the `buildmark` code fence using the rules above.
 4. Return `null` if no fence is found.
 5. Split the block body into lines.
