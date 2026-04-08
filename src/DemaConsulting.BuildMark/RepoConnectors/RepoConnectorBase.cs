@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Utilities;
+
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
@@ -43,7 +46,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public abstract Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
+    public abstract Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
 
     /// <summary>
     ///     Finds the index of a version in a version list by normalized version string.
@@ -55,7 +58,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     ///     This method is protected to allow repository connectors to determine version positions
     ///     when constructing BuildInformation objects.
     /// </remarks>
-    protected static int FindVersionIndex(List<Version> versions, string normalizedVersion)
+    protected static int FindVersionIndex(List<VersionInfo> versions, string normalizedVersion)
     {
         // Search for version matching the normalized version string
         for (var i = 0; i < versions.Count; i++)
@@ -66,7 +69,7 @@ public abstract class RepoConnectorBase : IRepoConnector
             }
         }
 
-        // Version not found in list
+        // VersionInfo not found in list
         return -1;
     }
 }

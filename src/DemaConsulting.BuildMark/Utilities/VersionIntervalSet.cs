@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Represents a set of version intervals.
@@ -26,6 +26,26 @@ namespace DemaConsulting.BuildMark.ItemControls;
 /// <param name="Intervals">Read-only list of version intervals.</param>
 public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
 {
+    /// <summary>
+    ///     Determines whether a candidate semantic version falls within any interval in the set.
+    /// </summary>
+    /// <param name="version">Semantic version text to evaluate.</param>
+    /// <returns>True when the version is within any interval; otherwise false.</returns>
+    public bool Contains(string version)
+    {
+        return Intervals.Any(interval => interval.Contains(version));
+    }
+
+    /// <summary>
+    ///     Determines whether a candidate BuildMark version falls within any interval in the set.
+    /// </summary>
+    /// <param name="version">BuildMark version to evaluate.</param>
+    /// <returns>True when the version is within any interval; otherwise false.</returns>
+    public bool Contains(VersionInfo version)
+    {
+        return Contains(version.SemanticVersion);
+    }
+
     /// <summary>
     ///     Parses a version interval set from text.
     /// </summary>

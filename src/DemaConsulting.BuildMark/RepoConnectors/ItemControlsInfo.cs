@@ -18,21 +18,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents the item controls extracted from a buildmark code block.
 /// </summary>
-public interface IRepoConnector
-{
-    /// <summary>
-    ///     Gets build information for a release.
-    /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
-}
+/// <param name="Visibility">Item visibility ("public" or "internal"), or null if not specified.</param>
+/// <param name="Type">Item type override ("bug" or "feature"), or null if not specified.</param>
+/// <param name="AffectedVersions">Affected version intervals, or null if not specified.</param>
+public record ItemControlsInfo(
+    string? Visibility,
+    string? Type,
+    VersionIntervalSet? AffectedVersions);

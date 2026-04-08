@@ -19,7 +19,7 @@
 // SOFTWARE.
 
 using System.Runtime.InteropServices;
-using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
 

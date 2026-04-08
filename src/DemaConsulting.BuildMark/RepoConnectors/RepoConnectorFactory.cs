@@ -18,6 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
+using DemaConsulting.BuildMark.Utilities;
+
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
@@ -28,24 +32,32 @@ public static class RepoConnectorFactory
     /// <summary>
     ///     Creates a repository connector based on the current environment.
     /// </summary>
+    /// <param name="config">Optional connector configuration.</param>
     /// <returns>Repository connector instance.</returns>
-    public static IRepoConnector Create()
+    public static IRepoConnector Create(ConnectorConfig? config = null)
     {
+        // Honor explicit connector selection when configuration is available.
+        if (config?.Type != null &&
+            config.Type.Equals("azure-devops", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new NotSupportedException("Azure DevOps connector support is not yet implemented.");
+        }
+
         // Check for GitHub Actions environment variables
         if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
-            return new GitHubRepoConnector();
+            return new GitHubRepoConnector(config?.GitHub);
         }
 
         // Check if git remote points to GitHub
         if (IsGitHubRepository())
         {
-            return new GitHubRepoConnector();
+            return new GitHubRepoConnector(config?.GitHub);
         }
 
         // Default to GitHub connector
-        return new GitHubRepoConnector();
+        return new GitHubRepoConnector(config?.GitHub);
     }
 
     /// <summary>

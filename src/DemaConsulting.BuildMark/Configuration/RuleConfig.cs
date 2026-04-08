@@ -18,21 +18,36 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents one item-routing rule.
 /// </summary>
-public interface IRepoConnector
+public sealed record RuleConfig
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets or sets the match conditions.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
+    public RuleMatchConfig? Match { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the destination route.
+    /// </summary>
+    public string? Route { get; init; }
+}
+
+/// <summary>
+///     Represents the supported match conditions for a routing rule.
+/// </summary>
+public sealed record RuleMatchConfig
+{
+    /// <summary>
+    ///     Gets the label match values.
+    /// </summary>
+    public List<string> Label { get; } = [];
+
+    /// <summary>
+    ///     Gets the work-item-type match values.
+    /// </summary>
+    public List<string> WorkItemType { get; } = [];
 }

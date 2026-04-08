@@ -18,21 +18,20 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents a configured report section.
 /// </summary>
-public interface IRepoConnector
+public sealed record SectionConfig
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets or sets the unique section identifier.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
+    public string Id { get; init; } = string.Empty;
+
+    /// <summary>
+    ///     Gets or sets the display title.
+    /// </summary>
+    public string Title { get; init; } = string.Empty;
 }

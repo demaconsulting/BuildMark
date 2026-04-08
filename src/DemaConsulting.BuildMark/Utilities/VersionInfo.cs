@@ -20,7 +20,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Represents a version with parsed semantic version information.
@@ -31,7 +31,7 @@ namespace DemaConsulting.BuildMark;
 /// <param name="PreRelease">The pre-release identifier (e.g., rc.4, alpha.1), or empty string if not a pre-release.</param>
 /// <param name="Metadata">The build metadata (e.g., build.5, linux.x64), or empty string if no metadata.</param>
 /// <param name="IsPreRelease">Whether this is a pre-release version.</param>
-public partial record Version(string Tag, string FullVersion, string SemanticVersion, string PreRelease, string Metadata, bool IsPreRelease)
+public partial record VersionInfo(string Tag, string FullVersion, string SemanticVersion, string PreRelease, string Metadata, bool IsPreRelease)
 {
     /// <summary>
     ///     Regex pattern for parsing version tags with optional prefix, pre-release, and build metadata.
@@ -50,7 +50,7 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
     /// </summary>
     /// <param name="tag">Tag name to parse.</param>
     /// <returns>Version instance if tag matches version format, null otherwise.</returns>
-    public static Version? TryCreate(string tag)
+    public static VersionInfo? TryCreate(string tag)
     {
         // Attempt to match tag against version pattern
         var match = TagPattern().Match(tag);
@@ -84,7 +84,7 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
         }
 
         // Create and return version record
-        return new Version(tag, fullVersion, version, preRelease, metadata, hasPreRelease);
+        return new VersionInfo(tag, fullVersion, version, preRelease, metadata, hasPreRelease);
     }
 
     /// <summary>
@@ -93,7 +93,7 @@ public partial record Version(string Tag, string FullVersion, string SemanticVer
     /// <param name="tag">Tag name to parse.</param>
     /// <returns>Version instance.</returns>
     /// <exception cref="ArgumentException">Thrown if tag doesn't match version format.</exception>
-    public static Version Create(string tag)
+    public static VersionInfo Create(string tag)
     {
         // Try to create version from tag
         var version = TryCreate(tag);

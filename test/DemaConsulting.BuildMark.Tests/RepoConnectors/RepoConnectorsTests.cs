@@ -19,7 +19,11 @@
 // SOFTWARE.
 
 using System.Runtime.InteropServices;
+using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -68,7 +72,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act: retrieve build information for v1.0.0
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
         Assert.IsNotNull(buildInfo);
@@ -107,7 +111,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act: retrieve build information for v2.0.0
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Assert: v1.1.0 is selected as baseline and a changelog link is generated
         Assert.IsNotNull(buildInfo);
@@ -163,7 +167,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.1.0"));
 
         // Assert: feature PR is in Changes, bug PR is in Bugs
         Assert.IsNotNull(buildInfo);
@@ -202,7 +206,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert: open issue surfaces as a known issue
         Assert.IsNotNull(buildInfo);
@@ -243,7 +247,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Assert: baseline should be v1.1.0 (the last release), not v2.0.0-rc.1 (a pre-release)
         Assert.IsNotNull(buildInfo);
@@ -327,7 +331,7 @@ public class RepoConnectorsTests
     {
         // Arrange: create connector and request a known version
         var connector = new MockRepoConnector();
-        var version = Version.Create("2.0.0");
+        var version = VersionInfo.Create("2.0.0");
 
         // Act: retrieve build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -345,7 +349,7 @@ public class RepoConnectorsTests
     {
         // Arrange: create connector
         var connector = new MockRepoConnector();
-        var version = Version.Create("2.0.0");
+        var version = VersionInfo.Create("2.0.0");
 
         // Act: retrieve build information
         var buildInfo = await connector.GetBuildInformationAsync(version);

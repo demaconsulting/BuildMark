@@ -17,7 +17,8 @@ sections:
           must use the configured owner, repo, and optional GitHub Enterprise base URL
           instead of auto-detecting them from the Git remote URL. CLI arguments remain
           as a fallback when the config values are absent.
-        tests: []
+        tests:
+          - GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
 
       - id: BuildMark-GitHub-BuildInformation
         title: The GitHubRepoConnector class shall retrieve build information from a GitHub repository.

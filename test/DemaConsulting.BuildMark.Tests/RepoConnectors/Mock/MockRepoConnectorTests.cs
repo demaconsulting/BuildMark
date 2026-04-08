@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -67,7 +70,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector and specify a known version
         var connector = new MockRepoConnector();
-        var version = Version.Create("v2.0.0");
+        var version = VersionInfo.Create("v2.0.0");
 
         // Act - Get build information with explicit version
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -89,7 +92,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector without explicit version, relying on tag matching
         var connector = new MockRepoConnector();
-        var version = Version.Create("v1.0.0");
+        var version = VersionInfo.Create("v1.0.0");
 
         // Act - Get build information for a version that exists in the mock tags
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -112,7 +115,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector with version that has associated changes
         var connector = new MockRepoConnector();
-        var version = Version.Create("2.0.0");
+        var version = VersionInfo.Create("2.0.0");
 
         // Act - Get build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -137,7 +140,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector and request version with known changes
         var connector = new MockRepoConnector();
-        var version = Version.Create("2.0.0");
+        var version = VersionInfo.Create("2.0.0");
 
         // Act - Get build information
         var buildInfo = await connector.GetBuildInformationAsync(version);

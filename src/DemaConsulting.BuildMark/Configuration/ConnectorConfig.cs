@@ -18,21 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents the connector envelope from configuration.
 /// </summary>
-public interface IRepoConnector
+public sealed record ConnectorConfig
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets or sets the connector type discriminator.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
+    public string? Type { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the GitHub connector settings.
+    /// </summary>
+    public GitHubConnectorConfig? GitHub { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the Azure DevOps connector settings.
+    /// </summary>
+    public AzureDevOpsConnectorConfig? AzureDevOps { get; init; }
 }

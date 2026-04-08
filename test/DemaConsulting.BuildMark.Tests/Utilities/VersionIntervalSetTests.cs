@@ -20,7 +20,7 @@
 
 namespace DemaConsulting.BuildMark.Tests;
 
-using DemaConsulting.BuildMark.ItemControls;
+using DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Tests for VersionIntervalSet.Parse method.
@@ -125,5 +125,86 @@ public class VersionIntervalSetTests
         Assert.HasCount(1, result.Intervals);
         Assert.AreEqual("1.0.0", result.Intervals[0].LowerBound);
         Assert.AreEqual("2.0.0", result.Intervals[0].UpperBound);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns true when the candidate is inside the first interval.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
+
+        // Act
+        var result = intervalSet.Contains("1.5.0");
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns true when the candidate is inside a later interval.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
+
+        // Act
+        var result = intervalSet.Contains("3.5.0");
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns false when the candidate is outside all intervals.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
+
+        // Act
+        var result = intervalSet.Contains("2.5.0");
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns false for an empty interval set.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_EmptySet_ReturnsFalse()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse(string.Empty);
+
+        // Act
+        var result = intervalSet.Contains("1.0.0");
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    /// <summary>
+    ///     Test that the VersionInfo overload delegates to the semantic version.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_Version_DelegatesToSemanticVersion()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
+        var version = VersionInfo.Create("v3.1.0-rc.1");
+
+        // Act
+        var result = intervalSet.Contains(version);
+
+        // Assert
+        Assert.IsTrue(result);
     }
 }

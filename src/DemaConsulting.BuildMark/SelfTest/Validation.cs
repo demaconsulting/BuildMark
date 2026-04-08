@@ -19,11 +19,13 @@
 // SOFTWARE.
 
 using System.Runtime.InteropServices;
+using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.TestResults.IO;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.SelfTest;
 
 /// <summary>
 ///     Provides self-validation functionality for the BuildMark tool.

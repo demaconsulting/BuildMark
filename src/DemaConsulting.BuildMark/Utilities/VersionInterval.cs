@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Represents a version interval with optional lower and upper bounds.
@@ -33,6 +33,77 @@ public record VersionInterval(
     string? UpperBound,
     bool UpperInclusive)
 {
+    /// <summary>
+    ///     Determines whether a candidate semantic version falls within the interval.
+    /// </summary>
+    /// <param name="version">Semantic version text to evaluate.</param>
+    /// <returns>True when the version is within the interval; otherwise false.</returns>
+    public bool Contains(string version)
+    {
+        // Reject invalid semantic version text.
+        if (!TryParseComparableVersion(version, out var candidateVersion))
+        {
+            return false;
+        }
+
+        // Reject versions below the lower bound.
+        if (LowerBound != null && TryParseComparableVersion(LowerBound, out var lowerBoundVersion))
+        {
+            var lowerComparison = candidateVersion.CompareTo(lowerBoundVersion);
+            if (lowerComparison < 0 || (lowerComparison == 0 && !LowerInclusive))
+            {
+                return false;
+            }
+        }
+
+        // Reject versions above the upper bound.
+        if (UpperBound != null && TryParseComparableVersion(UpperBound, out var upperBoundVersion))
+        {
+            var upperComparison = candidateVersion.CompareTo(upperBoundVersion);
+            if (upperComparison > 0 || (upperComparison == 0 && !UpperInclusive))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Determines whether a candidate BuildMark version falls within the interval.
+    /// </summary>
+    /// <param name="version">BuildMark version to evaluate.</param>
+    /// <returns>True when the version is within the interval; otherwise false.</returns>
+    public bool Contains(VersionInfo version)
+    {
+        return Contains(version.SemanticVersion);
+    }
+
+    /// <summary>
+    ///     Tries to parse a comparable version by first accepting plain <see cref="System.Version"/>
+    ///     input and then normalizing semantic-version text with prerelease or build metadata
+    ///     through <see cref="VersionInfo"/>.
+    /// </summary>
+    /// <param name="text">Semantic version text to parse.</param>
+    /// <param name="version">Comparable version value.</param>
+    /// <returns>True when parsing succeeds; otherwise false.</returns>
+    private static bool TryParseComparableVersion(string text, out System.Version version)
+    {
+        if (System.Version.TryParse(text, out version!))
+        {
+            return true;
+        }
+
+        var versionInfo = VersionInfo.TryCreate(text);
+        if (versionInfo != null && System.Version.TryParse(versionInfo.SemanticVersion, out version!))
+        {
+            return true;
+        }
+
+        version = null!;
+        return false;
+    }
+
     /// <summary>
     ///     Parses a version interval from text.
     /// </summary>

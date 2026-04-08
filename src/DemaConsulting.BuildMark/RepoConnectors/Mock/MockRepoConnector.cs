@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Utilities;
+
+namespace DemaConsulting.BuildMark.RepoConnectors.Mock;
 
 /// <summary>
 ///     Mock repository connector for deterministic testing.
@@ -83,7 +86,7 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
     {
         // Retrieve tag history and current commit hash from the repository
         var tags = await GetTagHistoryAsync();
@@ -136,9 +139,9 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="currentHash">Current commit hash.</param>
     /// <returns>Tuple of (toTagInfo, toHash).</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    private async Task<(Version toTagInfo, string toHash)> DetermineTargetVersionAsync(
-        Version? version,
-        List<Version> tags,
+    private async Task<(VersionInfo toTagInfo, string toHash)> DetermineTargetVersionAsync(
+        VersionInfo? version,
+        List<VersionInfo> tags,
         string currentHash)
     {
         // Use explicitly specified version if provided
@@ -179,9 +182,9 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="toTagInfo">Target version.</param>
     /// <param name="tags">List of tag history.</param>
     /// <returns>Tuple of (fromTagInfo, fromHash).</returns>
-    private async Task<(Version? fromTagInfo, string? fromHash)> DetermineBaselineVersionAsync(
-        Version toTagInfo,
-        List<Version> tags)
+    private async Task<(VersionInfo? fromTagInfo, string? fromHash)> DetermineBaselineVersionAsync(
+        VersionInfo toTagInfo,
+        List<VersionInfo> tags)
     {
         // Return null baseline if no tags exist
         if (tags.Count == 0)
@@ -214,7 +217,7 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="toIndex">Index of target version in tag history.</param>
     /// <param name="tags">List of tags.</param>
     /// <returns>Baseline version or null.</returns>
-    private static Version? DetermineBaselineForPreRelease(int toIndex, List<Version> tags)
+    private static VersionInfo? DetermineBaselineForPreRelease(int toIndex, List<VersionInfo> tags)
     {
         // Pre-release versions use the immediately previous tag as baseline
         if (toIndex > 0)
@@ -239,7 +242,7 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="toIndex">Index of target version in tag history.</param>
     /// <param name="tags">List of tags.</param>
     /// <returns>Baseline version or null.</returns>
-    private static Version? DetermineBaselineForRelease(int toIndex, List<Version> tags)
+    private static VersionInfo? DetermineBaselineForRelease(int toIndex, List<VersionInfo> tags)
     {
         // Release versions skip pre-releases and use previous release as baseline
         var startIndex = DetermineSearchStartIndex(toIndex, tags.Count);
@@ -355,13 +358,13 @@ public class MockRepoConnector : RepoConnectorBase
     ///     Gets the history of tags leading to the current branch.
     /// </summary>
     /// <returns>List of tags in chronological order.</returns>
-    private Task<List<Version>> GetTagHistoryAsync()
+    private Task<List<VersionInfo>> GetTagHistoryAsync()
     {
-        // Parse all mock tag names into Version objects
+        // Parse all mock tag names into VersionInfo objects
         var tagInfoList = _tagHashes.Keys
-            .Select(Version.TryCreate)
+            .Select(VersionInfo.TryCreate)
             .Where(t => t != null)
-            .Cast<Version>()
+            .Cast<VersionInfo>()
             .ToList();
 
         // Return parsed tag history
@@ -374,7 +377,7 @@ public class MockRepoConnector : RepoConnectorBase
     /// <param name="from">Starting version (null for start of history).</param>
     /// <param name="to">Ending version (null for current state).</param>
     /// <returns>List of changes with full information.</returns>
-    private Task<List<ItemInfo>> GetChangesBetweenTagsAsync(Version? from, Version? to)
+    private Task<List<ItemInfo>> GetChangesBetweenTagsAsync(VersionInfo? from, VersionInfo? to)
     {
         // Extract tag names from version objects
         var fromTagName = from?.Tag;

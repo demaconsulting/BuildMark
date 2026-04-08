@@ -178,6 +178,8 @@ sections:
             justification: |
               Configurable sections let teams tailor the structure of generated build notes to
               their conventions without modifying the tool.
+            children:
+              - BuildMark-Configuration-Read
 
           - id: BuildMark-Config-Rules
             title: >-
@@ -186,6 +188,9 @@ sections:
             justification: |
               Declarative routing rules allow repository owners to control categorization of items
               without embedding logic in CI scripts.
+            children:
+              - BuildMark-Configuration-Read
+              - BuildMark-ItemRouter-Route
 
           - id: BuildMark-Config-Lint
             title: >-
