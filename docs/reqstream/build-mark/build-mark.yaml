@@ -163,7 +163,7 @@ sections:
           - id: BuildMark-Config-Connector
             title: The tool shall read repository connector settings from the `.buildmark.yaml` file.
             justification: |
-              Centralising connector configuration in the repository avoids repeating connection
+              Centralizing connector configuration in the repository avoids repeating connection
               details across multiple CI pipelines.
 
           - id: BuildMark-Config-Sections
@@ -177,7 +177,7 @@ sections:
               The tool shall read item routing rules from the `.buildmark.yaml` file and route
               items to the appropriate report section.
             justification: |
-              Declarative routing rules allow repository owners to control categorisation of items
+              Declarative routing rules allow repository owners to control categorization of items
               without embedding logic in CI scripts.
 
       - title: Report Generation
