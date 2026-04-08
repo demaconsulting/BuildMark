@@ -6,9 +6,7 @@ The Utilities subsystem provides shared helper classes used across the BuildMark
 system. It contains `PathHelpers` for safe path combination with traversal
 prevention, `ProcessRunner` for executing external shell commands, and
 `VersionInterval`/`VersionIntervalSet` for parsing mathematical version interval
-expressions.
-
-The subsystem has no dependencies on other BuildMark subsystems.
+expressions and testing whether specific versions fall inside them.
 
 ## Units
 
@@ -34,20 +32,26 @@ The subsystem has no dependencies on other BuildMark subsystems.
 | `RunAsync(command, arguments)`    | Method | Run a process and return stdout; throws on failure      |
 | `TryRunAsync(command, arguments)` | Method | Run a process and return stdout, or null on any failure |
 
-`VersionInterval` exposes the following static method:
+`VersionInterval` exposes the following methods:
 
-| Member         | Kind   | Description                                              |
-|----------------|--------|----------------------------------------------------------|
-| `Parse(text)`  | Method | Parse a single interval token; returns null if invalid   |
+| Member                    | Kind   | Description                                                   |
+|---------------------------|--------|---------------------------------------------------------------|
+| `Parse(text)`             | Method | Parse a single interval token; returns null if invalid        |
+| `Contains(version)`       | Method | Test whether a semantic version string falls inside interval  |
+| `Contains(versionInfo)`   | Method | Test whether a BuildMark `Version` falls inside interval      |
 
-`VersionIntervalSet` exposes the following static method:
+`VersionIntervalSet` exposes the following methods:
 
-| Member         | Kind   | Description                                                        |
-|----------------|--------|--------------------------------------------------------------------|
-| `Parse(text)`  | Method | Parse a comma-separated interval string into an ordered collection |
+| Member                    | Kind   | Description                                                             |
+|---------------------------|--------|-------------------------------------------------------------------------|
+| `Parse(text)`             | Method | Parse a comma-separated interval string into an ordered collection      |
+| `Contains(version)`       | Method | Test whether a semantic version string falls inside any contained range |
+| `Contains(versionInfo)`   | Method | Test whether a BuildMark `Version` falls inside any contained range     |
 
 ## Interactions
 
-All units in this subsystem have no dependencies on other BuildMark subsystems.
-They are consumed by any unit that needs safe path combination, external process
-execution, or version interval parsing.
+`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
+subsystems. `VersionInterval` and `VersionIntervalSet` may consume BuildMark
+`Version` instances through their `Contains(Version)` overloads. The subsystem
+is consumed by any unit that needs safe path combination, external process
+execution, version interval parsing, or version containment checks.
