@@ -154,6 +154,87 @@ buildmark --validate
 buildmark --validate --results validation-results.trx
 ```
 
+## Configuration File
+
+BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root. This file
+separates persistent repository settings from runtime arguments, simplifying CI invocations and
+enabling version-controlled configuration.
+
+The file has three top-level sections:
+
+- **`connector`** — declares the repository connector type (`github`, `azure-devops`, or
+  `github+azure-devops`) and per-connector settings such as URL overrides, repository identifiers,
+  and token environment variable names.
+- **`sections`** — defines the ordered list of sections that will appear in the generated build
+  notes, each identified by an `id` and a `title`.
+- **`rules`** — an ordered list of match/route rules. Each rule can match on `label` and/or
+  `work-item-type`, and routes matched items to a named section or to `suppressed` to exclude them.
+  Rules are evaluated in order and the first match wins. A rule with no `match` key is a catch-all.
+
+Example `.buildmark.yaml`:
+
+```yaml
+# Repository Connector Settings
+connector:
+  # Type of repository
+  type: github+azure-devops   # "github" | "azure-devops" | "github+azure-devops"
+
+  # GitHub settings (used for github or github+azure-devops)
+  github:
+    url: https://github.mycompany.com   # optional; defaults to https://api.github.com
+    repository: owner/repo
+    token-env: GH_TOKEN
+
+  # Azure DevOps settings (used for azure-devops or github+azure-devops)
+  azure-devops:
+    url: https://ado.mycompany.com      # optional; defaults to https://dev.azure.com
+    organization: MyOrg
+    project: MyProject
+    repository: MyRepo
+    token-env: AZURE_DEVOPS_TOKEN
+
+# Build Notes sections
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+  - id: dependency-updates
+    title: Dependency Updates
+
+# Item routing rules
+rules:
+  # Labels of 'dependencies', 'renovate', or 'dependabot' get routed to the 'dependency-updates' section
+  - match:
+      label: [dependencies, renovate, dependabot]
+    route: dependency-updates
+
+  # Bug work-items get routed to the 'bugs-fixed' section
+  - match:
+      work-item-type: [Bug]
+    route: bugs-fixed
+
+  # Labels of 'bug', 'defect', or 'regression' get routed to the 'bugs-fixed' section
+  - match:
+      label: [bug, defect, regression]
+    route: bugs-fixed
+
+  # Labels of 'internal' or 'chore' get suppressed
+  - match:
+      label: [internal, chore]
+    route: suppressed
+
+  # Task and Epic work-items get suppressed
+  - match:
+      work-item-type: [Task, Epic]
+    route: suppressed
+
+  # Everything else gets routed to the 'changes' section
+  - route: changes
+```
+
+For more detail see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+
 ## Self Validation
 
 Running self-validation produces a report containing the following information:

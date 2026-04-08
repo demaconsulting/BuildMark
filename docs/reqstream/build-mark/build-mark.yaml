@@ -152,6 +152,34 @@ sections:
             children:
               - BuildMark-RepoConnectors-GitHubConnector
 
+      - title: Configuration File
+        requirements:
+          - id: BuildMark-Config-File
+            title: The tool shall consume settings from a `.buildmark.yaml` configuration file in the repository root.
+            justification: |
+              A dedicated configuration file separates persistent repository settings from runtime
+              arguments, simplifying CI invocations and enabling version-controlled configuration.
+
+          - id: BuildMark-Config-Connector
+            title: The tool shall read repository connector settings from the `.buildmark.yaml` file.
+            justification: |
+              Centralising connector configuration in the repository avoids repeating connection
+              details across multiple CI pipelines.
+
+          - id: BuildMark-Config-Sections
+            title: The tool shall read report section definitions from the `.buildmark.yaml` file.
+            justification: |
+              Configurable sections let teams tailor the structure of generated build notes to
+              their conventions without modifying the tool.
+
+          - id: BuildMark-Config-Rules
+            title: >-
+              The tool shall read item routing rules from the `.buildmark.yaml` file and route
+              items to the appropriate report section.
+            justification: |
+              Declarative routing rules allow repository owners to control categorisation of items
+              without embedding logic in CI scripts.
+
       - title: Report Generation
         requirements:
           - id: BuildMark-Rpt-Markdown
