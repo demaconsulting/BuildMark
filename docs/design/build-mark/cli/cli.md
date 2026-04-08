@@ -26,6 +26,7 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `Help`                | Property | Set when `--help` / `-h` / `-?` flag is present    |
 | `Silent`              | Property | Set when `--silent` flag is present                |
 | `Validate`            | Property | Set when `--validate` flag is present              |
+| `Lint`                | Property | Set when `--lint` flag is present                  |
 | `BuildVersion`        | Property | Value of `--build-version` argument                |
 | `ReportFile`          | Property | Value of `--report` argument                       |
 | `ReportDepth`         | Property | Value of `--report-depth` argument (default: 1)    |

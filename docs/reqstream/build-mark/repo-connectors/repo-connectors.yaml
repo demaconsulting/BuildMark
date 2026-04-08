@@ -46,7 +46,9 @@ sections:
           the correct report sections according to the configured section and rule definitions.
           Centralizing this logic in a shared unit ensures consistent routing behavior
           across the GitHub connector and any future connectors such as Azure DevOps.
-        tests: []
+        tests:
+          - RepoConnectors_ItemRouter_MatchingRule_RoutesToSection
+          - RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem
         children:
           - BuildMark-ItemRouter-Route
 
@@ -60,13 +62,13 @@ sections:
           Centralizing this parsing logic within the RepoConnectors subsystem ensures
           it is reusable by all connector implementations without duplication.
         tests:
-          - ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility
-          - ItemControlsParser_Parse_WithVisibilityInternal_ReturnsInternalVisibility
-          - ItemControlsParser_Parse_WithTypeBug_ReturnsBugType
-          - ItemControlsParser_Parse_WithTypeFeature_ReturnsFeatureType
-          - ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet
-          - ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls
-          - ItemControlsParser_Parse_WithNoBlock_ReturnsNull
+          - RepoConnectors_ItemControls_VisibilityPublic_ReturnsPublicVisibility
+          - RepoConnectors_ItemControls_VisibilityInternal_ReturnsInternalVisibility
+          - RepoConnectors_ItemControls_TypeBug_ReturnsBugType
+          - RepoConnectors_ItemControls_TypeFeature_ReturnsFeatureType
+          - RepoConnectors_ItemControls_AffectedVersions_ReturnsIntervalSet
+          - RepoConnectors_ItemControls_HiddenBlock_ReturnsControls
+          - RepoConnectors_ItemControls_NoBlock_ReturnsNull
         children:
           - BuildMark-ItemControlsInfo-Record
           - BuildMark-ItemControlsParser-Parse

@@ -1,8 +1,8 @@
-# Version
+# VersionInfo
 
 ## Overview
 
-`Version` is a record in the Utilities subsystem that parses repository tag
+`VersionInfo` is a record in the Utilities subsystem that parses repository tag
 strings into normalized semantic version data. It accepts optional tag
 prefixes, optional pre-release labels, and optional build metadata, and it
 exposes the parsed result in a form reusable across connectors and reporting.
@@ -10,7 +10,7 @@ exposes the parsed result in a form reusable across connectors and reporting.
 ## Data Model
 
 ```csharp
-public partial record Version(
+public partial record VersionInfo(
     string Tag,
     string FullVersion,
     string SemanticVersion,
@@ -33,21 +33,21 @@ and bare `2.0.0-beta.1`.
 
 ## Methods
 
-### `TryCreate(tag) → Version?`
+### `TryCreate(tag) → VersionInfo?`
 
 Static factory method. Attempts to parse the supplied tag string into a
-`Version` record. Returns `null` if the tag does not match a recognized version
+`VersionInfo` record. Returns `null` if the tag does not match a recognized version
 format.
 
-### `Create(tag) → Version`
+### `Create(tag) → VersionInfo`
 
 Static factory method. Calls `TryCreate` and throws `ArgumentException` when the
 tag does not match the supported version pattern.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                             |
-|---------------------|------------------------------------------------------------------|
-| `RepoConnectors`    | Call `TryCreate` or `Create` when parsing repository tags        |
-| `BuildNotes`        | `VersionTag` carries parsed `Version` data for report boundaries |
-| `VersionInterval`   | Consumes `Version.SemanticVersion` via `Contains(Version)`       |
+| Unit / Subsystem  | Role                                                                  |
+|-------------------|-----------------------------------------------------------------------|
+| `RepoConnectors`  | Call `TryCreate` or `Create` when parsing repository tags             |
+| `BuildNotes`      | `VersionTag` carries parsed `VersionInfo` data for report boundaries  |
+| `VersionInterval` | Consumes `VersionInfo.SemanticVersion` via `Contains(VersionInfo)`    |

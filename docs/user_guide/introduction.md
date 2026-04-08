@@ -128,21 +128,13 @@ Example `.buildmark.yaml`:
 # Repository Connector Settings
 connector:
   # Type of repository
-  type: github+azure-devops   # "github" | "azure-devops" | "github+azure-devops"
+  type: github
 
-  # GitHub settings (used for github or github+azure-devops)
+  # GitHub settings
   github:
     url: https://github.mycompany.com   # optional; defaults to https://api.github.com
     repository: owner/repo
     token-env: GH_TOKEN
-
-  # Azure DevOps settings (used for azure-devops or github+azure-devops)
-  azure-devops:
-    url: https://ado.mycompany.com      # optional; defaults to https://dev.azure.com
-    organization: MyOrg
-    project: MyProject
-    repository: MyRepo
-    token-env: AZURE_DEVOPS_TOKEN
 
 # Build Notes sections
 sections:
@@ -188,13 +180,12 @@ rules:
 
 The `connector` section declares how BuildMark connects to source-control and work-item systems.
 
-The `type` key selects which connector(s) are active:
+The `type` key currently supports only the GitHub connector. Azure DevOps values are reserved for
+future support and are not yet implemented.
 
 | Value | Description |
 | :---- | :---------- |
 | `github` | GitHub only |
-| `azure-devops` | Azure DevOps only |
-| `github+azure-devops` | Both GitHub and Azure DevOps |
 
 ### GitHub connector settings
 
@@ -203,16 +194,6 @@ The `type` key selects which connector(s) are active:
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
 | `token-env` | Yes | Name of the environment variable that holds the GitHub access token. |
-
-### Azure DevOps connector settings
-
-| Key | Required | Description |
-| :-- | :------- | :---------- |
-| `url` | No | Base URL of the Azure DevOps instance. Defaults to `https://dev.azure.com`. |
-| `organization` | Yes | Azure DevOps organization name. |
-| `project` | Yes | Azure DevOps project name. |
-| `repository` | Yes | Azure DevOps repository name. |
-| `token-env` | Yes | Name of the environment variable that holds the Azure DevOps access token. |
 
 ## Report Sections
 

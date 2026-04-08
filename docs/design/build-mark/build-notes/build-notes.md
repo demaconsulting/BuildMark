@@ -16,14 +16,14 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 |----------------------|-----------------------------------|---------------------------------------------------|
 | `BuildInformation`   | `BuildNotes/BuildInformation.cs`  | Top-level build data model and markdown renderer  |
 | `ItemInfo`           | `BuildNotes/ItemInfo.cs`          | Single issue or pull request in the report        |
-| `VersionTag`         | `BuildNotes/VersionTag.cs`        | Pairs a `Version` with its commit hash            |
+| `VersionTag`         | `BuildNotes/VersionTag.cs`        | Pairs a `VersionInfo` with its commit hash        |
 | `WebLink`            | `BuildNotes/WebLink.cs`           | Hyperlink used for the full-changelog entry       |
 
 ## Interactions
 
 | Unit / Subsystem    | Role                                                              |
 |---------------------|-------------------------------------------------------------------|
-| `Utilities`         | Supplies the `Version` type used by `VersionTag`                  |
+| `Utilities`         | Supplies the `VersionInfo` type used by `VersionTag`              |
 | `RepoConnectors`    | Connectors construct and populate `BuildInformation` records      |
 | `Program`           | Calls `BuildInformation.ToMarkdown` to produce the report file    |
 | `SelfTest`          | `Validation` creates `BuildInformation` records during self-tests |

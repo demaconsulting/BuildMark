@@ -17,11 +17,11 @@ sections:
           all parsed flags and output channels so that the rest of the tool has a single,
           consistent entry point for CLI interaction.
         tests:
-          - Context_Create_EmptyArguments_CreatesValidContext
-          - Context_Create_LongVersionFlag_SetsVersionProperty
-          - Context_Create_SilentFlag_SetsSilentProperty
-          - Context_Create_LogArgument_CreatesLogFile
-          - Context_Create_UnsupportedArgument_ThrowsArgumentException
+          - Cli_Context_EmptyArguments_CreatesValidContext
+          - Cli_VersionFlag_SetsProperty
+          - Cli_SilentFlag_SetsProperty
+          - Cli_LogFlag_CreatesLogFile
+          - Cli_InvalidArgument_ThrowsException
         children:
           - BuildMark-Context-ArgumentParsing
           - BuildMark-Context-InvalidArgs
@@ -36,8 +36,7 @@ sections:
           Users need to quickly identify the version of the tool they are using for
           troubleshooting and compatibility verification.
         tests:
-          - Context_Create_LongVersionFlag_SetsVersionProperty
-          - Context_Create_ShortVersionFlag_SetsVersionProperty
+          - Cli_VersionFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -47,9 +46,7 @@ sections:
           Users need access to command-line usage documentation without requiring
           external resources.
         tests:
-          - Context_Create_LongHelpFlag_SetsHelpProperty
-          - Context_Create_ShortHelpFlag_SetsHelpProperty
-          - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
+          - Cli_HelpFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -59,8 +56,8 @@ sections:
           Enables automated scripts and CI/CD pipelines to run the tool without
           cluttering output logs when only the exit code is needed.
         tests:
-          - Context_Create_SilentFlag_SetsSilentProperty
-          - Context_WriteLine_Silent_DoesNotWriteToConsole
+          - Cli_SilentFlag_SetsProperty
+          - Cli_SilentFlag_SuppressesConsoleOutput
         children:
           - BuildMark-Context-Silent
 
@@ -71,7 +68,7 @@ sections:
           enabling flexible version management strategies and supporting scenarios where
           version numbers are determined externally.
         tests:
-          - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
+          - Cli_BuildVersionFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -81,8 +78,7 @@ sections:
           Enables users to direct build notes output to a specific file and embed it at
           any heading level within a larger markdown document.
         tests:
-          - Context_Create_ReportArgument_SetsReportFileProperty
-          - Context_Create_ReportDepthArgument_SetsReportDepthProperty
+          - Cli_ReportFlags_SetProperties
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -92,10 +88,7 @@ sections:
           Provides persistent logging for debugging and audit trails. Log files enable
           post-run inspection of tool output without requiring console capture.
         tests:
-          - Context_Create_LogArgument_CreatesLogFile
-          - Context_Create_LogWithoutValue_ThrowsArgumentException
-          - Context_WriteError_WithLogFile_WritesToLogFile
-          - Context_WriteLine_WithLogFile_WritesToLogFile
+          - Cli_LogFlag_CreatesLogFile
         children:
           - BuildMark-Context-Output
 
@@ -105,7 +98,7 @@ sections:
           Provides a built-in mechanism to verify the tool is functioning correctly
           in the deployment environment.
         tests:
-          - Context_Create_ValidateFlag_SetsValidateProperty
+          - Cli_ValidateFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -115,8 +108,7 @@ sections:
           Enables integration with CI/CD systems that expect standard test result formats
           (TRX or JUnit XML).
         tests:
-          - Context_Create_ResultsArgument_SetsResultsFileProperty
-          - Context_Create_ResultsWithoutValue_ThrowsArgumentException
+          - Cli_ResultsFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -126,7 +118,7 @@ sections:
           Error messages must be written to stderr so they remain visible to the user
           without polluting stdout, which consumers may pipe or redirect for data capture.
         tests:
-          - Context_WriteError_NotSilent_WritesToConsole
+          - Cli_ErrorOutput_WritesToStderr
         children:
           - BuildMark-Context-ErrorOutput
 
@@ -136,16 +128,8 @@ sections:
           Providing clear feedback for invalid arguments helps users quickly correct
           mistakes and prevents silent misconfiguration in automated workflows.
         tests:
-          - Context_Create_UnsupportedArgument_ThrowsArgumentException
-          - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
-          - Context_Create_ReportWithoutValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithoutValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException
-          - Context_Create_ResultsWithoutValue_ThrowsArgumentException
-          - Context_Create_LogWithoutValue_ThrowsArgumentException
-          - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
+          - Cli_InvalidArgument_ThrowsException
+          - Cli_MissingArgumentValue_ThrowsException
         children:
           - BuildMark-Context-InvalidArgs
 
@@ -155,7 +139,7 @@ sections:
           Standard exit codes enable build automation systems and scripts to detect success
           or failure conditions programmatically.
         tests:
-          - Context_ExitCode_NoErrors_RemainsZero
-          - Context_WriteError_SetsExitCodeToOne
+          - Cli_ExitCode_DefaultsToZero
+          - Cli_WriteError_SetsExitCodeToOne
         children:
           - BuildMark-Context-ExitCode

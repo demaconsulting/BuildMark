@@ -480,4 +480,195 @@ public class RepoConnectorsTests
         // Assert: the factory selects the GitHub connector for this GitHub-hosted repository
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-RepoConnectors-ItemControls
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Test that the subsystem parses "public" visibility from a buildmark block.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_VisibilityPublic_ReturnsPublicVisibility()
+    {
+        // Arrange: description with public visibility
+        var description = "Issue description.\n\n```buildmark\nvisibility: public\n```\n";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: visibility is "public"
+        Assert.IsNotNull(result);
+        Assert.AreEqual("public", result.Visibility);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem parses "internal" visibility from a buildmark block.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_VisibilityInternal_ReturnsInternalVisibility()
+    {
+        // Arrange: description with internal visibility
+        var description = "Issue description.\n\n```buildmark\nvisibility: internal\n```\n";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: visibility is "internal"
+        Assert.IsNotNull(result);
+        Assert.AreEqual("internal", result.Visibility);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem parses "bug" type from a buildmark block.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_TypeBug_ReturnsBugType()
+    {
+        // Arrange: description with bug type
+        var description = "Bug description.\n\n```buildmark\ntype: bug\n```\n";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: type is "bug"
+        Assert.IsNotNull(result);
+        Assert.AreEqual("bug", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem parses "feature" type from a buildmark block.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_TypeFeature_ReturnsFeatureType()
+    {
+        // Arrange: description with feature type
+        var description = "Feature description.\n\n```buildmark\ntype: feature\n```\n";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: type is "feature"
+        Assert.IsNotNull(result);
+        Assert.AreEqual("feature", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem parses affected-versions from a buildmark block.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_AffectedVersions_ReturnsIntervalSet()
+    {
+        // Arrange: description with affected-versions field
+        var description = "Description.\n\n```buildmark\naffected-versions: (,1.0.1],[1.1.0,1.2.0)\n```\n";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: affected versions interval set is parsed correctly
+        Assert.IsNotNull(result);
+        Assert.IsNotNull(result.AffectedVersions);
+        Assert.HasCount(2, result.AffectedVersions.Intervals);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem recognizes a buildmark block hidden in an HTML comment.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_HiddenBlock_ReturnsControls()
+    {
+        // Arrange: buildmark block wrapped in HTML comment delimiters
+        var description = "Description.\n<!-- ```buildmark\ntype: feature\n``` -->";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: controls are extracted despite the HTML comment wrapping
+        Assert.IsNotNull(result);
+        Assert.AreEqual("feature", result.Type);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem returns null when no buildmark block is present.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemControls_NoBlock_ReturnsNull()
+    {
+        // Arrange: description with no buildmark block
+        var description = "A plain description with no controls block.";
+
+        // Act: parse the description
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert: null is returned
+        Assert.IsNull(result);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-RepoConnectors-ItemRouter
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Test that the subsystem routes items to matching sections based on rules.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemRouter_MatchingRule_RoutesToSection()
+    {
+        // Arrange: define sections and rules, then create items to route
+        var sections = new List<Configuration.SectionConfig>
+        {
+            new() { Id = "features", Title = "Features" },
+            new() { Id = "bugs", Title = "Bugs Fixed" }
+        };
+
+        var rules = new List<Configuration.RuleConfig>
+        {
+            new() { Match = new Configuration.RuleMatchConfig { Label = { "feature" } }, Route = "features" },
+            new() { Match = new Configuration.RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
+        };
+
+        var items = new List<BuildNotes.ItemInfo>
+        {
+            new("1", "Add feature X", "https://example.com/1", "feature", 1),
+            new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
+        };
+
+        // Act: route the items
+        var routed = ItemRouter.Route(items, rules, sections);
+
+        // Assert: each item is routed to its matching section
+        Assert.HasCount(1, routed["features"]);
+        Assert.AreEqual("1", routed["features"][0].Id);
+        Assert.HasCount(1, routed["bugs"]);
+        Assert.AreEqual("2", routed["bugs"][0].Id);
+    }
+
+    /// <summary>
+    ///     Test that the subsystem suppresses items when the route is "suppressed".
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem()
+    {
+        // Arrange: define a section and a suppression rule
+        var sections = new List<Configuration.SectionConfig>
+        {
+            new() { Id = "changes", Title = "Changes" }
+        };
+
+        var rules = new List<Configuration.RuleConfig>
+        {
+            new() { Match = new Configuration.RuleMatchConfig { Label = { "documentation" } }, Route = "suppressed" }
+        };
+
+        var items = new List<BuildNotes.ItemInfo>
+        {
+            new("3", "Update docs", "https://example.com/3", "documentation", 3)
+        };
+
+        // Act: route the items
+        var routed = ItemRouter.Route(items, rules, sections);
+
+        // Assert: the item is suppressed and does not appear in any section
+        Assert.IsEmpty(routed["changes"]);
+    }
 }
