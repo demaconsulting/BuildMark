@@ -159,6 +159,8 @@ sections:
             justification: |
               A dedicated configuration file separates persistent repository settings from runtime
               arguments, simplifying CI invocations and enabling version-controlled configuration.
+            tests:
+              - IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration
             children:
               - BuildMark-Configuration-Read
               - BuildMark-Program-Lint
@@ -168,6 +170,8 @@ sections:
             justification: |
               Centralizing connector configuration in the repository avoids repeating connection
               details across multiple CI pipelines.
+            tests:
+              - IntegrationTest_Report_UsesConnectorForBuildData
             children:
               - BuildMark-Configuration-ConnectorConfig
               - BuildMark-RepoConnectors-Factory
@@ -178,6 +182,8 @@ sections:
             justification: |
               Configurable sections let teams tailor the structure of generated build notes to
               their conventions without modifying the tool.
+            tests:
+              - IntegrationTest_Report_ContainsSectionDefinitions
             children:
               - BuildMark-Configuration-Read
 
@@ -188,6 +194,8 @@ sections:
             justification: |
               Declarative routing rules allow repository owners to control categorization of items
               without embedding logic in CI scripts.
+            tests:
+              - IntegrationTest_Report_RoutesItemsToCorrectSections
             children:
               - BuildMark-Configuration-Read
               - BuildMark-RepoConnectors-ItemRouter
@@ -200,6 +208,8 @@ sections:
               Operators need a way to verify the configuration file is well-formed without
               running a full build. Linting with precise issue locations helps teams fix
               configuration errors quickly.
+            tests:
+              - IntegrationTest_LintFlag_IsAccepted
             children:
               - BuildMark-Configuration-Issues
               - BuildMark-Program-Lint
@@ -324,6 +334,8 @@ sections:
               developers to attach control metadata directly to issues and pull requests. This
               eliminates the need for custom GitHub labels or external configuration files and
               keeps all item-level controls co-located with the work item itself.
+            tests:
+              - IntegrationTest_Report_RecognizesBuildmarkCodeBlock
             children:
               - BuildMark-RepoConnectors-ItemControls
 
@@ -334,6 +346,8 @@ sections:
               Developers may need to suppress internal housekeeping items from public release
               notes, or promote items that would otherwise be excluded. A visibility override
               gives fine-grained control without altering GitHub labels.
+            tests:
+              - IntegrationTest_Report_VisibilityFieldControlsInclusion
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -345,6 +359,8 @@ sections:
               Some items lack the standard labels that trigger automatic inclusion. The public
               value ensures these items still appear in the generated notes when the developer
               explicitly requests it.
+            tests:
+              - IntegrationTest_Report_PublicVisibility_IncludesItem
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -356,6 +372,8 @@ sections:
               Items such as dependency updates, internal refactoring, or CI configuration changes
               are often irrelevant to end-users. The internal value lets developers suppress such
               items without removing the labels that are used for other project-management purposes.
+            tests:
+              - IntegrationTest_Report_InternalVisibility_ExcludesItem
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -367,6 +385,8 @@ sections:
               GitHub labels do not always map cleanly to the bug/feature distinction used in
               release notes. A type override lets developers correct the classification for any
               individual item without modifying project-wide label conventions.
+            tests:
+              - IntegrationTest_Report_TypeFieldOverridesClassification
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -378,6 +398,8 @@ sections:
               Correct classification of bug fixes is important for end-users assessing whether a
               release addresses their reported problems. An explicit override ensures accuracy
               even when labels are missing or inconsistent.
+            tests:
+              - IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -388,6 +410,8 @@ sections:
             justification: |
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
+            tests:
+              - IntegrationTest_Report_TypeFeature_PlacesItemInChanges
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -399,6 +423,8 @@ sections:
               Encoding affected versions directly on the work item improves traceability and
               enables downstream tooling to filter or highlight relevant items for a given
               release without relying on external spreadsheets or manual documentation.
+            tests:
+              - IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-Utilities-VersionInterval
@@ -411,6 +437,8 @@ sections:
               Supporting multiple ranges allows expression of disjoint sets of affected versions
               in a single field, covering scenarios such as a bug present in two separate
               release branches.
+            tests:
+              - IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-Utilities-VersionInterval
@@ -422,6 +450,8 @@ sections:
               Some teams prefer clean issue descriptions without visible metadata blocks. Allowing
               the block to be hidden in an HTML comment satisfies both the need to supply control
               data and the desire for a tidy rendered appearance.
+            tests:
+              - IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized
             children:
               - BuildMark-RepoConnectors-ItemControls
 
