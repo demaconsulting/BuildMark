@@ -36,10 +36,10 @@ expressions and testing whether specific versions fall inside them.
 
 `VersionInfo` exposes the following static methods:
 
-| Member             | Kind   | Description                                                       |
-|--------------------|--------|-------------------------------------------------------------------|
-| `TryCreate(tag)`   | Method | Parse a repository tag and return a normalized `VersionInfo`, or null |
-| `Create(tag)`      | Method | Parse a repository tag and throw if the tag is not recognized     |
+| Member           | Kind   | Description                                                             |
+|------------------|--------|-------------------------------------------------------------------------|
+| `TryCreate(tag)` | Method | Parse a repository tag and return a normalized `VersionInfo`, or null   |
+| `Create(tag)`    | Method | Parse a repository tag and throw if the tag is not recognized           |
 
 `VersionInterval` exposes the following methods:
 

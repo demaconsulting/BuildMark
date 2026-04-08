@@ -46,8 +46,8 @@ tag does not match the supported version pattern.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                             |
-|---------------------|------------------------------------------------------------------|
-| `RepoConnectors`    | Call `TryCreate` or `Create` when parsing repository tags            |
-| `BuildNotes`        | `VersionTag` carries parsed `VersionInfo` data for report boundaries |
-| `VersionInterval`   | Consumes `VersionInfo.SemanticVersion` via `Contains(VersionInfo)`  |
+| Unit / Subsystem  | Role                                                                  |
+|-------------------|-----------------------------------------------------------------------|
+| `RepoConnectors`  | Call `TryCreate` or `Create` when parsing repository tags             |
+| `BuildNotes`      | `VersionTag` carries parsed `VersionInfo` data for report boundaries  |
+| `VersionInterval` | Consumes `VersionInfo.SemanticVersion` via `Contains(VersionInfo)`    |
