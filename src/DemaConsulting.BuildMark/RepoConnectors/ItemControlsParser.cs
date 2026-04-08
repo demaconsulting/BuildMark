@@ -19,8 +19,9 @@
 // SOFTWARE.
 
 using System.Text.RegularExpressions;
+using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Parses item controls from issue or pull request descriptions.

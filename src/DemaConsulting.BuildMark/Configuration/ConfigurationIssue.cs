@@ -18,15 +18,33 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Represents the item controls extracted from a buildmark code block.
+///     Represents the severity of a configuration issue.
 /// </summary>
-/// <param name="Visibility">Item visibility ("public" or "internal"), or null if not specified.</param>
-/// <param name="Type">Item type override ("bug" or "feature"), or null if not specified.</param>
-/// <param name="AffectedVersions">Affected version intervals, or null if not specified.</param>
-public record ItemControlsInfo(
-    string? Visibility,
-    string? Type,
-    VersionIntervalSet? AffectedVersions);
+public enum ConfigurationIssueSeverity
+{
+    /// <summary>
+    ///     Indicates a warning that does not prevent execution.
+    /// </summary>
+    Warning,
+
+    /// <summary>
+    ///     Indicates an error that prevents execution.
+    /// </summary>
+    Error
+}
+
+/// <summary>
+///     Represents one configuration load issue.
+/// </summary>
+/// <param name="FilePath">The source file path.</param>
+/// <param name="Line">The 1-based line number.</param>
+/// <param name="Severity">The issue severity.</param>
+/// <param name="Description">The issue description.</param>
+public sealed record ConfigurationIssue(
+    string FilePath,
+    int Line,
+    ConfigurationIssueSeverity Severity,
+    string Description);

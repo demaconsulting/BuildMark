@@ -18,16 +18,23 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.ItemControls;
-using DemaConsulting.BuildMark.RepoConnectors.GitHub;
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.Utilities;
+using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
 
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 /// <summary>
 ///     GitHub repository connector implementation using GraphQL.
 /// </summary>
 public class GitHubRepoConnector : RepoConnectorBase
 {
+    /// <summary>
+    ///     The optional GitHub connector configuration overrides.
+    /// </summary>
+    private readonly GitHubConnectorConfig? _config;
+
     /// <summary>
     ///     Mapping of label keywords to their normalized item types.
     /// </summary>
@@ -43,6 +50,15 @@ public class GitHubRepoConnector : RepoConnectorBase
     };
 
     /// <summary>
+    ///     Initializes a new instance of the <see cref="GitHubRepoConnector"/> class.
+    /// </summary>
+    /// <param name="config">Optional GitHub connector overrides.</param>
+    public GitHubRepoConnector(GitHubConnectorConfig? config = null)
+    {
+        _config = config;
+    }
+
+    /// <summary>
     ///     Creates a GitHub GraphQL client for API operations.
     /// </summary>
     /// <param name="token">GitHub personal access token for authentication.</param>
@@ -53,7 +69,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </remarks>
     internal virtual GitHubGraphQLClient CreateGraphQLClient(string token)
     {
-        return new GitHubGraphQLClient(token);
+        return new GitHubGraphQLClient(token, ResolveGraphQLEndpoint(_config?.BaseUrl));
     }
 
     /// <summary>
@@ -62,7 +78,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public override async Task<BuildInformation> GetBuildInformationAsync(Version? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null)
     {
         // Get repository metadata using git commands
         var repoUrl = await RunCommandAsync("git", "remote get-url origin");
@@ -70,7 +86,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         var currentCommitHash = await RunCommandAsync("git", "rev-parse HEAD");
 
         // Parse owner and repo from URL
-        var (owner, repo) = ParseGitHubUrl(repoUrl);
+        var (parsedOwner, parsedRepo) = ParseGitHubUrl(repoUrl);
+        var owner = _config?.Owner ?? parsedOwner;
+        var repo = _config?.Repo ?? parsedRepo;
 
         // Get GitHub token
         var token = await GetGitHubTokenAsync();
@@ -126,6 +144,36 @@ public class GitHubRepoConnector : RepoConnectorBase
             bugs,
             knownIssues,
             changelogLink);
+    }
+
+    /// <summary>
+    ///     Resolves the configured base URL to a GraphQL endpoint.
+    /// </summary>
+    /// <param name="baseUrl">The configured base URL.</param>
+    /// <returns>The GraphQL endpoint, or null for the default endpoint.</returns>
+    private static string? ResolveGraphQLEndpoint(string? baseUrl)
+    {
+        // Leave the endpoint unchanged when no override was provided.
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            return null;
+        }
+
+        // Preserve explicit GraphQL endpoints.
+        var trimmed = baseUrl.TrimEnd('/');
+        if (trimmed.EndsWith("/graphql", StringComparison.OrdinalIgnoreCase))
+        {
+            return trimmed;
+        }
+
+        // Handle the public GitHub API hostname directly.
+        if (trimmed.Contains("api.github.com", StringComparison.OrdinalIgnoreCase))
+        {
+            return $"{trimmed}/graphql";
+        }
+
+        // Default GitHub Enterprise installations expose the GraphQL endpoint under /api/graphql.
+        return $"{trimmed}/api/graphql";
     }
 
     /// <summary>
@@ -202,7 +250,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         List<ReleaseNode> BranchReleases,
         Dictionary<string, Tag> TagsByName,
         Dictionary<string, ReleaseNode> TagToRelease,
-        List<Version> ReleaseVersions,
+        List<BuildMarkVersion> ReleaseVersions,
         HashSet<string> BranchTagNames);
 
     /// <summary>
@@ -284,12 +332,12 @@ public class GitHubRepoConnector : RepoConnectorBase
             .GroupBy(r => r.TagName!)
             .ToDictionary(g => g.Key, g => g.First());
 
-        // Parse release tags into Version objects, maintaining release order (newest to oldest).
+        // Parse release tags into BuildMarkVersion objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
-            .Select(r => Version.TryCreate(r.TagName!))
+            .Select(r => BuildMarkVersion.TryCreate(r.TagName!))
             .Where(v => v != null)
-            .Cast<Version>()
+            .Cast<BuildMarkVersion>()
             .ToList();
 
         return new LookupData(
@@ -310,8 +358,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (toVersion, toHash).</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    private static (Version toVersion, string toHash) DetermineTargetVersion(
-        Version? version,
+    private static (BuildMarkVersion toVersion, string toHash) DetermineTargetVersion(
+        BuildMarkVersion? version,
         string currentCommitHash,
         LookupData lookupData)
     {
@@ -358,8 +406,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (fromVersion, fromHash).</returns>
-    private static (Version? fromVersion, string? fromHash) DetermineBaselineVersion(
-        Version toVersion,
+    private static (BuildMarkVersion? fromVersion, string? fromHash) DetermineBaselineVersion(
+        BuildMarkVersion toVersion,
         string toHash,
         LookupData lookupData)
     {
@@ -397,7 +445,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Baseline version or null.</returns>
-    private static Version? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
+    private static BuildMarkVersion? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
     {
         var releaseVersions = lookupData.ReleaseVersions;
 
@@ -450,7 +498,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toIndex">Index of target version in release history.</param>
     /// <param name="releaseVersions">List of release versions.</param>
     /// <returns>Baseline version or null.</returns>
-    private static Version? DetermineBaselineForRelease(int toIndex, List<Version> releaseVersions)
+    private static BuildMarkVersion? DetermineBaselineForRelease(int toIndex, List<BuildMarkVersion> releaseVersions)
     {
         // Release versions skip pre-releases and use previous non-pre-release as baseline
         var startIndex = DetermineSearchStartIndex(toIndex, releaseVersions.Count);

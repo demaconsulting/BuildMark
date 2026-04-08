@@ -18,17 +18,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.ItemControls;
-
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Represents an item in the build notes (change, bug, or known issue).
+///     Represents the placeholder Azure DevOps connector settings.
 /// </summary>
-/// <param name="Id">Item ID.</param>
-/// <param name="Title">Item title.</param>
-/// <param name="Url">Item URL.</param>
-/// <param name="Type">Item type (bug, feature, etc.).</param>
-/// <param name="Index">Numeric index for sorting (PR number for PRs, issue number for issues).</param>
-/// <param name="AffectedVersions">Optional set of version intervals that this item affects.</param>
-public record ItemInfo(string Id, string Title, string Url, string Type, int Index = 0, VersionIntervalSet? AffectedVersions = null);
+public sealed record AzureDevOpsConnectorConfig
+{
+    /// <summary>
+    ///     Returns a stable description for the placeholder configuration.
+    /// </summary>
+    /// <returns>The placeholder description.</returns>
+    public override string ToString()
+    {
+        return nameof(AzureDevOpsConnectorConfig);
+    }
+}

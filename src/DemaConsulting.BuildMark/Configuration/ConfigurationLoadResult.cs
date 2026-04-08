@@ -18,22 +18,40 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
+using DemaConsulting.BuildMark.Cli;
 
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents the result of loading a BuildMark configuration file.
 /// </summary>
-public interface IRepoConnector
+public sealed record ConfigurationLoadResult(
+    BuildMarkConfig? Config,
+    IReadOnlyList<ConfigurationIssue> Issues)
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets a value indicating whether any issue is an error.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null);
+    public bool HasErrors => Issues.Any(issue => issue.Severity == ConfigurationIssueSeverity.Error);
+
+    /// <summary>
+    ///     Reports all configuration issues to the supplied context.
+    /// </summary>
+    /// <param name="context">The destination context.</param>
+    internal void ReportTo(Context context)
+    {
+        // Emit each issue using consistent file/line formatting.
+        foreach (var issue in Issues)
+        {
+            var message = $"{issue.FilePath}:{issue.Line}: {issue.Severity}: {issue.Description}";
+            if (issue.Severity == ConfigurationIssueSeverity.Error)
+            {
+                context.WriteError(message);
+            }
+            else
+            {
+                context.WriteLine(message);
+            }
+        }
+    }
 }

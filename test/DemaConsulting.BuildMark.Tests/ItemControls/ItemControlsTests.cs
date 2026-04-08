@@ -20,7 +20,8 @@
 
 namespace DemaConsulting.BuildMark.Tests;
 
-using DemaConsulting.BuildMark.ItemControls;
+using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Subsystem-level tests for ItemControls parsing.

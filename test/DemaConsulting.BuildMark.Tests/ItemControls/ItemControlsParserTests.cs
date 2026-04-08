@@ -20,7 +20,7 @@
 
 namespace DemaConsulting.BuildMark.Tests;
 
-using DemaConsulting.BuildMark.ItemControls;
+using DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
 ///     Unit tests for ItemControlsParser.Parse method.

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Represents a version interval with optional lower and upper bounds.

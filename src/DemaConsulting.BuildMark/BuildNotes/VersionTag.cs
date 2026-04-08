@@ -18,22 +18,14 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Utilities;
 using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
 
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.BuildNotes;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents a version paired with its corresponding commit hash.
 /// </summary>
-public interface IRepoConnector
-{
-    /// <summary>
-    ///     Gets build information for a release.
-    /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null);
-}
+/// <param name="VersionInfo">The version information.</param>
+/// <param name="CommitHash">The git commit hash for this version.</param>
+public record VersionTag(BuildMarkVersion VersionInfo, string CommitHash);

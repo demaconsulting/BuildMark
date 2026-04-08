@@ -20,7 +20,7 @@
 
 namespace DemaConsulting.BuildMark.Tests;
 
-using DemaConsulting.BuildMark.ItemControls;
+using DemaConsulting.BuildMark.Utilities;
 
 /// <summary>
 ///     Tests for VersionIntervalSet.Parse method.

@@ -18,11 +18,17 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+using DemaConsulting.BuildMark.Utilities;
+
+namespace DemaConsulting.BuildMark.BuildNotes;
 
 /// <summary>
-///     Represents a version paired with its corresponding commit hash.
+///     Represents an item in the build notes (change, bug, or known issue).
 /// </summary>
-/// <param name="VersionInfo">The version information.</param>
-/// <param name="CommitHash">The git commit hash for this version.</param>
-public record VersionTag(Version VersionInfo, string CommitHash);
+/// <param name="Id">Item ID.</param>
+/// <param name="Title">Item title.</param>
+/// <param name="Url">Item URL.</param>
+/// <param name="Type">Item type (bug, feature, etc.).</param>
+/// <param name="Index">Numeric index for sorting (PR number for PRs, issue number for issues).</param>
+/// <param name="AffectedVersions">Optional set of version intervals that this item affects.</param>
+public record ItemInfo(string Id, string Title, string Url, string Type, int Index = 0, VersionIntervalSet? AffectedVersions = null);

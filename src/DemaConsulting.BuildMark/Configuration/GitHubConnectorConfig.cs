@@ -18,22 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
-
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents GitHub-specific connector settings.
 /// </summary>
-public interface IRepoConnector
+public sealed record GitHubConnectorConfig
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets or sets the repository owner override.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null);
+    public string? Owner { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the repository name override.
+    /// </summary>
+    public string? Repo { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the optional GitHub GraphQL base endpoint override.
+    /// </summary>
+    public string? BaseUrl { get; init; }
 }

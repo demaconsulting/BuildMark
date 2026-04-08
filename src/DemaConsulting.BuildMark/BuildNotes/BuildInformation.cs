@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.BuildNotes;
 
 /// <summary>
 ///     Represents build information for a release.

@@ -18,22 +18,25 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
-using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
-
-namespace DemaConsulting.BuildMark.RepoConnectors;
+namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Interface for repository connectors that fetch repository information.
+///     Represents the top-level BuildMark configuration.
 /// </summary>
-public interface IRepoConnector
+public sealed record BuildMarkConfig
 {
     /// <summary>
-    ///     Gets build information for a release.
+    ///     Gets or sets the optional connector configuration.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
-    /// <returns>BuildInformation record with all collected data.</returns>
-    /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null);
+    public ConnectorConfig? Connector { get; init; }
+
+    /// <summary>
+    ///     Gets the configured report sections.
+    /// </summary>
+    public List<SectionConfig> Sections { get; } = [];
+
+    /// <summary>
+    ///     Gets the configured routing rules.
+    /// </summary>
+    public List<RuleConfig> Rules { get; } = [];
 }
