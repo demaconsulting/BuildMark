@@ -41,13 +41,13 @@ public record VersionInterval(
     public bool Contains(string version)
     {
         // Reject invalid semantic version text.
-        if (!System.Version.TryParse(version, out var candidateVersion))
+        if (!TryParseComparableVersion(version, out var candidateVersion))
         {
             return false;
         }
 
         // Reject versions below the lower bound.
-        if (LowerBound != null && System.Version.TryParse(LowerBound, out var lowerBoundVersion))
+        if (LowerBound != null && TryParseComparableVersion(LowerBound, out var lowerBoundVersion))
         {
             var lowerComparison = candidateVersion.CompareTo(lowerBoundVersion);
             if (lowerComparison < 0 || (lowerComparison == 0 && !LowerInclusive))
@@ -57,7 +57,7 @@ public record VersionInterval(
         }
 
         // Reject versions above the upper bound.
-        if (UpperBound != null && System.Version.TryParse(UpperBound, out var upperBoundVersion))
+        if (UpperBound != null && TryParseComparableVersion(UpperBound, out var upperBoundVersion))
         {
             var upperComparison = candidateVersion.CompareTo(upperBoundVersion);
             if (upperComparison > 0 || (upperComparison == 0 && !UpperInclusive))
@@ -77,6 +77,29 @@ public record VersionInterval(
     public bool Contains(VersionInfo version)
     {
         return Contains(version.SemanticVersion);
+    }
+
+    /// <summary>
+    ///     Tries to parse a comparable version from semantic version text.
+    /// </summary>
+    /// <param name="text">Semantic version text to parse.</param>
+    /// <param name="version">Comparable version value.</param>
+    /// <returns>True when parsing succeeds; otherwise false.</returns>
+    private static bool TryParseComparableVersion(string text, out System.Version version)
+    {
+        if (System.Version.TryParse(text, out version!))
+        {
+            return true;
+        }
+
+        var versionInfo = VersionInfo.TryCreate(text);
+        if (versionInfo != null && System.Version.TryParse(versionInfo.SemanticVersion, out version!))
+        {
+            return true;
+        }
+
+        version = null!;
+        return false;
     }
 
     /// <summary>
