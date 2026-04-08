@@ -5,6 +5,11 @@ includes:
   - docs/reqstream/build-mark/program.yaml
   - docs/reqstream/build-mark/cli/cli.yaml
   - docs/reqstream/build-mark/cli/context.yaml
+  - docs/reqstream/build-mark/build-notes/build-notes.yaml
+  - docs/reqstream/build-mark/build-notes/build-information.yaml
+  - docs/reqstream/build-mark/build-notes/item-info.yaml
+  - docs/reqstream/build-mark/build-notes/version-tag.yaml
+  - docs/reqstream/build-mark/build-notes/web-link.yaml
   - docs/reqstream/build-mark/self-test/self-test.yaml
   - docs/reqstream/build-mark/self-test/validation.yaml
   - docs/reqstream/build-mark/utilities/utilities.yaml
@@ -14,6 +19,7 @@ includes:
   - docs/reqstream/build-mark/utilities/version-interval.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml
+  - docs/reqstream/build-mark/repo-connectors/item-router.yaml
   - docs/reqstream/build-mark/repo-connectors/item-controls-parser.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml
   - docs/reqstream/build-mark/repo-connectors/github/github-repo-connector.yaml

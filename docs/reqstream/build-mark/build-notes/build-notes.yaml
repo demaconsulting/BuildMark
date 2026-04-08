@@ -1,0 +1,30 @@
+---
+# BuildNotes Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the BuildMark BuildNotes subsystem
+# - The BuildNotes subsystem spans BuildInformation.cs, ItemInfo.cs,
+#   VersionTag.cs, and WebLink.cs
+# - Subsystem requirements describe the shared report data model and markdown
+#   rendering behavior used by Program and repository connectors
+
+sections:
+  - title: BuildNotes Subsystem Requirements
+    requirements:
+      - id: BuildMark-BuildNotes-ReportModel
+        title: >-
+          The BuildNotes subsystem shall provide the report data model and
+          markdown rendering behavior for generated build notes.
+        justification: |
+          BuildMark separates report assembly from repository retrieval so that
+          connectors can populate a common in-memory model and Program can render
+          the final markdown output consistently.
+        tests:
+          - BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
+          - BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
+          - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+        children:
+          - BuildMark-BuildInformation-Markdown
+          - BuildMark-ItemInfo-Record
+          - BuildMark-VersionTag-Record
+          - BuildMark-WebLink-Record

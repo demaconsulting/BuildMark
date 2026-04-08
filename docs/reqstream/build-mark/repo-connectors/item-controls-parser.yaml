@@ -9,6 +9,20 @@
 sections:
   - title: ItemControlsParser Unit Requirements
     requirements:
+      - id: BuildMark-ItemControlsInfo-Record
+        title: >-
+          The ItemControlsInfo record shall store the parsed visibility, type,
+          and affected-version values extracted from a buildmark block.
+        justification: |
+          Connectors need a single immutable value to carry all parsed overrides
+          from ItemControlsParser to downstream classification and reporting logic.
+          Storing the parsed values together keeps the parser output stable and
+          easy to consume.
+        tests:
+          - ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility
+          - ItemControlsParser_Parse_WithTypeBug_ReturnsBugType
+          - ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet
+
       - id: BuildMark-ItemControlsParser-Parse
         title: >-
           The ItemControlsParser class shall extract and parse a buildmark code block

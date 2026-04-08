@@ -38,13 +38,17 @@ sections:
           - BuildMark-RepoConnectorFactory-Create
 
       - id: BuildMark-RepoConnectors-ItemRouter
-        title: The RepoConnectors subsystem shall provide a shared item-routing utility for assigning items to report sections.
+        title: >-
+          The RepoConnectors subsystem shall provide a shared item-routing utility
+          for assigning items to report sections.
         justification: |
           All connector implementations must route items (issues and pull requests) into
           the correct report sections according to the configured section and rule definitions.
           Centralizing this logic in a shared unit ensures consistent routing behaviour
           across the GitHub connector and any future connectors such as Azure DevOps.
         tests: []
+        children:
+          - BuildMark-ItemRouter-Route
 
       - id: BuildMark-RepoConnectors-ItemControls
         title: >-
@@ -64,11 +68,14 @@ sections:
           - ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls
           - ItemControlsParser_Parse_WithNoBlock_ReturnsNull
         children:
+          - BuildMark-ItemControlsInfo-Record
           - BuildMark-ItemControlsParser-Parse
           - BuildMark-ItemControlsParser-HiddenBlock
 
       - id: BuildMark-RepoConnectors-GitHub
-        title: The RepoConnectors subsystem shall provide a GitHub repository connector subsystem.
+        title: >-
+          The RepoConnectors subsystem shall provide a GitHub repository connector
+          subsystem.
         justification: |
           Generating build notes from GitHub repositories requires a dedicated subsystem
           that can authenticate to the GitHub API, retrieve commits, releases, tags, pull
@@ -81,11 +88,16 @@ sections:
           - RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
           - RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
+          - BuildMark-GitHub-ConnectorConfig
           - BuildMark-GitHub-BuildInformation
+          - BuildMark-GitHub-ItemControls
+          - BuildMark-GitHub-DescriptionBody
           - BuildMark-GitHub-GraphQLClient
 
       - id: BuildMark-RepoConnectors-Mock
-        title: The RepoConnectors subsystem shall provide a mock connector subsystem for self-test and development.
+        title: >-
+          The RepoConnectors subsystem shall provide a mock connector subsystem
+          for self-test and development.
         justification: |
           A mock connector subsystem enables the built-in --validate self-test and unit
           testing of build information processing logic without requiring an actual

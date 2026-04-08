@@ -1,0 +1,26 @@
+---
+# Software Unit Requirements for the BuildInformation Class
+#
+# BuildInformation is the top-level BuildNotes record that holds the current and
+# baseline version tags, categorized items, known issues, and the optional full
+# changelog link for one report instance.
+
+sections:
+  - title: BuildInformation Unit Requirements
+    requirements:
+      - id: BuildMark-BuildInformation-Markdown
+        title: >-
+          The BuildInformation class shall render the collected build data as a
+          structured markdown report.
+        justification: |
+          Report generation is the primary outcome of BuildMark. The BuildNotes
+          model must render version information, categorized items, optional known
+          issues, and the optional full changelog link in a predictable format.
+        tests:
+          - BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
+          - BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
+          - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
+          - BuildInformation_ToMarkdown_IncludesIssueLinks
+          - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+          - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
+          - BuildInformation_ToMarkdown_UsesBulletLists

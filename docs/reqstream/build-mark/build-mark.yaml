@@ -128,7 +128,7 @@ sections:
             tests:
               - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
             children:
-              - BuildMark-RepoConnectors-GitHubConnector
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-GH-IssueTracking
             title: The tool shall track issues and pull requests from GitHub.
@@ -139,7 +139,7 @@ sections:
             tests:
               - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
-              - BuildMark-RepoConnectors-GitHubConnector
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-GH-VersionTags
             title: The tool shall identify changes between version tags.
@@ -150,7 +150,7 @@ sections:
             tests:
               - IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease
             children:
-              - BuildMark-RepoConnectors-GitHubConnector
+              - BuildMark-RepoConnectors-GitHub
 
       - title: Configuration File
         requirements:
@@ -211,6 +211,7 @@ sections:
             tests:
               - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Depth
@@ -222,6 +223,7 @@ sections:
             tests:
               - IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-VersionInfo
@@ -233,6 +235,7 @@ sections:
             tests:
               - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Changes
@@ -244,6 +247,7 @@ sections:
             tests:
               - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-BugFixes
@@ -255,6 +259,7 @@ sections:
             tests:
               - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-KnownIssues
@@ -266,6 +271,7 @@ sections:
             tests:
               - IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-VersionRange
@@ -277,6 +283,7 @@ sections:
             tests:
               - IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
           - id: BuildMark-Rpt-Hyperlinks
@@ -288,7 +295,8 @@ sections:
             tests:
               - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
-              - BuildMark-RepoConnectors-GitHubConnector
+              - BuildMark-BuildNotes-ReportModel
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Rpt-Structure
             title: The tool shall format build notes with proper markdown structure.
@@ -299,6 +307,7 @@ sections:
             tests:
               - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
             children:
+              - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
       - title: Extended Item Controls
@@ -311,8 +320,7 @@ sections:
               eliminates the need for custom GitHub labels or external configuration files and
               keeps all item-level controls co-located with the work item itself.
             children:
-              - BuildMark-ItemControls-Parse
-              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-RepoConnectors-ItemControls
 
           - id: BuildMark-Ctrl-Visibility
             title: The tool shall support a visibility field in the buildmark block to override
@@ -322,8 +330,7 @@ sections:
               notes, or promote items that would otherwise be excluded. A visibility override
               gives fine-grained control without altering GitHub labels.
             children:
-              - BuildMark-ItemControls-Parse
-              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-RepoConnectors-ItemControls
               - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-VisibilityPublic
@@ -356,8 +363,7 @@ sections:
               release notes. A type override lets developers correct the classification for any
               individual item without modifying project-wide label conventions.
             children:
-              - BuildMark-ItemControls-Parse
-              - BuildMark-ItemControlsParser-Parse
+              - BuildMark-RepoConnectors-ItemControls
               - BuildMark-GitHub-ItemControls
 
           - id: BuildMark-Ctrl-TypeBug
@@ -389,9 +395,8 @@ sections:
               enables downstream tooling to filter or highlight relevant items for a given
               release without relying on external spreadsheets or manual documentation.
             children:
-              - BuildMark-ItemControls-VersionInterval
-              - BuildMark-VersionInterval-Parse
-              - BuildMark-VersionIntervalSet-Parse
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-Utilities-VersionInterval
 
           - id: BuildMark-Ctrl-AffectedVersionsInterval
             title: The affected-versions field shall use mathematical interval notation with
@@ -402,9 +407,8 @@ sections:
               in a single field, covering scenarios such as a bug present in two separate
               release branches.
             children:
-              - BuildMark-ItemControls-VersionInterval
-              - BuildMark-VersionInterval-Parse
-              - BuildMark-VersionIntervalSet-Parse
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-Utilities-VersionInterval
 
           - id: BuildMark-Ctrl-HiddenBlock
             title: The tool shall recognize a buildmark code block that is wrapped in an HTML
@@ -414,8 +418,7 @@ sections:
               the block to be hidden in an HTML comment satisfies both the need to supply control
               data and the desire for a tidy rendered appearance.
             children:
-              - BuildMark-ItemControls-Parse
-              - BuildMark-ItemControlsParser-HiddenBlock
+              - BuildMark-RepoConnectors-ItemControls
 
       - title: Validation and Testing
         requirements:

@@ -1,0 +1,21 @@
+---
+# Software Unit Requirements for the ItemInfo Class
+#
+# ItemInfo represents one issue or pull request entry in a generated build-note
+# report, including its display identity, classification, sort index, and
+# optional affected-version interval data.
+
+sections:
+  - title: ItemInfo Unit Requirements
+    requirements:
+      - id: BuildMark-ItemInfo-Record
+        title: >-
+          The ItemInfo record shall carry the identifier, title, link, type,
+          ordering index, and optional affected-version data for one report item.
+        justification: |
+          Connectors and downstream report generation need a stable data shape for
+          individual changes, bug fixes, and known issues so that items can be
+          sorted, classified, filtered, and rendered consistently.
+        tests:
+          - BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
+          - BuildInformation_ToMarkdown_UsesBulletLists
