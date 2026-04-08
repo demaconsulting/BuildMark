@@ -52,7 +52,9 @@ BuildMark (System)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
 │   ├── PathHelpers (Unit)
-│   └── ProcessRunner (Unit)
+│   ├── ProcessRunner (Unit)
+│   ├── VersionInterval (Unit)
+│   └── VersionIntervalSet (Unit)
 ├── Configuration (Subsystem)
 │   ├── BuildMarkConfig (Unit)
 │   ├── BuildMarkConfigReader (Unit)
@@ -68,16 +70,13 @@ BuildMark (System)
     ├── RepoConnectorBase (Unit)
     ├── RepoConnectorFactory (Unit)
     ├── ItemRouter (Unit)
-    ├── ItemControls (Sub-Subsystem)
-    │   ├── ItemControlsInfo (Unit)
-    │   ├── ItemControlsParser (Unit)
-    │   ├── VersionInterval (Unit)
-    │   └── VersionIntervalSet (Unit)
-    ├── GitHub (Sub-Subsystem)
+    ├── ItemControlsInfo (Unit)
+    ├── ItemControlsParser (Unit)
+    ├── GitHub (Subsystem)
     │   ├── GitHubRepoConnector (Unit)
     │   ├── GitHubGraphQLClient (Unit)
     │   └── GitHubGraphQLTypes (Unit)
-    └── Mock (Sub-Subsystem)
+    └── Mock (Subsystem)
         └── MockRepoConnector (Unit)
 ```
 
@@ -103,7 +102,9 @@ src/DemaConsulting.BuildMark/
 │   └── Validation.cs                        — self-validation test runner
 ├── Utilities/
 │   ├── PathHelpers.cs                       — safe path combination utilities
-│   └── ProcessRunner.cs                     — process runner for Git commands
+│   ├── ProcessRunner.cs                     — process runner for Git commands
+│   ├── VersionInterval.cs                   — single version interval model and parser
+│   └── VersionIntervalSet.cs                — ordered set of version intervals
 ├── Configuration/
 │   ├── BuildMarkConfig.cs                   — top-level configuration data model
 │   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
@@ -119,11 +120,8 @@ src/DemaConsulting.BuildMark/
     ├── RepoConnectorBase.cs                 — repository connector base class
     ├── RepoConnectorFactory.cs              — repository connector factory
     ├── ItemRouter.cs                        — shared item routing logic
-    ├── ItemControls/
-    │   ├── ItemControlsInfo.cs              — item controls data model
-    │   ├── ItemControlsParser.cs            — buildmark block parser
-    │   ├── VersionInterval.cs               — single version interval model and parser
-    │   └── VersionIntervalSet.cs            — ordered set of version intervals
+    ├── ItemControlsInfo.cs                  — item controls data model
+    ├── ItemControlsParser.cs                — buildmark block parser
     ├── GitHub/
     │   ├── GitHubRepoConnector.cs           — GitHub API integration
     │   ├── GitHubGraphQLClient.cs           — GraphQL API client

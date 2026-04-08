@@ -1,8 +1,8 @@
-# Mock Sub-Subsystem
+# Mock Subsystem
 
 ## Overview
 
-The Mock sub-subsystem groups the in-memory connector used by the built-in
+The Mock subsystem groups the in-memory connector used by the built-in
 `--validate` self-test. It sits within the RepoConnectors subsystem.
 
 `MockRepoConnector` lives in production code — not in the test project — because

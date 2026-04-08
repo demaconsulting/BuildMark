@@ -61,6 +61,6 @@ report when the `--include-known-issues` flag is set.
 | Unit / Subsystem    | Role                                                                                 |
 |---------------------|--------------------------------------------------------------------------------------|
 | `Context`           | Provides output methods, `ResultsFile`, and exit code sink                           |
-| `MockRepoConnector` | Supplies deterministic data for all tests (in RepoConnectors/Mock sub-subsystem)     |
+| `MockRepoConnector` | Supplies deterministic data for all tests (in RepoConnectors/Mock subsystem)     |
 | `BuildInformation`  | Target of the tests; validated against expected content                              |
 | `PathHelpers`       | Used directly (e.g., `SafePathCombine`) to build temp, log, and report file paths    |

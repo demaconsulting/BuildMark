@@ -92,5 +92,5 @@ Parses a comma-separated list of intervals:
 ## Interactions
 
 `VersionInterval` and `VersionIntervalSet` have no dependencies on other
-BuildMark subsystems. They are created only by `ItemControlsParser` and stored
-on `ItemControlsInfo`.
+BuildMark subsystems. They are general-purpose utility types created by
+`ItemControlsParser` and stored on `ItemControlsInfo`.

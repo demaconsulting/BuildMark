@@ -3,18 +3,21 @@
 ## Overview
 
 The Utilities subsystem provides shared helper classes used across the BuildMark
-system. It contains `PathHelpers`, which provides safe path combination with
-traversal prevention, and `ProcessRunner`, which executes external shell commands
-and captures their output.
+system. It contains `PathHelpers` for safe path combination with traversal
+prevention, `ProcessRunner` for executing external shell commands, and
+`VersionInterval`/`VersionIntervalSet` for parsing mathematical version interval
+expressions.
 
 The subsystem has no dependencies on other BuildMark subsystems.
 
 ## Units
 
-| Unit            | File                           | Responsibility                              |
-|-----------------|--------------------------------|---------------------------------------------|
-| `PathHelpers`   | `Utilities/PathHelpers.cs`     | Safe path combination with traversal checks |
-| `ProcessRunner` | `Utilities/ProcessRunner.cs`   | Executes external shell commands            |
+| Unit                  | File                                  | Responsibility                                        |
+|-----------------------|---------------------------------------|-------------------------------------------------------|
+| `PathHelpers`         | `Utilities/PathHelpers.cs`            | Safe path combination with traversal checks           |
+| `ProcessRunner`       | `Utilities/ProcessRunner.cs`          | Executes external shell commands                      |
+| `VersionInterval`     | `Utilities/VersionInterval.cs`        | Single mathematical version interval model and parser |
+| `VersionIntervalSet`  | `Utilities/VersionIntervalSet.cs`     | Ordered collection of version intervals               |
 
 ## Interfaces
 
@@ -26,13 +29,25 @@ The subsystem has no dependencies on other BuildMark subsystems.
 
 `ProcessRunner` exposes the following static methods:
 
-| Member                              | Kind   | Description                                              |
-|-------------------------------------|--------|----------------------------------------------------------|
-| `RunAsync(command, arguments)`      | Method | Run a process and return stdout; throws on failure       |
-| `TryRunAsync(command, arguments)`   | Method | Run a process and return stdout, or null on any failure  |
+| Member                            | Kind   | Description                                             |
+|-----------------------------------|--------|---------------------------------------------------------|
+| `RunAsync(command, arguments)`    | Method | Run a process and return stdout; throws on failure      |
+| `TryRunAsync(command, arguments)` | Method | Run a process and return stdout, or null on any failure |
+
+`VersionInterval` exposes the following static method:
+
+| Member         | Kind   | Description                                              |
+|----------------|--------|----------------------------------------------------------|
+| `Parse(text)`  | Method | Parse a single interval token; returns null if invalid   |
+
+`VersionIntervalSet` exposes the following static method:
+
+| Member         | Kind   | Description                                                        |
+|----------------|--------|--------------------------------------------------------------------|
+| `Parse(text)`  | Method | Parse a comma-separated interval string into an ordered collection |
 
 ## Interactions
 
-`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
-subsystems. They are used by any unit that needs to combine file paths safely or
-execute external processes.
+All units in this subsystem have no dependencies on other BuildMark subsystems.
+They are consumed by any unit that needs safe path combination, external process
+execution, or version interval parsing.

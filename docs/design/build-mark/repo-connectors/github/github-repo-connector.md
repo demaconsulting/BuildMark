@@ -3,7 +3,7 @@
 ## Overview
 
 `GitHubRepoConnector` is the production unit in the RepoConnectors/GitHub
-sub-subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
+subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
 query the GitHub GraphQL API for issues, pull requests, version tags, and commits.
 
 The unit reads the repository URL and current commit hash from Git, resolves the

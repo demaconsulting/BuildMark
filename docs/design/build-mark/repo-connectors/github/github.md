@@ -1,8 +1,8 @@
-# GitHub Sub-Subsystem
+# GitHub Subsystem
 
 ## Overview
 
-The GitHub sub-subsystem groups the units responsible for querying the GitHub
+The GitHub subsystem groups the units responsible for querying the GitHub
 GraphQL API. It sits within the RepoConnectors subsystem and provides the
 production connector used when the repository host is GitHub or GitHub Enterprise.
 

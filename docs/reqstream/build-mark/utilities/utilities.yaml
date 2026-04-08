@@ -3,7 +3,8 @@
 #
 # PURPOSE:
 # - Define requirements for the BuildMark Utilities subsystem
-# - The Utilities subsystem spans PathHelpers.cs (safe path-combination utilities)
+# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs,
+#   VersionInterval.cs, and VersionIntervalSet.cs
 # - Subsystem requirements describe the shared utility behavior available to all other subsystems
 
 sections:
@@ -23,3 +24,45 @@ sections:
           - PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException
         children:
           - BuildMark-PathHelpers-SafeCombine
+
+      - id: BuildMark-Utilities-ProcessRunner
+        title: The Utilities subsystem shall provide a process execution utility for running external shell commands.
+        justification: |
+          Multiple subsystems need to execute shell commands (e.g., git, gh CLI) to retrieve
+          repository information and authentication tokens. Placing ProcessRunner in the shared
+          Utilities subsystem ensures a consistent, testable interface with proper error
+          handling, avoiding duplication across connector implementations.
+        tests:
+          - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
+          - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
+          - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+          - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
+          - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+        children:
+          - BuildMark-ProcessRunner-RunAsync
+
+      - id: BuildMark-Utilities-VersionInterval
+        title: >-
+          The Utilities subsystem shall provide version interval parsing using mathematical
+          interval notation.
+        justification: |
+          Version intervals are a general-purpose concept used to express affected-version
+          ranges in repository item metadata. Placing this logic in Utilities makes it
+          available to any subsystem without coupling it to a specific connector.
+        tests:
+          - VersionInterval_Parse_InclusiveLower_IsInclusive
+          - VersionInterval_Parse_ExclusiveLower_IsExclusive
+          - VersionInterval_Parse_InclusiveUpper_IsInclusive
+          - VersionInterval_Parse_ExclusiveUpper_IsExclusive
+          - VersionInterval_Parse_UnboundedLower_HasNullLowerBound
+          - VersionInterval_Parse_UnboundedUpper_HasNullUpperBound
+          - VersionInterval_Parse_BothBoundsPresent_ReturnsInterval
+          - VersionInterval_Parse_InvalidFormat_ReturnsNull
+          - VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
+          - VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals
+          - VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly
+          - VersionIntervalSet_Parse_EmptyString_ReturnsEmptySet
+          - VersionIntervalSet_Parse_InvalidToken_DiscardedSilently
+        children:
+          - BuildMark-VersionInterval-Parse
+          - BuildMark-VersionIntervalSet-Parse

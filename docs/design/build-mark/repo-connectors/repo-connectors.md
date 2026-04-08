@@ -5,31 +5,32 @@
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark.
 It provides an interface and base class for repository connectors, a factory for
 creating the appropriate connector, a shared `ItemRouter` for routing items to
-report sections, and the `ItemControls` sub-subsystem for parsing metadata embedded
-in repository item descriptions.
+report sections, and `ItemControlsParser` with `ItemControlsInfo` for parsing
+metadata embedded in repository item descriptions.
 
-Concrete connector implementations are organized into sub-subsystems: the `GitHub`
-sub-subsystem provides the production GitHub GraphQL connector, and the `Mock`
-sub-subsystem provides the in-memory connector used by the built-in `--validate`
+Concrete connector implementations are organized into subsystems: the `GitHub`
+subsystem provides the production GitHub GraphQL connector, and the `Mock`
+subsystem provides the in-memory connector used by the built-in `--validate`
 self-test. Future connectors (e.g. Azure DevOps) will each have their own
-sub-subsystem alongside `GitHub` and `Mock`.
+subsystem alongside `GitHub` and `Mock`.
 
 ## Units
 
-| Unit                   | File                                           | Responsibility                                    |
-|------------------------|------------------------------------------------|---------------------------------------------------|
-| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors           |
-| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic            |
-| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector                 |
-| `ItemRouter`           | `RepoConnectors/ItemRouter.cs`                 | Shared item-routing logic for all connectors      |
+| Unit                   | File                                           | Responsibility                                         |
+|------------------------|------------------------------------------------|--------------------------------------------------------|
+| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors                |
+| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic                 |
+| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector                      |
+| `ItemRouter`           | `RepoConnectors/ItemRouter.cs`                 | Shared item-routing logic for all connectors           |
+| `ItemControlsParser`   | `RepoConnectors/ItemControls/ItemControlsParser.cs` | Parses buildmark blocks from item description bodies |
+| `ItemControlsInfo`     | `RepoConnectors/ItemControls/ItemControlsInfo.cs`   | Data record holding visibility, type, and version set |
 
-## Sub-Subsystems
+## Subsystems
 
-| Sub-Subsystem   | Folder                           | Contents                                                           |
-|-----------------|----------------------------------|--------------------------------------------------------------------|
-| `ItemControls`  | `RepoConnectors/ItemControls/`   | `ItemControlsParser`, `ItemControlsInfo`, `VersionInterval`, `VersionIntervalSet` |
-| `GitHub`        | `RepoConnectors/GitHub/`         | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
-| `Mock`          | `RepoConnectors/Mock/`           | `MockRepoConnector` (used by `--validate` self-test)               |
+| Subsystem | Folder                      | Contents                                                           |
+|-----------|-----------------------------|--------------------------------------------------------------------|
+| `GitHub`  | `RepoConnectors/GitHub/`    | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
+| `Mock`    | `RepoConnectors/Mock/`      | `MockRepoConnector` (used by `--validate` self-test)               |
 
 ## Interfaces
 
