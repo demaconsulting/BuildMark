@@ -22,7 +22,9 @@ This document covers the detailed design of the following software units:
 - **ItemControlsParser** — buildmark block parser (`ItemControls/ItemControlsParser.cs`)
 - **VersionInterval** — version interval model and parser (`ItemControls/VersionInterval.cs`)
 - **GitHubRepoConnector** — GitHub GraphQL API integration (`RepoConnectors/GitHub/GitHubRepoConnector.cs`)
-- **Configuration** — reading and parsing the `.buildmark.yaml` configuration file (`Configuration/`)
+- **Configuration** — reading and parsing the `.buildmark.yaml` configuration file
+  (`Configuration/`), including `ConfigurationLoadResult` and `ConfigurationIssue`
+  for surfacing load errors and warnings
 
 The following topics are out of scope:
 
@@ -47,7 +49,11 @@ BuildMark (System)
 ├── Configuration (Subsystem)
 │   ├── BuildMarkConfig (Unit)
 │   ├── BuildMarkConfigReader (Unit)
+│   ├── ConfigurationLoadResult (Unit)
+│   ├── ConfigurationIssue (Unit)
 │   ├── ConnectorConfig (Unit)
+│   ├── GitHubConnectorConfig (Unit)
+│   ├── AzureDevOpsConnectorConfig (Unit)
 │   ├── SectionConfig (Unit)
 │   └── RuleConfig (Unit)
 ├── ItemControls (Subsystem)
@@ -87,7 +93,11 @@ src/DemaConsulting.BuildMark/
 ├── Configuration/
 │   ├── BuildMarkConfig.cs                   — top-level configuration data model
 │   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
-│   ├── ConnectorConfig.cs                   — connector settings data model
+│   ├── ConfigurationLoadResult.cs           — holds config and any load issues
+│   ├── ConfigurationIssue.cs                — single issue with location and severity
+│   ├── ConnectorConfig.cs                   — connector envelope data model
+│   ├── GitHubConnectorConfig.cs             — GitHub connector settings data model
+│   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings (future)
 │   ├── SectionConfig.cs                     — report section definition data model
 │   └── RuleConfig.cs                        — routing rule data model
 ├── ItemControls/

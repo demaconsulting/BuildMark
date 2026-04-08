@@ -11,15 +11,15 @@ markdown report suitable for embedding in release documentation.
 
 BuildMark is composed of five subsystems and a top-level entry point:
 
-| Component            | Kind      | Responsibility                                           |
-|----------------------|-----------|----------------------------------------------------------|
-| `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags   |
-| `Cli`                | Subsystem | Command-line argument parsing and output channel control |
-| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file          |
-| `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API |
-| `SelfTest`           | Subsystem | Built-in self-validation test framework                  |
-| `Utilities`          | Subsystem | Shared path combination helpers                          |
-| `ItemControls`       | Subsystem | Parsing of buildmark blocks and version interval sets    |
+| Component            | Kind      | Responsibility                                                      |
+|----------------------|-----------|---------------------------------------------------------------------|
+| `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags              |
+| `Cli`                | Subsystem | Command-line argument parsing and output channel control            |
+| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file                     |
+| `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API            |
+| `SelfTest`           | Subsystem | Built-in self-validation test framework                             |
+| `Utilities`          | Subsystem | Shared path combination helpers                                     |
+| `ItemControls`       | Subsystem | Parsing of `buildmark` blocks embedded in issue and PR descriptions |
 
 ## External Interfaces
 
@@ -46,13 +46,16 @@ BuildMark is composed of five subsystems and a top-level entry point:
         ├─ --version  →  writes version to stdout
         ├─ --help     →  writes usage to stdout
         ├─ --validate →  Validation (SelfTest) → writes results to --results file
+        ├─ --lint     →  BuildMarkConfigReader (Configuration)
+        │                  reads .buildmark.yaml, reports issues, exits
         └─ (default)  →  ProcessBuildNotes()
                               │
                               ├──────────────────────────────────────────────┐
                               ▼                                              │
                BuildMarkConfigReader (Configuration)                        │
                     reads .buildmark.yaml (optional)                        │
-                    returns BuildMarkConfig                                  │
+                    returns ConfigurationLoadResult                          │
+                    reports any issues to Context                            │
                               │                                              │
                               ▼                                              │
                    RepoConnectorFactory ◄────────────────────────────────────┘
@@ -84,21 +87,42 @@ BuildMark is composed of five subsystems and a top-level entry point:
 - **Self-contained**: The tool operates without any configuration file; an optional
   `.buildmark.yaml` file in the repository root enables connector selection and
   item routing customization
+- **Configuration linting**: Malformed configuration file issues are reported to the
+  user via `ConfigurationLoadResult.ReportTo`; the `--lint` flag validates the
+  configuration file and exits without performing a build
 
 ## Integration Patterns
 
 ### Configuration File
 
 `BuildMarkConfigReader.ReadAsync(path)` looks for a `.buildmark.yaml` file at the
-supplied path (normally the repository root). If the file is absent the method
-returns `null` and the tool proceeds with default behavior. When the file is
-present it is deserialized into a `BuildMarkConfig` object, which is consumed by
-`Program` during startup:
+supplied path (normally the repository root). The method always returns a
+`ConfigurationLoadResult`:
+
+- If the file is absent, `Config` is `null` and `Issues` is empty; the tool
+  proceeds with default behavior.
+- If the file is present but contains YAML errors or invalid values, `Config` may
+  be `null` and `Issues` contains one or more `ConfigurationIssue` records, each
+  carrying a `FilePath`, `Line`, `Severity` (`Error` or `Warning`), and
+  `Description`. `ReportTo(context)` writes each issue to the log and sets the
+  exit code to 1 when any issue is an error.
+- If the file is valid, `Config` is a fully populated `BuildMarkConfig` and
+  `Issues` is empty.
+
+`Program` calls `result.ReportTo(context)` immediately after reading the
+configuration. The `--lint` flag causes `Program` to stop after this step,
+allowing operators to validate the configuration file without running a build.
+
+When a valid `BuildMarkConfig` is available, its properties are consumed as
+follows:
 
 - `BuildMarkConfig.Connector` — optional `ConnectorConfig` carrying the connector
-  `Type` (`"github"`, `"azure-devops"`, or `"github+azure-devops"`) and any
-  connector-specific settings. Passed to `RepoConnectorFactory` to select the
-  appropriate connector implementation.
+  `Type` (`"github"`, `"azure-devops"`, or `"github+azure-devops"`), a `GitHub`
+  property holding a `GitHubConnectorConfig` (when `Type` includes `"github"`),
+  and an `AzureDevOps` placeholder. The `GitHubConnectorConfig` is passed to
+  `GitHubRepoConnector` and may supply `Owner`, `Repo`, and `BaseUrl` overrides.
+  The full `ConnectorConfig` is also passed to `RepoConnectorFactory` to select
+  the appropriate connector implementation.
 - `BuildMarkConfig.Sections` — ordered list of `SectionConfig` objects (each with
   an `Id` and `Title`) that define the report sections. Passed to the active
   connector for output structuring.
