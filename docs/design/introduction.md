@@ -22,6 +22,7 @@ This document covers the detailed design of the following software units:
 - **ItemControlsParser** — buildmark block parser (`ItemControls/ItemControlsParser.cs`)
 - **VersionInterval** — version interval model and parser (`ItemControls/VersionInterval.cs`)
 - **GitHubRepoConnector** — GitHub GraphQL API integration (`RepoConnectors/GitHub/GitHubRepoConnector.cs`)
+- **Configuration** — reading and parsing the `.buildmark.yaml` configuration file (`Configuration/`)
 
 The following topics are out of scope:
 
@@ -43,6 +44,12 @@ BuildMark (System)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
 │   └── PathHelpers (Unit)
+├── Configuration (Subsystem)
+│   ├── BuildMarkConfig (Unit)
+│   ├── BuildMarkConfigReader (Unit)
+│   ├── ConnectorConfig (Unit)
+│   ├── SectionConfig (Unit)
+│   └── RuleConfig (Unit)
 ├── ItemControls (Subsystem)
 │   ├── ItemControlsInfo (Unit)
 │   ├── ItemControlsParser (Unit)
@@ -77,6 +84,12 @@ src/DemaConsulting.BuildMark/
 │   └── Validation.cs                        — self-validation test runner
 ├── Utilities/
 │   └── PathHelpers.cs                       — safe path combination utilities
+├── Configuration/
+│   ├── BuildMarkConfig.cs                   — top-level configuration data model
+│   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
+│   ├── ConnectorConfig.cs                   — connector settings data model
+│   ├── SectionConfig.cs                     — report section definition data model
+│   └── RuleConfig.cs                        — routing rule data model
 ├── ItemControls/
 │   ├── ItemControlsInfo.cs                  — item controls data model
 │   ├── ItemControlsParser.cs                — buildmark block parser

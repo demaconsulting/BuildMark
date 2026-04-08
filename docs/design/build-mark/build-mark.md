@@ -15,6 +15,7 @@ BuildMark is composed of five subsystems and a top-level entry point:
 |----------------------|-----------|----------------------------------------------------------|
 | `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags   |
 | `Cli`                | Subsystem | Command-line argument parsing and output channel control |
+| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file          |
 | `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API |
 | `SelfTest`           | Subsystem | Built-in self-validation test framework                  |
 | `Utilities`          | Subsystem | Shared path combination helpers                          |
@@ -22,14 +23,15 @@ BuildMark is composed of five subsystems and a top-level entry point:
 
 ## External Interfaces
 
-| Interface       | Direction | Protocol / Format                                   |
-|-----------------|-----------|-----------------------------------------------------|
-| Command line    | Input     | POSIX-style flags parsed by `Context`               |
-| GitHub GraphQL  | Output    | HTTPS POST to `https://api.github.com/graphql`      |
-| Markdown report | Output    | File written to `--report` path, UTF-8 markdown     |
-| Log file        | Output    | Optional file written to `--log` path, plain text   |
-| Test results    | Output    | TRX or JUnit XML written to `--results` path        |
-| Exit code       | Output    | 0 = success, 1 = error                              |
+| Interface            | Direction | Protocol / Format                                        |
+|----------------------|-----------|----------------------------------------------------------|
+| Command line         | Input     | POSIX-style flags parsed by `Context`                    |
+| `.buildmark.yaml`    | Input     | YAML file read from the repository root                  |
+| GitHub GraphQL       | Output    | HTTPS POST to `https://api.github.com/graphql`           |
+| Markdown report      | Output    | File written to `--report` path, UTF-8 markdown          |
+| Log file             | Output    | Optional file written to `--log` path, plain text        |
+| Test results         | Output    | TRX or JUnit XML written to `--results` path             |
+| Exit code            | Output    | 0 = success, 1 = error                                   |
 
 ## Data Flow
 
@@ -46,13 +48,20 @@ BuildMark is composed of five subsystems and a top-level entry point:
         ├─ --validate →  Validation (SelfTest) → writes results to --results file
         └─ (default)  →  ProcessBuildNotes()
                               │
-                              ▼
-                   RepoConnectorFactory
+                              ├──────────────────────────────────────────────┐
+                              ▼                                              │
+               BuildMarkConfigReader (Configuration)                        │
+                    reads .buildmark.yaml (optional)                        │
+                    returns BuildMarkConfig                                  │
+                              │                                              │
+                              ▼                                              │
+                   RepoConnectorFactory ◄────────────────────────────────────┘
+                    (uses ConnectorConfig)
                               │
                               ▼
                    GitHubRepoConnector   ←─── GitHub GraphQL API
                               │                (fetches body of issues and PRs)
-                              │
+                              │  ← applies SectionConfig / RuleConfig
                               ▼
                    ItemControlsParser (ItemControls)
                               │  ← applied per-issue and per-PR
@@ -72,9 +81,30 @@ BuildMark is composed of five subsystems and a top-level entry point:
 - **Authentication**: GitHub token supplied via `GH_TOKEN` environment variable,
   `GITHUB_TOKEN` environment variable, or `gh auth token` CLI fallback
 - **No GUI**: All interaction is through the command line; no interactive prompts
-- **Self-contained**: No external configuration files required for normal operation
+- **Self-contained**: The tool operates without any configuration file; an optional
+  `.buildmark.yaml` file in the repository root enables connector selection and
+  item routing customization
 
 ## Integration Patterns
+
+### Configuration File
+
+`BuildMarkConfigReader.ReadAsync(path)` looks for a `.buildmark.yaml` file at the
+supplied path (normally the repository root). If the file is absent the method
+returns `null` and the tool proceeds with default behavior. When the file is
+present it is deserialized into a `BuildMarkConfig` object, which is consumed by
+`Program` during startup:
+
+- `BuildMarkConfig.Connector` — optional `ConnectorConfig` carrying the connector
+  `Type` (`"github"`, `"azure-devops"`, or `"github+azure-devops"`) and any
+  connector-specific settings. Passed to `RepoConnectorFactory` to select the
+  appropriate connector implementation.
+- `BuildMarkConfig.Sections` — ordered list of `SectionConfig` objects (each with
+  an `Id` and `Title`) that define the report sections. Passed to the active
+  connector for output structuring.
+- `BuildMarkConfig.Rules` — list of `RuleConfig` objects that map item attributes
+  (labels, work-item types) to report sections. Passed to the active connector for
+  item routing.
 
 ### GitHub GraphQL Client
 
