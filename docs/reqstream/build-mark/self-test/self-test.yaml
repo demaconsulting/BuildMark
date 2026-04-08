@@ -20,8 +20,8 @@ sections:
           summary, enabling quality assurance teams to obtain tool qualification evidence
           without requiring a separate test harness.
         tests:
-          - Validation_Run_WithTrxResultsFile_WritesTrxFile
-          - Validation_Run_WithXmlResultsFile_WritesJUnitFile
+          - SelfTest_Validation_WithTrxFile_WritesResults
+          - SelfTest_Validation_WithXmlFile_WritesResults
         children:
           - BuildMark-Validation-Run
 
@@ -34,8 +34,8 @@ sections:
           directly into pipeline tooling and traceability reports without additional
           conversion steps, satisfying audit trail requirements.
         tests:
-          - Validation_Run_WithTrxResultsFile_WritesTrxFile
-          - Validation_Run_WithXmlResultsFile_WritesJUnitFile
+          - SelfTest_ResultsOutput_WithTrxFile_CreatesFile
+          - SelfTest_ResultsOutput_WithXmlFile_CreatesFile
         children:
           - BuildMark-Validation-TrxOutput
           - BuildMark-Validation-JUnitOutput

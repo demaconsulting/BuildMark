@@ -19,9 +19,9 @@ sections:
           file system access. This requirement captures the subsystem-level safety guarantee
           that all consumers of the Utilities subsystem can rely upon.
         tests:
-          - PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly
-          - PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException
-          - PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException
+          - Utilities_SafePaths_ValidPaths_CombinesCorrectly
+          - Utilities_SafePaths_TraversalPath_ThrowsException
+          - Utilities_SafePaths_AbsolutePath_ThrowsException
         children:
           - BuildMark-PathHelpers-SafeCombine
 
@@ -33,11 +33,9 @@ sections:
           Utilities subsystem ensures a consistent, testable interface with proper error
           handling, avoiding duplication across connector implementations.
         tests:
-          - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
-          - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
-          - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+          - Utilities_ProcessRunner_ValidCommand_ReturnsOutput
+          - Utilities_ProcessRunner_InvalidCommand_ReturnsNull
+          - Utilities_ProcessRunner_FailingCommand_ThrowsException
         children:
           - BuildMark-ProcessRunner-RunAsync
 
@@ -49,11 +47,9 @@ sections:
           version ranges. Placing Version in Utilities centralizes that parsing
           and normalization logic for reuse across the system.
         tests:
-          - VersionInfo_Create_SimpleVPrefix_ParsesVersion
-          - VersionInfo_Create_AlphaPreRelease_DetectsPreRelease
-          - VersionInfo_Create_BuildMetadata_ParsesVersion
-          - VersionInfo_TryCreate_InvalidTag_ReturnsNull
-          - VersionInfo_Create_InvalidTag_ThrowsArgumentException
+          - Utilities_Version_SimpleTag_ParsesCorrectly
+          - Utilities_Version_PreRelease_DetectsCorrectly
+          - Utilities_Version_InvalidTag_ReturnsNull
         children:
           - BuildMark-Version-Parse
           - BuildMark-Version-InvalidTag
@@ -67,19 +63,10 @@ sections:
           ranges in repository item metadata. Placing this logic in Utilities makes it
           available to any subsystem without coupling it to a specific connector.
         tests:
-          - VersionInterval_Parse_InclusiveLower_IsInclusive
-          - VersionInterval_Parse_ExclusiveLower_IsExclusive
-          - VersionInterval_Parse_InclusiveUpper_IsInclusive
-          - VersionInterval_Parse_ExclusiveUpper_IsExclusive
-          - VersionInterval_Parse_UnboundedLower_HasNullLowerBound
-          - VersionInterval_Parse_UnboundedUpper_HasNullUpperBound
-          - VersionInterval_Parse_BothBoundsPresent_ReturnsInterval
-          - VersionInterval_Parse_InvalidFormat_ReturnsNull
-          - VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
-          - VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals
-          - VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly
-          - VersionIntervalSet_Parse_EmptyString_ReturnsEmptySet
-          - VersionIntervalSet_Parse_InvalidToken_DiscardedSilently
+          - Utilities_VersionInterval_ValidInterval_Parses
+          - Utilities_VersionInterval_InvalidInterval_ReturnsNull
+          - Utilities_VersionIntervalSet_MultipleIntervals_ParsesAll
+          - Utilities_VersionIntervalSet_EmptyString_ReturnsEmpty
         children:
           - BuildMark-VersionInterval-Parse
           - BuildMark-VersionIntervalSet-Parse

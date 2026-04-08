@@ -20,11 +20,11 @@ sections:
           The subsystem must always return a result object regardless of whether the
           file is present or malformed, so that callers can inspect issues without
           special-casing null returns.
-        tests: []
+        tests:
+          - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
+          - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
+          - Configuration_ReadAsync_MalformedFile_ReportsError
         children:
-          - BuildMark-ConfigReader-ReadAsync
-          - BuildMark-ConfigReader-MissingFile
-          - BuildMark-ConfigReader-MalformedFile
 
       - id: BuildMark-Configuration-Issues
         title: >-
@@ -34,9 +34,9 @@ sections:
           Providing structured issue reports with file path, line number, severity, and
           description allows the tool to give precise, actionable feedback when a
           configuration file contains errors.
-        tests: []
+        tests:
+          - Configuration_Issues_ErrorIssue_SetsExitCode
         children:
-          - BuildMark-ConfigLoadResult-ReportTo
 
       - id: BuildMark-Configuration-ConnectorConfig
         title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
@@ -45,9 +45,9 @@ sections:
           settings objects (GitHubConnectorConfig, AzureDevOpsConnectorConfig). Correct
           deserialization ensures the factory receives the right settings for the
           selected connector.
-        tests: []
+        tests:
+          - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
         children:
-          - BuildMark-GitHubConnectorConfig-Properties
 
   - title: BuildMarkConfigReader Unit Requirements
     requirements:

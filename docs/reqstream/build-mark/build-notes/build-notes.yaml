@@ -20,9 +20,9 @@ sections:
           connectors can populate a common in-memory model and Program can render
           the final markdown output consistently.
         tests:
-          - BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
-          - BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
-          - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+          - BuildNotes_ReportModel_GeneratesCorrectMarkdown
+          - BuildNotes_ReportModel_IncludesKnownIssues
+          - BuildNotes_ReportModel_IncludesFullChangelog
         children:
           - BuildMark-BuildInformation-Markdown
           - BuildMark-ItemInfo-Record
