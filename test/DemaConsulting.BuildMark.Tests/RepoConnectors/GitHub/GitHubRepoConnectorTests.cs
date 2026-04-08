@@ -64,13 +64,10 @@ public class GitHubRepoConnectorTests
         var connector = new GitHubRepoConnector(config);
 
         // Assert
-        var configField = typeof(GitHubRepoConnector).GetField("_config", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        Assert.IsNotNull(configField);
-        var storedConfig = configField.GetValue(connector);
-        Assert.IsInstanceOfType<GitHubConnectorConfig>(storedConfig);
-        Assert.AreEqual("example-owner", ((GitHubConnectorConfig)storedConfig).Owner);
-        Assert.AreEqual("example-repo", ((GitHubConnectorConfig)storedConfig).Repo);
-        Assert.AreEqual("https://api.github.com", ((GitHubConnectorConfig)storedConfig).BaseUrl);
+        Assert.IsNotNull(connector.ConfigurationOverrides);
+        Assert.AreEqual("example-owner", connector.ConfigurationOverrides.Owner);
+        Assert.AreEqual("example-repo", connector.ConfigurationOverrides.Repo);
+        Assert.AreEqual("https://api.github.com", connector.ConfigurationOverrides.BaseUrl);
     }
 
     /// <summary>

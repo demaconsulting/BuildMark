@@ -80,12 +80,10 @@ public class RepoConnectorFactoryTests
 
         // Assert
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
-        var configField = typeof(GitHubRepoConnector).GetField("_config", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
-        Assert.IsNotNull(configField);
-        var forwardedConfig = configField.GetValue(connector);
-        Assert.IsInstanceOfType<GitHubConnectorConfig>(forwardedConfig);
-        Assert.AreEqual("example-owner", ((GitHubConnectorConfig)forwardedConfig).Owner);
-        Assert.AreEqual("example-repo", ((GitHubConnectorConfig)forwardedConfig).Repo);
-        Assert.AreEqual("https://api.github.com", ((GitHubConnectorConfig)forwardedConfig).BaseUrl);
+        var forwardedConfig = ((GitHubRepoConnector)connector).ConfigurationOverrides;
+        Assert.IsNotNull(forwardedConfig);
+        Assert.AreEqual("example-owner", forwardedConfig.Owner);
+        Assert.AreEqual("example-repo", forwardedConfig.Repo);
+        Assert.AreEqual("https://api.github.com", forwardedConfig.BaseUrl);
     }
 }

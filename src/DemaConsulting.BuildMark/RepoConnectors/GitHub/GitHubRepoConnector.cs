@@ -58,6 +58,11 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
+    ///     Gets the optional GitHub connector configuration overrides.
+    /// </summary>
+    internal GitHubConnectorConfig? ConfigurationOverrides => _config;
+
+    /// <summary>
     ///     Creates a GitHub GraphQL client for API operations.
     /// </summary>
     /// <param name="token">GitHub personal access token for authentication.</param>
