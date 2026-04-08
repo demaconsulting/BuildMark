@@ -220,7 +220,7 @@ public class IntegrationTests
     ///     Test that build-version parameter is accepted.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_VersionInfoParameter_IsAccepted()
+    public void IntegrationTest_BuildVersionParameter_IsAccepted()
     {
         // Run the application with build-version parameter
         var exitCode = Runner.Run(

@@ -49,11 +49,11 @@ sections:
           version ranges. Placing Version in Utilities centralizes that parsing
           and normalization logic for reuse across the system.
         tests:
-          - TagInfo_Constructor_ParsesSimpleVPrefix
-          - TagInfo_Constructor_DetectsAlphaPreRelease
-          - TagInfo_Constructor_ParsesBuildMetadata
-          - Version_TryCreate_ReturnsNullForInvalidTag
-          - Version_Create_ThrowsForInvalidTag
+          - VersionInfo_Create_SimpleVPrefix_ParsesVersion
+          - VersionInfo_Create_AlphaPreRelease_DetectsPreRelease
+          - VersionInfo_Create_BuildMetadata_ParsesVersion
+          - VersionInfo_TryCreate_InvalidTag_ReturnsNull
+          - VersionInfo_Create_InvalidTag_ThrowsArgumentException
         children:
           - BuildMark-Version-Parse
           - BuildMark-Version-InvalidTag

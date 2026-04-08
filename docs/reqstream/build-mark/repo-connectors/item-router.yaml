@@ -15,4 +15,6 @@ sections:
           Centralizing routing logic ensures all connectors classify and group
           items consistently when generating build notes, without duplicating the
           same rule-processing behavior in multiple connector implementations.
-        tests: []
+        tests:
+          - ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection
+          - ItemRouter_Route_SuppressedRouteOmitsMatchingItem

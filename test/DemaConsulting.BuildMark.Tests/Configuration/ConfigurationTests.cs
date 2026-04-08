@@ -144,6 +144,39 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that malformed configuration files surface an error issue.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+             type: github
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNull(result.Config);
+            Assert.IsTrue(result.HasErrors);
+            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
     ///     Test that reporting an error issue sets the context exit code.
     /// </summary>
     [TestMethod]

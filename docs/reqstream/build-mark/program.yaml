@@ -39,7 +39,8 @@ sections:
           Operators need a quick way to verify that the configuration file is well-formed
           without running a full build. The --lint flag reads and validates .buildmark.yaml,
           reports any issues to the user, and exits without generating a report.
-        tests: []
+        tests:
+          - Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
 
       - id: BuildMark-Program-Report
         title: The Program class shall generate build notes markdown reports when --report is specified.

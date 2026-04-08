@@ -26,4 +26,5 @@ sections:
           The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector
           so that owner, repository, and base URL overrides from .buildmark.yaml take
           effect. This pattern extends naturally to future connector types.
-        tests: []
+        tests:
+          - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration

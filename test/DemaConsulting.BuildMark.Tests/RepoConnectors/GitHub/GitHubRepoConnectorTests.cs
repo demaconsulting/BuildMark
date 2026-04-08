@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
@@ -43,6 +44,33 @@ public class GitHubRepoConnectorTests
         // Verify instance
         Assert.IsNotNull(connector);
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that GitHubRepoConnector stores the provided configuration overrides.
+    /// </summary>
+    [TestMethod]
+    public void GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides()
+    {
+        // Arrange
+        var config = new GitHubConnectorConfig
+        {
+            Owner = "example-owner",
+            Repo = "example-repo",
+            BaseUrl = "https://api.github.com"
+        };
+
+        // Act
+        var connector = new GitHubRepoConnector(config);
+
+        // Assert
+        var configField = typeof(GitHubRepoConnector).GetField("_config", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        Assert.IsNotNull(configField);
+        var storedConfig = configField.GetValue(connector);
+        Assert.IsInstanceOfType<GitHubConnectorConfig>(storedConfig);
+        Assert.AreEqual("example-owner", ((GitHubConnectorConfig)storedConfig).Owner);
+        Assert.AreEqual("example-repo", ((GitHubConnectorConfig)storedConfig).Repo);
+        Assert.AreEqual("https://api.github.com", ((GitHubConnectorConfig)storedConfig).BaseUrl);
     }
 
     /// <summary>

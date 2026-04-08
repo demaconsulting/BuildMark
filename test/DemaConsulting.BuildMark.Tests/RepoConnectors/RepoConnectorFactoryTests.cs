@@ -56,4 +56,36 @@ public class RepoConnectorFactoryTests
         // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
+
+    /// <summary>
+    ///     Test that Create forwards GitHub connector configuration to the created connector.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration()
+    {
+        // Arrange
+        var config = new ConnectorConfig
+        {
+            Type = "github",
+            GitHub = new GitHubConnectorConfig
+            {
+                Owner = "example-owner",
+                Repo = "example-repo",
+                BaseUrl = "https://api.github.com"
+            }
+        };
+
+        // Act
+        var connector = RepoConnectorFactory.Create(config);
+
+        // Assert
+        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        var configField = typeof(GitHubRepoConnector).GetField("_config", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic);
+        Assert.IsNotNull(configField);
+        var forwardedConfig = configField.GetValue(connector);
+        Assert.IsInstanceOfType<GitHubConnectorConfig>(forwardedConfig);
+        Assert.AreEqual("example-owner", ((GitHubConnectorConfig)forwardedConfig).Owner);
+        Assert.AreEqual("example-repo", ((GitHubConnectorConfig)forwardedConfig).Repo);
+        Assert.AreEqual("https://api.github.com", ((GitHubConnectorConfig)forwardedConfig).BaseUrl);
+    }
 }

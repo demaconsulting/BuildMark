@@ -57,7 +57,8 @@ sections:
           Callers must always receive a result object rather than null or an exception
           so that subsequent steps (issue reporting, connector creation) are uniform
           regardless of file presence or parse errors.
-        tests: []
+        tests:
+          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
       - id: BuildMark-ConfigReader-MissingFile
         title: >-
@@ -66,7 +67,8 @@ sections:
         justification: |
           An absent configuration file is the normal case for repositories that have
           not yet adopted .buildmark.yaml. The tool must continue working with defaults.
-        tests: []
+        tests:
+          - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
 
       - id: BuildMark-ConfigReader-MalformedFile
         title: >-
@@ -75,7 +77,8 @@ sections:
         justification: |
           A malformed configuration file should produce actionable error messages rather
           than a silent failure or an unhandled exception.
-        tests: []
+        tests:
+          - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
 
   - title: ConfigurationLoadResult Unit Requirements
     requirements:
@@ -86,7 +89,8 @@ sections:
         justification: |
           Centralizing issue reporting in a helper method ensures consistent formatting
           and exit-code behavior across both the --lint path and the normal build path.
-        tests: []
+        tests:
+          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 
   - title: GitHubConnectorConfig Unit Requirements
     requirements:
@@ -98,4 +102,5 @@ sections:
           Teams using GitHub Enterprise or repositories where auto-detection is unreliable
           need a way to specify the owner, repository name, and API base URL explicitly
           in the configuration file.
-        tests: []
+        tests:
+          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
