@@ -9,16 +9,17 @@ markdown report suitable for embedding in release documentation.
 
 ## System Architecture
 
-BuildMark is composed of five subsystems and a top-level entry point:
+BuildMark is composed of six subsystems and a top-level entry point:
 
 | Component            | Kind      | Responsibility                                                      |
 |----------------------|-----------|---------------------------------------------------------------------|
 | `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags              |
 | `Cli`                | Subsystem | Command-line argument parsing and output channel control            |
+| `BuildNotes`         | Subsystem | Output data model shared by all connectors and Program              |
 | `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file                     |
 | `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API            |
 | `SelfTest`           | Subsystem | Built-in self-validation test framework                             |
-| `Utilities`          | Subsystem | Shared path combination helpers                                     |
+| `Utilities`          | Subsystem | Shared path combination and process execution helpers               |
 | `ItemControls`       | Subsystem | Parsing of `buildmark` blocks embedded in issue and PR descriptions |
 
 ## External Interfaces
@@ -64,13 +65,13 @@ BuildMark is composed of five subsystems and a top-level entry point:
                               ▼
                    GitHubRepoConnector   ←─── GitHub GraphQL API
                               │                (fetches body of issues and PRs)
-                              │  ← applies SectionConfig / RuleConfig
+                              │  ← applies SectionConfig / RuleConfig via ItemRouter
                               ▼
                    ItemControlsParser (ItemControls)
                               │  ← applied per-issue and per-PR
                               │  ← overrides visibility, type, affected-versions
                               ▼
-                   BuildInformation.ToMarkdown()
+                   BuildNotes.BuildInformation.ToMarkdown()
                               │
                               ▼
                    [Markdown Report File]

@@ -42,10 +42,17 @@ BuildMark (System)
 ├── Program (Unit)
 ├── Cli (Subsystem)
 │   └── Context (Unit)
+├── BuildNotes (Subsystem)
+│   ├── BuildInformation (Unit)
+│   ├── ItemInfo (Unit)
+│   ├── Version (Unit)
+│   ├── VersionTag (Unit)
+│   └── WebLink (Unit)
 ├── SelfTest (Subsystem)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
-│   └── PathHelpers (Unit)
+│   ├── PathHelpers (Unit)
+│   └── ProcessRunner (Unit)
 ├── Configuration (Subsystem)
 │   ├── BuildMarkConfig (Unit)
 │   ├── BuildMarkConfigReader (Unit)
@@ -62,11 +69,16 @@ BuildMark (System)
 │   ├── VersionInterval (Unit)
 │   └── VersionIntervalSet (Unit)
 └── RepoConnectors (Subsystem)
+    ├── IRepoConnector (Unit)
     ├── RepoConnectorBase (Unit)
-    ├── MockRepoConnector (Unit)
-    ├── ProcessRunner (Unit)
     ├── RepoConnectorFactory (Unit)
-    └── GitHubRepoConnector (Unit)
+    ├── ItemRouter (Unit)
+    ├── GitHub (Sub-Subsystem)
+    │   ├── GitHubRepoConnector (Unit)
+    │   ├── GitHubGraphQLClient (Unit)
+    │   └── GitHubGraphQLTypes (Unit)
+    └── Mock (Sub-Subsystem)
+        └── MockRepoConnector (Unit)
 ```
 
 Each unit is described in detail in its own chapter within this document.
@@ -79,17 +91,19 @@ reviewers an explicit navigation aid from design to code:
 ```text
 src/DemaConsulting.BuildMark/
 ├── Program.cs                               — entry point and execution orchestrator
-├── BuildInformation.cs                      — build information data model
-├── ItemInfo.cs                              — item information data model
-├── Version.cs                               — version information
-├── VersionTag.cs                            — version tag representation
-├── WebLink.cs                               — web link helper
+├── BuildNotes/
+│   ├── BuildInformation.cs                  — build information data model
+│   ├── ItemInfo.cs                          — item information data model
+│   ├── Version.cs                           — version information
+│   ├── VersionTag.cs                        — version tag representation
+│   └── WebLink.cs                           — web link helper
 ├── Cli/
 │   └── Context.cs                           — command-line argument parser and I/O owner
 ├── SelfTest/
 │   └── Validation.cs                        — self-validation test runner
 ├── Utilities/
-│   └── PathHelpers.cs                       — safe path combination utilities
+│   ├── PathHelpers.cs                       — safe path combination utilities
+│   └── ProcessRunner.cs                     — process runner for Git commands
 ├── Configuration/
 │   ├── BuildMarkConfig.cs                   — top-level configuration data model
 │   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
@@ -109,12 +123,13 @@ src/DemaConsulting.BuildMark/
     ├── IRepoConnector.cs                    — repository connector interface
     ├── RepoConnectorBase.cs                 — repository connector base class
     ├── RepoConnectorFactory.cs              — repository connector factory
-    ├── MockRepoConnector.cs                 — mock repository connector for testing
-    ├── ProcessRunner.cs                     — process runner for Git commands
-    ├── GitHubRepoConnector.cs               — GitHub API integration
-    └── GitHub/
-        ├── GitHubGraphQLClient.cs           — GraphQL API client
-        └── GitHubGraphQLTypes.cs            — GraphQL type definitions
+    ├── ItemRouter.cs                        — shared item routing logic
+    ├── GitHub/
+    │   ├── GitHubRepoConnector.cs           — GitHub API integration
+    │   ├── GitHubGraphQLClient.cs           — GraphQL API client
+    │   └── GitHubGraphQLTypes.cs            — GraphQL type definitions
+    └── Mock/
+        └── MockRepoConnector.cs             — mock repository connector for self-test
 ```
 
 The test project mirrors the same layout under `test/DemaConsulting.BuildMark.Tests/`.

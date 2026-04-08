@@ -2,9 +2,9 @@
 
 ## Overview
 
-`GitHubRepoConnector` is the production unit in the RepoConnectors subsystem. It
-implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to query the GitHub
-GraphQL API for issues, pull requests, version tags, and commits.
+`GitHubRepoConnector` is the production unit in the RepoConnectors/GitHub
+sub-subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
+query the GitHub GraphQL API for issues, pull requests, version tags, and commits.
 
 The unit reads the repository URL and current commit hash from Git, resolves the
 GitHub token from environment variables, and fetches all data needed to construct
@@ -33,30 +33,6 @@ GitHub issue and pull request labels are mapped to normalized types:
 | `documentation`, `performance`, `security` | label name      |
 
 Items labelled as `"bug"` are placed in the `Bugs` list; all others go to `Changes`.
-
-### ItemInfo Record
-
-Each issue and pull request that appears in a report section is represented by
-an `ItemInfo` record:
-
-```csharp
-public record ItemInfo(
-    string Id,
-    string Title,
-    string Url,
-    string Type,
-    int Index = 0,
-    VersionIntervalSet? AffectedVersions = null);
-```
-
-| Property           | Type                  | Description                                                   |
-|--------------------|-----------------------|---------------------------------------------------------------|
-| `Id`               | `string`              | Human-readable identifier (e.g., `#42`)                       |
-| `Title`            | `string`              | Issue or pull request title                                   |
-| `Url`              | `string`              | Link to the issue or pull request on GitHub                   |
-| `Type`             | `string`              | Normalized type: `"bug"`, `"feature"`, or a label name        |
-| `Index`            | `int`                 | Numeric issue/PR number used for deterministic sorting        |
-| `AffectedVersions` | `VersionIntervalSet?` | Interval set from the `affected-versions` field, or `null`    |
 
 ### GraphQL Response Types
 
@@ -145,8 +121,9 @@ Main entry point. Performs the following steps:
 
 | Unit / Subsystem        | Role                                                               |
 |-------------------------|--------------------------------------------------------------------|
-| `GitHubConnectorConfig` | Received from `RepoConnectorFactory`; overrides owner, repo, URL   |
+| `GitHubConnectorConfig` | Received from `RepoConnectorFactory`; overrides owner, repo, URL  |
 | `GitHubGraphQLClient`   | Executes GraphQL queries against the GitHub API                    |
-| `ProcessRunner`         | Runs Git commands to get repository metadata                       |
+| `ProcessRunner`         | Runs Git commands to get repository metadata (via Utilities)       |
+| `ItemRouter`            | Routes assembled items into report sections                        |
 | `ItemControlsParser`    | Parses buildmark blocks from issue and PR description bodies       |
 | `BuildInformation`      | The output record assembled from fetched data                      |

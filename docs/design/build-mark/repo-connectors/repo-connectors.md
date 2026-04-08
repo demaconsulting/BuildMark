@@ -4,22 +4,29 @@
 
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark.
 It provides an interface and base class for repository connectors, a factory for
-creating the appropriate connector, a mock connector for testing, and a process
-runner for executing Git commands.
+creating the appropriate connector, and a shared `ItemRouter` for routing items to
+report sections.
 
-The primary production connector is `GitHubRepoConnector`, which queries the GitHub
-GraphQL API to retrieve issues, pull requests, tags, and commits.
+Concrete connector implementations are organized into sub-subsystems: the `GitHub`
+sub-subsystem provides the production GitHub GraphQL connector, and the `Mock`
+sub-subsystem provides the in-memory connector used by the built-in `--validate`
+self-test.
 
 ## Units
 
-| Unit                   | File                                           | Responsibility                          |
-|------------------------|------------------------------------------------|-----------------------------------------|
-| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors |
-| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic  |
-| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector       |
-| `MockRepoConnector`    | `RepoConnectors/MockRepoConnector.cs`          | In-memory connector for testing         |
-| `ProcessRunner`        | `RepoConnectors/ProcessRunner.cs`              | Runs Git commands via the shell         |
-| `GitHubRepoConnector`  | `RepoConnectors/GitHubRepoConnector.cs`        | GitHub GraphQL API connector            |
+| Unit                   | File                                           | Responsibility                                    |
+|------------------------|------------------------------------------------|---------------------------------------------------|
+| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors           |
+| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic            |
+| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector                 |
+| `ItemRouter`           | `RepoConnectors/ItemRouter.cs`                 | Shared item-routing logic for all connectors      |
+
+## Sub-Subsystems
+
+| Sub-Subsystem | Folder                      | Contents                                                      |
+|---------------|-----------------------------|---------------------------------------------------------------|
+| `GitHub`      | `RepoConnectors/GitHub/`    | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
+| `Mock`        | `RepoConnectors/Mock/`      | `MockRepoConnector` (used by `--validate` self-test)          |
 
 ## Interfaces
 

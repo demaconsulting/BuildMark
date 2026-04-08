@@ -6,6 +6,10 @@
 self-validation and unit testing. It returns a fixed, deterministic dataset
 without making any network or filesystem calls.
 
+`MockRepoConnector` lives in production code — not in the test project — because
+the `--validate` flag must work in any deployment without requiring a separate test
+assembly or external tooling.
+
 ## Data Model
 
 The connector holds hard-coded mappings used to build the `BuildInformation` response:

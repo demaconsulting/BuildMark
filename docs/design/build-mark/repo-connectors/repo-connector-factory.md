@@ -33,5 +33,5 @@ environment to confirm GitHub is appropriate, using the following signals:
 | `ConnectorConfig`       | Optional envelope passed to `Create`; type discriminates the result   |
 | `GitHubConnectorConfig` | Forwarded to `GitHubRepoConnector` as `config?.GitHub`                |
 | `GitHubRepoConnector`   | The concrete connector returned by `Create` for GitHub repositories   |
-| `ProcessRunner`         | Used via `TryRunAsync` to inspect the git remote URL                  |
+| `ProcessRunner`         | Used via `TryRunAsync` to inspect the git remote URL (in Utilities)   |
 | `Program`               | Calls `RepoConnectorFactory.Create(result.Config?.Connector)`         |

@@ -25,8 +25,8 @@ as its input parameter.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                  |
-|---------------------|-------------------------------------------------------|
-| `Context`           | Provides output methods and `ResultsFile` path        |
-| `MockRepoConnector` | Provides deterministic repository data for self-tests |
-| `BuildInformation`  | Generated during tests to verify report content       |
+| Unit / Subsystem    | Role                                                                        |
+|---------------------|-----------------------------------------------------------------------------|
+| `Context`           | Provides output methods and `ResultsFile` path                              |
+| `MockRepoConnector` | Provides deterministic repository data for self-tests (RepoConnectors/Mock) |
+| `BuildInformation`  | Generated during tests to verify report content                             |
