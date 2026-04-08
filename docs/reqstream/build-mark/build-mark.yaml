@@ -170,8 +170,8 @@ sections:
               details across multiple CI pipelines.
             children:
               - BuildMark-Configuration-ConnectorConfig
-              - BuildMark-RepoConnectorFactory-ConnectorConfig
-              - BuildMark-GitHub-ConnectorConfig
+              - BuildMark-RepoConnectors-Factory
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Config-Sections
             title: The tool shall read report section definitions from the `.buildmark.yaml` file.
@@ -190,7 +190,7 @@ sections:
               without embedding logic in CI scripts.
             children:
               - BuildMark-Configuration-Read
-              - BuildMark-ItemRouter-Route
+              - BuildMark-RepoConnectors-ItemRouter
 
           - id: BuildMark-Config-Lint
             title: >-
@@ -336,7 +336,7 @@ sections:
               gives fine-grained control without altering GitHub labels.
             children:
               - BuildMark-RepoConnectors-ItemControls
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-VisibilityPublic
             title: The tool shall include an item in the build notes when visibility is set to
@@ -346,8 +346,8 @@ sections:
               value ensures these items still appear in the generated notes when the developer
               explicitly requests it.
             children:
-              - BuildMark-ItemControlsParser-Parse
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-VisibilityInternal
             title: The tool shall exclude an item from the build notes when visibility is set to
@@ -357,8 +357,8 @@ sections:
               are often irrelevant to end-users. The internal value lets developers suppress such
               items without removing the labels that are used for other project-management purposes.
             children:
-              - BuildMark-ItemControlsParser-Parse
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-Type
             title: The tool shall support a type field in the buildmark block to override the
@@ -369,7 +369,7 @@ sections:
               individual item without modifying project-wide label conventions.
             children:
               - BuildMark-RepoConnectors-ItemControls
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeBug
             title: The tool shall classify an item as a bug fix when type is set to bug, placing
@@ -379,8 +379,8 @@ sections:
               release addresses their reported problems. An explicit override ensures accuracy
               even when labels are missing or inconsistent.
             children:
-              - BuildMark-ItemControlsParser-Parse
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeFeature
             title: The tool shall classify an item as a feature or change when type is set to
@@ -389,8 +389,8 @@ sections:
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
             children:
-              - BuildMark-ItemControlsParser-Parse
-              - BuildMark-GitHub-ItemControls
+              - BuildMark-RepoConnectors-ItemControls
+              - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-AffectedVersions
             title: The tool shall support an affected-versions field in the buildmark block to
