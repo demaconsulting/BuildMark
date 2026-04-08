@@ -18,14 +18,14 @@ public record BuildInformation(
     WebLink? CompleteChangelogLink);
 ```
 
-| Property               | Type               | Description                                             |
-|------------------------|--------------------|---------------------------------------------------------|
-| `BaselineVersionTag`   | `VersionTag?`      | The previous version tag (lower boundary of the range) |
-| `CurrentVersionTag`    | `VersionTag?`      | The version tag being reported                          |
-| `Changes`              | `List<ItemInfo>`   | Feature and other non-bug items in this build           |
-| `Bugs`                 | `List<ItemInfo>`   | Bug-fix items in this build                             |
-| `KnownIssues`          | `List<ItemInfo>`   | Open issues not yet fixed                               |
-| `CompleteChangelogLink`| `WebLink?`         | Optional link to the full changelog on the host         |
+- `BaselineVersionTag` (`VersionTag?`) — the previous version tag, which is the
+  lower boundary of the reported range
+- `CurrentVersionTag` (`VersionTag?`) — the version tag being reported
+- `Changes` (`List<ItemInfo>`) — feature and other non-bug items in this build
+- `Bugs` (`List<ItemInfo>`) — bug-fix items in this build
+- `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed
+- `CompleteChangelogLink` (`WebLink?`) — optional link to the full changelog on
+  the host
 
 ## Methods
 

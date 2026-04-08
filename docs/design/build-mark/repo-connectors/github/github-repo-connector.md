@@ -119,11 +119,11 @@ Main entry point. Performs the following steps:
 
 ## Interactions
 
-| Unit / Subsystem        | Role                                                               |
-|-------------------------|--------------------------------------------------------------------|
-| `GitHubConnectorConfig` | Received from `RepoConnectorFactory`; overrides owner, repo, URL  |
-| `GitHubGraphQLClient`   | Executes GraphQL queries against the GitHub API                    |
-| `ProcessRunner`         | Runs Git commands to get repository metadata (via Utilities)       |
-| `ItemRouter`            | Routes assembled items into report sections                        |
-| `ItemControlsParser`    | Parses buildmark blocks from issue and PR description bodies       |
-| `BuildInformation`      | The output record assembled from fetched data                      |
+- `GitHubConnectorConfig` is received from `RepoConnectorFactory` and overrides
+  the owner, repository, and URL.
+- `GitHubGraphQLClient` executes GraphQL queries against the GitHub API.
+- `ProcessRunner` runs Git commands to get repository metadata.
+- `ItemRouter` routes assembled items into report sections.
+- `ItemControlsParser` parses buildmark blocks from issue and pull request
+  description bodies.
+- `BuildInformation` is the output record assembled from fetched data.

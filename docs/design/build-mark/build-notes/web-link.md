@@ -14,14 +14,10 @@ public record WebLink(
     string TargetUrl);
 ```
 
-| Property    | Type     | Description                                  |
-|-------------|----------|----------------------------------------------|
-| `LinkText`  | `string` | Human-readable link label shown in the report |
-| `TargetUrl` | `string` | Fully-qualified URL that the link points to   |
+- `LinkText` (`string`) is the human-readable link label shown in the report.
+- `TargetUrl` (`string`) is the fully-qualified URL that the link points to.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                               |
-|---------------------|--------------------------------------------------------------------|
-| `BuildInformation`  | Holds a `WebLink?` as `CompleteChangelogLink`                      |
-| `RepoConnectors`    | Connectors construct the `WebLink` from baseline and current tags  |
+- `BuildInformation` holds a `WebLink?` as `CompleteChangelogLink`.
+- `RepoConnectors` construct the `WebLink` from baseline and current tags.

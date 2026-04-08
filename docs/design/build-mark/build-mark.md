@@ -11,15 +11,14 @@ markdown report suitable for embedding in release documentation.
 
 BuildMark is composed of six subsystems and a top-level entry point:
 
-| Component            | Kind      | Responsibility                                                                          |
-|----------------------|-----------|-----------------------------------------------------------------------------------------|
-| `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags                                  |
-| `Cli`                | Subsystem | Command-line argument parsing and output channel control                                |
-| `BuildNotes`         | Subsystem | Output data model shared by all connectors and Program                                  |
-| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file                                         |
-| `RepoConnectors`     | Subsystem | Repository metadata retrieval; includes item-controls parsing and concrete connectors   |
-| `SelfTest`           | Subsystem | Built-in self-validation test framework                                                 |
-| `Utilities`          | Subsystem | Shared path combination and process execution helpers                                   |
+- `Program` (Unit) — entry point; dispatches to handlers based on CLI flags
+- `Cli` (Subsystem) — command-line argument parsing and output channel control
+- `BuildNotes` (Subsystem) — output data model shared by all connectors and `Program`
+- `Configuration` (Subsystem) — parses the `.buildmark.yaml` configuration file
+- `RepoConnectors` (Subsystem) — repository metadata retrieval, including item-controls
+  parsing and concrete connectors
+- `SelfTest` (Subsystem) — built-in self-validation test framework
+- `Utilities` (Subsystem) — shared path combination and process execution helpers
 
 ## External Interfaces
 

@@ -44,7 +44,7 @@ sections:
         justification: |
           All connector implementations must route items (issues and pull requests) into
           the correct report sections according to the configured section and rule definitions.
-          Centralizing this logic in a shared unit ensures consistent routing behaviour
+          Centralizing this logic in a shared unit ensures consistent routing behavior
           across the GitHub connector and any future connectors such as Azure DevOps.
         tests: []
         children:

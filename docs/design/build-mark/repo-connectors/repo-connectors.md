@@ -16,14 +16,18 @@ subsystem alongside `GitHub` and `Mock`.
 
 ## Units
 
-| Unit                   | File                                           | Responsibility                                         |
-|------------------------|------------------------------------------------|--------------------------------------------------------|
-| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors                |
-| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic                 |
-| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector                      |
-| `ItemRouter`           | `RepoConnectors/ItemRouter.cs`                 | Shared item-routing logic for all connectors           |
-| `ItemControlsParser`   | `RepoConnectors/ItemControls/ItemControlsParser.cs` | Parses buildmark blocks from item description bodies |
-| `ItemControlsInfo`     | `RepoConnectors/ItemControls/ItemControlsInfo.cs`   | Data record holding visibility, type, and version set |
+- `IRepoConnector` — `RepoConnectors/IRepoConnector.cs` — interface for all
+  repository connectors
+- `RepoConnectorBase` — `RepoConnectors/RepoConnectorBase.cs` — base class with
+  common connector logic
+- `RepoConnectorFactory` — `RepoConnectors/RepoConnectorFactory.cs` — creates
+  the appropriate connector
+- `ItemRouter` — `RepoConnectors/ItemRouter.cs` — shared item-routing logic for
+  all connectors
+- `ItemControlsParser` — `ItemControls/ItemControlsParser.cs` — parses
+  buildmark blocks from item description bodies
+- `ItemControlsInfo` — `ItemControls/ItemControlsInfo.cs` — data record holding
+  visibility, type, and version-set values
 
 ## Subsystems
 

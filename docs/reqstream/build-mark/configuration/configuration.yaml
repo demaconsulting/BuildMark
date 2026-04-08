@@ -84,8 +84,8 @@ sections:
           ConfigurationLoadResult.ReportTo shall write all issues to Context and set
           the exit code to 1 when any issue is an error.
         justification: |
-          Centralising issue reporting in a helper method ensures consistent formatting
-          and exit-code behaviour across both the --lint path and the normal build path.
+          Centralizing issue reporting in a helper method ensures consistent formatting
+          and exit-code behavior across both the --lint path and the normal build path.
         tests: []
 
   - title: GitHubConnectorConfig Unit Requirements

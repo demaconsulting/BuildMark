@@ -28,8 +28,8 @@ with mock implementations that return fixed strings without spawning real proces
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                                       |
-|-----------------------|----------------------------------------------------------------------------|
-| `ProcessRunner`       | Used by `RunCommandAsync` to execute shell commands (in Utilities subsystem)|
-| `GitHubRepoConnector` | Concrete implementation that inherits this base                            |
-| `MockRepoConnector`   | Test implementation that overrides `RunCommandAsync`                       |
+- `ProcessRunner` is used by `RunCommandAsync` to execute shell commands in the
+  Utilities subsystem.
+- `GitHubRepoConnector` is a concrete implementation that inherits this base.
+- `MockRepoConnector` is a test implementation that overrides
+  `RunCommandAsync`.
