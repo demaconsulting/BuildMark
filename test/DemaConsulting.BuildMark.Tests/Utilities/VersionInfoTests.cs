@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Utilities;
+
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>
@@ -33,7 +35,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesSimpleVPrefix()
     {
         // Parse a simple version tag with v prefix
-        var tagVersion = Version.Create("v1.2.3");
+        var tagVersion = VersionInfo.Create("v1.2.3");
 
         // Verify tag and version are extracted correctly
         Assert.AreEqual("v1.2.3", tagVersion.Tag);
@@ -48,7 +50,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesVerPrefix()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("ver-2.0.0");
+        var tagVersion = VersionInfo.Create("ver-2.0.0");
 
         // Assert
         Assert.AreEqual("ver-2.0.0", tagVersion.Tag);
@@ -63,7 +65,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesReleaseUnderscorePrefix()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("release_3.1.4");
+        var tagVersion = VersionInfo.Create("release_3.1.4");
 
         // Assert
         Assert.AreEqual("release_3.1.4", tagVersion.Tag);
@@ -78,7 +80,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsAlphaPreRelease()
     {
         // Parse a version tag with alpha pre-release
-        var tagVersion = Version.Create("v2.0.0-alpha.1");
+        var tagVersion = VersionInfo.Create("v2.0.0-alpha.1");
 
         // Verify pre-release is detected correctly
         Assert.AreEqual("v2.0.0-alpha.1", tagVersion.Tag);
@@ -93,7 +95,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsBetaPreRelease()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v2.0.0-beta.2");
+        var tagVersion = VersionInfo.Create("v2.0.0-beta.2");
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.2", tagVersion.Tag);
@@ -108,7 +110,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsRcPreRelease()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v2.0.0-rc.1");
+        var tagVersion = VersionInfo.Create("v2.0.0-rc.1");
 
         // Assert
         Assert.AreEqual("v2.0.0-rc.1", tagVersion.Tag);
@@ -123,7 +125,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_DetectsPrePreRelease()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v2.0.0-pre");
+        var tagVersion = VersionInfo.Create("v2.0.0-pre");
 
         // Assert
         Assert.AreEqual("v2.0.0-pre", tagVersion.Tag);
@@ -138,7 +140,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_HandlesNoPrefix()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("1.0.0");
+        var tagVersion = VersionInfo.Create("1.0.0");
 
         // Assert
         Assert.AreEqual("1.0.0", tagVersion.Tag);
@@ -153,7 +155,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_HandlesComplexPrefix()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("my-awesome-release_1.2.3-beta");
+        var tagVersion = VersionInfo.Create("my-awesome-release_1.2.3-beta");
 
         // Assert
         Assert.AreEqual("my-awesome-release_1.2.3-beta", tagVersion.Tag);
@@ -168,7 +170,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesBuildMetadata()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v1.0.0+arch");
+        var tagVersion = VersionInfo.Create("v1.0.0+arch");
 
         // Assert
         Assert.AreEqual("v1.0.0+arch", tagVersion.Tag);
@@ -183,7 +185,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_AcceptsDotSeparatedAsPreRelease()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v1.0.0.arch");
+        var tagVersion = VersionInfo.Create("v1.0.0.arch");
 
         // Assert
         Assert.AreEqual("v1.0.0.arch", tagVersion.Tag);
@@ -198,7 +200,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesComplexVersionWithMetadata()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("Rel_1.2.3.rc.4+build.5");
+        var tagVersion = VersionInfo.Create("Rel_1.2.3.rc.4+build.5");
 
         // Assert
         Assert.AreEqual("Rel_1.2.3.rc.4+build.5", tagVersion.Tag);
@@ -213,7 +215,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesComplexVersionWithHyphenPreRelease()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("Rel_1.2.3-rc.4+build.5");
+        var tagVersion = VersionInfo.Create("Rel_1.2.3-rc.4+build.5");
 
         // Assert
         Assert.AreEqual("Rel_1.2.3-rc.4+build.5", tagVersion.Tag);
@@ -228,7 +230,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_CorrectlyDetectsRcWithNumber()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v1.0.0-rc1");
+        var tagVersion = VersionInfo.Create("v1.0.0-rc1");
 
         // Assert
         Assert.AreEqual("v1.0.0-rc1", tagVersion.Tag);
@@ -243,7 +245,7 @@ public class TagInfoTests
     public void TagInfo_Constructor_ParsesPreReleaseWithBuildMetadata()
     {
         // Arrange & Act
-        var tagVersion = Version.Create("v2.0.0-beta.1+linux.x64");
+        var tagVersion = VersionInfo.Create("v2.0.0-beta.1+linux.x64");
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1+linux.x64", tagVersion.Tag);
@@ -258,7 +260,7 @@ public class TagInfoTests
     public void Version_TryCreate_ReturnsNullForInvalidTag()
     {
         // Attempt to parse an invalid tag
-        var tagVersion = Version.TryCreate("not-a-version");
+        var tagVersion = VersionInfo.TryCreate("not-a-version");
 
         // Verify null is returned for invalid format
         Assert.IsNull(tagVersion);
@@ -273,7 +275,7 @@ public class TagInfoTests
         try
         {
             // Attempt to create version from invalid tag
-            _ = Version.Create("not-a-version");
+            _ = VersionInfo.Create("not-a-version");
 
             // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");

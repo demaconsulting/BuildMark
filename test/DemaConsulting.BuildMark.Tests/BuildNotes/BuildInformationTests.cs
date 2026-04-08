@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Utilities;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
@@ -38,7 +41,7 @@ public class BuildInformationTests
     {
         // Create mock connector that throws for no tags
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
             .Throws(new InvalidOperationException(
                 "No tags found in repository and no version specified. " +
                 "Please provide a version parameter."));
@@ -59,7 +62,7 @@ public class BuildInformationTests
     {
         // Create mock connector that throws for commit mismatch
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
             .Throws(new InvalidOperationException(
                 "Target version not specified and current commit does not match any tag. " +
                 "Please provide a version parameter."));
@@ -80,7 +83,7 @@ public class BuildInformationTests
     {
         // Create build information with explicit version
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.1.0"));
 
         // Verify version and hashes are set correctly
         Assert.AreEqual("v2.1.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
@@ -97,10 +100,10 @@ public class BuildInformationTests
     {
         // Create mock connector that returns data for matching tag
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<Version?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
             .Returns(Task.FromResult(new BuildInformation(
-                new VersionTag(Version.Create("ver-1.1.0"), "def456ghi789"),
-                new VersionTag(Version.Create("v2.0.0"), "mno345pqr678"),
+                new VersionTag(VersionInfo.Create("ver-1.1.0"), "def456ghi789"),
+                new VersionTag(VersionInfo.Create("v2.0.0"), "mno345pqr678"),
                 [],
                 [],
                 [],
@@ -125,7 +128,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0-beta.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0-beta.1"));
 
         // Assert
         Assert.AreEqual("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionInfo.Tag);
@@ -142,7 +145,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Assert
         Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
@@ -157,7 +160,7 @@ public class BuildInformationTests
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("ver-1.1.0"));
 
         // Verify change issues are collected (including PR without issues)
         Assert.HasCount(2, buildInfo.Changes);
@@ -185,7 +188,7 @@ public class BuildInformationTests
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("ver-1.1.0"));
 
         // Verify changes are ordered by Index (PR number)
         // Issue #1 from PR #10 should come before PR #13
@@ -213,7 +216,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Assert - verify bugs and changes are properly separated
         Assert.HasCount(1, buildInfo.Changes);
@@ -232,7 +235,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert - verify first release has no previous version
         Assert.IsNull(buildInfo.BaselineVersionTag);
@@ -247,7 +250,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -270,7 +273,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -289,7 +292,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(headingDepth: 3);
@@ -309,8 +312,8 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no change issues
         var buildInfo = new BuildInformation(
-            new VersionTag(Version.Create("v1.0.0"), "abc123"),
-            new VersionTag(Version.Create("v1.1.0"), "def456"),
+            new VersionTag(VersionInfo.Create("v1.0.0"), "abc123"),
+            new VersionTag(VersionInfo.Create("v1.1.0"), "def456"),
             [], // No changes
             [new ItemInfo("2", "Bug fix", "https://example.com/2", "bug")],
             [],
@@ -334,8 +337,8 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no bug issues
         var buildInfo = new BuildInformation(
-            new VersionTag(Version.Create("v1.0.0"), "abc123"),
-            new VersionTag(Version.Create("v1.1.0"), "def456"),
+            new VersionTag(VersionInfo.Create("v1.0.0"), "abc123"),
+            new VersionTag(VersionInfo.Create("v1.1.0"), "def456"),
             [new ItemInfo("1", "Feature", "https://example.com/1", "feature")],
             [], // No bugs
             [],
@@ -358,7 +361,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -376,7 +379,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -397,7 +400,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -417,7 +420,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -434,7 +437,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -467,7 +470,7 @@ public class BuildInformationTests
     public void VersionTag_Constructor_StoresVersionAndHash()
     {
         // Arrange
-        var version = Version.Create("v1.0.0");
+        var version = VersionInfo.Create("v1.0.0");
         var hash = "abc123def456";
 
         // Act

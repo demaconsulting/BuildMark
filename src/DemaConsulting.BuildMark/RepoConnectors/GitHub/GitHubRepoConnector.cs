@@ -21,7 +21,6 @@
 using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
 
 namespace DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
@@ -78,7 +77,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public override async Task<BuildInformation> GetBuildInformationAsync(BuildMarkVersion? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
     {
         // Get repository metadata using git commands
         var repoUrl = await RunCommandAsync("git", "remote get-url origin");
@@ -250,7 +249,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         List<ReleaseNode> BranchReleases,
         Dictionary<string, Tag> TagsByName,
         Dictionary<string, ReleaseNode> TagToRelease,
-        List<BuildMarkVersion> ReleaseVersions,
+        List<VersionInfo> ReleaseVersions,
         HashSet<string> BranchTagNames);
 
     /// <summary>
@@ -332,12 +331,12 @@ public class GitHubRepoConnector : RepoConnectorBase
             .GroupBy(r => r.TagName!)
             .ToDictionary(g => g.Key, g => g.First());
 
-        // Parse release tags into BuildMarkVersion objects, maintaining release order (newest to oldest).
+        // Parse release tags into VersionInfo objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
-            .Select(r => BuildMarkVersion.TryCreate(r.TagName!))
+            .Select(r => VersionInfo.TryCreate(r.TagName!))
             .Where(v => v != null)
-            .Cast<BuildMarkVersion>()
+            .Cast<VersionInfo>()
             .ToList();
 
         return new LookupData(
@@ -358,8 +357,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (toVersion, toHash).</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    private static (BuildMarkVersion toVersion, string toHash) DetermineTargetVersion(
-        BuildMarkVersion? version,
+    private static (VersionInfo toVersion, string toHash) DetermineTargetVersion(
+        VersionInfo? version,
         string currentCommitHash,
         LookupData lookupData)
     {
@@ -406,8 +405,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (fromVersion, fromHash).</returns>
-    private static (BuildMarkVersion? fromVersion, string? fromHash) DetermineBaselineVersion(
-        BuildMarkVersion toVersion,
+    private static (VersionInfo? fromVersion, string? fromHash) DetermineBaselineVersion(
+        VersionInfo toVersion,
         string toHash,
         LookupData lookupData)
     {
@@ -445,7 +444,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Baseline version or null.</returns>
-    private static BuildMarkVersion? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
+    private static VersionInfo? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
     {
         var releaseVersions = lookupData.ReleaseVersions;
 
@@ -498,7 +497,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toIndex">Index of target version in release history.</param>
     /// <param name="releaseVersions">List of release versions.</param>
     /// <returns>Baseline version or null.</returns>
-    private static BuildMarkVersion? DetermineBaselineForRelease(int toIndex, List<BuildMarkVersion> releaseVersions)
+    private static VersionInfo? DetermineBaselineForRelease(int toIndex, List<VersionInfo> releaseVersions)
     {
         // Release versions skip pre-releases and use previous non-pre-release as baseline
         var startIndex = DetermineSearchStartIndex(toIndex, releaseVersions.Count);

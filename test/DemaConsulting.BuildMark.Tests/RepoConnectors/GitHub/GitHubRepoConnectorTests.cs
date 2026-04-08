@@ -18,7 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -81,7 +84,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -122,7 +125,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -186,7 +189,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.1.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -250,7 +253,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -300,7 +303,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-rc.1
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-rc.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-rc.1"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -352,7 +355,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -398,7 +401,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-beta.2 which doesn't exist in releases yet
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-beta.2"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-beta.2"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -442,7 +445,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-rc.1
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("1.1.2-rc.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-rc.1"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -497,7 +500,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - This must not throw ArgumentException due to duplicate dictionary key
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert - Build info should be valid and not null
         Assert.IsNotNull(buildInfo);
@@ -540,7 +543,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert - PR with "debugging" label must NOT be classified as a bug
         Assert.IsNotNull(buildInfo);
@@ -577,7 +580,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert - Open issue with "debugging" label must NOT be classified as a known issue
         Assert.IsNotNull(buildInfo);
@@ -609,7 +612,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -641,7 +644,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -674,7 +677,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -707,7 +710,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(Version.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);

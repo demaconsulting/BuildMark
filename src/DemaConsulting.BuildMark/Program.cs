@@ -25,7 +25,6 @@ using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.SelfTest;
 using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
 
 namespace DemaConsulting.BuildMark;
 
@@ -182,12 +181,12 @@ internal static class Program
         var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
 
         // Parse build version if provided
-        BuildMarkVersion? buildVersion = null;
+        VersionInfo? buildVersion = null;
         if (context.BuildVersion != null)
         {
             try
             {
-                buildVersion = BuildMarkVersion.Create(context.BuildVersion);
+                buildVersion = VersionInfo.Create(context.BuildVersion);
             }
             catch (ArgumentException)
             {

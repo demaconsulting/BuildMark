@@ -482,12 +482,15 @@ public static class BuildMarkConfigReader
         var line = lines[index];
         var itemIndent = line.Indent;
         var inline = line.Text[2..].Trim();
+        var originalIndex = index;
         if (!string.IsNullOrEmpty(inline))
         {
             ParseRuleProperty(filePath, lines, ref index, issues, inline, itemIndent, ref match, ref route, consumeCurrentLine: false);
         }
-
-        index++;
+        if (index == originalIndex)
+        {
+            index++;
+        }
         while (index < lines.Count && lines[index].Indent > itemIndent)
         {
             ParseRuleProperty(filePath, lines, ref index, issues, lines[index].Text, itemIndent, ref match, ref route, consumeCurrentLine: true);
@@ -556,7 +559,7 @@ public static class BuildMarkConfigReader
     {
         // Parse label and work-item-type lists from the match block.
         var match = new RuleMatchConfig();
-        var parentIndent = lines[index].Indent;
+        var parentIndent = matchIndent;
         index++;
 
         while (index < lines.Count && lines[index].Indent > parentIndent)

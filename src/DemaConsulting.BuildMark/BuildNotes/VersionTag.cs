@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Utilities;
-using BuildMarkVersion = DemaConsulting.BuildMark.Utilities.Version;
 
 namespace DemaConsulting.BuildMark.BuildNotes;
 
@@ -28,4 +27,4 @@ namespace DemaConsulting.BuildMark.BuildNotes;
 /// </summary>
 /// <param name="VersionInfo">The version information.</param>
 /// <param name="CommitHash">The git commit hash for this version.</param>
-public record VersionTag(BuildMarkVersion VersionInfo, string CommitHash);
+public record VersionTag(VersionInfo VersionInfo, string CommitHash);

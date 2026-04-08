@@ -18,7 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests;
@@ -218,7 +220,7 @@ public class IntegrationTests
     ///     Test that build-version parameter is accepted.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_BuildVersionParameter_IsAccepted()
+    public void IntegrationTest_VersionInfoParameter_IsAccepted()
     {
         // Run the application with build-version parameter
         var exitCode = Runner.Run(

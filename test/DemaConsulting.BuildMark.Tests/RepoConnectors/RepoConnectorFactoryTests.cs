@@ -18,7 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 namespace DemaConsulting.BuildMark.Tests;
 

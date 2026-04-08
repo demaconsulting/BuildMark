@@ -18,6 +18,8 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Cli;
+
 namespace DemaConsulting.BuildMark.Tests;
 
 /// <summary>
@@ -93,6 +95,7 @@ public class ProgramTests
             var output = writer.ToString();
             Assert.Contains("Usage: buildmark", output);
             Assert.Contains("Options:", output);
+            Assert.Contains("--lint", output);
         }
         finally
         {
@@ -177,5 +180,21 @@ public class ProgramTests
                 File.Delete(reportFile);
             }
         }
+    }
+
+    /// <summary>
+    ///     Test that Run with lint flag succeeds when no configuration file is present.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero()
+    {
+        // Arrange
+        using var context = Context.Create(["--lint", "--silent"]);
+
+        // Act
+        Program.Run(context);
+
+        // Assert
+        Assert.AreEqual(0, context.ExitCode);
     }
 }
