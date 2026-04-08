@@ -80,7 +80,9 @@ public record VersionInterval(
     }
 
     /// <summary>
-    ///     Tries to parse a comparable version from semantic version text.
+    ///     Tries to parse a comparable version by first accepting plain <see cref="System.Version"/>
+    ///     input and then normalizing semantic-version text with prerelease or build metadata
+    ///     through <see cref="VersionInfo"/>.
     /// </summary>
     /// <param name="text">Semantic version text to parse.</param>
     /// <param name="version">Comparable version value.</param>
