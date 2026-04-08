@@ -120,9 +120,14 @@ unchanged.
 Main entry point. Performs the following steps:
 
 1. Get repository metadata (URL, branch, current commit hash) from Git.
-2. Parse the owner and repository name from the Git remote URL.
-3. Resolve the GitHub authentication token.
-4. Create a `GitHubGraphQLClient` with the resolved token.
+2. Determine the owner and repository name — from `GitHubConnectorConfig.Owner`
+   and `GitHubConnectorConfig.Repo` if provided, otherwise parsed from the Git
+   remote URL.
+3. Resolve the GitHub authentication token (see Authentication above).
+4. Create a `GitHubGraphQLClient` with the resolved token. If
+   `GitHubConnectorConfig.BaseUrl` is set, use that URL as the GraphQL endpoint
+   instead of the default `https://api.github.com/graphql` (supports GitHub
+   Enterprise).
 5. Fetch all tags, commits, releases, issues (with body), and pull requests (with
    body) via GraphQL.
 6. Determine the target version tag (highest tag matching `version`, or latest).
@@ -138,9 +143,10 @@ Main entry point. Performs the following steps:
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                          |
-|-----------------------|---------------------------------------------------------------|
-| `GitHubGraphQLClient` | Executes GraphQL queries against the GitHub API               |
-| `ProcessRunner`       | Runs Git commands to get repository metadata                  |
-| `ItemControlsParser`  | Parses buildmark blocks from issue and PR description bodies  |
-| `BuildInformation`    | The output record assembled from fetched data                 |
+| Unit / Subsystem        | Role                                                               |
+|-------------------------|--------------------------------------------------------------------|
+| `GitHubConnectorConfig` | Received from `RepoConnectorFactory`; overrides owner, repo, URL   |
+| `GitHubGraphQLClient`   | Executes GraphQL queries against the GitHub API                    |
+| `ProcessRunner`         | Runs Git commands to get repository metadata                       |
+| `ItemControlsParser`    | Parses buildmark blocks from issue and PR description bodies       |
+| `BuildInformation`      | The output record assembled from fetched data                      |

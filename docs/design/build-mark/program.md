@@ -41,22 +41,28 @@ method applies the following priority order:
 1. If `context.Version` is set, print the version string and return.
 2. If `context.Help` is set, print the usage message and return.
 3. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
-4. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
+4. If `context.Lint` is set, call `BuildMarkConfigReader.ReadAsync`, call
+   `result.ReportTo(context)`, and return.
+5. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
 
 The exit code is managed through `context.ExitCode` rather than as a return value.
 
 ### `ProcessBuildNotes(Context context)`
 
-Resolves the build version, creates a repository connector via
-`context.ConnectorFactory` (or the default `RepoConnectorFactory`), fetches
+Calls `BuildMarkConfigReader.ReadAsync` to load the optional `.buildmark.yaml`
+file, then calls `result.ReportTo(context)` to surface any configuration issues.
+If no errors occurred, resolves the build version, creates a repository connector
+via `RepoConnectorFactory.Create(result.Config?.Connector)`, fetches
 `BuildInformation`, writes a summary to the console, and optionally writes the
 markdown report to `context.ReportFile`.
 
 ## Interactions
 
-| Unit / Subsystem       | Role                                                              |
-|------------------------|-------------------------------------------------------------------|
-| `Context`              | Provides parsed flags, arguments, and output methods              |
-| `Validation`           | Executes self-validation when `--validate` flag is set            |
-| `RepoConnectorFactory` | Creates the default `IRepoConnector` implementation               |
-| `BuildInformation`     | Returned by the connector; converted to markdown via `ToMarkdown` |
+| Unit / Subsystem         | Role                                                                            |
+|--------------------------|---------------------------------------------------------------------------------|
+| `Context`                | Provides parsed flags, arguments, and output methods                            |
+| `Validation`             | Executes self-validation when `--validate` flag is set                          |
+| `BuildMarkConfigReader`  | Called in `Run` (for `--lint`) and `ProcessBuildNotes` to read `.buildmark.yaml`|
+| `ConfigurationLoadResult`| Returned by `BuildMarkConfigReader`; `ReportTo(context)` called immediately     |
+| `RepoConnectorFactory`   | Creates the connector via `Create(result.Config?.Connector)`                    |
+| `BuildInformation`       | Returned by the connector; converted to markdown via `ToMarkdown`               |

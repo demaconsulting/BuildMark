@@ -8,6 +8,17 @@
 sections:
   - title: GitHubRepoConnector Unit Requirements
     requirements:
+      - id: BuildMark-GitHub-ConnectorConfig
+        title: >-
+          The GitHubRepoConnector class shall accept an optional GitHubConnectorConfig to
+          override the repository owner, name, and API base URL.
+        justification: |
+          When a .buildmark.yaml file provides GitHub connector settings, the connector
+          must use the configured owner, repo, and optional GitHub Enterprise base URL
+          instead of auto-detecting them from the Git remote URL. CLI arguments remain
+          as a fallback when the config values are absent.
+        tests: []
+
       - id: BuildMark-GitHub-BuildInformation
         title: The GitHubRepoConnector class shall retrieve build information from a GitHub repository.
         justification: |

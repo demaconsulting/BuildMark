@@ -18,6 +18,7 @@ includes:
   - docs/reqstream/build-mark/repo-connectors/process-runner.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml
   - docs/reqstream/build-mark/repo-connectors/github-repo-connector.yaml
+  - docs/reqstream/build-mark/configuration/configuration.yaml
   - docs/reqstream/ots/mstest.yaml
   - docs/reqstream/ots/reqstream.yaml
   - docs/reqstream/ots/buildmark.yaml

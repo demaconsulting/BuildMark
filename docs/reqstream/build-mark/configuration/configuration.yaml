@@ -1,0 +1,101 @@
+---
+# Configuration Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the BuildMark Configuration subsystem
+# - The Configuration subsystem spans BuildMarkConfig.cs, BuildMarkConfigReader.cs,
+#   ConfigurationLoadResult.cs, ConfigurationIssue.cs, ConnectorConfig.cs,
+#   GitHubConnectorConfig.cs, AzureDevOpsConnectorConfig.cs, SectionConfig.cs,
+#   and RuleConfig.cs
+# - Subsystem requirements describe the externally visible configuration behavior
+
+sections:
+  - title: Configuration Subsystem Requirements
+    requirements:
+      - id: BuildMark-Configuration-Read
+        title: >-
+          The Configuration subsystem shall read the optional .buildmark.yaml file and
+          return a ConfigurationLoadResult.
+        justification: |
+          The subsystem must always return a result object regardless of whether the
+          file is present or malformed, so that callers can inspect issues without
+          special-casing null returns.
+        tests: []
+        children:
+          - BuildMark-ConfigReader-ReadAsync
+          - BuildMark-ConfigReader-MissingFile
+          - BuildMark-ConfigReader-MalformedFile
+
+      - id: BuildMark-Configuration-Issues
+        title: >-
+          The Configuration subsystem shall surface parse errors and validation warnings
+          through ConfigurationLoadResult with location, severity, and description.
+        justification: |
+          Providing structured issue reports with file path, line number, severity, and
+          description allows the tool to give precise, actionable feedback when a
+          configuration file contains errors.
+        tests: []
+        children:
+          - BuildMark-ConfigLoadResult-ReportTo
+
+      - id: BuildMark-Configuration-ConnectorConfig
+        title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
+        justification: |
+          The ConnectorConfig envelope carries a type discriminator and per-connector
+          settings objects (GitHubConnectorConfig, AzureDevOpsConnectorConfig). Correct
+          deserialization ensures the factory receives the right settings for the
+          selected connector.
+        tests: []
+        children:
+          - BuildMark-GitHubConnectorConfig-Properties
+
+  - title: BuildMarkConfigReader Unit Requirements
+    requirements:
+      - id: BuildMark-ConfigReader-ReadAsync
+        title: BuildMarkConfigReader.ReadAsync shall return a ConfigurationLoadResult for any input path.
+        justification: |
+          Callers must always receive a result object rather than null or an exception
+          so that subsequent steps (issue reporting, connector creation) are uniform
+          regardless of file presence or parse errors.
+        tests: []
+
+      - id: BuildMark-ConfigReader-MissingFile
+        title: >-
+          BuildMarkConfigReader.ReadAsync shall return an empty-issues result with null
+          Config when the file is absent.
+        justification: |
+          An absent configuration file is the normal case for repositories that have
+          not yet adopted .buildmark.yaml. The tool must continue working with defaults.
+        tests: []
+
+      - id: BuildMark-ConfigReader-MalformedFile
+        title: >-
+          BuildMarkConfigReader.ReadAsync shall return a ConfigurationLoadResult with one or more
+          error issues and null Config when the file cannot be parsed.
+        justification: |
+          A malformed configuration file should produce actionable error messages rather
+          than a silent failure or an unhandled exception.
+        tests: []
+
+  - title: ConfigurationLoadResult Unit Requirements
+    requirements:
+      - id: BuildMark-ConfigLoadResult-ReportTo
+        title: >-
+          ConfigurationLoadResult.ReportTo shall write all issues to Context and set
+          the exit code to 1 when any issue is an error.
+        justification: |
+          Centralising issue reporting in a helper method ensures consistent formatting
+          and exit-code behaviour across both the --lint path and the normal build path.
+        tests: []
+
+  - title: GitHubConnectorConfig Unit Requirements
+    requirements:
+      - id: BuildMark-GitHubConnectorConfig-Properties
+        title: >-
+          GitHubConnectorConfig shall expose Owner, Repo, and BaseUrl properties that
+          override the corresponding auto-detected values in GitHubRepoConnector.
+        justification: |
+          Teams using GitHub Enterprise or repositories where auto-detection is unreliable
+          need a way to specify the owner, repository name, and API base URL explicitly
+          in the configuration file.
+        tests: []
