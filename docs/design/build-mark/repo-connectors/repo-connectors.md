@@ -24,9 +24,9 @@ subsystem alongside `GitHub` and `Mock`.
   the appropriate connector
 - `ItemRouter` — `RepoConnectors/ItemRouter.cs` — shared item-routing logic for
   all connectors
-- `ItemControlsParser` — `ItemControls/ItemControlsParser.cs` — parses
+- `ItemControlsParser` — `RepoConnectors/ItemControlsParser.cs` — parses
   buildmark blocks from item description bodies
-- `ItemControlsInfo` — `ItemControls/ItemControlsInfo.cs` — data record holding
+- `ItemControlsInfo` — `RepoConnectors/ItemControlsInfo.cs` — data record holding
   visibility, type, and version-set values
 
 ## Subsystems

@@ -20,6 +20,7 @@ so that any open log file is properly flushed and closed.
 | `Help`               | `bool` | `false` | `-?` / `-h` / `--help`   |
 | `Silent`             | `bool` | `false` | `--silent`               |
 | `Validate`           | `bool` | `false` | `--validate`             |
+| `Lint`               | `bool` | `false` | `--lint`                 |
 | `IncludeKnownIssues` | `bool` | `false` | `--include-known-issues` |
 
 ### Parsed Arguments

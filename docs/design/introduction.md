@@ -43,7 +43,7 @@ BuildMark (System)
 ├── Utilities (Subsystem)
 │   ├── PathHelpers (Unit)
 │   ├── ProcessRunner (Unit)
-│   ├── Version (Unit)
+│   ├── VersionInfo (Unit)
 │   ├── VersionInterval (Unit)
 │   └── VersionIntervalSet (Unit)
 ├── Configuration (Subsystem)
@@ -93,7 +93,7 @@ src/DemaConsulting.BuildMark/
 ├── Utilities/
 │   ├── PathHelpers.cs                       — safe path combination utilities
 │   ├── ProcessRunner.cs                     — process runner for Git commands
-│   ├── Version.cs                           — semantic version parser and normalized model
+│   ├── VersionInfo.cs                       — semantic version parser and normalized model
 │   ├── VersionInterval.cs                   — single version interval model and parser
 │   └── VersionIntervalSet.cs                — ordered set of version intervals
 ├── Configuration/
