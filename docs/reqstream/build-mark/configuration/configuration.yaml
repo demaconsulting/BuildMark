@@ -25,6 +25,9 @@ sections:
           - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
           - Configuration_ReadAsync_MalformedFile_ReportsError
         children:
+          - BuildMark-ConfigReader-ReadAsync
+          - BuildMark-ConfigReader-MissingFile
+          - BuildMark-ConfigReader-MalformedFile
 
       - id: BuildMark-Configuration-Issues
         title: >-
@@ -37,6 +40,7 @@ sections:
         tests:
           - Configuration_Issues_ErrorIssue_SetsExitCode
         children:
+          - BuildMark-ConfigLoadResult-ReportTo
 
       - id: BuildMark-Configuration-ConnectorConfig
         title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
@@ -48,6 +52,7 @@ sections:
         tests:
           - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
         children:
+          - BuildMark-GitHubConnectorConfig-Properties
 
   - title: BuildMarkConfigReader Unit Requirements
     requirements:

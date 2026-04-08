@@ -50,6 +50,7 @@ sections:
           - RepoConnectors_ItemRouter_MatchingRule_RoutesToSection
           - RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem
         children:
+          - BuildMark-ItemRouter-Route
 
       - id: BuildMark-RepoConnectors-ItemControls
         title: >-
