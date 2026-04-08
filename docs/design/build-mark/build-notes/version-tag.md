@@ -2,10 +2,10 @@
 
 ## Overview
 
-`VersionTag` is a record in the BuildNotes subsystem that pairs a parsed `Version`
-with the Git commit hash at which that version tag was created. It is used to
-identify the baseline and current version boundaries when assembling a
-`BuildInformation` record.
+`VersionTag` is a record in the BuildNotes subsystem that pairs a parsed
+`Version` value from the Utilities subsystem with the Git commit hash at which
+that version tag was created. It is used to identify the baseline and current
+version boundaries when assembling a `BuildInformation` record.
 
 ## Data Model
 
@@ -24,6 +24,6 @@ public record VersionTag(
 
 | Unit / Subsystem    | Role                                                             |
 |---------------------|------------------------------------------------------------------|
-| `Version`           | Carries the parsed version details                               |
+| `Utilities`         | Supplies the `Version` type that carries parsed version details  |
 | `BuildInformation`  | Uses `VersionTag` for `BaselineVersionTag` and `CurrentVersionTag` |
 | `RepoConnectors`    | Connectors construct `VersionTag` records from repository data   |

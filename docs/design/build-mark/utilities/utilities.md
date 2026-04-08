@@ -4,7 +4,8 @@
 
 The Utilities subsystem provides shared helper classes used across the BuildMark
 system. It contains `PathHelpers` for safe path combination with traversal
-prevention, `ProcessRunner` for executing external shell commands, and
+prevention, `ProcessRunner` for executing external shell commands, `Version` for
+parsing repository tags into normalized semantic version data, and
 `VersionInterval`/`VersionIntervalSet` for parsing mathematical version interval
 expressions and testing whether specific versions fall inside them.
 
@@ -14,6 +15,7 @@ expressions and testing whether specific versions fall inside them.
 |-----------------------|---------------------------------------|-------------------------------------------------------|
 | `PathHelpers`         | `Utilities/PathHelpers.cs`            | Safe path combination with traversal checks           |
 | `ProcessRunner`       | `Utilities/ProcessRunner.cs`          | Executes external shell commands                      |
+| `Version`             | `Utilities/Version.cs`                | Parses version tags into normalized semantic data     |
 | `VersionInterval`     | `Utilities/VersionInterval.cs`        | Single mathematical version interval model and parser |
 | `VersionIntervalSet`  | `Utilities/VersionIntervalSet.cs`     | Ordered collection of version intervals               |
 
@@ -31,6 +33,13 @@ expressions and testing whether specific versions fall inside them.
 |-----------------------------------|--------|---------------------------------------------------------|
 | `RunAsync(command, arguments)`    | Method | Run a process and return stdout; throws on failure      |
 | `TryRunAsync(command, arguments)` | Method | Run a process and return stdout, or null on any failure |
+
+`Version` exposes the following static methods:
+
+| Member             | Kind   | Description                                                       |
+|--------------------|--------|-------------------------------------------------------------------|
+| `TryCreate(tag)`   | Method | Parse a repository tag and return a normalized `Version`, or null |
+| `Create(tag)`      | Method | Parse a repository tag and throw if the tag is not recognized     |
 
 `VersionInterval` exposes the following methods:
 
@@ -50,8 +59,9 @@ expressions and testing whether specific versions fall inside them.
 
 ## Interactions
 
-`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
-subsystems. `VersionInterval` and `VersionIntervalSet` may consume BuildMark
+`PathHelpers`, `ProcessRunner`, and `Version` have no dependencies on other
+BuildMark subsystems. `VersionInterval` and `VersionIntervalSet` may consume
 `Version` instances through their `Contains(Version)` overloads. The subsystem
 is consumed by any unit that needs safe path combination, external process
-execution, version interval parsing, or version containment checks.
+execution, version parsing, version interval parsing, or version containment
+checks.

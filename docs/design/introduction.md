@@ -13,18 +13,9 @@ requirements; it explains how they are realized.
 
 ## Scope
 
-This document covers the detailed design of the following software units:
-
-- **Program** — entry point and execution orchestrator (`Program.cs`)
-- **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
-- **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
-- **PathHelpers** — safe path combination utilities (`Utilities/PathHelpers.cs`)
-- **ItemControlsParser** — buildmark block parser (`ItemControls/ItemControlsParser.cs`)
-- **VersionInterval** — version interval model and parser (`ItemControls/VersionInterval.cs`)
-- **GitHubRepoConnector** — GitHub GraphQL API integration (`RepoConnectors/GitHub/GitHubRepoConnector.cs`)
-- **Configuration** — reading and parsing the `.buildmark.yaml` configuration file
-  (`Configuration/`), including `ConfigurationLoadResult` and `ConfigurationIssue`
-  for surfacing load errors and warnings
+This document covers the detailed design of the BuildMark system, including all
+subsystems and units identified in the software structure below. Each unit has
+its own detailed design chapter within this document.
 
 The following topics are out of scope:
 
@@ -45,7 +36,6 @@ BuildMark (System)
 ├── BuildNotes (Subsystem)
 │   ├── BuildInformation (Unit)
 │   ├── ItemInfo (Unit)
-│   ├── Version (Unit)
 │   ├── VersionTag (Unit)
 │   └── WebLink (Unit)
 ├── SelfTest (Subsystem)
@@ -53,6 +43,7 @@ BuildMark (System)
 ├── Utilities (Subsystem)
 │   ├── PathHelpers (Unit)
 │   ├── ProcessRunner (Unit)
+│   ├── Version (Unit)
 │   ├── VersionInterval (Unit)
 │   └── VersionIntervalSet (Unit)
 ├── Configuration (Subsystem)
@@ -93,7 +84,6 @@ src/DemaConsulting.BuildMark/
 ├── BuildNotes/
 │   ├── BuildInformation.cs                  — build information data model
 │   ├── ItemInfo.cs                          — item information data model
-│   ├── Version.cs                           — version information
 │   ├── VersionTag.cs                        — version tag representation
 │   └── WebLink.cs                           — web link helper
 ├── Cli/
@@ -103,6 +93,7 @@ src/DemaConsulting.BuildMark/
 ├── Utilities/
 │   ├── PathHelpers.cs                       — safe path combination utilities
 │   ├── ProcessRunner.cs                     — process runner for Git commands
+│   ├── Version.cs                           — semantic version parser and normalized model
 │   ├── VersionInterval.cs                   — single version interval model and parser
 │   └── VersionIntervalSet.cs                — ordered set of version intervals
 ├── Configuration/

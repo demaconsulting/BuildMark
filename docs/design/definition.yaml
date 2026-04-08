@@ -20,6 +20,7 @@ input-files:
   - docs/design/build-mark/self-test/validation.md
   - docs/design/build-mark/utilities/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
+  - docs/design/build-mark/utilities/version.md
   - docs/design/build-mark/item-controls/item-controls.md
   - docs/design/build-mark/item-controls/item-controls-parser.md
   - docs/design/build-mark/item-controls/version-interval.md

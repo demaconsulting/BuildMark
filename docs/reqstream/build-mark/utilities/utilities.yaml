@@ -3,7 +3,7 @@
 #
 # PURPOSE:
 # - Define requirements for the BuildMark Utilities subsystem
-# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs,
+# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs, Version.cs,
 #   VersionInterval.cs, and VersionIntervalSet.cs
 # - Subsystem requirements describe the shared utility behavior available to all other subsystems
 
@@ -40,6 +40,23 @@ sections:
           - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
         children:
           - BuildMark-ProcessRunner-RunAsync
+
+      - id: BuildMark-Utilities-Version
+        title: The Utilities subsystem shall provide a shared parser for repository version tags.
+        justification: |
+          Multiple subsystems need a consistent representation of release tags
+          when selecting baselines, identifying current versions, and evaluating
+          version ranges. Placing Version in Utilities centralizes that parsing
+          and normalization logic for reuse across the system.
+        tests:
+          - TagInfo_Constructor_ParsesSimpleVPrefix
+          - TagInfo_Constructor_DetectsAlphaPreRelease
+          - TagInfo_Constructor_ParsesBuildMetadata
+          - Version_TryCreate_ReturnsNullForInvalidTag
+          - Version_Create_ThrowsForInvalidTag
+        children:
+          - BuildMark-Version-Parse
+          - BuildMark-Version-InvalidTag
 
       - id: BuildMark-Utilities-VersionInterval
         title: >-

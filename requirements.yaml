@@ -10,6 +10,7 @@ includes:
   - docs/reqstream/build-mark/utilities/utilities.yaml
   - docs/reqstream/build-mark/utilities/path-helpers.yaml
   - docs/reqstream/build-mark/utilities/process-runner.yaml
+  - docs/reqstream/build-mark/utilities/version.yaml
   - docs/reqstream/build-mark/utilities/version-interval.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml

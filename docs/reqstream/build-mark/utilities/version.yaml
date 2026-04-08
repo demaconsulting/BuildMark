@@ -1,0 +1,47 @@
+---
+# Software Unit Requirements for the Version Class
+#
+# Version parses repository tag strings into normalized semantic version data.
+# It supports optional prefixes, optional pre-release segments, and optional
+# build metadata so callers can work with a consistent representation.
+
+sections:
+  - title: Version Unit Requirements
+    requirements:
+      - id: BuildMark-Version-Parse
+        title: >-
+          The Version class shall parse supported repository tag formats into
+          normalized semantic version information.
+        justification: |
+          BuildMark relies on repository tags to identify release boundaries and
+          report version ranges. A shared version parser ensures connectors and
+          reporting logic interpret prefixes, pre-release suffixes, and metadata
+          consistently across the system.
+        tests:
+          - TagInfo_Constructor_ParsesSimpleVPrefix
+          - TagInfo_Constructor_ParsesVerPrefix
+          - TagInfo_Constructor_ParsesReleaseUnderscorePrefix
+          - TagInfo_Constructor_DetectsAlphaPreRelease
+          - TagInfo_Constructor_DetectsBetaPreRelease
+          - TagInfo_Constructor_DetectsRcPreRelease
+          - TagInfo_Constructor_DetectsPrePreRelease
+          - TagInfo_Constructor_HandlesNoPrefix
+          - TagInfo_Constructor_HandlesComplexPrefix
+          - TagInfo_Constructor_ParsesBuildMetadata
+          - TagInfo_Constructor_AcceptsDotSeparatedAsPreRelease
+          - TagInfo_Constructor_ParsesComplexVersionWithMetadata
+          - TagInfo_Constructor_ParsesComplexVersionWithHyphenPreRelease
+          - TagInfo_Constructor_CorrectlyDetectsRcWithNumber
+          - TagInfo_Constructor_ParsesPreReleaseWithBuildMetadata
+
+      - id: BuildMark-Version-InvalidTag
+        title: >-
+          The Version class shall reject unrecognized tag formats by returning
+          null from TryCreate and throwing from Create.
+        justification: |
+          Repository connectors need a clear distinction between valid release
+          tags and unrelated tags. A non-throwing parse path supports filtering,
+          while a throwing path supports callers that require a valid version.
+        tests:
+          - Version_TryCreate_ReturnsNullForInvalidTag
+          - Version_Create_ThrowsForInvalidTag
