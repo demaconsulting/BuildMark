@@ -11,13 +11,13 @@ expressions and testing whether specific versions fall inside them.
 
 ## Units
 
-| Unit                  | File                                  | Responsibility                                        |
-|-----------------------|---------------------------------------|-------------------------------------------------------|
-| `PathHelpers`         | `Utilities/PathHelpers.cs`            | Safe path combination with traversal checks           |
-| `ProcessRunner`       | `Utilities/ProcessRunner.cs`          | Executes external shell commands                      |
-| `Version`             | `Utilities/Version.cs`                | Parses version tags into normalized semantic data     |
-| `VersionInterval`     | `Utilities/VersionInterval.cs`        | Single mathematical version interval model and parser |
-| `VersionIntervalSet`  | `Utilities/VersionIntervalSet.cs`     | Ordered collection of version intervals               |
+| Unit                 | File                              | Responsibility                        |
+|----------------------|-----------------------------------|---------------------------------------|
+| `PathHelpers`        | `Utilities/PathHelpers.cs`        | Safe path combination                 |
+| `ProcessRunner`      | `Utilities/ProcessRunner.cs`      | External process execution            |
+| `Version`            | `Utilities/Version.cs`            | Repository tag parser                 |
+| `VersionInterval`    | `Utilities/VersionInterval.cs`    | Version interval parser               |
+| `VersionIntervalSet` | `Utilities/VersionIntervalSet.cs` | Ordered version interval collection   |
 
 ## Interfaces
 

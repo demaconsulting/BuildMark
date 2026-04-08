@@ -22,8 +22,7 @@ public record VersionTag(
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                             |
-|---------------------|------------------------------------------------------------------|
-| `Utilities`         | Supplies the `Version` type that carries parsed version details  |
-| `BuildInformation`  | Uses `VersionTag` for `BaselineVersionTag` and `CurrentVersionTag` |
-| `RepoConnectors`    | Connectors construct `VersionTag` records from repository data   |
+- `Utilities` supplies the `Version` type that carries parsed version details.
+- `BuildInformation` uses `VersionTag` for `BaselineVersionTag` and
+  `CurrentVersionTag`.
+- `RepoConnectors` construct `VersionTag` records from repository data.
