@@ -27,6 +27,26 @@ namespace DemaConsulting.BuildMark.Utilities;
 public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
 {
     /// <summary>
+    ///     Determines whether a candidate semantic version falls within any interval in the set.
+    /// </summary>
+    /// <param name="version">Semantic version text to evaluate.</param>
+    /// <returns>True when the version is within any interval; otherwise false.</returns>
+    public bool Contains(string version)
+    {
+        return Intervals.Any(interval => interval.Contains(version));
+    }
+
+    /// <summary>
+    ///     Determines whether a candidate BuildMark version falls within any interval in the set.
+    /// </summary>
+    /// <param name="version">BuildMark version to evaluate.</param>
+    /// <returns>True when the version is within any interval; otherwise false.</returns>
+    public bool Contains(VersionInfo version)
+    {
+        return Contains(version.SemanticVersion);
+    }
+
+    /// <summary>
     ///     Parses a version interval set from text.
     /// </summary>
     /// <param name="text">Text to parse (e.g., "(,1.0.1],[1.1.0,1.2.0)").</param>

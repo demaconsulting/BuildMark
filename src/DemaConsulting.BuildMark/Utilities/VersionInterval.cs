@@ -34,6 +34,52 @@ public record VersionInterval(
     bool UpperInclusive)
 {
     /// <summary>
+    ///     Determines whether a candidate semantic version falls within the interval.
+    /// </summary>
+    /// <param name="version">Semantic version text to evaluate.</param>
+    /// <returns>True when the version is within the interval; otherwise false.</returns>
+    public bool Contains(string version)
+    {
+        // Reject invalid semantic version text.
+        if (!System.Version.TryParse(version, out var candidateVersion))
+        {
+            return false;
+        }
+
+        // Reject versions below the lower bound.
+        if (LowerBound != null && System.Version.TryParse(LowerBound, out var lowerBoundVersion))
+        {
+            var lowerComparison = candidateVersion.CompareTo(lowerBoundVersion);
+            if (lowerComparison < 0 || (lowerComparison == 0 && !LowerInclusive))
+            {
+                return false;
+            }
+        }
+
+        // Reject versions above the upper bound.
+        if (UpperBound != null && System.Version.TryParse(UpperBound, out var upperBoundVersion))
+        {
+            var upperComparison = candidateVersion.CompareTo(upperBoundVersion);
+            if (upperComparison > 0 || (upperComparison == 0 && !UpperInclusive))
+            {
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    /// <summary>
+    ///     Determines whether a candidate BuildMark version falls within the interval.
+    /// </summary>
+    /// <param name="version">BuildMark version to evaluate.</param>
+    /// <returns>True when the version is within the interval; otherwise false.</returns>
+    public bool Contains(VersionInfo version)
+    {
+        return Contains(version.SemanticVersion);
+    }
+
+    /// <summary>
     ///     Parses a version interval from text.
     /// </summary>
     /// <param name="text">Text to parse (e.g., "[1.0.0,2.0.0)", "(,1.0.0]").</param>

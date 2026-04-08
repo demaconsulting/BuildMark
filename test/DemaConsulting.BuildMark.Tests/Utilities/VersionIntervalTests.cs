@@ -204,4 +204,117 @@ public class VersionIntervalTests
         // Assert
         Assert.IsNull(result);
     }
+
+    /// <summary>
+    ///     Test that Contains returns true when the candidate equals the inclusive lower bound.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
+
+        // Act
+        var result = interval!.Contains("1.0.0");
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns false when the candidate equals the exclusive lower bound.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("(1.0.0,2.0.0)");
+
+        // Act
+        var result = interval!.Contains("1.0.0");
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns true when the candidate equals the inclusive upper bound.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringEqualToInclusiveUpper_ReturnsTrue()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0,2.0.0]");
+
+        // Act
+        var result = interval!.Contains("2.0.0");
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns false when the candidate equals the exclusive upper bound.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringEqualToExclusiveUpper_ReturnsFalse()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
+
+        // Act
+        var result = interval!.Contains("2.0.0");
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns true for a candidate inside an unbounded interval.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringInsideUnboundedInterval_ReturnsTrue()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("(,1.0.1]");
+
+        // Act
+        var result = interval!.Contains("1.0.0");
+
+        // Assert
+        Assert.IsTrue(result);
+    }
+
+    /// <summary>
+    ///     Test that Contains returns false for a candidate outside the interval.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_StringOutsideInterval_ReturnsFalse()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
+
+        // Act
+        var result = interval!.Contains("2.1.0");
+
+        // Assert
+        Assert.IsFalse(result);
+    }
+
+    /// <summary>
+    ///     Test that the VersionInfo overload delegates to the semantic version.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_Version_DelegatesToSemanticVersion()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
+        var version = VersionInfo.Create("v1.5.0-beta.1");
+
+        // Act
+        var result = interval!.Contains(version);
+
+        // Assert
+        Assert.IsTrue(result);
+    }
 }
