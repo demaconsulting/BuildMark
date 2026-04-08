@@ -11,16 +11,15 @@ markdown report suitable for embedding in release documentation.
 
 BuildMark is composed of six subsystems and a top-level entry point:
 
-| Component            | Kind      | Responsibility                                                      |
-|----------------------|-----------|---------------------------------------------------------------------|
-| `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags              |
-| `Cli`                | Subsystem | Command-line argument parsing and output channel control            |
-| `BuildNotes`         | Subsystem | Output data model shared by all connectors and Program              |
-| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file                     |
-| `RepoConnectors`     | Subsystem | Repository metadata retrieval via the GitHub GraphQL API            |
-| `SelfTest`           | Subsystem | Built-in self-validation test framework                             |
-| `Utilities`          | Subsystem | Shared path combination and process execution helpers               |
-| `ItemControls`       | Subsystem | Parsing of `buildmark` blocks embedded in issue and PR descriptions |
+| Component            | Kind      | Responsibility                                                                          |
+|----------------------|-----------|-----------------------------------------------------------------------------------------|
+| `Program`            | Unit      | Entry point; dispatches to handlers based on CLI flags                                  |
+| `Cli`                | Subsystem | Command-line argument parsing and output channel control                                |
+| `BuildNotes`         | Subsystem | Output data model shared by all connectors and Program                                  |
+| `Configuration`      | Subsystem | Parses the `.buildmark.yaml` configuration file                                         |
+| `RepoConnectors`     | Subsystem | Repository metadata retrieval; includes item-controls parsing and concrete connectors   |
+| `SelfTest`           | Subsystem | Built-in self-validation test framework                                                 |
+| `Utilities`          | Subsystem | Shared path combination and process execution helpers                                   |
 
 ## External Interfaces
 

@@ -1,15 +1,16 @@
-# ItemControls Subsystem
+# ItemControls Sub-Subsystem
 
 ## Overview
 
-The ItemControls subsystem provides parsing and data-model support for the
-`buildmark` fenced code block that developers embed in GitHub issue and pull
-request descriptions. It extracts optional visibility, type, and
-affected-version overrides from the block and exposes them as a strongly-typed
-record for the `GitHubRepoConnector` to apply when building the item lists.
+The ItemControls sub-subsystem is part of the RepoConnectors subsystem. It
+provides parsing and data-model support for the `buildmark` fenced code block
+that developers embed in repository item (issue and pull request) descriptions.
+It extracts optional visibility, type, and affected-version overrides from the
+block and exposes them as a strongly-typed record for connector implementations
+to apply when building the item lists.
 
-The subsystem has no dependencies on other BuildMark subsystems. It receives a
-plain description string and returns a data record; it performs no I/O.
+The sub-subsystem receives a plain description string and returns a data record;
+it performs no I/O and has no dependencies outside the RepoConnectors subsystem.
 
 ## Units
 
@@ -37,8 +38,9 @@ plain description string and returns a data record; it performs no I/O.
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                              |
-|-----------------------|-------------------------------------------------------------------|
-| `GitHubRepoConnector` | Calls `ItemControlsParser.Parse` on each issue and PR description |
-| `ItemControlsInfo`    | Returned by `ItemControlsParser`; consumed by the connector       |
-| `VersionIntervalSet`  | Stored on `ItemControlsInfo.AffectedVersions`                     |
+| Unit / Subsystem      | Role                                                               |
+|-----------------------|--------------------------------------------------------------------|
+| `GitHubRepoConnector` | Calls `ItemControlsParser.Parse` on each issue and PR description  |
+| `MockRepoConnector`   | May call `ItemControlsParser.Parse` for testing purposes           |
+| `ItemControlsInfo`    | Returned by `ItemControlsParser`; consumed by the connector        |
+| `VersionIntervalSet`  | Stored on `ItemControlsInfo.AffectedVersions`                      |

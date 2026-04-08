@@ -63,16 +63,16 @@ BuildMark (System)
 │   ├── AzureDevOpsConnectorConfig (Unit)
 │   ├── SectionConfig (Unit)
 │   └── RuleConfig (Unit)
-├── ItemControls (Subsystem)
-│   ├── ItemControlsInfo (Unit)
-│   ├── ItemControlsParser (Unit)
-│   ├── VersionInterval (Unit)
-│   └── VersionIntervalSet (Unit)
 └── RepoConnectors (Subsystem)
     ├── IRepoConnector (Unit)
     ├── RepoConnectorBase (Unit)
     ├── RepoConnectorFactory (Unit)
     ├── ItemRouter (Unit)
+    ├── ItemControls (Sub-Subsystem)
+    │   ├── ItemControlsInfo (Unit)
+    │   ├── ItemControlsParser (Unit)
+    │   ├── VersionInterval (Unit)
+    │   └── VersionIntervalSet (Unit)
     ├── GitHub (Sub-Subsystem)
     │   ├── GitHubRepoConnector (Unit)
     │   ├── GitHubGraphQLClient (Unit)
@@ -114,16 +114,16 @@ src/DemaConsulting.BuildMark/
 │   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings (future)
 │   ├── SectionConfig.cs                     — report section definition data model
 │   └── RuleConfig.cs                        — routing rule data model
-├── ItemControls/
-│   ├── ItemControlsInfo.cs                  — item controls data model
-│   ├── ItemControlsParser.cs                — buildmark block parser
-│   ├── VersionInterval.cs                   — single version interval model and parser
-│   └── VersionIntervalSet.cs                — ordered set of version intervals
 └── RepoConnectors/
     ├── IRepoConnector.cs                    — repository connector interface
     ├── RepoConnectorBase.cs                 — repository connector base class
     ├── RepoConnectorFactory.cs              — repository connector factory
     ├── ItemRouter.cs                        — shared item routing logic
+    ├── ItemControls/
+    │   ├── ItemControlsInfo.cs              — item controls data model
+    │   ├── ItemControlsParser.cs            — buildmark block parser
+    │   ├── VersionInterval.cs               — single version interval model and parser
+    │   └── VersionIntervalSet.cs            — ordered set of version intervals
     ├── GitHub/
     │   ├── GitHubRepoConnector.cs           — GitHub API integration
     │   ├── GitHubGraphQLClient.cs           — GraphQL API client

@@ -4,13 +4,15 @@
 
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark.
 It provides an interface and base class for repository connectors, a factory for
-creating the appropriate connector, and a shared `ItemRouter` for routing items to
-report sections.
+creating the appropriate connector, a shared `ItemRouter` for routing items to
+report sections, and the `ItemControls` sub-subsystem for parsing metadata embedded
+in repository item descriptions.
 
 Concrete connector implementations are organized into sub-subsystems: the `GitHub`
 sub-subsystem provides the production GitHub GraphQL connector, and the `Mock`
 sub-subsystem provides the in-memory connector used by the built-in `--validate`
-self-test.
+self-test. Future connectors (e.g. Azure DevOps) will each have their own
+sub-subsystem alongside `GitHub` and `Mock`.
 
 ## Units
 
@@ -23,10 +25,11 @@ self-test.
 
 ## Sub-Subsystems
 
-| Sub-Subsystem | Folder                      | Contents                                                      |
-|---------------|-----------------------------|---------------------------------------------------------------|
-| `GitHub`      | `RepoConnectors/GitHub/`    | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
-| `Mock`        | `RepoConnectors/Mock/`      | `MockRepoConnector` (used by `--validate` self-test)          |
+| Sub-Subsystem   | Folder                           | Contents                                                           |
+|-----------------|----------------------------------|--------------------------------------------------------------------|
+| `ItemControls`  | `RepoConnectors/ItemControls/`   | `ItemControlsParser`, `ItemControlsInfo`, `VersionInterval`, `VersionIntervalSet` |
+| `GitHub`        | `RepoConnectors/GitHub/`         | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
+| `Mock`          | `RepoConnectors/Mock/`           | `MockRepoConnector` (used by `--validate` self-test)               |
 
 ## Interfaces
 
