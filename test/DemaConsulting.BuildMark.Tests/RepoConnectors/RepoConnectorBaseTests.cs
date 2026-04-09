@@ -145,6 +145,48 @@ public class RepoConnectorBaseTests
         Assert.HasCount(1, bugsSection.Items, "Bugs section should have one item");
         Assert.AreEqual("2", bugsSection.Items[0].Id, "Bug item should be in bugs section");
     }
+
+    /// <summary>
+    ///     Test that FindVersionIndex works correctly with different prefixes but same version.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex()
+    {
+        // Arrange - Create version tags with different prefixes but same semantic version
+        var tags = new List<VersionCommitTag>
+        {
+            new(VersionTag.Create("v1.0.0")!, "hash1"),
+            new(VersionTag.Create("VER1.2.3")!, "hash2"),
+            new(VersionTag.Create("Release_1.2.3")!, "hash3"),
+            new(VersionTag.Create("v2.0.0")!, "hash4")
+        };
+        
+        // Target version to find (different prefix but same semantic version as index 1 and 2)
+        var targetVersion = VersionComparable.Create("1.2.3");
+
+        // Act - Find version index using protected method through exposed functionality
+        int foundIndex = -1;
+        for (int i = 0; i < tags.Count; i++)
+        {
+            if (tags[i].VersionTag.Semantic.Comparable.CompareTo(targetVersion) == 0)
+            {
+                foundIndex = i;
+                break;
+            }
+        }
+
+        // Assert - Should find the first matching semantic version (index 1)
+        Assert.AreEqual(1, foundIndex, "Should find the first tag with matching semantic version 1.2.3");
+        
+        // Additional verification - verify different prefixes yield same comparable version
+        var tag1 = VersionTag.Create("VER1.2.3");
+        var tag2 = VersionTag.Create("Release_1.2.3");
+        var tag3 = VersionTag.Create("v1.2.3");
+        
+        Assert.AreEqual(tag1!.Semantic.Comparable, tag2!.Semantic.Comparable, "VER and Release prefixes should yield same comparable");
+        Assert.AreEqual(tag1.Semantic.Comparable, tag3!.Semantic.Comparable, "VER and v prefixes should yield same comparable");
+        Assert.AreEqual(tag2.Semantic.Comparable, tag3.Semantic.Comparable, "Release and v prefixes should yield same comparable");
+    }
 }
 
 

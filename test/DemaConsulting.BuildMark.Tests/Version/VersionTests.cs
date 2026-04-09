@@ -31,6 +31,106 @@ namespace DemaConsulting.BuildMark.Tests.Version;
 public class VersionTests
 {
     /// <summary>
+    ///     Test that VersionComparable can be created from valid versions.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Create_ValidVersions_ReturnsVersionComparable()
+    {
+        // Arrange & Act
+        var simple = VersionComparable.Create("1.2.3");
+        var preRelease = VersionComparable.Create("2.0.0-alpha.1");
+        var complex = VersionComparable.Create("10.5.99-beta.10");
+
+        // Assert
+        Assert.IsNotNull(simple);
+        Assert.IsNotNull(preRelease);
+        Assert.IsNotNull(complex);
+        Assert.IsInstanceOfType(simple, typeof(VersionComparable));
+        Assert.IsInstanceOfType(preRelease, typeof(VersionComparable));
+        Assert.IsInstanceOfType(complex, typeof(VersionComparable));
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic can be created from valid semantic versions.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic()
+    {
+        // Arrange & Act
+        var simple = VersionSemantic.Create("1.2.3");
+        var withMetadata = VersionSemantic.Create("2.0.0+build.123");
+        var complex = VersionSemantic.Create("1.0.0-alpha.beta.2+exp.sha.5114f85");
+
+        // Assert
+        Assert.IsNotNull(simple);
+        Assert.IsNotNull(withMetadata);
+        Assert.IsNotNull(complex);
+        Assert.IsInstanceOfType(simple, typeof(VersionSemantic));
+        Assert.IsInstanceOfType(withMetadata, typeof(VersionSemantic));
+        Assert.IsInstanceOfType(complex, typeof(VersionSemantic));
+    }
+
+    /// <summary>
+    ///     Test that VersionTag can be created from valid tags.
+    /// </summary>
+    [TestMethod]
+    public void VersionTag_Create_ValidTag_ReturnsVersionTag()
+    {
+        // Arrange & Act
+        var simple = VersionTag.Create("1.2.3");
+        var prefixed = VersionTag.Create("v2.0.0");
+        var complex = VersionTag.Create("release-1.5.0-rc.1");
+
+        // Assert
+        Assert.IsNotNull(simple);
+        Assert.IsNotNull(prefixed);
+        Assert.IsNotNull(complex);
+        Assert.IsInstanceOfType(simple, typeof(VersionTag));
+        Assert.IsInstanceOfType(prefixed, typeof(VersionTag));
+        Assert.IsInstanceOfType(complex, typeof(VersionTag));
+    }
+
+    /// <summary>
+    ///     Test that VersionInterval can be created from valid interval parameters.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Create_ValidInterval_ReturnsVersionInterval()
+    {
+        // Arrange & Act
+        var inclusive = new VersionInterval("1.0.0", true, "2.0.0", true);
+        var exclusive = new VersionInterval("1.0.0", false, "2.0.0", false);
+        var mixed = new VersionInterval("1.0.0", true, "2.0.0", false);
+
+        // Assert
+        Assert.IsNotNull(inclusive);
+        Assert.IsNotNull(exclusive);
+        Assert.IsNotNull(mixed);
+        Assert.IsInstanceOfType(inclusive, typeof(VersionInterval));
+        Assert.IsInstanceOfType(exclusive, typeof(VersionInterval));
+        Assert.IsInstanceOfType(mixed, typeof(VersionInterval));
+    }
+
+    /// <summary>
+    ///     Test that VersionCommitTag can be created from valid parameters.
+    /// </summary>
+    [TestMethod]
+    public void VersionCommitTag_Constructor_ValidParameters_CreatesInstance()
+    {
+        // Arrange
+        var versionTag = VersionTag.Create("v1.2.3");
+        var commitHash = "abc123def456789";
+
+        // Act
+        var versionCommitTag = new VersionCommitTag(versionTag!, commitHash);
+
+        // Assert
+        Assert.IsNotNull(versionCommitTag);
+        Assert.IsInstanceOfType(versionCommitTag, typeof(VersionCommitTag));
+        Assert.AreEqual(versionTag, versionCommitTag.VersionTag);
+        Assert.AreEqual(commitHash, versionCommitTag.CommitHash);
+    }
+
+    /// <summary>
     ///     Test that the Version subsystem can create and use all version types correctly.
     ///     This validates the subsystem-level requirement for version processing capabilities.
     /// </summary>

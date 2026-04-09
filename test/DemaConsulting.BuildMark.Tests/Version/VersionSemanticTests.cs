@@ -29,6 +29,102 @@ namespace DemaConsulting.BuildMark.Tests.Version;
 public class VersionSemanticTests
 {
     /// <summary>
+    ///     Test that VersionSemantic creates instance with build metadata.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_Create_WithBuildMetadata_ReturnsInstance()
+    {
+        // Arrange & Act
+        var version = VersionSemantic.Create("1.2.3+build.123");
+
+        // Assert
+        Assert.IsNotNull(version);
+        Assert.AreEqual("build.123", version.Metadata);
+        Assert.AreEqual("1.2.3+build.123", version.FullVersion);
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic creates instance without build metadata.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance()
+    {
+        // Arrange & Act
+        var version = VersionSemantic.Create("1.2.3");
+
+        // Assert
+        Assert.IsNotNull(version);
+        Assert.IsNull(version.Metadata);
+        Assert.AreEqual("1.2.3", version.FullVersion);
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic properties delegate to comparable correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_Properties_DelegateToComparable_Correctly()
+    {
+        // Arrange & Act
+        var version = VersionSemantic.Create("1.2.3-alpha");
+
+        // Assert
+        Assert.AreEqual(1, version.Major);
+        Assert.AreEqual(2, version.Minor);
+        Assert.AreEqual(3, version.Patch);
+        Assert.AreEqual("alpha", version.PreRelease);
+        Assert.AreEqual("1.2.3-alpha", version.CompareVersion);
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic formats completely with all components.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_ToString_FormatsCompletely_WithAllComponents()
+    {
+        // Arrange
+        var version = VersionSemantic.Create("1.2.3-alpha+build.123");
+
+        // Act
+        var result = version.FullVersion;
+
+        // Assert
+        Assert.AreEqual("1.2.3-alpha+build.123", result);
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic PreRelease returns empty string for release versions.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_PreRelease_ReturnsEmptyStringForRelease()
+    {
+        // Arrange & Act
+        var version = VersionSemantic.Create("1.2.3");
+
+        // Assert
+        Assert.AreEqual("", version.PreRelease);
+        Assert.IsFalse(version.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that VersionSemantic parses valid semantic versions correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly()
+    {
+        // Arrange & Act
+        var simple = VersionSemantic.Create("1.0.0");
+        var preRelease = VersionSemantic.Create("1.0.0-alpha.1");
+        var withMetadata = VersionSemantic.Create("1.0.0+20130313144700");
+        var complex = VersionSemantic.Create("1.0.0-beta.2+exp.sha.5114f85");
+
+        // Assert
+        Assert.AreEqual("1.0.0", simple.FullVersion);
+        Assert.AreEqual("1.0.0-alpha.1", preRelease.FullVersion);
+        Assert.AreEqual("1.0.0+20130313144700", withMetadata.FullVersion);
+        Assert.AreEqual("1.0.0-beta.2+exp.sha.5114f85", complex.FullVersion);
+    }
+
+    /// <summary>
     ///     Test that VersionSemantic parses simple version without metadata.
     /// </summary>
     [TestMethod]

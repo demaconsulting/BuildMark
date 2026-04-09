@@ -29,6 +29,22 @@ namespace DemaConsulting.BuildMark.Tests.Version;
 public class VersionComparableTests
 {
     /// <summary>
+    ///     Test that VersionComparable creates instances from valid version strings.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Create_ValidVersion_ReturnsInstance()
+    {
+        // Arrange & Act
+        var version = VersionComparable.Create("1.2.3");
+
+        // Assert
+        Assert.IsNotNull(version);
+        Assert.AreEqual(1, version.Major);
+        Assert.AreEqual(2, version.Minor);
+        Assert.AreEqual(3, version.Patch);
+    }
+
+    /// <summary>
     ///     Test that VersionComparable parses simple version.
     /// </summary>
     [TestMethod]
@@ -93,7 +109,7 @@ public class VersionComparableTests
     ///     Test that CompareTo works correctly with identical versions.
     /// </summary>
     [TestMethod]
-    public void VersionComparable_CompareTo_IdenticalVersions_ReturnsZero()
+    public void VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero()
     {
         // Arrange
         var version1 = VersionComparable.Create("1.2.3");
@@ -104,6 +120,181 @@ public class VersionComparableTests
 
         // Assert
         Assert.AreEqual(0, result);
+    }
+
+    /// <summary>
+    ///     Test that CompareTo handles different major versions correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("2.1.1");
+
+        // Act
+        var result = version1.CompareTo(version2);
+
+        // Assert
+        Assert.IsTrue(result < 0, "1.2.3 should be less than 2.1.1");
+    }
+
+    /// <summary>
+    ///     Test that CompareTo handles different minor versions correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("1.3.1");
+
+        // Act
+        var result = version1.CompareTo(version2);
+
+        // Assert
+        Assert.IsTrue(result < 0, "1.2.3 should be less than 1.3.1");
+    }
+
+    /// <summary>
+    ///     Test that CompareTo handles different patch versions correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("1.2.4");
+
+        // Act
+        var result = version1.CompareTo(version2);
+
+        // Assert
+        Assert.IsTrue(result < 0, "1.2.3 should be less than 1.2.4");
+    }
+
+    /// <summary>
+    ///     Test that CompareTo treats pre-release vs release correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder()
+    {
+        // Arrange
+        var preRelease = VersionComparable.Create("1.2.3-alpha");
+        var release = VersionComparable.Create("1.2.3");
+
+        // Act
+        var result = preRelease.CompareTo(release);
+
+        // Assert
+        Assert.IsTrue(result < 0, "1.2.3-alpha should be less than 1.2.3");
+    }
+
+    /// <summary>
+    ///     Test that CompareTo orders pre-releases lexicographically.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3-alpha");
+        var version2 = VersionComparable.Create("1.2.3-beta");
+
+        // Act
+        var result = version1.CompareTo(version2);
+
+        // Assert
+        Assert.IsTrue(result < 0, "alpha should be less than beta lexicographically");
+    }
+
+    /// <summary>
+    ///     Test that less-than operator works correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Operators_LessThan_WorksCorrectly()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("1.11.2");
+
+        // Act & Assert
+        Assert.IsTrue(version1 < version2);
+        Assert.IsFalse(version2 < version1);
+    }
+
+    /// <summary>
+    ///     Test that greater-than operator works correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Operators_GreaterThan_WorksCorrectly()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.11.2");
+        var version2 = VersionComparable.Create("1.2.3");
+
+        // Act & Assert
+        Assert.IsTrue(version1 > version2);
+        Assert.IsFalse(version2 > version1);
+    }
+
+    /// <summary>
+    ///     Test that less-than-or-equal operator works correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Operators_LessThanOrEqual_WorksCorrectly()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("1.2.3");
+        var version3 = VersionComparable.Create("1.11.2");
+
+        // Act & Assert
+        Assert.IsTrue(version1 <= version2); // Equal case
+        Assert.IsTrue(version1 <= version3); // Less than case
+        Assert.IsFalse(version3 <= version1); // False case
+    }
+
+    /// <summary>
+    ///     Test that greater-than-or-equal operator works correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly()
+    {
+        // Arrange
+        var version1 = VersionComparable.Create("1.2.3");
+        var version2 = VersionComparable.Create("1.2.3");
+        var version3 = VersionComparable.Create("1.11.2");
+
+        // Act & Assert
+        Assert.IsTrue(version1 >= version2); // Equal case
+        Assert.IsTrue(version3 >= version1); // Greater than case
+        Assert.IsFalse(version1 >= version3); // False case
+    }
+
+    /// <summary>
+    ///     Test that CompareTo orders semantic versions correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder()
+    {
+        // Arrange - Test various semantic version scenarios
+        var versions = new[]
+        {
+            "1.0.0",
+            "2.0.0",
+            "2.1.0",
+            "2.1.1"
+        }.Select(v => VersionComparable.Create(v)).ToArray();
+
+        // Act & Assert - Test that they are in ascending order
+        for (var i = 0; i < versions.Length - 1; i++)
+        {
+            var current = versions[i];
+            var next = versions[i + 1];
+            var result = current!.CompareTo(next);
+
+            Assert.IsTrue(result < 0, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
+        }
     }
 
     /// <summary>
@@ -155,36 +346,6 @@ public class VersionComparableTests
 
         // Assert
         Assert.IsTrue(result < 0, "alpha should be less than beta lexicographically");
-    }
-
-    /// <summary>
-    ///     Test that less-than operator works correctly.
-    /// </summary>
-    [TestMethod]
-    public void VersionComparable_LessThanOperator_FirstVersionLess_ReturnsTrue()
-    {
-        // Arrange
-        var version1 = VersionComparable.Create("1.2.3");
-        var version2 = VersionComparable.Create("1.11.2");
-
-        // Act & Assert
-        Assert.IsTrue(version1 < version2);
-        Assert.IsFalse(version2 < version1);
-    }
-
-    /// <summary>
-    ///     Test that greater-than operator works correctly.
-    /// </summary>
-    [TestMethod]
-    public void VersionComparable_GreaterThanOperator_FirstVersionGreater_ReturnsTrue()
-    {
-        // Arrange
-        var version1 = VersionComparable.Create("1.11.2");
-        var version2 = VersionComparable.Create("1.2.3");
-
-        // Act & Assert
-        Assert.IsTrue(version1 > version2);
-        Assert.IsFalse(version2 > version1);
     }
 
     /// <summary>
