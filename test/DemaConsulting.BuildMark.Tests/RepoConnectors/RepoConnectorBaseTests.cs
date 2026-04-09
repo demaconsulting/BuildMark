@@ -51,7 +51,12 @@ public class RepoConnectorBaseTests
 
         /// <inheritdoc/>
         public override Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
-            => Task.FromResult<BuildInformation>(null!);
+        {
+            // Return a minimal but valid BuildInformation for stub testing purposes
+            var versionInfo = version ?? VersionInfo.Create("1.0.0");
+            var versionTag = new VersionTag(versionInfo, "stub-hash");
+            return Task.FromResult(new BuildInformation(null, versionTag, [], [], [], null));
+        }
     }
 
     /// <summary>

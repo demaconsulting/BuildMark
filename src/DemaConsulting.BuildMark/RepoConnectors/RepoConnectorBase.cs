@@ -84,7 +84,7 @@ public abstract class RepoConnectorBase : IRepoConnector
             result.Add((section.Id, section.Title, items));
         }
 
-        // Include any extra sections not in the configured section list
+        // Include any extra sections created by rules that don't have corresponding SectionConfig entries
         foreach (var kvp in routedDict)
         {
             // Skip sections already included via configured section definitions
@@ -93,7 +93,7 @@ public abstract class RepoConnectorBase : IRepoConnector
                 continue;
             }
 
-            // Add extra section using its ID as the title
+            // Add extra section using its ID as the title (no SectionConfig title available)
             result.Add((kvp.Key, kvp.Key, kvp.Value));
         }
 

@@ -109,6 +109,7 @@ public record BuildInformation(
     private void AppendRoutedSections(System.Text.StringBuilder markdown, string subHeading)
     {
         // Render each configured section as a markdown heading with its item list
+        // sectionId (first tuple element) is unused here; only title and items are rendered
         foreach (var (_, sectionTitle, items) in RoutedSections!)
         {
             // Add section heading
