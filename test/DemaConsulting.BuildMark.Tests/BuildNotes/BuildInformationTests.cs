@@ -498,4 +498,64 @@ public class BuildInformationTests
         Assert.AreEqual(text, webLink.LinkText);
         Assert.AreEqual(url, webLink.TargetUrl);
     }
+
+    /// <summary>
+    ///     Test that ToMarkdown renders custom section headings when RoutedSections is populated.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: BuildInformation.ToMarkdown with RoutedSections
+    ///     What the assertions prove: Custom section headings appear and legacy sections do not
+    /// </remarks>
+    [TestMethod]
+    public void BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections()
+    {
+        // Arrange - Build information with routed sections
+        var versionTag = new VersionTag(VersionInfo.Create("1.0.0"), "abc123");
+        var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
+        var bugItem = new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2);
+        var routedSections = new List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>
+        {
+            ("features", "Features", new List<ItemInfo> { featureItem }),
+            ("bugs", "Bugs", new List<ItemInfo> { bugItem })
+        };
+        var buildInfo = new BuildInformation(null, versionTag, [], [], [], null)
+        {
+            RoutedSections = routedSections
+        };
+
+        // Act - Generate markdown
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - Custom section headings are present
+        Assert.Contains("## Features", markdown, "Features heading should be present");
+        Assert.Contains("## Bugs", markdown, "Bugs heading should be present");
+        Assert.Contains("Add feature X", markdown, "Feature item should be present");
+        Assert.Contains("Fix bug Y", markdown, "Bug item should be present");
+
+        // Assert - Legacy sections are not present
+        Assert.IsFalse(markdown.Contains("## Changes"), "Legacy Changes heading should not be present");
+        Assert.IsFalse(markdown.Contains("## Bugs Fixed"), "Legacy Bugs Fixed heading should not be present");
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown renders default sections when RoutedSections is null.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: BuildInformation.ToMarkdown without RoutedSections
+    ///     What the assertions prove: Legacy Changes/Bugs Fixed sections are present
+    /// </remarks>
+    [TestMethod]
+    public void BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections()
+    {
+        // Arrange - Build information without routed sections (legacy mode)
+        var versionTag = new VersionTag(VersionInfo.Create("1.0.0"), "abc123");
+        var buildInfo = new BuildInformation(null, versionTag, [], [], [], null);
+
+        // Act - Generate markdown
+        var markdown = buildInfo.ToMarkdown();
+
+        // Assert - Legacy section headings are present
+        Assert.Contains("## Changes", markdown, "Legacy Changes heading should be present");
+        Assert.Contains("## Bugs Fixed", markdown, "Legacy Bugs Fixed heading should be present");
+    }
 }

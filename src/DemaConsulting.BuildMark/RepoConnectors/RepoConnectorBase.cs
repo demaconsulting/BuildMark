@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
@@ -28,6 +29,78 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public abstract class RepoConnectorBase : IRepoConnector
 {
+    /// <summary>
+    ///     The routing rules for distributing items into report sections.
+    /// </summary>
+    private IReadOnlyList<RuleConfig> _rules = [];
+
+    /// <summary>
+    ///     The report section definitions.
+    /// </summary>
+    private IReadOnlyList<SectionConfig> _sections = [];
+
+    /// <summary>
+    ///     Gets a value indicating whether routing rules have been configured.
+    /// </summary>
+    protected bool HasRules => _rules.Count > 0;
+
+    /// <summary>
+    ///     Configures the routing rules and section definitions for this connector.
+    /// </summary>
+    /// <param name="rules">Routing rules to apply when distributing items.</param>
+    /// <param name="sections">Section definitions that determine output structure.</param>
+    public void Configure(IReadOnlyList<RuleConfig> rules, IReadOnlyList<SectionConfig> sections)
+    {
+        // Store the provided rules for use when routing items into sections
+        _rules = rules;
+
+        // Store the provided sections for use when building the output structure
+        _sections = sections;
+    }
+
+    /// <summary>
+    ///     Routes items into report sections using the configured rules and sections.
+    /// </summary>
+    /// <param name="allItems">All items to be routed.</param>
+    /// <returns>Ordered list of section data with items assigned to each section.</returns>
+    protected IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> ApplyRules(
+        IEnumerable<ItemInfo> allItems)
+    {
+        // Route all items into section buckets using configured rules
+        var routedDict = ItemRouter.Route(allItems.ToList(), _rules, _sections);
+
+        // Build ordered list of sections with their items, using configured section order
+        var result = new List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>();
+
+        // Process each configured section in order
+        foreach (var section in _sections)
+        {
+            // Get items routed to this section (empty list if no items)
+            var items = routedDict.TryGetValue(section.Id, out var bucket)
+                ? (IReadOnlyList<ItemInfo>)bucket
+                : [];
+
+            // Add section to result list with its title and items
+            result.Add((section.Id, section.Title, items));
+        }
+
+        // Include any extra sections not in the configured section list
+        foreach (var kvp in routedDict)
+        {
+            // Skip sections already included via configured section definitions
+            if (_sections.Any(s => s.Id == kvp.Key))
+            {
+                continue;
+            }
+
+            // Add extra section using its ID as the title
+            result.Add((kvp.Key, kvp.Key, kvp.Value));
+        }
+
+        // Return the ordered section results
+        return result;
+    }
+
     /// <summary>
     ///     Runs a command and returns its output.
     /// </summary>

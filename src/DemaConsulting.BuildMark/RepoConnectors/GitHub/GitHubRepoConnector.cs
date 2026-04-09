@@ -131,6 +131,15 @@ public class GitHubRepoConnector : RepoConnectorBase
         bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
+        // Apply routing rules if configured, otherwise use legacy categorization
+        IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>? routedSections = null;
+        if (HasRules)
+        {
+            // Route all collected items into configured sections
+            var allItems = nonBugChanges.Concat(bugs).Concat(knownIssues);
+            routedSections = ApplyRules(allItems);
+        }
+
         // Build version tags from version and hash info
         var currentTag = new VersionTag(toVersion, toHash);
         var baselineTag = fromVersion != null && fromHash != null
@@ -147,7 +156,10 @@ public class GitHubRepoConnector : RepoConnectorBase
             nonBugChanges,
             bugs,
             knownIssues,
-            changelogLink);
+            changelogLink)
+        {
+            RoutedSections = routedSections
+        };
     }
 
     /// <summary>

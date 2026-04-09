@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
@@ -157,5 +158,92 @@ public class MockRepoConnectorTests
         {
             Assert.AreEqual("bug", bug.Type, $"Bug {bug.Id} should have type 'bug'");
         }
+    }
+
+    /// <summary>
+    ///     Test that Configure stores rules and sections, making HasRules true via behavior.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector.Configure stores provided rules
+    ///     What the assertions prove: After Configure with non-empty rules, GetBuildInformationAsync returns RoutedSections
+    /// </remarks>
+    [TestMethod]
+    public async Task MockRepoConnector_Configure_StoresRulesAndSections()
+    {
+        // Arrange - Create connector and define rules
+        var connector = new MockRepoConnector();
+        var rules = new List<RuleConfig>
+        {
+            new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+            new RuleConfig { Route = "features" }
+        };
+        var sections = new List<SectionConfig>
+        {
+            new SectionConfig { Id = "features", Title = "Features" },
+            new SectionConfig { Id = "bugs", Title = "Bugs" }
+        };
+
+        // Act - Configure the connector with rules
+        connector.Configure(rules, sections);
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+
+        // Assert - Routing was applied (RoutedSections is populated when rules are configured)
+        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be set when rules are configured");
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync with rules returns routed sections.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector routes items when rules are configured
+    ///     What the assertions prove: RoutedSections contains expected section titles
+    /// </remarks>
+    [TestMethod]
+    public async Task MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections()
+    {
+        // Arrange - Create connector with routing rules
+        var connector = new MockRepoConnector();
+        connector.Configure(
+            new List<RuleConfig>
+            {
+                new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                new RuleConfig { Route = "features" }
+            },
+            new List<SectionConfig>
+            {
+                new SectionConfig { Id = "features", Title = "Features" },
+                new SectionConfig { Id = "bugs", Title = "Bugs" }
+            });
+
+        // Act - Get build information with routing rules configured
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+
+        // Assert - RoutedSections is populated with the configured sections
+        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should not be null when rules are configured");
+        Assert.AreEqual(2, buildInfo.RoutedSections.Count, "Should have two configured sections");
+
+        var sectionTitles = buildInfo.RoutedSections.Select(s => s.SectionTitle).ToList();
+        Assert.Contains("Features", sectionTitles, "Features section should be present");
+        Assert.Contains("Bugs", sectionTitles, "Bugs section should be present");
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync without rules returns null RoutedSections.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector does not route when no rules are configured
+    ///     What the assertions prove: RoutedSections is null when no rules are configured
+    /// </remarks>
+    [TestMethod]
+    public async Task MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections()
+    {
+        // Arrange - Create connector without configuring rules
+        var connector = new MockRepoConnector();
+
+        // Act - Get build information without rules configured
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+
+        // Assert - RoutedSections should be null (legacy mode)
+        Assert.IsNull(buildInfo.RoutedSections, "RoutedSections should be null when no rules are configured");
     }
 }
