@@ -38,6 +38,8 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `WriteError(message)` | Method   | Writes an error line and sets exit code to 1       |
 | `Dispose()`           | Method   | Closes the log file if one was opened              |
 
+> `Create(args)` throws `ArgumentException` for invalid or malformed arguments.
+
 ## Interactions
 
 The Cli subsystem has no dependencies on other BuildMark subsystems. `Program`
