@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.Cli;
 
 /// <summary>
 ///     Context class that handles command-line arguments and program output.
@@ -54,6 +54,11 @@ internal sealed class Context : IDisposable
     ///     Gets a value indicating whether the validate flag was specified.
     /// </summary>
     public bool Validate { get; private init; }
+
+    /// <summary>
+    ///     Gets a value indicating whether the lint flag was specified.
+    /// </summary>
+    public bool Lint { get; private init; }
 
     /// <summary>
     ///     Gets the build version string.
@@ -126,6 +131,7 @@ internal sealed class Context : IDisposable
             Help = parser.Help,
             Silent = parser.Silent,
             Validate = parser.Validate,
+            Lint = parser.Lint,
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
             ReportDepth = parser.ReportDepth,
@@ -188,6 +194,11 @@ internal sealed class Context : IDisposable
         ///     Gets a value indicating whether the validate flag was specified.
         /// </summary>
         public bool Validate { get; private set; }
+
+        /// <summary>
+        ///     Gets a value indicating whether the lint flag was specified.
+        /// </summary>
+        public bool Lint { get; private set; }
 
         /// <summary>
         ///     Gets the build version string.
@@ -261,6 +272,10 @@ internal sealed class Context : IDisposable
 
                 case "--validate":
                     Validate = true;
+                    return index;
+
+                case "--lint":
+                    Lint = true;
                     return index;
 
                 case "--log":

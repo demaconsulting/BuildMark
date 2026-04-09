@@ -30,11 +30,6 @@ For a detailed explanation of how BuildMark works internally, see the
 - 🌐 **Multi-Platform** - Support for Windows, Linux, macOS with .NET 8, 9, and 10
 - ✅ **Self-Validation** - Built-in tests without requiring external tools
 - 📊 **Detailed Reporting** - Track changes, bug fixes, and known issues between versions
-- 🔍 **Linting Enforcement** - markdownlint, cspell, and yamllint enforced on every CI run
-- 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
-  following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
-- ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
-- 🔗 **Requirements Traceability** - Requirements linked to passing tests with auto-generated trace matrix
 
 ## Installation
 
@@ -114,6 +109,7 @@ Options:
   -?, -h, --help               Display this help message
   --silent                     Suppress console output
   --validate                   Run self-validation
+  --lint                       Validate .buildmark.yaml and exit
   --results <file>             Write validation results (TRX or JUnit format)
   --log <file>                 Write output to log file
   --build-version <version>    Specify the build version
@@ -154,6 +150,84 @@ buildmark --validate
 buildmark --validate --results validation-results.trx
 ```
 
+## Configuration File
+
+BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root. This file
+separates persistent repository settings from runtime arguments, simplifying CI invocations and
+enabling version-controlled configuration.
+
+The file has three top-level sections:
+
+- **`connector`** — declares the repository connector type and per-connector settings such as URL
+  overrides and repository identifiers. Current releases support the `github` connector. Azure
+  DevOps connector values are reserved for future support and are not yet implemented.
+- **`sections`** — defines the ordered list of sections that will appear in the generated build
+  notes, each identified by an `id` and a `title`.
+- **`rules`** — an ordered list of match/route rules. Each rule can match on `label` and/or
+  `work-item-type`, and routes matched items to a named section or to `suppressed` to exclude them.
+  Rules are evaluated in order and the first match wins. A rule with no `match` key is a catch-all.
+
+Example `.buildmark.yaml`:
+
+```yaml
+# Repository Connector Settings
+connector:
+  # Type of repository
+  type: github
+
+  # GitHub settings
+  github:
+    url: https://github.mycompany.com   # optional; defaults to https://api.github.com
+    repository: owner/repo
+
+# Build Notes sections
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+  - id: dependency-updates
+    title: Dependency Updates
+
+# Item routing rules
+rules:
+  # Labels of 'dependencies', 'renovate', or 'dependabot' get routed to the 'dependency-updates' section
+  - match:
+      label: [dependencies, renovate, dependabot]
+    route: dependency-updates
+
+  # Bug work-items get routed to the 'bugs-fixed' section
+  - match:
+      work-item-type: [Bug]
+    route: bugs-fixed
+
+  # Labels of 'bug', 'defect', or 'regression' get routed to the 'bugs-fixed' section
+  - match:
+      label: [bug, defect, regression]
+    route: bugs-fixed
+
+  # Labels of 'internal' or 'chore' get suppressed
+  - match:
+      label: [internal, chore]
+    route: suppressed
+
+  # Task and Epic work-items get suppressed
+  - match:
+      work-item-type: [Task, Epic]
+    route: suppressed
+
+  # Everything else gets routed to the 'changes' section
+  - route: changes
+```
+
+GitHub authentication is not configured in `.buildmark.yaml`. BuildMark currently resolves a token
+from `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`.
+
+Azure DevOps connector configuration is reserved for future support and should not be used with the
+current release.
+
+For more detail see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+
 ## Self Validation
 
 Running self-validation produces a report containing the following information:
@@ -173,9 +247,10 @@ Running self-validation produces a report containing the following information:
 ✓ BuildMark_GitIntegration - Passed
 ✓ BuildMark_IssueTracking - Passed
 ✓ BuildMark_KnownIssuesReporting - Passed
+✓ BuildMark_RulesRouting - Passed
 
-Total Tests: 4
-Passed: 4
+Total Tests: 5
+Passed: 5
 Failed: 0
 ```
 
@@ -185,6 +260,7 @@ Each test in the report proves:
 - **`BuildMark_GitIntegration`** - Git repository connector reads version tags and commits.
 - **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
+- **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.
 
 See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md) for more details
 on the self-validation tests.
@@ -288,6 +364,16 @@ Example report structure:
 
 [View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
 ```
+
+## Project Practices
+
+The BuildMark repository itself follows these development practices:
+
+- 🔍 **Linting Enforcement** - markdownlint, cspell, and yamllint enforced on every CI run
+- 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
+  following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
+- ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
+- 🔗 **Requirements Traceability** - Requirements linked to passing tests with auto-generated trace matrix
 
 ## Contributing
 

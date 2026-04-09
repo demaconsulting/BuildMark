@@ -18,6 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Version;
+
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
@@ -31,5 +34,5 @@ public interface IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
+    Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null);
 }

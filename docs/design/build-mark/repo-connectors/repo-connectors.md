@@ -4,22 +4,37 @@
 
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark.
 It provides an interface and base class for repository connectors, a factory for
-creating the appropriate connector, a mock connector for testing, and a process
-runner for executing Git commands.
+creating the appropriate connector, a shared `ItemRouter` for routing items to
+report sections, and `ItemControlsParser` with `ItemControlsInfo` for parsing
+metadata embedded in repository item descriptions.
 
-The primary production connector is `GitHubRepoConnector`, which queries the GitHub
-GraphQL API to retrieve issues, pull requests, tags, and commits.
+Concrete connector implementations are organized into subsystems: the `GitHub`
+subsystem provides the production GitHub GraphQL connector, and the `Mock`
+subsystem provides the in-memory connector used by the built-in `--validate`
+self-test. Future connectors (e.g. Azure DevOps) will each have their own
+subsystem alongside `GitHub` and `Mock`.
 
 ## Units
 
-| Unit                   | File                                           | Responsibility                          |
-|------------------------|------------------------------------------------|-----------------------------------------|
-| `IRepoConnector`       | `RepoConnectors/IRepoConnector.cs`             | Interface for all repository connectors |
-| `RepoConnectorBase`    | `RepoConnectors/RepoConnectorBase.cs`          | Base class with common connector logic  |
-| `RepoConnectorFactory` | `RepoConnectors/RepoConnectorFactory.cs`       | Creates the appropriate connector       |
-| `MockRepoConnector`    | `RepoConnectors/MockRepoConnector.cs`          | In-memory connector for testing         |
-| `ProcessRunner`        | `RepoConnectors/ProcessRunner.cs`              | Runs Git commands via the shell         |
-| `GitHubRepoConnector`  | `RepoConnectors/GitHubRepoConnector.cs`        | GitHub GraphQL API connector            |
+- `IRepoConnector` — `RepoConnectors/IRepoConnector.cs` — interface for all
+  repository connectors
+- `RepoConnectorBase` — `RepoConnectors/RepoConnectorBase.cs` — base class with
+  common connector logic
+- `RepoConnectorFactory` — `RepoConnectors/RepoConnectorFactory.cs` — creates
+  the appropriate connector
+- `ItemRouter` — `RepoConnectors/ItemRouter.cs` — shared item-routing logic for
+  all connectors
+- `ItemControlsParser` — `RepoConnectors/ItemControlsParser.cs` — parses
+  buildmark blocks from item description bodies
+- `ItemControlsInfo` — `RepoConnectors/ItemControlsInfo.cs` — data record holding
+  visibility, type, and version-set values
+
+## Subsystems
+
+| Subsystem | Folder                      | Contents                                                           |
+|-----------|-----------------------------|--------------------------------------------------------------------|
+| `GitHub`  | `RepoConnectors/GitHub/`    | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
+| `Mock`    | `RepoConnectors/Mock/`      | `MockRepoConnector` (used by `--validate` self-test)               |
 
 ## Interfaces
 
@@ -31,9 +46,11 @@ GraphQL API to retrieve issues, pull requests, tags, and commits.
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                          |
-|-----------------------|---------------------------------------------------------------|
-| `Program`             | Creates a connector via `RepoConnectorFactory` and calls it   |
-| `Validation`          | Uses `MockRepoConnector` directly for self-tests              |
-| `ItemControlsParser`  | Called by `GitHubRepoConnector` on each description body      |
-| `BuildInformation`    | The data record returned by connectors                        |
+| Unit / Subsystem      | Role                                                                   |
+|-----------------------|------------------------------------------------------------------------|
+| `Program`             | Creates a connector via `RepoConnectorFactory` and calls it            |
+| `Program`             | Passes `GitHubConnectorConfig` (from `result.Config.Connector.GitHub`) |
+|                       | to `GitHubRepoConnector` for owner, repo, and base-URL settings        |
+| `Validation`          | Uses `MockRepoConnector` directly for self-tests                       |
+| `ItemControlsParser`  | Called by `GitHubRepoConnector` on each description body               |
+| `BuildInformation`    | The data record returned by connectors                                 |

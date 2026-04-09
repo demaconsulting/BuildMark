@@ -18,7 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Tests;
+using DemaConsulting.BuildMark.Cli;
+
+namespace DemaConsulting.BuildMark.Tests.Cli;
 
 /// <summary>
 ///     Tests for the Context class.
@@ -137,6 +139,19 @@ public class ContextTests
 
         // Verify Validate property is set
         Assert.IsTrue(context.Validate);
+    }
+
+    /// <summary>
+    ///     Test that Context.Create with --lint flag sets Lint property.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_LintFlag_SetsLintProperty()
+    {
+        // Create context with --lint flag
+        using var context = Context.Create(["--lint"]);
+
+        // Verify Lint property is set
+        Assert.IsTrue(context.Lint);
     }
 
     /// <summary>
@@ -788,3 +803,6 @@ public class ContextTests
         }
     }
 }
+
+
+

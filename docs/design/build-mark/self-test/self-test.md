@@ -25,8 +25,20 @@ as its input parameter.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                  |
-|---------------------|-------------------------------------------------------|
-| `Context`           | Provides output methods and `ResultsFile` path        |
-| `MockRepoConnector` | Provides deterministic repository data for self-tests |
-| `BuildInformation`  | Generated during tests to verify report content       |
+| Unit / Subsystem    | Role                                                                        |
+|---------------------|-----------------------------------------------------------------------------|
+| `Context`           | Provides output methods and `ResultsFile` path                              |
+| `MockRepoConnector` | Provides deterministic repository data for self-tests (RepoConnectors/Mock) |
+| `BuildInformation`  | Generated during tests to verify report content                             |
+
+## Validation Tests
+
+`Validation.Run` executes the following self-tests in order:
+
+| Test Name                                | What it verifies                                                       |
+|------------------------------------------|------------------------------------------------------------------------|
+| `BuildMark_MarkdownReportGeneration`     | Markdown report is correctly generated from mock data                  |
+| `BuildMark_GitIntegration`               | Git repository connector reads version tags and commits                |
+| `BuildMark_IssueTracking`                | GitHub issue and pull request tracking works correctly                 |
+| `BuildMark_KnownIssuesReporting`         | Known issues are correctly included in the report when requested       |
+| `BuildMark_RulesRouting`                 | Rules-based item routing assigns items to the correct report sections  |

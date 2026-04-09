@@ -1,0 +1,36 @@
+---
+# Version Tag Requirements
+
+sections:
+  - title: VersionTag Requirements
+    requirements:
+      - id: BuildMark-VersionTag-Formats
+        title: >-
+          VersionTag shall parse repository tags in various formats and normalize
+          them to VersionComparable for consistent version handling.
+        justification: |
+          Repository tags come in many formats (v1.2.3, 1.2.3.rc.1, release-1.2.3).
+          VersionTag provides parsing and normalization while preserving the original
+          tag for display purposes.
+        tests:
+          - VersionTag_Create_StandardTag_ParsesCorrectly
+          - VersionTag_Create_PrefixedTag_ParsesCorrectly
+          - VersionTag_Create_DotSeparatedPreRelease_NormalizesToHyphen
+          - VersionTag_Create_ComplexTag_ExtractsVersionCorrectly
+          - VersionTag_TryCreate_InvalidTag_ReturnsNull
+          - VersionTag_Properties_ExposeOriginalAndParsed_Correctly
+          - VersionTag_ToString_ReturnsOriginalTag
+
+      - id: BuildMark-VersionTag-Equality
+        title: >-
+          VersionTag equality shall be determined by VersionComparable semantic
+          comparison, not by tag string comparison, enabling different prefixes
+          with identical versions to be treated as equal.
+        justification: |
+          Repository connectors must recognize that "v1.2.3", "VER1.2.3", and
+          "Release_1.2.3" represent the same semantic version for version matching,
+          baseline determination, and range operations. String-based comparison
+          would incorrectly treat these as different versions.
+        tests:
+          - VersionComparable_Equals_DifferentPrefixesSameVersion_ReturnsTrue
+          - RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex

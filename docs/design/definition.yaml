@@ -2,11 +2,15 @@
 resource-path:
   - docs/design
   - docs/design/build-mark
+  - docs/design/build-mark/build-notes
   - docs/design/build-mark/cli
+  - docs/design/build-mark/configuration
   - docs/design/build-mark/self-test
   - docs/design/build-mark/utilities
-  - docs/design/build-mark/item-controls
+  - docs/design/build-mark/version
   - docs/design/build-mark/repo-connectors
+  - docs/design/build-mark/repo-connectors/github
+  - docs/design/build-mark/repo-connectors/mock
   - docs/template
 
 input-files:
@@ -14,21 +18,37 @@ input-files:
   - docs/design/introduction.md
   - docs/design/build-mark/build-mark.md
   - docs/design/build-mark/program.md
+  - docs/design/build-mark/build-notes/build-notes.md
+  - docs/design/build-mark/build-notes/build-information.md
+  - docs/design/build-mark/build-notes/item-info.md
+  - docs/design/build-mark/version/version-tag.md
+  - docs/design/build-mark/build-notes/web-link.md
   - docs/design/build-mark/cli/cli.md
   - docs/design/build-mark/cli/context.md
+  - docs/design/build-mark/configuration/configuration.md
   - docs/design/build-mark/self-test/self-test.md
   - docs/design/build-mark/self-test/validation.md
   - docs/design/build-mark/utilities/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
-  - docs/design/build-mark/item-controls/item-controls.md
-  - docs/design/build-mark/item-controls/item-controls-parser.md
-  - docs/design/build-mark/item-controls/version-interval.md
+  - docs/design/build-mark/utilities/process-runner.md
+  - docs/design/build-mark/version/version.md
+  - docs/design/build-mark/version/version-comparable.md
+  - docs/design/build-mark/version/version-semantic.md
+  - docs/design/build-mark/version/version-tag.md
+  - docs/design/build-mark/version/version-interval.md
+  - docs/design/build-mark/version/version-commit-tag.md
   - docs/design/build-mark/repo-connectors/repo-connectors.md
   - docs/design/build-mark/repo-connectors/repo-connector-base.md
-  - docs/design/build-mark/repo-connectors/mock-repo-connector.md
-  - docs/design/build-mark/repo-connectors/process-runner.md
+  - docs/design/build-mark/repo-connectors/item-router.md
+  - docs/design/build-mark/repo-connectors/item-controls-info.md
+  - docs/design/build-mark/repo-connectors/item-controls-parser.md
   - docs/design/build-mark/repo-connectors/repo-connector-factory.md
-  - docs/design/build-mark/repo-connectors/github-repo-connector.md
+  - docs/design/build-mark/repo-connectors/github/github.md
+  - docs/design/build-mark/repo-connectors/github/github-repo-connector.md
+  - docs/design/build-mark/repo-connectors/github/github-graphql-client.md
+  - docs/design/build-mark/repo-connectors/github/github-graphql-types.md
+  - docs/design/build-mark/repo-connectors/mock/mock.md
+  - docs/design/build-mark/repo-connectors/mock/mock-repo-connector.md
 template: template.html
 table-of-contents: true
 number-sections: true

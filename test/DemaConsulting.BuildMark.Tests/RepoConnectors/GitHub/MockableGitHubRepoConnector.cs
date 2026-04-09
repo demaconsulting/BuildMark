@@ -18,10 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Mock implementation of GitHubRepoConnector for testing purposes.
@@ -85,3 +84,6 @@ internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
             : base.CreateGraphQLClient(token);
     }
 }
+
+
+

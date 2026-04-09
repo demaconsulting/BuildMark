@@ -1,0 +1,19 @@
+---
+# Software Unit Requirements for the WebLink Class
+#
+# WebLink stores hyperlink text and target URL for report elements such as the
+# optional full changelog link.
+
+sections:
+  - title: WebLink Unit Requirements
+    requirements:
+      - id: BuildMark-WebLink-Record
+        title: >-
+          The WebLink record shall store display text and a target URL for a
+          hyperlink included in the generated report.
+        justification: |
+          BuildInformation needs a lightweight value object for optional links such
+          as the full changelog entry so the rendered markdown can present a stable
+          label and destination.
+        tests:
+          - WebLink_Constructor_StoresTextAndUrl

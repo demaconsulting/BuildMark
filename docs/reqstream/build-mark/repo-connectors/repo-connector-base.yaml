@@ -25,5 +25,22 @@ sections:
           to override it with mock implementations, enabling deterministic unit tests
           that do not spawn real processes.
         tests:
-          - MockRepoConnector_Constructor_CreatesInstance
-          - GitHubRepoConnector_Constructor_CreatesInstance
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
+
+      - id: BuildMark-RepoConnectorBase-RulesRouting
+        title: >-
+          The RepoConnectorBase class shall provide Configure and ApplyRules methods
+          for rules-based section routing.
+        justification: |
+          Centralizing routing configuration in the base class avoids duplicating
+          Configure/ApplyRules logic in every concrete connector and ensures that
+          all connectors honour the same rules and section definitions supplied by
+          the program configuration.
+        tests:
+          - RepoConnectorBase_Configure_StoresRulesAndSections_HasRulesReturnsTrue
+          - RepoConnectorBase_Configure_EmptyRules_HasRulesReturnsFalse
+          - RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections
+          - MockRepoConnector_Configure_StoresRulesAndSections
+          - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
+          - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections

@@ -20,7 +20,7 @@
 
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Tests for the MockGitHubGraphQLHttpMessageHandler class.
@@ -139,3 +139,6 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
         Assert.AreEqual("v2.0.0", releases[2].TagName);
     }
 }
+
+
+

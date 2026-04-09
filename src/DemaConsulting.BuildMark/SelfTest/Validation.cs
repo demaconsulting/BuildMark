@@ -19,11 +19,15 @@
 // SOFTWARE.
 
 using System.Runtime.InteropServices;
+using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 using DemaConsulting.TestResults.IO;
 
-namespace DemaConsulting.BuildMark;
+namespace DemaConsulting.BuildMark.SelfTest;
 
 /// <summary>
 ///     Provides self-validation functionality for the BuildMark tool.
@@ -53,6 +57,7 @@ internal static class Validation
         RunGitIntegration(context, testResults, mockFactory);
         RunIssueTracking(context, testResults, mockFactory);
         RunKnownIssuesReporting(context, testResults, mockFactory);
+        RunRulesRouting(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -123,8 +128,8 @@ internal static class Validation
 
                 if (reportContent.Contains("# Build Report") &&
                     reportContent.Contains("## Version Information") &&
-                    reportContent.Contains("2.0.0") &&
-                    reportContent.Contains("current123hash456"))
+                    reportContent.Contains("v2.0.0") &&
+                    reportContent.Contains("mno345pqr678"))
                 {
                     return null;
                 }
@@ -152,8 +157,8 @@ internal static class Validation
             null,
             (logContent, _) =>
             {
-                if (logContent.Contains("Build Version: 2.0.0") &&
-                    logContent.Contains("Commit Hash: current123hash456") &&
+                if (logContent.Contains("Build Version: v2.0.0") &&
+                    logContent.Contains("Commit Hash: mno345pqr678") &&
                     logContent.Contains("Previous Version: ver-1.1.0"))
                 {
                     return null;
@@ -223,6 +228,59 @@ internal static class Validation
                 }
 
                 return "Expected known issues not found in report";
+            });
+    }
+
+    /// <summary>
+    ///     Runs a test for rules-based routing functionality.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunRulesRouting(
+        Context context,
+        DemaConsulting.TestResults.TestResults testResults)
+    {
+        // Create a factory that configures the mock connector with routing rules
+        var rulesFactory = () =>
+        {
+            // Create a mock connector with rules that route bugs to a bugs section and everything else to features
+            var mc = new MockRepoConnector();
+            mc.Configure(
+                new List<RuleConfig>
+                {
+                    new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                    new() { Route = "features" }
+                },
+                new List<SectionConfig>
+                {
+                    new() { Id = "features", Title = "Features" },
+                    new() { Id = "bugs", Title = "Bugs" }
+                });
+
+            // Return the configured connector as the interface type
+            return (IRepoConnector)mc;
+        };
+
+        RunValidationTest(
+            context,
+            testResults,
+            "BuildMark_RulesRouting",
+            rulesFactory,
+            "rules-report.md",
+            (logContent, reportContent) =>
+            {
+                if (reportContent == null)
+                {
+                    return "Report file not created";
+                }
+
+                if (reportContent.Contains("## Features") &&
+                    reportContent.Contains("## Bugs"))
+                {
+                    return null;
+                }
+
+                return "Report file missing expected routed section headings";
             });
     }
 

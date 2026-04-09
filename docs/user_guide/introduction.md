@@ -116,6 +116,130 @@ To include known issues in the report:
 buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues
 ```
 
+# Configuration File
+
+BuildMark can be configured with a `.buildmark.yaml` file placed in the repository root. This file
+separates persistent repository settings from runtime arguments, simplifying CI invocations and
+enabling version-controlled configuration.
+
+Example `.buildmark.yaml`:
+
+```yaml
+# Repository Connector Settings
+connector:
+  # Type of repository
+  type: github
+
+  # GitHub settings
+  github:
+    url: https://github.mycompany.com   # optional; defaults to https://api.github.com
+    repository: owner/repo
+
+# Build Notes sections
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+  - id: dependency-updates
+    title: Dependency Updates
+
+# Item routing rules
+rules:
+  # Labels of 'dependencies', 'renovate', or 'dependabot' get routed to the 'dependency-updates' section
+  - match:
+      label: [dependencies, renovate, dependabot]
+    route: dependency-updates
+
+  # Bug work-items get routed to the 'bugs-fixed' section
+  - match:
+      work-item-type: [Bug]
+    route: bugs-fixed
+
+  # Labels of 'bug', 'defect', or 'regression' get routed to the 'bugs-fixed' section
+  - match:
+      label: [bug, defect, regression]
+    route: bugs-fixed
+
+  # Labels of 'internal' or 'chore' get suppressed
+  - match:
+      label: [internal, chore]
+    route: suppressed
+
+  # Task and Epic work-items get suppressed
+  - match:
+      work-item-type: [Task, Epic]
+    route: suppressed
+
+  # Everything else gets routed to the 'changes' section
+  - route: changes
+```
+
+## Connector Settings
+
+The `connector` section declares how BuildMark connects to source-control and work-item systems.
+
+The `type` key currently supports only the GitHub connector. Azure DevOps values are reserved for
+future support and are not yet implemented.
+
+| Value | Description |
+| :---- | :---------- |
+| `github` | GitHub only |
+
+### GitHub connector settings
+
+BuildMark currently resolves the GitHub access token automatically from `GH_TOKEN`, then
+`GITHUB_TOKEN`, then `gh auth token`.
+
+| Key | Required | Description |
+| :-- | :------- | :---------- |
+| `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
+| `repository` | Yes | Repository in `owner/repo` format. |
+
+## Report Sections
+
+The `sections` sequence defines which sections appear in the generated build notes and in what
+order. Each entry has two keys:
+
+| Key | Description |
+| :-- | :---------- |
+| `id` | Unique identifier used to reference this section in routing rules. |
+| `title` | Human-readable heading that appears in the generated report. |
+
+Sections are rendered in the order they are listed. Any section that receives no items is omitted
+from the output.
+
+## Item Routing Rules
+
+The `rules` sequence controls how individual work items are categorized into report sections.
+Rules are evaluated in order and the **first matching rule wins**.
+
+Each rule may contain:
+
+| Key | Description |
+| :-- | :---------- |
+| `match` | Optional. Criteria to test against each item (see below). |
+| `route` | Required. The section `id` to place matched items in, or `suppressed` to exclude them. |
+
+### Match criteria
+
+| Criterion | Description |
+| :-------- | :---------- |
+| `label` | A label name or list of label names. Matches if the item carries any of the listed labels. |
+| `work-item-type` | A work-item type name or list of names (e.g., `Bug`, `Task`, `Epic`). |
+
+Multiple criteria within a single `match` block are combined with AND logic — the item must satisfy
+all specified criteria to match that rule.
+
+A rule with no `match` key is a **catch-all** and matches every item that has not already been
+routed by an earlier rule. Place the catch-all last to act as a default.
+
+### The `suppressed` route
+
+Setting `route: suppressed` excludes matched items from the report entirely. Use this to hide
+internal tasks, dependency-update noise, or any other items that should not appear in the published
+build notes.
+
 # Command-Line Options
 
 ## Display Options

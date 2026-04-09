@@ -18,9 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the RepoConnectorFactory class.
@@ -54,4 +56,50 @@ public class RepoConnectorFactoryTests
         // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
+
+    /// <summary>
+    ///     Test that Create forwards GitHub connector configuration to the created connector.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration()
+    {
+        // Arrange
+        var config = new ConnectorConfig
+        {
+            Type = "github",
+            GitHub = new GitHubConnectorConfig
+            {
+                Owner = "example-owner",
+                Repo = "example-repo",
+                BaseUrl = "https://api.github.com"
+            }
+        };
+
+        // Act
+        var connector = RepoConnectorFactory.Create(config);
+
+        // Assert
+        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        var forwardedConfig = ((GitHubRepoConnector)connector).ConfigurationOverrides;
+        Assert.IsNotNull(forwardedConfig);
+        Assert.AreEqual("example-owner", forwardedConfig.Owner);
+        Assert.AreEqual("example-repo", forwardedConfig.Repo);
+        Assert.AreEqual("https://api.github.com", forwardedConfig.BaseUrl);
+    }
+
+    /// <summary>
+    ///     Test that Create throws NotSupportedException when Azure DevOps type is specified.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException()
+    {
+        // Arrange - create config with Azure DevOps connector type
+        var config = new ConnectorConfig { Type = "azure-devops" };
+
+        // Act and Assert - verify NotSupportedException is thrown
+        Assert.ThrowsExactly<NotSupportedException>(() => RepoConnectorFactory.Create(config));
+    }
 }
+
+
+

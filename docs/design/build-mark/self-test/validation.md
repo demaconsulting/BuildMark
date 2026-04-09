@@ -56,11 +56,18 @@ and collected correctly into the `Changes` and `Bugs` lists of `BuildInformation
 Uses `MockRepoConnector` to verify that known issues are included in the markdown
 report when the `--include-known-issues` flag is set.
 
+### `RunRulesRouting`
+
+Creates a `MockRepoConnector` configured with routing rules that direct items labelled
+`bug` to a `bugs` section and all other items to a `features` section. Generates a
+`BuildInformation` record, calls `ToMarkdown`, writes the output to a temporary file,
+and verifies the file contains both `## Features` and `## Bugs` section headings.
+
 ## Interactions
 
-| Unit / Subsystem    | Role                                                                                 |
-|---------------------|--------------------------------------------------------------------------------------|
-| `Context`           | Provides output methods, `ResultsFile`, and exit code sink                           |
-| `MockRepoConnector` | Supplies deterministic data for all tests                                            |
-| `BuildInformation`  | Target of the tests; validated against expected content                              |
-| `PathHelpers`       | Used directly (e.g., `SafePathCombine`) to build temp, log, and report file paths    |
+- `Context` provides output methods, `ResultsFile`, and the exit code sink.
+- `MockRepoConnector` supplies deterministic data for all tests in the
+  `RepoConnectors/Mock` subsystem.
+- `BuildInformation` is the test target validated against expected content.
+- `PathHelpers` is used directly, for example through `SafePathCombine`, to
+  build temporary, log, and report file paths.

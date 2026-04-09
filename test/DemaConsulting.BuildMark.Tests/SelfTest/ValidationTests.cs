@@ -18,9 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.SelfTest;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.SelfTest;
 
 /// <summary>
 ///     Tests for the Validation class.
@@ -217,4 +219,24 @@ public class ValidationTests
             Console.SetError(originalError);
         }
     }
+
+    /// <summary>
+    ///     Test that Validation.Run completes successfully when no results file is specified.
+    /// </summary>
+    [TestMethod]
+    public void Validation_Run_WithoutResultsFile_CompletesSuccessfully()
+    {
+        // Arrange - no --results argument
+        var args = new[] { "--validate", "--silent" };
+
+        // Act
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
+
+        // Assert - validation should complete without error
+        Assert.AreEqual(0, context.ExitCode, "Validation should succeed with exit code 0");
+    }
 }
+
+
+

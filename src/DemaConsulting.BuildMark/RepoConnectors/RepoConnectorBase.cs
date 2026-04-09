@@ -18,6 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
+
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
 /// <summary>
@@ -25,6 +30,78 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// </summary>
 public abstract class RepoConnectorBase : IRepoConnector
 {
+    /// <summary>
+    ///     The routing rules for distributing items into report sections.
+    /// </summary>
+    private IReadOnlyList<RuleConfig> _rules = [];
+
+    /// <summary>
+    ///     The report section definitions.
+    /// </summary>
+    private IReadOnlyList<SectionConfig> _sections = [];
+
+    /// <summary>
+    ///     Gets a value indicating whether routing rules have been configured.
+    /// </summary>
+    protected bool HasRules => _rules.Count > 0;
+
+    /// <summary>
+    ///     Configures the routing rules and section definitions for this connector.
+    /// </summary>
+    /// <param name="rules">Routing rules to apply when distributing items.</param>
+    /// <param name="sections">Section definitions that determine output structure.</param>
+    public void Configure(IReadOnlyList<RuleConfig> rules, IReadOnlyList<SectionConfig> sections)
+    {
+        // Store the provided rules for use when routing items into sections
+        _rules = rules;
+
+        // Store the provided sections for use when building the output structure
+        _sections = sections;
+    }
+
+    /// <summary>
+    ///     Routes items into report sections using the configured rules and sections.
+    /// </summary>
+    /// <param name="allItems">All items to be routed.</param>
+    /// <returns>Ordered list of section data with items assigned to each section.</returns>
+    protected IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> ApplyRules(
+        IEnumerable<ItemInfo> allItems)
+    {
+        // Route all items into section buckets using configured rules
+        var routedDict = ItemRouter.Route(allItems.ToList(), _rules, _sections);
+
+        // Build ordered list of sections with their items, using configured section order
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> result = new();
+
+        // Process each configured section in order
+        foreach (var section in _sections)
+        {
+            // Get items routed to this section (empty list if no items)
+            var items = routedDict.TryGetValue(section.Id, out var bucket)
+                ? (IReadOnlyList<ItemInfo>)bucket
+                : [];
+
+            // Add section to result list with its title and items
+            result.Add((section.Id, section.Title, items));
+        }
+
+        // Include any extra sections created by rules that don't have corresponding SectionConfig entries
+        foreach (var kvp in routedDict)
+        {
+            // Skip sections already included via configured section definitions
+            if (_sections.Any(s => s.Id == kvp.Key))
+            {
+                continue;
+            }
+
+            // Add extra section using its ID as the title (no SectionConfig title available)
+            result.Add((kvp.Key, kvp.Key, kvp.Value));
+        }
+
+        // Return the ordered section results
+        return result;
+    }
+
     /// <summary>
     ///     Runs a command and returns its output.
     /// </summary>
@@ -43,24 +120,24 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public abstract Task<BuildInformation> GetBuildInformationAsync(Version? version = null);
+    public abstract Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null);
 
     /// <summary>
-    ///     Finds the index of a version in a version list by normalized version string.
+    ///     Finds the index of a version in a version list by normalized comparable version.
     /// </summary>
     /// <param name="versions">List of versions to search.</param>
-    /// <param name="normalizedVersion">Normalized version string to find (e.g., "1.0.0" or "2.0.0-beta.1").</param>
+    /// <param name="targetVersion">Target version to find.</param>
     /// <returns>Index of the version in the list, or -1 if not found.</returns>
     /// <remarks>
-    ///     This method is protected to allow repository connectors to determine version positions
-    ///     when constructing BuildInformation objects.
+    ///     This method compares versions using their VersionComparable, so tags like 'v1.2.3' and 'VER1.2.3' 
+    ///     are considered equal since they both represent version 1.2.3.
     /// </remarks>
-    protected static int FindVersionIndex(List<Version> versions, string normalizedVersion)
+    protected static int FindVersionIndex(List<VersionTag> versions, VersionTag targetVersion)
     {
-        // Search for version matching the normalized version string
+        // Search for version with matching VersionComparable
         for (var i = 0; i < versions.Count; i++)
         {
-            if (versions[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            if (versions[i].Semantic.Comparable.Equals(targetVersion.Semantic.Comparable))
             {
                 return i;
             }

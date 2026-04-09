@@ -1,0 +1,25 @@
+---
+# Software Unit Requirements for the ItemRouter Class
+#
+# ItemRouter distributes ItemInfo records into configured report sections using
+# section definitions and routing rules supplied by the active connector.
+
+sections:
+  - title: ItemRouter Unit Requirements
+    requirements:
+      - id: BuildMark-ItemRouter-Route
+        title: >-
+          The ItemRouter class shall assign items to report sections according to
+          the configured rules and sections.
+        justification: |
+          Centralizing routing logic ensures all connectors classify and group
+          items consistently when generating build notes, without duplicating the
+          same rule-processing behavior in multiple connector implementations.
+        tests:
+          - ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection
+          - ItemRouter_Route_SuppressedRouteOmitsMatchingItem
+          - RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections
+          - ItemRouter_Route_WithNullMatchBlock_MatchesAllItems
+          - ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
+          - ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection
+          - ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection

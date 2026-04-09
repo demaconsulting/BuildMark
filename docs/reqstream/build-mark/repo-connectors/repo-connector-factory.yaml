@@ -17,3 +17,14 @@ sections:
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+
+      - id: BuildMark-RepoConnectorFactory-ConnectorConfig
+        title: >-
+          The RepoConnectorFactory class shall accept an optional ConnectorConfig and forward
+          connector-specific settings to the created connector.
+        justification: |
+          The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector
+          so that owner, repository, and base URL overrides from .buildmark.yaml take
+          effect. This pattern extends naturally to future connector types.
+        tests:
+          - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration

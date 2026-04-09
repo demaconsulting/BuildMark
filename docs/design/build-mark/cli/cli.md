@@ -26,6 +26,7 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `Help`                | Property | Set when `--help` / `-h` / `-?` flag is present    |
 | `Silent`              | Property | Set when `--silent` flag is present                |
 | `Validate`            | Property | Set when `--validate` flag is present              |
+| `Lint`                | Property | Set when `--lint` flag is present                  |
 | `BuildVersion`        | Property | Value of `--build-version` argument                |
 | `ReportFile`          | Property | Value of `--report` argument                       |
 | `ReportDepth`         | Property | Value of `--report-depth` argument (default: 1)    |
@@ -36,6 +37,8 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `WriteLine(message)`  | Method   | Writes a line to console (if not silent) and log   |
 | `WriteError(message)` | Method   | Writes an error line and sets exit code to 1       |
 | `Dispose()`           | Method   | Closes the log file if one was opened              |
+
+> `Create(args)` throws `ArgumentException` for invalid or malformed arguments.
 
 ## Interactions
 

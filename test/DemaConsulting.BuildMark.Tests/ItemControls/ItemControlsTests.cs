@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Tests;
+using DemaConsulting.BuildMark.RepoConnectors;
 
-using DemaConsulting.BuildMark.ItemControls;
+namespace DemaConsulting.BuildMark.Tests.ItemControls;
 
 /// <summary>
 ///     Subsystem-level tests for ItemControls parsing.
@@ -263,3 +263,6 @@ public class ItemControlsTests
         Assert.IsNull(result.AffectedVersions.Intervals[0].UpperBound);
     }
 }
+
+
+

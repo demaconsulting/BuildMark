@@ -3,7 +3,8 @@
 #
 # PURPOSE:
 # - Define requirements for the BuildMark Utilities subsystem
-# - The Utilities subsystem spans PathHelpers.cs (safe path-combination utilities)
+# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs, Version.cs,
+#   VersionInterval.cs, and VersionIntervalSet.cs
 # - Subsystem requirements describe the shared utility behavior available to all other subsystems
 
 sections:
@@ -18,8 +19,39 @@ sections:
           file system access. This requirement captures the subsystem-level safety guarantee
           that all consumers of the Utilities subsystem can rely upon.
         tests:
-          - PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly
-          - PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException
-          - PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException
+          - Utilities_SafePaths_ValidPaths_CombinesCorrectly
+          - Utilities_SafePaths_TraversalPath_ThrowsException
+          - Utilities_SafePaths_AbsolutePath_ThrowsException
         children:
           - BuildMark-PathHelpers-SafeCombine
+
+      - id: BuildMark-Utilities-ProcessRunner
+        title: The Utilities subsystem shall provide a process execution utility for running external shell commands.
+        justification: |
+          Multiple subsystems need to execute shell commands (e.g., git, gh CLI) to retrieve
+          repository information and authentication tokens. Placing ProcessRunner in the shared
+          Utilities subsystem ensures a consistent, testable interface with proper error
+          handling, avoiding duplication across connector implementations.
+        tests:
+          - Utilities_ProcessRunner_ValidCommand_ReturnsOutput
+          - Utilities_ProcessRunner_InvalidCommand_ReturnsNull
+          - Utilities_ProcessRunner_FailingCommand_ThrowsException
+        children:
+          - BuildMark-ProcessRunner-RunAsync
+
+      - id: BuildMark-Utilities-VersionInterval
+        title: >-
+          The Utilities subsystem shall provide version interval parsing using mathematical
+          interval notation.
+        justification: |
+          Version intervals are a general-purpose concept used to express affected-version
+          ranges in repository item metadata. Placing this logic in Utilities makes it
+          available to any subsystem without coupling it to a specific connector.
+        tests:
+          - Utilities_VersionInterval_ValidInterval_Parses
+          - Utilities_VersionInterval_InvalidInterval_ReturnsNull
+          - Utilities_VersionIntervalSet_MultipleIntervals_ParsesAll
+          - Utilities_VersionIntervalSet_EmptyString_ReturnsEmpty
+        children:
+          - BuildMark-VersionInterval-Parse
+          - BuildMark-VersionIntervalSet-Parse

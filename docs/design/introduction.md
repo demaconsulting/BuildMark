@@ -13,15 +13,9 @@ requirements; it explains how they are realized.
 
 ## Scope
 
-This document covers the detailed design of the following software units:
-
-- **Program** — entry point and execution orchestrator (`Program.cs`)
-- **Context** — command-line argument parser and I/O owner (`Cli/Context.cs`)
-- **Validation** — self-validation test runner (`SelfTest/Validation.cs`)
-- **PathHelpers** — safe path combination utilities (`Utilities/PathHelpers.cs`)
-- **ItemControlsParser** — buildmark block parser (`ItemControls/ItemControlsParser.cs`)
-- **VersionInterval** — version interval model and parser (`ItemControls/VersionInterval.cs`)
-- **GitHubRepoConnector** — GitHub GraphQL API integration (`RepoConnectors/GitHub/GitHubRepoConnector.cs`)
+This document covers the detailed design of the BuildMark system, including all
+subsystems and units identified in the software structure below. Each unit has
+its own detailed design chapter within this document.
 
 The following topics are out of scope:
 
@@ -39,21 +33,45 @@ BuildMark (System)
 ├── Program (Unit)
 ├── Cli (Subsystem)
 │   └── Context (Unit)
+├── BuildNotes (Subsystem)
+│   ├── BuildInformation (Unit)
+│   ├── ItemInfo (Unit)
+│   └── WebLink (Unit)
 ├── SelfTest (Subsystem)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
-│   └── PathHelpers (Unit)
-├── ItemControls (Subsystem)
-│   ├── ItemControlsInfo (Unit)
-│   ├── ItemControlsParser (Unit)
+│   ├── PathHelpers (Unit)
+│   └── ProcessRunner (Unit)
+├── Version (Subsystem)
+│   ├── VersionComparable (Unit)
+│   ├── VersionSemantic (Unit)  
+│   ├── VersionTag (Unit)
 │   ├── VersionInterval (Unit)
-│   └── VersionIntervalSet (Unit)
+│   ├── VersionIntervalSet (Unit)
+│   └── VersionCommitTag (Unit)
+├── Configuration (Subsystem)
+│   ├── BuildMarkConfig (Unit)
+│   ├── BuildMarkConfigReader (Unit)
+│   ├── ConfigurationLoadResult (Unit)
+│   ├── ConfigurationIssue (Unit)
+│   ├── ConnectorConfig (Unit)
+│   ├── GitHubConnectorConfig (Unit)
+│   ├── AzureDevOpsConnectorConfig (Unit)
+│   ├── SectionConfig (Unit)
+│   └── RuleConfig (Unit)
 └── RepoConnectors (Subsystem)
+    ├── IRepoConnector (Unit)
     ├── RepoConnectorBase (Unit)
-    ├── MockRepoConnector (Unit)
-    ├── ProcessRunner (Unit)
     ├── RepoConnectorFactory (Unit)
-    └── GitHubRepoConnector (Unit)
+    ├── ItemRouter (Unit)
+    ├── ItemControlsInfo (Unit)
+    ├── ItemControlsParser (Unit)
+    ├── GitHub (Subsystem)
+    │   ├── GitHubRepoConnector (Unit)
+    │   ├── GitHubGraphQLClient (Unit)
+    │   └── GitHubGraphQLTypes (Unit)
+    └── Mock (Subsystem)
+        └── MockRepoConnector (Unit)
 ```
 
 Each unit is described in detail in its own chapter within this document.
@@ -66,32 +84,47 @@ reviewers an explicit navigation aid from design to code:
 ```text
 src/DemaConsulting.BuildMark/
 ├── Program.cs                               — entry point and execution orchestrator
-├── BuildInformation.cs                      — build information data model
-├── ItemInfo.cs                              — item information data model
-├── Version.cs                               — version information
-├── VersionTag.cs                            — version tag representation
-├── WebLink.cs                               — web link helper
+├── BuildNotes/
+│   ├── BuildInformation.cs                  — build information data model
+│   ├── ItemInfo.cs                          — item information data model
+│   └── WebLink.cs                           — web link helper
 ├── Cli/
 │   └── Context.cs                           — command-line argument parser and I/O owner
 ├── SelfTest/
 │   └── Validation.cs                        — self-validation test runner
 ├── Utilities/
-│   └── PathHelpers.cs                       — safe path combination utilities
-├── ItemControls/
-│   ├── ItemControlsInfo.cs                  — item controls data model
-│   ├── ItemControlsParser.cs                — buildmark block parser
+│   ├── PathHelpers.cs                       — safe path combination utilities
+│   └── ProcessRunner.cs                     — process runner for Git commands
+├── Version/
+│   ├── VersionComparable.cs                 — core integer-based version comparison
+│   ├── VersionSemantic.cs                   — semantic version with build metadata
+│   ├── VersionTag.cs                        — repository tag parsing and normalization
 │   ├── VersionInterval.cs                   — single version interval model and parser
-│   └── VersionIntervalSet.cs                — ordered set of version intervals
+│   ├── VersionIntervalSet.cs                — ordered set of version intervals
+│   └── VersionCommitTag.cs                  — version commit tag representation
+├── Configuration/
+│   ├── BuildMarkConfig.cs                   — top-level configuration data model
+│   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
+│   ├── ConfigurationLoadResult.cs           — holds config and any load issues
+│   ├── ConfigurationIssue.cs                — single issue with location and severity
+│   ├── ConnectorConfig.cs                   — connector envelope data model
+│   ├── GitHubConnectorConfig.cs             — GitHub connector settings data model
+│   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings (future)
+│   ├── SectionConfig.cs                     — report section definition data model
+│   └── RuleConfig.cs                        — routing rule data model
 └── RepoConnectors/
     ├── IRepoConnector.cs                    — repository connector interface
     ├── RepoConnectorBase.cs                 — repository connector base class
     ├── RepoConnectorFactory.cs              — repository connector factory
-    ├── MockRepoConnector.cs                 — mock repository connector for testing
-    ├── ProcessRunner.cs                     — process runner for Git commands
-    ├── GitHubRepoConnector.cs               — GitHub API integration
-    └── GitHub/
-        ├── GitHubGraphQLClient.cs           — GraphQL API client
-        └── GitHubGraphQLTypes.cs            — GraphQL type definitions
+    ├── ItemRouter.cs                        — shared item routing logic
+    ├── ItemControlsInfo.cs                  — item controls data model
+    ├── ItemControlsParser.cs                — buildmark block parser
+    ├── GitHub/
+    │   ├── GitHubRepoConnector.cs           — GitHub API integration
+    │   ├── GitHubGraphQLClient.cs           — GraphQL API client
+    │   └── GitHubGraphQLTypes.cs            — GraphQL type definitions
+    └── Mock/
+        └── MockRepoConnector.cs             — mock repository connector for self-test
 ```
 
 The test project mirrors the same layout under `test/DemaConsulting.BuildMark.Tests/`.

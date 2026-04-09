@@ -3,33 +3,14 @@
 #
 # PURPOSE:
 # - Define requirements for the BuildMark RepoConnectors subsystem
-# - The RepoConnectors subsystem spans GitHubRepoConnector.cs, MockRepoConnector.cs,
-#   RepoConnectorFactory.cs, and ProcessRunner.cs
+# - The RepoConnectors subsystem provides the common interface, base class, factory,
+#   item router, and item-controls parsing used by all connector implementations
+# - Concrete connectors live in the GitHub and Mock subsystems beneath this one
 # - Subsystem requirements describe the externally visible repository connector behavior
 
 sections:
   - title: RepoConnectors Subsystem Requirements
     requirements:
-      - id: BuildMark-RepoConnectors-GitHubConnector
-        title: >-
-          The RepoConnectors subsystem shall provide a GitHub repository connector for retrieving
-          build information.
-        justification: |
-          Generating build notes from GitHub repositories requires a connector that can
-          authenticate to the GitHub API, retrieve commits, releases, tags, pull requests,
-          and issues, and assemble them into structured build information. The GitHub
-          connector satisfies this need for teams using GitHub as their source repository.
-        tests:
-          - RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue
-          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
-          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline
-          - RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges
-          - RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
-          - RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
-        children:
-          - BuildMark-GitHub-BuildInformation
-          - BuildMark-GitHub-GraphQLClient
-
       - id: BuildMark-RepoConnectors-ConnectorBase
         title: >-
           The RepoConnectors subsystem shall provide a common interface and base class for all repository connectors.
@@ -43,36 +24,7 @@ sections:
         children:
           - BuildMark-RepoConnectorBase-Interface
           - BuildMark-RepoConnectorBase-CommandExecution
-
-      - id: BuildMark-RepoConnectors-MockConnector
-        title: The RepoConnectors subsystem shall provide a mock connector for testing and development.
-        justification: |
-          A mock connector enables unit testing of build information processing logic
-          without requiring an actual GitHub repository connection, ensuring tests are
-          fast, deterministic, and independent of external services.
-        tests:
-          - RepoConnectors_MockConnector_Constructor_CreatesInstance
-          - RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue
-          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion
-          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
-        children:
-          - BuildMark-MockRepoConnector-Deterministic
-
-      - id: BuildMark-RepoConnectors-ProcessRunner
-        title: The RepoConnectors subsystem shall provide a process execution utility for running shell commands.
-        justification: |
-          The RepoConnectors subsystem needs to execute shell commands (e.g., git, gh CLI)
-          to retrieve repository information and authentication tokens. The ProcessRunner
-          utility provides a consistent, testable interface for process execution with
-          proper error handling.
-        tests:
-          - RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
-          - RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
-          - RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
-          - RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
-          - RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
-        children:
-          - BuildMark-ProcessRunner-RunAsync
+          - BuildMark-RepoConnectorBase-RulesRouting
 
       - id: BuildMark-RepoConnectors-Factory
         title: The RepoConnectors subsystem shall provide a factory for creating the appropriate repository connector.
@@ -85,3 +37,80 @@ sections:
           - RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo
         children:
           - BuildMark-RepoConnectorFactory-Create
+
+      - id: BuildMark-RepoConnectors-ItemRouter
+        title: >-
+          The RepoConnectors subsystem shall provide a shared item-routing utility
+          for assigning items to report sections.
+        justification: |
+          All connector implementations must route items (issues and pull requests) into
+          the correct report sections according to the configured section and rule definitions.
+          Centralizing this logic in a shared unit ensures consistent routing behavior
+          across the GitHub connector and any future connectors such as Azure DevOps.
+        tests:
+          - RepoConnectors_ItemRouter_MatchingRule_RoutesToSection
+          - RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem
+        children:
+          - BuildMark-ItemRouter-Route
+
+      - id: BuildMark-RepoConnectors-ItemControls
+        title: >-
+          The RepoConnectors subsystem shall parse a buildmark code block from a repository item
+          description and expose the extracted controls as a structured record.
+        justification: |
+          Connector implementations need to extract optional visibility, type, and
+          affected-version overrides from issue and pull request description bodies.
+          Centralizing this parsing logic within the RepoConnectors subsystem ensures
+          it is reusable by all connector implementations without duplication.
+        tests:
+          - RepoConnectors_ItemControls_VisibilityPublic_ReturnsPublicVisibility
+          - RepoConnectors_ItemControls_VisibilityInternal_ReturnsInternalVisibility
+          - RepoConnectors_ItemControls_TypeBug_ReturnsBugType
+          - RepoConnectors_ItemControls_TypeFeature_ReturnsFeatureType
+          - RepoConnectors_ItemControls_AffectedVersions_ReturnsIntervalSet
+          - RepoConnectors_ItemControls_HiddenBlock_ReturnsControls
+          - RepoConnectors_ItemControls_NoBlock_ReturnsNull
+        children:
+          - BuildMark-ItemControlsInfo-Record
+          - BuildMark-ItemControlsParser-Parse
+          - BuildMark-ItemControlsParser-HiddenBlock
+
+      - id: BuildMark-RepoConnectors-GitHub
+        title: >-
+          The RepoConnectors subsystem shall provide a GitHub repository connector
+          subsystem.
+        justification: |
+          Generating build notes from GitHub repositories requires a dedicated subsystem
+          that can authenticate to the GitHub API, retrieve commits, releases, tags, pull
+          requests, and issues, and assemble them into structured build information.
+        tests:
+          - RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges
+          - RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
+          - RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+        children:
+          - BuildMark-GitHub-ConnectorConfig
+          - BuildMark-GitHub-BuildInformation
+          - BuildMark-GitHub-ItemControls
+          - BuildMark-GitHub-DescriptionBody
+          - BuildMark-GitHub-GraphQLClient
+          - BuildMark-GitHub-Rules
+
+      - id: BuildMark-RepoConnectors-Mock
+        title: >-
+          The RepoConnectors subsystem shall provide a mock connector subsystem
+          for self-test and development.
+        justification: |
+          A mock connector subsystem enables the built-in --validate self-test and unit
+          testing of build information processing logic without requiring an actual
+          repository connection, ensuring tests are fast, deterministic, and independent
+          of external services.
+        tests:
+          - RepoConnectors_MockConnector_Constructor_CreatesInstance
+          - RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion
+          - RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+        children:
+          - BuildMark-MockRepoConnector-Deterministic

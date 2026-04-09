@@ -19,7 +19,12 @@
 // SOFTWARE.
 
 using System.Reflection;
+using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.SelfTest;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark;
 
@@ -113,7 +118,15 @@ internal static class Program
             return;
         }
 
-        // Priority 4: Build notes processing
+        // Priority 4: Configuration linting
+        if (context.Lint)
+        {
+            var loadResult = LoadConfiguration();
+            loadResult.ReportTo(context);
+            return;
+        }
+
+        // Priority 5: Build notes processing
         ProcessBuildNotes(context);
     }
 
@@ -141,6 +154,7 @@ internal static class Program
         context.WriteLine("  -?, -h, --help               Display this help message");
         context.WriteLine("  --silent                     Suppress console output");
         context.WriteLine("  --validate                   Run self-validation");
+        context.WriteLine("  --lint                       Validate .buildmark.yaml and exit");
         context.WriteLine("  --results <file>             Write validation results (TRX or JUnit format)");
         context.WriteLine("  --log <file>                 Write output to log file");
         context.WriteLine("  --build-version <version>    Specify the build version");
@@ -155,16 +169,33 @@ internal static class Program
     /// <param name="context">The context containing command line arguments and program state.</param>
     private static void ProcessBuildNotes(Context context)
     {
-        // Create repository connector using factory if provided, otherwise use default
-        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create();
+        // Load the optional configuration before attempting report generation.
+        var loadResult = LoadConfiguration();
+        loadResult.ReportTo(context);
+        if (loadResult.HasErrors)
+        {
+            return;
+        }
+
+        // Create repository connector using factory if provided, otherwise use the configured connector.
+        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
+
+        // Configure routing rules on the connector when not using a test factory
+        if (context.ConnectorFactory == null && connector is RepoConnectorBase configurableConnector)
+        {
+            // Pass rules and sections from configuration to the connector
+            configurableConnector.Configure(
+                loadResult.Config?.Rules ?? [],
+                loadResult.Config?.Sections ?? []);
+        }
 
         // Parse build version if provided
-        DemaConsulting.BuildMark.Version? buildVersion = null;
+        VersionTag? buildVersion = null;
         if (context.BuildVersion != null)
         {
             try
             {
-                buildVersion = DemaConsulting.BuildMark.Version.Create(context.BuildVersion);
+                buildVersion = VersionTag.Create(context.BuildVersion);
             }
             catch (ArgumentException)
             {
@@ -187,11 +218,11 @@ internal static class Program
         }
 
         // Display build information summary
-        context.WriteLine($"Build Version: {buildInfo.CurrentVersionTag.VersionInfo.Tag}");
+        context.WriteLine($"Build Version: {buildInfo.CurrentVersionTag.VersionTag.Tag}");
         context.WriteLine($"Commit Hash: {buildInfo.CurrentVersionTag.CommitHash}");
         if (buildInfo.BaselineVersionTag != null)
         {
-            context.WriteLine($"Previous Version: {buildInfo.BaselineVersionTag.VersionInfo.Tag}");
+            context.WriteLine($"Previous Version: {buildInfo.BaselineVersionTag.VersionTag.Tag}");
             context.WriteLine($"Previous Commit Hash: {buildInfo.BaselineVersionTag.CommitHash}");
         }
         context.WriteLine($"Changes: {buildInfo.Changes.Count}");
@@ -215,5 +246,14 @@ internal static class Program
                 context.WriteError($"Error: Failed to write report: {ex.Message}");
             }
         }
+    }
+
+    /// <summary>
+    ///     Loads the optional repository configuration.
+    /// </summary>
+    /// <returns>The configuration load result.</returns>
+    private static ConfigurationLoadResult LoadConfiguration()
+    {
+        return BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory).GetAwaiter().GetResult();
     }
 }
