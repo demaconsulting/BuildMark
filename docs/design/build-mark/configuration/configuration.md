@@ -66,19 +66,19 @@ problem with its file path, line number, severity, and description.
 
 `ConnectorConfig` carries the following properties:
 
-| Member        | Kind     | Description                                                               |
-|---------------|----------|---------------------------------------------------------------------------|
-| `Type`        | Property | Connector type: `"github"`, `"azure-devops"`, or `"github+azure-devops"`  |
-| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` includes `"github"` |
-| `AzureDevOps` | Property | Reserved for future use; `null` in the current release                    |
+| Member        | Kind     | Description                                                         |
+|---------------|----------|---------------------------------------------------------------------|
+| `Type`        | Property | Connector type: `"github"` or `"azure-devops"`                      |
+| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` is `"github"` |
+| `AzureDevOps` | Property | Reserved for future use; `null` in the current release              |
 
 `GitHubConnectorConfig` carries the following properties:
 
-| Member    | Kind     | Description                                                        |
-|-----------|----------|--------------------------------------------------------------------|
-| `Owner`   | Property | Repository owner; falls back to `--owner` CLI argument if absent   |
-| `Repo`    | Property | Repository name; falls back to `--repo` CLI argument if absent     |
-| `BaseUrl` | Property | Optional GitHub Enterprise API base URL; `null` uses the public API|
+| Member    | Kind     | Description                                                         |
+|-----------|----------|---------------------------------------------------------------------|
+| `Owner`   | Property | Repository owner override                                           |
+| `Repo`    | Property | Repository name override                                            |
+| `BaseUrl` | Property | Optional GitHub Enterprise API base URL; `null` uses the public API |
 
 `AzureDevOpsConnectorConfig` is a placeholder for future Azure DevOps connector settings.
 No properties are defined in the current release.

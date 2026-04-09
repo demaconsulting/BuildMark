@@ -101,4 +101,4 @@ Version processing follows fail-fast principles:
 
 - **Interval Creation**: O(1) for single ranges
 - **Set Operations**: O(n) where n is interval count
-- **Contains Checks**: O(log n) for sorted interval sets
+- **Contains Checks**: O(n) because the current implementation performs a linear scan

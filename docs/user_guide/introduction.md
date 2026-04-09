@@ -134,7 +134,6 @@ connector:
   github:
     url: https://github.mycompany.com   # optional; defaults to https://api.github.com
     repository: owner/repo
-    token-env: GH_TOKEN
 
 # Build Notes sections
 sections:
@@ -189,11 +188,13 @@ future support and are not yet implemented.
 
 ### GitHub connector settings
 
+BuildMark currently resolves the GitHub access token automatically from `GH_TOKEN`, then
+`GITHUB_TOKEN`, then `gh auth token`.
+
 | Key | Required | Description |
 | :-- | :------- | :---------- |
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
-| `token-env` | Yes | Name of the environment variable that holds the GitHub access token. |
 
 ## Report Sections
 

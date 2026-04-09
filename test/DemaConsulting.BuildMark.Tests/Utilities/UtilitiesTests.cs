@@ -125,7 +125,7 @@ public class UtilitiesTests
     {
         // Arrange: a command that exits with code 1
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "sh";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c 'exit 1'";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c \"exit 1\"";
 
         // Act & Assert: InvalidOperationException is thrown
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
@@ -242,6 +242,5 @@ public class UtilitiesTests
         Assert.IsEmpty(intervalSet.Intervals);
     }
 }
-
 
 

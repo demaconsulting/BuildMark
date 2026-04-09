@@ -159,9 +159,8 @@ enabling version-controlled configuration.
 The file has three top-level sections:
 
 - **`connector`** — declares the repository connector type and per-connector settings such as URL
-  overrides, repository identifiers, and token environment variable names. Current releases support
-  the `github` connector. Azure DevOps connector values are reserved for future support and are not
-  yet implemented.
+  overrides and repository identifiers. Current releases support the `github` connector. Azure
+  DevOps connector values are reserved for future support and are not yet implemented.
 - **`sections`** — defines the ordered list of sections that will appear in the generated build
   notes, each identified by an `id` and a `title`.
 - **`rules`** — an ordered list of match/route rules. Each rule can match on `label` and/or
@@ -180,7 +179,6 @@ connector:
   github:
     url: https://github.mycompany.com   # optional; defaults to https://api.github.com
     repository: owner/repo
-    token-env: GH_TOKEN
 
 # Build Notes sections
 sections:
@@ -221,6 +219,9 @@ rules:
   # Everything else gets routed to the 'changes' section
   - route: changes
 ```
+
+GitHub authentication is not configured in `.buildmark.yaml`. BuildMark currently resolves a token
+from `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`.
 
 Azure DevOps connector configuration is reserved for future support and should not be used with the
 current release.

@@ -112,11 +112,11 @@ Tests whether a `VersionComparable` instance falls within the interval:
    is `false`.
 7. Return `true` otherwise.
 
-### `VersionInterval.Contains(VersionInfo version) → bool`
+### `VersionInterval.Contains(VersionTag version) → bool`
 
 Convenience overload for callers that already hold a parsed BuildMark
-`VersionInfo`. This overload delegates to `Contains(string)` using
-`version.Numbers`.
+`VersionTag`. This overload delegates to `Contains(VersionComparable)` using
+`version.Semantic.Comparable`.
 
 ### `VersionIntervalSet.Contains(string version) → bool`
 
@@ -136,10 +136,10 @@ Tests whether a `VersionComparable` instance falls within any interval in the se
 3. Return `true` as soon as any interval contains the candidate version.
 4. Return `false` when no interval matches.
 
-### `VersionIntervalSet.Contains(VersionInfo version) → bool`
+### `VersionIntervalSet.Contains(VersionTag version) → bool`
 
 Convenience overload for callers that already hold a parsed BuildMark
-`VersionInfo`. This overload delegates to `Contains(string)` using
+`VersionTag`. This overload delegates to `Contains(string)` using
 `version.Numbers`.
 
 ## Parsing Examples
@@ -155,7 +155,7 @@ Convenience overload for callers that already hold a parsed BuildMark
 
 `VersionInterval` and `VersionIntervalSet` are general-purpose utility types.
 They are created by `ItemControlsParser`, stored on `ItemControlsInfo`, and may
-consume BuildMark `VersionInfo` instances through their `Contains(VersionInfo)`
+consume BuildMark `VersionTag` instances through their `Contains(VersionTag)`
 overloads.
 
 The implementation uses `VersionComparable` for semantic version parsing and

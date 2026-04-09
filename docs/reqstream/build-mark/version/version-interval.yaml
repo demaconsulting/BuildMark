@@ -30,13 +30,13 @@ sections:
       - id: BuildMark-VersionInterval-Contains
         title: >-
           The VersionInterval class shall determine whether a candidate version falls
-          inside the interval, with overloads for string, VersionComparable, and VersionInfo input.
+          inside the interval, with overloads for string, VersionComparable, and VersionTag input.
         justification: |
           Callers need to evaluate whether a release version is included by an
-          affected-version interval. Providing string, VersionComparable, and VersionInfo
+          affected-version interval. Providing string, VersionComparable, and VersionTag
           overloads makes the utility reusable across parsing and reporting flows.
           The VersionComparable overload provides direct access to analytical comparison,
-          while the VersionInfo overload maintains backward compatibility.
+          while the VersionTag overload accepts parsed repository tags directly.
         tests:
           - VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue
           - VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse
@@ -65,12 +65,12 @@ sections:
       - id: BuildMark-VersionIntervalSet-Contains
         title: >-
           The VersionIntervalSet class shall determine whether a candidate version falls
-          inside any interval in the set, with overloads for string, VersionComparable, and VersionInfo input.
+          inside any interval in the set, with overloads for string, VersionComparable, and VersionTag input.
         justification: |
           Affected-version metadata can contain multiple disjoint ranges. The utility
           must allow callers to determine whether a version is covered by any one of
           those ranges without re-implementing interval iteration logic. VersionComparable
-          provides analytical comparison while VersionInfo maintains backward compatibility.
+          provides analytical comparison while VersionTag accepts parsed repository tags.
         tests:
           - VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue
           - VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue

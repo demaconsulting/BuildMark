@@ -117,12 +117,12 @@ When a valid `BuildMarkConfig` is available, its properties are consumed as
 follows:
 
 - `BuildMarkConfig.Connector` — optional `ConnectorConfig` carrying the connector
-  `Type` (`"github"`, `"azure-devops"`, or `"github+azure-devops"`), a `GitHub`
-  property holding a `GitHubConnectorConfig` (when `Type` includes `"github"`),
-  and an `AzureDevOps` placeholder. The `GitHubConnectorConfig` is passed to
-  `GitHubRepoConnector` and may supply `Owner`, `Repo`, and `BaseUrl` overrides.
-  The full `ConnectorConfig` is also passed to `RepoConnectorFactory` to select
-  the appropriate connector implementation.
+  `Type` (`"github"` or `"azure-devops"`), a `GitHub` property holding a
+  `GitHubConnectorConfig` for GitHub-based operation, and an `AzureDevOps`
+  placeholder. The `GitHubConnectorConfig` is passed to `GitHubRepoConnector`
+  and may supply `Owner`, `Repo`, and `BaseUrl` overrides. The full
+  `ConnectorConfig` is also passed to `RepoConnectorFactory` to select the
+  appropriate connector implementation.
 - `BuildMarkConfig.Sections` — ordered list of `SectionConfig` objects (each with
   an `Id` and `Title`) that define the report sections. Passed to the active
   connector for output structuring.
