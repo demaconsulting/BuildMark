@@ -34,7 +34,7 @@ public static class RepoConnectorFactory
     /// </summary>
     /// <param name="config">Optional connector configuration.</param>
     /// <returns>Repository connector instance.</returns>
-    public static IRepoConnector Create(ConnectorConfig? config = null)
+    public static async Task<IRepoConnector> CreateAsync(ConnectorConfig? config = null)
     {
         // Honor explicit connector selection when configuration is available.
         if (config?.Type != null &&
@@ -51,7 +51,7 @@ public static class RepoConnectorFactory
         }
 
         // Check if git remote points to GitHub
-        if (IsGitHubRepository())
+        if (await IsGitHubRepositoryAsync())
         {
             return new GitHubRepoConnector(config?.GitHub);
         }
@@ -61,13 +61,42 @@ public static class RepoConnectorFactory
     }
 
     /// <summary>
+    ///     Creates a repository connector based on the current environment (synchronous version).
+    /// </summary>
+    /// <param name="config">Optional connector configuration.</param>
+    /// <returns>Repository connector instance.</returns>
+    /// <remarks>
+    ///     This synchronous version avoids the git repository check to prevent deadlock risks.
+    ///     It defaults to GitHub connector after checking environment variables only.
+    /// </remarks>
+    public static IRepoConnector Create(ConnectorConfig? config = null)
+    {
+        // Honor explicit connector selection when configuration is available.
+        if (config?.Type != null &&
+            config.Type.Equals("azure-devops", StringComparison.OrdinalIgnoreCase))
+        {
+            throw new NotSupportedException("Azure DevOps connector support is not yet implemented.");
+        }
+
+        // Check for GitHub Actions environment variables
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_ACTIONS")) ||
+            !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
+        {
+            return new GitHubRepoConnector(config?.GitHub);
+        }
+
+        // Default to GitHub connector (avoid git check to prevent sync-over-async deadlocks)
+        return new GitHubRepoConnector(config?.GitHub);
+    }
+
+    /// <summary>
     ///     Checks if the current repository is a GitHub repository.
     /// </summary>
     /// <returns>True if GitHub repository.</returns>
-    private static bool IsGitHubRepository()
+    private static async Task<bool> IsGitHubRepositoryAsync()
     {
         // Get git remote URL and check if it contains github.com
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
+        var output = await ProcessRunner.TryRunAsync("git", "remote get-url origin");
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 }

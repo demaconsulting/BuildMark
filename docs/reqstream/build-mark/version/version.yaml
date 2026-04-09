@@ -25,6 +25,18 @@ sections:
           - VersionTag_Create_ValidTag_ReturnsVersionTag
           - VersionInterval_Create_ValidInterval_ReturnsVersionInterval
           - VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+        children:
+          - BuildMark-VersionComparable-Comparison
+          - BuildMark-VersionComparable-PreReleaseComparison
+          - BuildMark-VersionComparable-Creation
+          - BuildMark-VersionSemantic-FullVersion
+          - BuildMark-VersionTag-Formats
+          - BuildMark-VersionTag-Equality
+          - BuildMark-VersionInterval-Parse
+          - BuildMark-VersionInterval-Contains
+          - BuildMark-VersionIntervalSet-Parse
+          - BuildMark-VersionIntervalSet-Contains
+          - BuildMark-VersionCommitTag-Record
 
       - id: BuildMark-Version-SemanticVersioning
         title: >-
@@ -40,3 +52,7 @@ sections:
           - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
           - VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
           - VersionTag_GetVersionComparable_SemanticTags_ReturnsCorrectComparison
+        children:
+          - BuildMark-VersionComparable-Comparison
+          - BuildMark-VersionComparable-PreReleaseComparison
+          - BuildMark-VersionSemantic-FullVersion

@@ -427,7 +427,7 @@ sections:
               - IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully
             children:
               - BuildMark-RepoConnectors-ItemControls
-              - BuildMark-Utilities-VersionInterval
+              - BuildMark-VersionInterval-Parse
 
           - id: BuildMark-Controls-AffectedVersionsInterval
             title: The affected-versions field shall use mathematical interval notation with
@@ -441,7 +441,7 @@ sections:
               - IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation
             children:
               - BuildMark-RepoConnectors-ItemControls
-              - BuildMark-Utilities-VersionInterval
+              - BuildMark-VersionInterval-Parse
 
           - id: BuildMark-Controls-HiddenBlock
             title: The tool shall recognize a buildmark code block that is wrapped in an HTML
