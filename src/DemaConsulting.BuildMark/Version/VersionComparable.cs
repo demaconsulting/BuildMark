@@ -20,7 +20,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace DemaConsulting.BuildMark.Utilities;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents the comparable portion of a semantic version (major.minor.patch[-pre-release]).

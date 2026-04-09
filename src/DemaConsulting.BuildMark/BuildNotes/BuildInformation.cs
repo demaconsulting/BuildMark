@@ -20,6 +20,8 @@
 
 using System.Globalization;
 
+using DemaConsulting.BuildMark.Version;
+
 namespace DemaConsulting.BuildMark.BuildNotes;
 
 /// <summary>

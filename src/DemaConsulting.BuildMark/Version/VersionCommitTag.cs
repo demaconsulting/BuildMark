@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.BuildNotes;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents a version paired with its corresponding commit hash.

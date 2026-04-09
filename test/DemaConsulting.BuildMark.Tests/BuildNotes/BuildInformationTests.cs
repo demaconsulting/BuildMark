@@ -22,6 +22,7 @@ using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 

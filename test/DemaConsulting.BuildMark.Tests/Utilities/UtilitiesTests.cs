@@ -20,6 +20,7 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests.Utilities;
 

@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Utilities;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents a complete semantic version including the comparable portion and optional build metadata.

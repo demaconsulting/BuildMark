@@ -25,6 +25,7 @@ using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.SelfTest;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark;
 

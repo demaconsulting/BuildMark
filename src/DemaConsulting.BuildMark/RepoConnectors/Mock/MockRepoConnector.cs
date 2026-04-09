@@ -21,6 +21,7 @@
 using System.Globalization;
 using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.RepoConnectors.Mock;
 

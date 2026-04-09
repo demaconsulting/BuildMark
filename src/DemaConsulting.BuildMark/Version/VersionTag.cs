@@ -20,7 +20,7 @@
 
 using System.Text.RegularExpressions;
 
-namespace DemaConsulting.BuildMark.Utilities;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents a repository tag parsed into semantic version information.

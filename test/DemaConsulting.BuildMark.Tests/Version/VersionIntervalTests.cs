@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.Tests.Utilities;
+namespace DemaConsulting.BuildMark.Tests.Version;
 
 /// <summary>
 ///     Tests for VersionInterval.Parse method.

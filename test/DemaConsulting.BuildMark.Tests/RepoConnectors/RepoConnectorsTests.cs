@@ -24,6 +24,7 @@ using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 

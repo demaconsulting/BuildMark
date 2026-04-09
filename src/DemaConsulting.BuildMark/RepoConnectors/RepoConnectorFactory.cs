@@ -21,6 +21,7 @@
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
 

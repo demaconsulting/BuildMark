@@ -20,6 +20,7 @@
 
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests.BuildNotes;
 
