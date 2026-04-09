@@ -180,6 +180,15 @@ internal static class Program
         // Create repository connector using factory if provided, otherwise use the configured connector.
         var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
 
+        // Configure routing rules on the connector when not using a test factory
+        if (context.ConnectorFactory == null && connector is RepoConnectorBase configurableConnector)
+        {
+            // Pass rules and sections from configuration to the connector
+            configurableConnector.Configure(
+                loadResult.Config?.Rules ?? [],
+                loadResult.Config?.Sections ?? []);
+        }
+
         // Parse build version if provided
         VersionInfo? buildVersion = null;
         if (context.BuildVersion != null)

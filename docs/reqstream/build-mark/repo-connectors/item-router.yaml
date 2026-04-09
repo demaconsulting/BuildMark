@@ -18,3 +18,4 @@ sections:
         tests:
           - ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection
           - ItemRouter_Route_SuppressedRouteOmitsMatchingItem
+          - RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections

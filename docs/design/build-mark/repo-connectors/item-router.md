@@ -32,5 +32,5 @@ wins. Items that do not match any rule are placed in a default section.
   subsystem.
 - `RuleConfig` provides routing rules from the Configuration subsystem.
 - `SectionConfig` provides section definitions from the Configuration subsystem.
-- `GitHubRepoConnector` calls `ItemRouter.Route` to assign items to report
-  sections.
+- `RepoConnectorBase.ApplyRules` calls `ItemRouter.Route` to assign items to report sections.
+- `GitHubRepoConnector` and `MockRepoConnector` call `ApplyRules` when rules are configured.

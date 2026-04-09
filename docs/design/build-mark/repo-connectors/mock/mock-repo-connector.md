@@ -31,9 +31,15 @@ determines the target and baseline versions, collects changes and known issues,
 and returns a fully populated `BuildInformation` record. The logic mirrors the
 production GitHubRepoConnector flow but operates entirely on in-memory data.
 
+When routing rules have been configured via `Configure`, `GetBuildInformationAsync`
+collects all items and passes them to `ApplyRules` (inherited from `RepoConnectorBase`)
+to produce the `RoutedSections` list. If no rules are configured, the legacy
+categorization into `Changes` and `Bugs` is used.
+
 ## Interactions
 
-| Unit / Subsystem    | Role                                                           |
-|---------------------|----------------------------------------------------------------|
-| `RepoConnectorBase` | Base class providing `FindVersionIndex` and command delegation |
-| `Validation`        | Instantiates `MockRepoConnector` directly for self-tests       |
+| Unit / Subsystem         | Role                                                                              |
+|--------------------------|-----------------------------------------------------------------------------------|
+| `RepoConnectorBase`      | Base class providing `FindVersionIndex` and command delegation                    |
+| `Configure` (inherited)  | Called by `Validation.RunRulesRouting` to test rules-based routing                |
+| `Validation`             | Instantiates `MockRepoConnector` directly for self-tests                          |

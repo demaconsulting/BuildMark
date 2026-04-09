@@ -71,6 +71,20 @@ sections:
           - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
           - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
 
+      - id: BuildMark-GitHub-Rules
+        title: >-
+          The GitHubRepoConnector class shall apply configured routing rules and sections
+          to distribute assembled items into the appropriate report sections.
+        justification: |
+          When a .buildmark.yaml file provides routing rules and section definitions,
+          the connector must delegate to RepoConnectorBase.ApplyRules so that items are
+          distributed according to the operator-supplied rules rather than the default
+          label-derived categorization. This allows teams to customize which items
+          appear in which sections of the generated build notes.
+        tests:
+          - GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+          - GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+
       - id: BuildMark-GitHub-GraphQLClient
         title: The GitHubRepoConnector class shall use a GraphQL client for GitHub API interactions.
         justification: |

@@ -21,3 +21,6 @@ sections:
           - MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
           - MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline
           - MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly
+          - MockRepoConnector_Configure_StoresRulesAndSections
+          - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
+          - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections

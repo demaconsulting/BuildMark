@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.BuildNotes;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.RepoConnectors.Mock;
@@ -112,6 +113,15 @@ public class MockRepoConnector : RepoConnectorBase
         bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
+        // Apply routing rules if configured, otherwise use legacy categorization
+        IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>? routedSections = null;
+        if (HasRules)
+        {
+            // Route all collected items into configured sections
+            var allItems = nonBugChanges.Concat(bugs).Concat(knownIssues);
+            routedSections = ApplyRules(allItems);
+        }
+
         // Build version tags from version and hash info
         var currentTag = new VersionTag(toTagInfo, toHash.Trim());
         var baselineTag = fromTagInfo != null && fromHash != null
@@ -128,7 +138,10 @@ public class MockRepoConnector : RepoConnectorBase
             nonBugChanges,
             bugs,
             knownIssues,
-            changelogLink);
+            changelogLink)
+        {
+            RoutedSections = routedSections
+        };
     }
 
     /// <summary>

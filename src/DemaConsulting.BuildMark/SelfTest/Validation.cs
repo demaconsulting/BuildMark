@@ -20,6 +20,7 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
@@ -55,6 +56,7 @@ internal static class Validation
         RunGitIntegration(context, testResults, mockFactory);
         RunIssueTracking(context, testResults, mockFactory);
         RunKnownIssuesReporting(context, testResults, mockFactory);
+        RunRulesRouting(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -225,6 +227,59 @@ internal static class Validation
                 }
 
                 return "Expected known issues not found in report";
+            });
+    }
+
+    /// <summary>
+    ///     Runs a test for rules-based routing functionality.
+    /// </summary>
+    /// <param name="context">The context for output.</param>
+    /// <param name="testResults">The test results collection.</param>
+    private static void RunRulesRouting(
+        Context context,
+        DemaConsulting.TestResults.TestResults testResults)
+    {
+        // Create a factory that configures the mock connector with routing rules
+        var rulesFactory = () =>
+        {
+            // Create a mock connector with rules that route bugs to a bugs section and everything else to features
+            var mc = new MockRepoConnector();
+            mc.Configure(
+                new List<RuleConfig>
+                {
+                    new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                    new RuleConfig { Route = "features" }
+                },
+                new List<SectionConfig>
+                {
+                    new SectionConfig { Id = "features", Title = "Features" },
+                    new SectionConfig { Id = "bugs", Title = "Bugs" }
+                });
+
+            // Return the configured connector as the interface type
+            return (IRepoConnector)mc;
+        };
+
+        RunValidationTest(
+            context,
+            testResults,
+            "BuildMark_RulesRouting",
+            rulesFactory,
+            "rules-report.md",
+            (logContent, reportContent) =>
+            {
+                if (reportContent == null)
+                {
+                    return "Report file not created";
+                }
+
+                if (reportContent.Contains("## Features") &&
+                    reportContent.Contains("## Bugs"))
+                {
+                    return null;
+                }
+
+                return "Report file missing expected routed section headings";
             });
     }
 

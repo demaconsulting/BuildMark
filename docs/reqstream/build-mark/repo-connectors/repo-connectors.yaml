@@ -95,6 +95,7 @@ sections:
           - BuildMark-GitHub-ItemControls
           - BuildMark-GitHub-DescriptionBody
           - BuildMark-GitHub-GraphQLClient
+          - BuildMark-GitHub-Rules
 
       - id: BuildMark-RepoConnectors-Mock
         title: >-

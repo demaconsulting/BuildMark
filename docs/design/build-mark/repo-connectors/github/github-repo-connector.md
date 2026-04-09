@@ -34,6 +34,10 @@ GitHub issue and pull request labels are mapped to normalized types:
 
 Items labelled as `"bug"` are placed in the `Bugs` list; all others go to `Changes`.
 
+When routing rules are configured via `.buildmark.yaml`, the label-derived categorization
+is overridden by `RepoConnectorBase.ApplyRules`, which delegates to `ItemRouter` to
+distribute all collected items into the configured report sections instead.
+
 ### GraphQL Response Types
 
 The `GitHubGraphQLClient` returns `PullRequestNode` and `IssueNode` records that
@@ -114,8 +118,13 @@ Main entry point. Performs the following steps:
 10. Collect known issues (open issues not included in this build), applying item
     controls overrides from description bodies.
 11. Sort all lists chronologically.
-12. Generate the full changelog URL from the baseline and target tags.
-13. Return the assembled `BuildInformation` record.
+12. If routing rules are configured, call `ApplyRules` (inherited from
+    `RepoConnectorBase`) to route all collected items into the configured report
+    sections and populate `BuildInformation.RoutedSections`. If no rules are
+    configured, items remain in the legacy `Changes`, `Bugs`, and `KnownIssues`
+    lists.
+13. Generate the full changelog URL from the baseline and target tags.
+14. Return the assembled `BuildInformation` record.
 
 ## Interactions
 
