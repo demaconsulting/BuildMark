@@ -775,4 +775,68 @@ public class GitHubRepoConnectorTests
         Assert.IsNotNull(connector);
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync with configured rules populates RoutedSections.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: GitHubRepoConnector.GetBuildInformationAsync routing behavior
+    ///     What the assertions prove: When rules are configured, items are routed into the
+    ///     correct sections and RoutedSections is populated on the returned BuildInformation.
+    /// </remarks>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections()
+    {
+        // Arrange: set up two merged PRs with different labels — one feature, one bug
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("feat123", "bug456")
+            .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddTagsResponse(new MockTag("v1.0.0", "feat123"))
+            .AddPullRequestsResponse(
+                new MockPullRequest(1, "Feature PR", "https://github.com/owner/repo/pull/1", true, "feat123", "feat123", ["feature"]),
+                new MockPullRequest(2, "Bug PR", "https://github.com/owner/repo/pull/2", true, "bug456", "bug456", ["bug"]))
+            .AddIssuesResponse();
+
+        // Set up connector with mocked HTTP and git commands
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "feat123");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Configure routing rules: bugs → "bugs" section, everything else → "features" section
+        var rules = new List<RuleConfig>
+        {
+            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+            new() { Route = "features" }
+        };
+        var sections = new List<SectionConfig>
+        {
+            new() { Id = "features", Title = "Features" },
+            new() { Id = "bugs", Title = "Bugs Fixed" }
+        };
+        connector.Configure(rules, sections);
+
+        // Act: retrieve build information
+        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+
+        // Assert: RoutedSections is populated when rules are configured
+        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be populated when rules are configured");
+        Assert.HasCount(2, buildInfo.RoutedSections);
+
+        // Verify the feature item was routed to the "features" section (first section)
+        var featuresSection = buildInfo.RoutedSections[0];
+        Assert.AreEqual("features", featuresSection.SectionId);
+        Assert.AreEqual("Features", featuresSection.SectionTitle);
+        Assert.HasCount(1, featuresSection.Items);
+        Assert.AreEqual("Feature PR", featuresSection.Items[0].Title);
+
+        // Verify the bug item was routed to the "bugs" section (second section)
+        var bugsSection = buildInfo.RoutedSections[1];
+        Assert.AreEqual("bugs", bugsSection.SectionId);
+        Assert.AreEqual("Bugs Fixed", bugsSection.SectionTitle);
+        Assert.HasCount(1, bugsSection.Items);
+        Assert.AreEqual("Bug PR", bugsSection.Items[0].Title);
+    }
 }
