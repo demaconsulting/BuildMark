@@ -18,9 +18,9 @@ existing files and to know where to make new files.
 │   ├── requirements_report/
 │   └── reqstream/
 ├── src/
-│   └── <project>/
+│   └── {project}/
 └── test/
-    └── <test-project>/
+    └── {test-project}/
 ```
 
 # Key Configuration Files
@@ -42,13 +42,15 @@ existing files and to know where to make new files.
 
 Before performing any work, agents must read and apply the relevant standards from `.github/standards/`:
 
-- **`csharp-language.md`** - For C# code development (literate programming, XML docs, dependency injection)
+- **`coding-principles.md`** - For universal coding standards (literate programming, architecture principles)
+- **`testing-principles.md`** - For universal testing standards (dependency boundaries, AAA pattern)
+- **`csharp-language.md`** - For C# code development (formatting, XML docs, C#-specific guidance)
 - **`csharp-testing.md`** - For C# test development (AAA pattern, naming, MSTest anti-patterns)
-- **`design-documentation.md`** - For design documentation (software structure diagrams, system.md, subsystem organization)
+- **`design-documentation.md`** - For design documentation (software structure diagrams, system.md, hierarchy)
 - **`reqstream-usage.md`** - For requirements management (traceability, semantic IDs, source filters)
 - **`reviewmark-usage.md`** - For file review management (review-sets, file patterns, enforcement)
 - **`software-items.md`** - For software categorization (system/subsystem/unit/OTS classification)
-- **`technical-documentation.md`** - For documentation creation and maintenance (structure, Pandoc, README best practices)
+- **`technical-documentation.md`** - For documentation creation and maintenance (structure, Pandoc, best practices)
 
 Load only the standards relevant to your specific task scope and apply their
 quality checks and guidelines throughout your work.
@@ -62,14 +64,14 @@ Delegate to specialized agents only for specific scenarios:
 - **Light quality checking** (linting, basic validation) → Call the quality agent
 - **Formal feature implementation** (complex, multi-step) → Call the implementation agent
 - **Formal bug resolution** (complex debugging, systematic fixes) → Call the implementation agent
-- **Formal reviews** (compliance verification, detailed analysis) → Call the code-review agent
+- **Formal reviews** (compliance verification, detailed analysis) → Call the formal-review agent
 - **Template consistency** (downstream repository alignment) → Call the repo-consistency agent
 
 ## Available Specialized Agents
 
 - **developer** - General-purpose software development agent that applies appropriate
   standards based on the work being performed
-- **code-review** - Agent for performing formal reviews using standardized review processes
+- **formal-review** - Agent for performing formal reviews using standardized review processes
 - **implementation** - Orchestrator agent that manages quality implementations
   through a formal state machine workflow
 - **quality** - Quality assurance agent that grades developer work against DEMA
@@ -81,7 +83,7 @@ Delegate to specialized agents only for specific scenarios:
 
 1. **Markdown Auto-fix**: `npx markdownlint-cli2 --fix **/*.md` (fixes most markdown issues except line length)
 2. **Dotnet Auto-fix**: `dotnet format` (reformats .NET languages)
-3. **Run full check**: `lint.bat` (Windows) or `lint.sh` (Unix)  
+3. **Run full check**: `lint.bat` (Windows) or `lint.sh` (Unix)
 4. **Fix remaining**: Address line length, spelling, YAML syntax manually
 5. **Verify clean**: Re-run until 0 errors before quality validation
 
