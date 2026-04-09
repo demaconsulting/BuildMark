@@ -201,7 +201,7 @@ public class BuildInformationTests
         // Verify Index values are in ascending order
         for (var i = 0; i < buildInfo.Changes.Count - 1; i++)
         {
-            Assert.IsLessThanOrEqualTo(buildInfo.Changes[i + 1].Index, buildInfo.Changes[i].Index,
+            Assert.IsLessThanOrEqualTo(buildInfo.Changes[i].Index, buildInfo.Changes[i + 1].Index,
                 $"Changes should be ordered by Index. Found {buildInfo.Changes[i].Index} before {buildInfo.Changes[i + 1].Index}");
         }
     }
