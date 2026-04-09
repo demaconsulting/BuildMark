@@ -23,6 +23,7 @@ using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -566,8 +567,8 @@ public class IntegrationTests
             var content = File.ReadAllText(reportFile);
             var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
             var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-            Assert.IsTrue(changesStart >= 0, "Report must contain Changes section");
-            Assert.IsTrue(bugsStart >= 0, "Report must contain Bugs Fixed section");
+            Assert.IsGreaterThanOrEqualTo(0, changesStart, "Report must contain Changes section");
+            Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
 
             // Bug-typed item "Fix bug in Y" should be in Bugs Fixed section
             var bugsSection = content[bugsStart..];
@@ -650,7 +651,7 @@ public class IntegrationTests
 
         // Assert: item originally typed as feature was reclassified to bug (appears in Bugs Fixed)
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsTrue(bugsStart >= 0, "Report must contain Bugs Fixed section");
+        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Reclassified as bug", bugsSection);
 
@@ -671,7 +672,7 @@ public class IntegrationTests
 
         // Assert: item with type: bug override appears in the Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsTrue(bugsStart >= 0, "Report must contain Bugs Fixed section");
+        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Reclassified as bug", bugsSection);
     }
@@ -688,8 +689,8 @@ public class IntegrationTests
         // Assert: item with type: feature override appears in the Changes section
         var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsTrue(changesStart >= 0, "Report must contain Changes section");
-        Assert.IsTrue(bugsStart > changesStart, "Bugs Fixed section must follow Changes section");
+        Assert.IsGreaterThanOrEqualTo(0, changesStart, "Report must contain Changes section");
+        Assert.IsGreaterThan(changesStart, bugsStart, "Bugs Fixed section must follow Changes section");
         var changesSection = content[changesStart..bugsStart];
         Assert.Contains("Reclassified as feature", changesSection);
     }
@@ -720,7 +721,7 @@ public class IntegrationTests
 
         // Assert: the item with interval notation was parsed and routed to Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsTrue(bugsStart >= 0, "Report must contain Bugs Fixed section");
+        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Bug with affected versions", bugsSection);
     }
@@ -737,7 +738,7 @@ public class IntegrationTests
         // Assert: item with HTML-comment-wrapped buildmark block is recognized and processed
         // The hidden block specifies type: bug, so the item should appear in Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsTrue(bugsStart >= 0, "Report must contain Bugs Fixed section");
+        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Hidden block item", bugsSection);
     }
@@ -797,7 +798,7 @@ public class IntegrationTests
         /// </summary>
         /// <param name="version">Optional target version.</param>
         /// <returns>BuildInformation with items processed through item controls.</returns>
-        public Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
+        public Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
         {
             // Define items with buildmark control blocks in their descriptions
             var items = new (string Id, string Title, string DefaultType, string Description)[]
@@ -879,10 +880,10 @@ public class IntegrationTests
             }
 
             // Build version information
-            var currentVersion = version ?? VersionInfo.Create("2.0.0");
-            var currentTag = new VersionTag(currentVersion, "abc123def456");
-            var baselineVersion = VersionInfo.Create("1.0.0");
-            var baselineTag = new VersionTag(baselineVersion, "def456ghi789");
+            var currentVersion = version ?? VersionTag.Create("2.0.0");
+            var currentTag = new VersionCommitTag(currentVersion, "abc123def456");
+            var baselineVersion = VersionTag.Create("1.0.0");
+            var baselineTag = new VersionCommitTag(baselineVersion, "def456ghi789");
 
             // Return build information
             return Task.FromResult(new BuildInformation(
@@ -895,3 +896,6 @@ public class IntegrationTests
         }
     }
 }
+
+
+

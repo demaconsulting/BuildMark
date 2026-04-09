@@ -4,10 +4,15 @@
 
 The Utilities subsystem provides shared helper classes used across the BuildMark
 system. It contains `PathHelpers` for safe path combination with traversal
-prevention, `ProcessRunner` for executing external shell commands, `VersionInfo`
-for parsing repository tags into normalized semantic version data, and
-`VersionInterval`/`VersionIntervalSet` for parsing mathematical version interval
-expressions and testing whether specific versions fall inside them.
+prevention, `ProcessRunner` for executing external shell commands, and a
+comprehensive version handling hierarchy:
+
+- `VersionComparable` for core integer-based version comparison
+- `VersionSemantic` for semantic versioning with build metadata support  
+- `VersionTag` for parsing repository tags into normalized version data
+- `VersionInfo` for legacy compatibility and semantic version representation
+- `VersionInterval`/`VersionIntervalSet` for parsing mathematical version interval
+  expressions and testing whether specific versions fall inside them
 
 ## Units
 
@@ -15,7 +20,10 @@ expressions and testing whether specific versions fall inside them.
 |----------------------|-----------------------------------|---------------------------------------|
 | `PathHelpers`        | `Utilities/PathHelpers.cs`        | Safe path combination                 |
 | `ProcessRunner`      | `Utilities/ProcessRunner.cs`      | External process execution            |
-| `VersionInfo`        | `Utilities/VersionInfo.cs`        | Repository tag parser                 |
+| `VersionComparable`  | `Utilities/VersionComparable.cs`  | Core version comparison logic         |
+| `VersionSemantic`    | `Utilities/VersionSemantic.cs`    | Semantic version with metadata        |
+| `VersionTag`         | `Utilities/VersionTag.cs`         | Repository tag parsing                |
+| `VersionInfo`        | `Utilities/VersionInfo.cs`        | Legacy semantic version interface     |
 | `VersionInterval`    | `Utilities/VersionInterval.cs`    | Version interval parser               |
 | `VersionIntervalSet` | `Utilities/VersionIntervalSet.cs` | Ordered version interval collection   |
 
@@ -34,6 +42,28 @@ expressions and testing whether specific versions fall inside them.
 | `RunAsync(command, arguments)`    | Method | Run a process and return stdout; throws on failure      |
 | `TryRunAsync(command, arguments)` | Method | Run a process and return stdout, or null on any failure |
 
+`VersionComparable` exposes the following methods:
+
+| Member                            | Kind   | Description                                     |
+|-----------------------------------|--------|-------------------------------------------------|
+| `Create(versionString)`           | Method | Parse version string into VersionComparable     |
+| `TryCreate(versionString)`        | Method | Try parse version; returns null on failure      |
+| `CompareTo(other)`                | Method | Compare this version to another analytically    |
+
+`VersionSemantic` exposes the following methods:
+
+| Member                            | Kind   | Description                                     |
+|-----------------------------------|--------|-------------------------------------------------|
+| `Create(versionString)`           | Method | Parse version string into VersionSemantic       |
+| `TryCreate(versionString)`        | Method | Try parse version; returns null on failure      |
+
+`VersionTag` exposes the following methods:
+
+| Member                            | Kind   | Description                                     |
+|-----------------------------------|--------|-------------------------------------------------|
+| `Create(tagString)`               | Method | Parse repository tag into VersionTag            |
+| `TryCreate(tagString)`            | Method | Try parse tag; returns null on failure          |
+
 `VersionInfo` exposes the following static methods:
 
 | Member           | Kind   | Description                                                             |
@@ -43,25 +73,44 @@ expressions and testing whether specific versions fall inside them.
 
 `VersionInterval` exposes the following methods:
 
-| Member                    | Kind   | Description                                                   |
-|---------------------------|--------|---------------------------------------------------------------|
-| `Parse(text)`             | Method | Parse a single interval token; returns null if invalid        |
-| `Contains(version)`       | Method | Test whether a semantic version string falls inside interval  |
-| `Contains(versionInfo)`   | Method | Test whether a BuildMark `VersionInfo` falls inside interval  |
++--------------------------------+--------+-----------------------------------------------------------+
+| Member                         | Kind   | Description                                               |
++================================+========+===========================================================+
+| `Parse(text)`                  | Method | Parse a single interval token; returns null if invalid   |
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(version)`            | Method | Test whether semantic version string falls inside interval|
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(versionInfo)`        | Method | Test whether version falls inside interval               |
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(versionComparable)`  | Method | Test whether VersionComparable falls in interval        |
++--------------------------------+--------+-----------------------------------------------------------+
 
 `VersionIntervalSet` exposes the following methods:
 
-| Member                    | Kind   | Description                                                             |
-|---------------------------|--------|-------------------------------------------------------------------------|
-| `Parse(text)`             | Method | Parse a comma-separated interval string into an ordered collection      |
-| `Contains(version)`       | Method | Test whether a semantic version string falls inside any contained range |
-| `Contains(versionInfo)`   | Method | Test whether a BuildMark `VersionInfo` falls inside any contained range |
++--------------------------------+--------+---------------------------------------------------------------------+
+| Member                         | Kind   | Description                                                         |
++================================+========+=====================================================================+
+| `Parse(text)`                  | Method | Parse a comma-separated interval string into an ordered collection  |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(version)`            | Method | Test whether a semantic version string falls inside any range      |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(versionInfo)`        | Method | Test whether version falls inside any range                        |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(versionComparable)`  | Method | Test whether VersionComparable falls in any range                  |
++--------------------------------+--------+---------------------------------------------------------------------+
 
 ## Interactions
 
-`PathHelpers`, `ProcessRunner`, and `VersionInfo` have no dependencies on other
-BuildMark subsystems. `VersionInterval` and `VersionIntervalSet` may consume
-`VersionInfo` instances through their `Contains(VersionInfo)` overloads. The
-subsystem is consumed by any unit that needs safe path combination, external
+`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
+subsystems. The version hierarchy follows these relationships:
+
+- `VersionComparable` provides core comparison logic (no dependencies)
+- `VersionSemantic` builds on `VersionComparable` adding metadata support
+- `VersionTag` uses `VersionComparable` for parsing repository tags
+- `VersionInfo` provides legacy compatibility by delegating to `VersionSemantic`
+- `VersionInterval` and `VersionIntervalSet` consume `VersionComparable` for
+  version comparison and containment checks
+
+The subsystem is consumed by any unit that needs safe path combination, external
 process execution, version parsing, version interval parsing, or version
 containment checks.

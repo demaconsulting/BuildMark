@@ -30,11 +30,6 @@ For a detailed explanation of how BuildMark works internally, see the
 - 🌐 **Multi-Platform** - Support for Windows, Linux, macOS with .NET 8, 9, and 10
 - ✅ **Self-Validation** - Built-in tests without requiring external tools
 - 📊 **Detailed Reporting** - Track changes, bug fixes, and known issues between versions
-- 🔍 **Linting Enforcement** - markdownlint, cspell, and yamllint enforced on every CI run
-- 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
-  following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
-- ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
-- 🔗 **Requirements Traceability** - Requirements linked to passing tests with auto-generated trace matrix
 
 ## Installation
 
@@ -251,9 +246,10 @@ Running self-validation produces a report containing the following information:
 ✓ BuildMark_GitIntegration - Passed
 ✓ BuildMark_IssueTracking - Passed
 ✓ BuildMark_KnownIssuesReporting - Passed
+✓ BuildMark_RulesRouting - Passed
 
-Total Tests: 4
-Passed: 4
+Total Tests: 5
+Passed: 5
 Failed: 0
 ```
 
@@ -263,6 +259,7 @@ Each test in the report proves:
 - **`BuildMark_GitIntegration`** - Git repository connector reads version tags and commits.
 - **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
+- **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.
 
 See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md) for more details
 on the self-validation tests.
@@ -366,6 +363,16 @@ Example report structure:
 
 [View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
 ```
+
+## Project Practices
+
+The BuildMark repository itself follows these development practices:
+
+- 🔍 **Linting Enforcement** - markdownlint, cspell, and yamllint enforced on every CI run
+- 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
+  following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
+- ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
+- 🔗 **Requirements Traceability** - Requirements linked to passing tests with auto-generated trace matrix
 
 ## Contributing
 

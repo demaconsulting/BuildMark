@@ -116,8 +116,8 @@ internal static class ProcessRunner
             await Task.WhenAll(outputTask, errorTask);
             await process.WaitForExitAsync();
 
-            // Return output only if command succeeded
-            return process.ExitCode == 0 ? outputTask.Result : null;
+            // Return trimmed output only if command succeeded
+            return process.ExitCode == 0 ? outputTask.Result.TrimEnd() : null;
         }
         catch
         {

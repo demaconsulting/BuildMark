@@ -8,15 +8,13 @@ includes:
   - docs/reqstream/build-mark/build-notes/build-notes.yaml
   - docs/reqstream/build-mark/build-notes/build-information.yaml
   - docs/reqstream/build-mark/build-notes/item-info.yaml
-  - docs/reqstream/build-mark/build-notes/version-tag.yaml
   - docs/reqstream/build-mark/build-notes/web-link.yaml
   - docs/reqstream/build-mark/self-test/self-test.yaml
   - docs/reqstream/build-mark/self-test/validation.yaml
   - docs/reqstream/build-mark/utilities/utilities.yaml
   - docs/reqstream/build-mark/utilities/path-helpers.yaml
   - docs/reqstream/build-mark/utilities/process-runner.yaml
-  - docs/reqstream/build-mark/utilities/version.yaml
-  - docs/reqstream/build-mark/utilities/version-interval.yaml
+  - docs/reqstream/build-mark/version/version.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml
   - docs/reqstream/build-mark/repo-connectors/item-router.yaml

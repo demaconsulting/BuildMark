@@ -22,7 +22,7 @@ using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the ItemRouter class.
@@ -39,17 +39,17 @@ public class ItemRouterTests
         // Arrange
         List<ItemInfo> items =
         [
-            new ItemInfo("1", "Feature", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Bug", "https://example.com/2", "bug", 2)
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
         ];
         List<SectionConfig> sections =
         [
-            new SectionConfig { Id = "changes", Title = "Changes" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
         ];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "bug" } },
                 Route = "bugs"
@@ -73,11 +73,11 @@ public class ItemRouterTests
     public void ItemRouter_Route_SuppressedRouteOmitsMatchingItem()
     {
         // Arrange
-        List<ItemInfo> items = [new ItemInfo("1", "Internal", "https://example.com/1", "internal", 1)];
-        List<SectionConfig> sections = [new SectionConfig { Id = "changes", Title = "Changes" }];
+        List<ItemInfo> items = [new("1", "Internal", "https://example.com/1", "internal", 1)];
+        List<SectionConfig> sections = [new() { Id = "changes", Title = "Changes" }];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "internal" } },
                 Route = "suppressed"
@@ -90,4 +90,132 @@ public class ItemRouterTests
         // Assert
         Assert.IsEmpty(routedItems["changes"]);
     }
+
+    /// <summary>
+    ///     Test that a rule with null Match block acts as a catch-all and matches all items.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_WithNullMatchBlock_MatchesAllItems()
+    {
+        // Arrange
+        List<ItemInfo> items =
+        [
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
+        ];
+        List<SectionConfig> sections =
+        [
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "other", Title = "Other" }
+        ];
+        List<RuleConfig> rules =
+        [
+            new() { Match = null, Route = "other" }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - catch-all routes all items to "other", leaving "changes" empty
+        Assert.IsEmpty(routedItems["changes"]);
+        Assert.HasCount(2, routedItems["other"]);
+    }
+
+    /// <summary>
+    ///     Test that WorkItemType matching routes only items with a matching type.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem()
+    {
+        // Arrange
+        List<ItemInfo> items =
+        [
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
+        ];
+        List<SectionConfig> sections =
+        [
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
+        ];
+        List<RuleConfig> rules =
+        [
+            new()
+            {
+                Match = new RuleMatchConfig { WorkItemType = { "bug" } },
+                Route = "bugs"
+            }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - only the bug item is routed to "bugs"; feature falls through to default
+        Assert.HasCount(1, routedItems["changes"]);
+        Assert.AreEqual("1", routedItems["changes"][0].Id);
+        Assert.HasCount(1, routedItems["bugs"]);
+        Assert.AreEqual("2", routedItems["bugs"][0].Id);
+    }
+
+    /// <summary>
+    ///     Test that items with no matching rule are routed to the default (first) section.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection()
+    {
+        // Arrange
+        List<ItemInfo> items = [new("1", "Unknown", "https://example.com/1", "unknown", 1)];
+        List<SectionConfig> sections =
+        [
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
+        ];
+        List<RuleConfig> rules =
+        [
+            new()
+            {
+                Match = new RuleMatchConfig { Label = { "bug" } },
+                Route = "bugs"
+            }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - unmatched item lands in the first section ("changes")
+        Assert.HasCount(1, routedItems["changes"]);
+        Assert.AreEqual("1", routedItems["changes"][0].Id);
+        Assert.IsEmpty(routedItems["bugs"]);
+    }
+
+    /// <summary>
+    ///     Test that items routed to a section not in the initial list create a new bucket entry.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection()
+    {
+        // Arrange
+        List<ItemInfo> items = [new("1", "Feature", "https://example.com/1", "feature", 1)];
+        List<SectionConfig> sections = [new() { Id = "changes", Title = "Changes" }];
+        List<RuleConfig> rules =
+        [
+            new()
+            {
+                Match = new RuleMatchConfig { Label = { "feature" } },
+                Route = "new-section"
+            }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - item is routed to the new section, which is created dynamically
+        Assert.IsEmpty(routedItems["changes"]);
+        Assert.IsTrue(routedItems.ContainsKey("new-section"));
+        Assert.HasCount(1, routedItems["new-section"]);
+        Assert.AreEqual("1", routedItems["new-section"][0].Id);
+    }
 }
+
+
+

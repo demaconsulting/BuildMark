@@ -42,18 +42,22 @@ public static class ItemRouter
     {
         // Initialize the output buckets using the configured section order.
         var routedItems = sections.ToDictionary(section => section.Id, _ => new List<ItemInfo>());
-        var defaultSectionId = sections.FirstOrDefault()?.Id ?? "changes";
+        var defaultSectionId = sections.Count > 0 ? sections[0].Id : "changes";
 
         // Route each item to the first matching destination.
         foreach (var item in items)
         {
+            // Find the first rule that matches this item, defaulting to the first section.
             var matchingRule = rules.FirstOrDefault(rule => RuleMatches(rule, item));
             var destination = matchingRule?.Route ?? defaultSectionId;
+
+            // Suppressed items are omitted from all sections.
             if (string.Equals(destination, "suppressed", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
+            // Retrieve or create the destination bucket for the target section.
             if (!routedItems.TryGetValue(destination, out var bucket))
             {
                 bucket = [];

@@ -1,0 +1,21 @@
+﻿---
+# Version Semantic Requirements
+
+sections:
+  - title: VersionSemantic Requirements
+    requirements:
+      - id: BuildMark-VersionSemantic-FullVersion
+        title: >-
+          VersionSemantic shall combine VersionComparable with build metadata
+          to provide complete semantic version representation.
+        justification: |
+          Semantic versioning includes build metadata (e.g., +build.123) that
+          does not affect version precedence. VersionSemantic provides this
+          complete representation while delegating comparison to VersionComparable.
+        tests:
+          - VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
+          - VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
+          - VersionSemantic_Properties_DelegateToComparable_Correctly
+          - VersionSemantic_ToString_FormatsCompletely_WithAllComponents
+          - VersionSemantic_TryCreate_InvalidVersion_ReturnsNull
+          - VersionSemantic_PreRelease_ReturnsEmptyStringForRelease

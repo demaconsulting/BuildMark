@@ -17,6 +17,7 @@ sections:
         tests:
           - Validation_Run_WithTrxResultsFile_WritesTrxFile
           - Validation_Run_WithXmlResultsFile_WritesJUnitFile
+          - Validation_Run_WithoutResultsFile_CompletesSuccessfully
 
       - id: BuildMark-Validation-TrxOutput
         title: The Validation class shall write TRX format test results when a .trx results file is specified.

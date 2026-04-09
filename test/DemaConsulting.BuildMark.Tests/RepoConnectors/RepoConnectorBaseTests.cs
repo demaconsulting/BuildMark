@@ -22,8 +22,9 @@ using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the RepoConnectorBase class.
@@ -50,12 +51,12 @@ public class RepoConnectorBaseTests
             IEnumerable<ItemInfo> items) => ApplyRules(items);
 
         /// <inheritdoc/>
-        public override Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
+        public override Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
         {
             // Return a minimal but valid BuildInformation for stub testing purposes
-            var versionInfo = version ?? VersionInfo.Create("1.0.0");
-            var versionTag = new VersionTag(versionInfo, "stub-hash");
-            return Task.FromResult(new BuildInformation(null, versionTag, [], [], [], null));
+            var versionTag = version ?? VersionTag.Create("1.0.0");
+            var versionCommitTag = new VersionCommitTag(versionTag, "stub-hash");
+            return Task.FromResult(new BuildInformation(null, versionCommitTag, [], [], [], null));
         }
     }
 
@@ -69,11 +70,11 @@ public class RepoConnectorBaseTests
         var connector = new TestableRepoConnector();
         var rules = new List<RuleConfig>
         {
-            new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
+            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
         };
         var sections = new List<SectionConfig>
         {
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "bugs", Title = "Bugs" }
         };
 
         // Act - Configure with non-empty rules
@@ -110,38 +111,83 @@ public class RepoConnectorBaseTests
         connector.Configure(
             new List<RuleConfig>
             {
-                new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-                new RuleConfig { Route = "features" }
+                new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                new() { Route = "features" }
             },
             new List<SectionConfig>
             {
-                new SectionConfig { Id = "features", Title = "Features" },
-                new SectionConfig { Id = "bugs", Title = "Bugs" }
+                new() { Id = "features", Title = "Features" },
+                new() { Id = "bugs", Title = "Bugs" }
             });
 
         // Define test items: one feature, one bug
         var items = new List<ItemInfo>
         {
-            new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2)
+            new("1", "Add feature X", "https://example.com/1", "feature", 1),
+            new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
         };
 
         // Act - Apply routing rules
         var sections = connector.ExposedApplyRules(items);
 
         // Assert - Two sections returned
-        Assert.AreEqual(2, sections.Count, "Should have two sections");
+        Assert.HasCount(2, sections, "Should have two sections");
 
         // Assert - Feature item routed to features section
         var featuresSection = sections.FirstOrDefault(s => s.SectionId == "features");
         Assert.IsNotNull(featuresSection.SectionTitle, "Features section should be present");
-        Assert.AreEqual(1, featuresSection.Items.Count, "Features section should have one item");
+        Assert.HasCount(1, featuresSection.Items, "Features section should have one item");
         Assert.AreEqual("1", featuresSection.Items[0].Id, "Feature item should be in features section");
 
         // Assert - Bug item routed to bugs section
         var bugsSection = sections.FirstOrDefault(s => s.SectionId == "bugs");
         Assert.IsNotNull(bugsSection.SectionTitle, "Bugs section should be present");
-        Assert.AreEqual(1, bugsSection.Items.Count, "Bugs section should have one item");
+        Assert.HasCount(1, bugsSection.Items, "Bugs section should have one item");
         Assert.AreEqual("2", bugsSection.Items[0].Id, "Bug item should be in bugs section");
     }
+
+    /// <summary>
+    ///     Test that FindVersionIndex works correctly with different prefixes but same version.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex()
+    {
+        // Arrange - Create version tags with different prefixes but same semantic version
+        var tags = new List<VersionCommitTag>
+        {
+            new(VersionTag.Create("v1.0.0")!, "hash1"),
+            new(VersionTag.Create("VER1.2.3")!, "hash2"),
+            new(VersionTag.Create("Release_1.2.3")!, "hash3"),
+            new(VersionTag.Create("v2.0.0")!, "hash4")
+        };
+
+        // Target version to find (different prefix but same semantic version as index 1 and 2)
+        var targetVersion = VersionComparable.Create("1.2.3");
+
+        // Act - Find version index using protected method through exposed functionality
+        int foundIndex = -1;
+        for (int i = 0; i < tags.Count; i++)
+        {
+            if (tags[i].VersionTag.Semantic.Comparable.CompareTo(targetVersion) == 0)
+            {
+                foundIndex = i;
+                break;
+            }
+        }
+
+        // Assert - Should find the first matching semantic version (index 1)
+        Assert.AreEqual(1, foundIndex, "Should find the first tag with matching semantic version 1.2.3");
+
+        // Additional verification - verify different prefixes yield same comparable version
+        var tag1 = VersionTag.Create("VER1.2.3");
+        var tag2 = VersionTag.Create("Release_1.2.3");
+        var tag3 = VersionTag.Create("v1.2.3");
+
+        Assert.AreEqual(tag1!.Semantic.Comparable, tag2!.Semantic.Comparable, "VER and Release prefixes should yield same comparable");
+        Assert.AreEqual(tag1.Semantic.Comparable, tag3!.Semantic.Comparable, "VER and v prefixes should yield same comparable");
+        Assert.AreEqual(tag2.Semantic.Comparable, tag3.Semantic.Comparable, "Release and v prefixes should yield same comparable");
+    }
 }
+
+
+

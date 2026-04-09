@@ -9,7 +9,7 @@ markdown report suitable for embedding in release documentation.
 
 ## System Architecture
 
-BuildMark is composed of six subsystems and a top-level entry point:
+BuildMark is composed of seven subsystems and a top-level entry point:
 
 - `Program` (Unit) — entry point; dispatches to handlers based on CLI flags
 - `Cli` (Subsystem) — command-line argument parsing and output channel control
@@ -19,6 +19,7 @@ BuildMark is composed of six subsystems and a top-level entry point:
   parsing and concrete connectors
 - `SelfTest` (Subsystem) — built-in self-validation test framework
 - `Utilities` (Subsystem) — shared path combination and process execution helpers
+- `Version` (Subsystem) — semantic version processing and comparison engine
 
 ## External Interfaces
 

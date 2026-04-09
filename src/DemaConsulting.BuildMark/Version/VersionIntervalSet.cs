@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Utilities;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents a set of version intervals.
@@ -37,13 +37,23 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
     }
 
     /// <summary>
+    ///     Determines whether a candidate VersionComparable falls within any interval in the set.
+    /// </summary>
+    /// <param name="version">VersionComparable to evaluate.</param>
+    /// <returns>True when the version is within any interval; otherwise false.</returns>
+    public bool Contains(VersionComparable version)
+    {
+        return Intervals.Any(interval => interval.Contains(version));
+    }
+
+    /// <summary>
     ///     Determines whether a candidate BuildMark version falls within any interval in the set.
     /// </summary>
     /// <param name="version">BuildMark version to evaluate.</param>
     /// <returns>True when the version is within any interval; otherwise false.</returns>
-    public bool Contains(VersionInfo version)
+    public bool Contains(VersionTag version)
     {
-        return Contains(version.SemanticVersion);
+        return Contains(version.Numbers);
     }
 
     /// <summary>
@@ -55,7 +65,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
     {
         // Walk character by character tracking bracket depth
         // Split on ',' when depth==0 (these separate intervals)
-        var intervals = new List<VersionInterval>();
+        List<VersionInterval> intervals = new();
         var depth = 0;
         var pos = 0;
         var tokenStart = 0;
@@ -66,12 +76,12 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
             var ch = text[pos];
 
             // Increment depth on '[' or '('
-            if (ch == '[' || ch == '(')
+            if (ch is '[' or '(')
             {
                 depth++;
             }
             // Decrement depth on ']' or ')'
-            else if (ch == ']' || ch == ')')
+            else if (ch is ']' or ')')
             {
                 depth--;
 

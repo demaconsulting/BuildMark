@@ -39,21 +39,6 @@ sections:
         children:
           - BuildMark-ProcessRunner-RunAsync
 
-      - id: BuildMark-Utilities-Version
-        title: The Utilities subsystem shall provide a shared parser for repository version tags.
-        justification: |
-          Multiple subsystems need a consistent representation of release tags
-          when selecting baselines, identifying current versions, and evaluating
-          version ranges. Placing Version in Utilities centralizes that parsing
-          and normalization logic for reuse across the system.
-        tests:
-          - Utilities_Version_SimpleTag_ParsesCorrectly
-          - Utilities_Version_PreRelease_DetectsCorrectly
-          - Utilities_Version_InvalidTag_ReturnsNull
-        children:
-          - BuildMark-Version-Parse
-          - BuildMark-Version-InvalidTag
-
       - id: BuildMark-Utilities-VersionInterval
         title: >-
           The Utilities subsystem shall provide version interval parsing using mathematical

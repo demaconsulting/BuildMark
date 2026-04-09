@@ -20,7 +20,7 @@
 
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Utilities;
 
 /// <summary>
 ///     Tests for the PathHelpers class.
@@ -125,3 +125,6 @@ public class PathHelpersTests
         }
     }
 }
+
+
+

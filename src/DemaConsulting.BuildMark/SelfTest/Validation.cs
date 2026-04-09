@@ -24,6 +24,7 @@ using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 using DemaConsulting.TestResults.IO;
 
 namespace DemaConsulting.BuildMark.SelfTest;
@@ -127,8 +128,8 @@ internal static class Validation
 
                 if (reportContent.Contains("# Build Report") &&
                     reportContent.Contains("## Version Information") &&
-                    reportContent.Contains("2.0.0") &&
-                    reportContent.Contains("current123hash456"))
+                    reportContent.Contains("v2.0.0") &&
+                    reportContent.Contains("mno345pqr678"))
                 {
                     return null;
                 }
@@ -156,8 +157,8 @@ internal static class Validation
             null,
             (logContent, _) =>
             {
-                if (logContent.Contains("Build Version: 2.0.0") &&
-                    logContent.Contains("Commit Hash: current123hash456") &&
+                if (logContent.Contains("Build Version: v2.0.0") &&
+                    logContent.Contains("Commit Hash: mno345pqr678") &&
                     logContent.Contains("Previous Version: ver-1.1.0"))
                 {
                     return null;
@@ -247,13 +248,13 @@ internal static class Validation
             mc.Configure(
                 new List<RuleConfig>
                 {
-                    new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-                    new RuleConfig { Route = "features" }
+                    new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                    new() { Route = "features" }
                 },
                 new List<SectionConfig>
                 {
-                    new SectionConfig { Id = "features", Title = "Features" },
-                    new SectionConfig { Id = "bugs", Title = "Bugs" }
+                    new() { Id = "features", Title = "Features" },
+                    new() { Id = "bugs", Title = "Bugs" }
                 });
 
             // Return the configured connector as the interface type

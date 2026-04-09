@@ -20,6 +20,7 @@
 
 using System.Text.RegularExpressions;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;
 
@@ -184,7 +185,11 @@ public static class ItemControlsParser
             // affected-versions
             else if (key == "affected-versions" && !string.IsNullOrEmpty(value))
             {
-                affectedVersions = VersionIntervalSet.Parse(value);
+                var parsed = VersionIntervalSet.Parse(value);
+                if (parsed.Intervals.Count > 0)
+                {
+                    affectedVersions = parsed;
+                }
             }
             // Unknown keys/values silently ignored
         }

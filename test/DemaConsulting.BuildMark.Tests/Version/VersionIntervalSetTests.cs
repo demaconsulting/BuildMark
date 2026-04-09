@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Tests;
+using DemaConsulting.BuildMark.Version;
 
-using DemaConsulting.BuildMark.Utilities;
+namespace DemaConsulting.BuildMark.Tests.Version;
 
 /// <summary>
 ///     Tests for VersionIntervalSet.Parse method.
@@ -199,7 +199,7 @@ public class VersionIntervalSetTests
     {
         // Arrange
         var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
-        var version = VersionInfo.Create("v3.1.0-rc.1");
+        var version = VersionTag.Create("v3.1.0-rc.1");
 
         // Act
         var result = intervalSet.Contains(version);
@@ -207,4 +207,82 @@ public class VersionIntervalSetTests
         // Assert
         Assert.IsTrue(result);
     }
+
+    /// <summary>
+    ///     Test that Contains works correctly with pre-release versions across multiple intervals.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_PreReleaseVersions_HandlesCorrectly()
+    {
+        // Arrange - intervals that include pre-release boundaries
+        var intervalSet = VersionIntervalSet.Parse("[1.0.0-rc.1,1.0.0],[2.0.0-alpha.1,2.0.0-beta.5)");
+
+        // Act & Assert - first interval tests
+        Assert.IsTrue(intervalSet.Contains("1.0.0-rc.1"));   // Lower bound of first interval
+        Assert.IsTrue(intervalSet.Contains("1.0.0-rc.2"));   // Within first interval
+        Assert.IsTrue(intervalSet.Contains("1.0.0"));        // Upper bound of first interval
+
+        // Act & Assert - second interval tests  
+        Assert.IsTrue(intervalSet.Contains("2.0.0-alpha.1")); // Lower bound of second interval
+        Assert.IsTrue(intervalSet.Contains("2.0.0-beta.1"));  // Within second interval
+        Assert.IsFalse(intervalSet.Contains("2.0.0-beta.5")); // Exclusive upper bound
+        Assert.IsFalse(intervalSet.Contains("2.0.0"));       // Outside second interval (release > pre-release)
+
+        // Act & Assert - outside all intervals
+        Assert.IsFalse(intervalSet.Contains("1.0.0-alpha.1")); // Before first interval
+        Assert.IsFalse(intervalSet.Contains("1.5.0"));        // Between intervals
+        Assert.IsFalse(intervalSet.Contains("2.1.0"));        // After all intervals
+    }
+
+    /// <summary>
+    ///     Test that Contains works with VersionComparable overload for pre-release versions.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Contains_VersionComparable_HandlesPreRelease()
+    {
+        // Arrange
+        var intervalSet = VersionIntervalSet.Parse("[1.2.0-rc.1,1.2.0],[2.0.0,3.0.0)");
+        var preReleaseInFirst = VersionComparable.Create("1.2.0-rc.2");
+        var releaseInFirst = VersionComparable.Create("1.2.0");
+        var releaseInSecond = VersionComparable.Create("2.5.0");
+        var versionOutside = VersionComparable.Create("1.1.0");
+
+        // Act & Assert
+        Assert.IsTrue(intervalSet.Contains(preReleaseInFirst));
+        Assert.IsTrue(intervalSet.Contains(releaseInFirst));
+        Assert.IsTrue(intervalSet.Contains(releaseInSecond));
+        Assert.IsFalse(intervalSet.Contains(versionOutside));
+    }
+
+    /// <summary>
+    ///     Test parsing intervals with pre-release bounds in the text.
+    /// </summary>
+    [TestMethod]
+    public void VersionIntervalSet_Parse_PreReleaseBounds_ParsesCorrectly()
+    {
+        // Arrange
+        var text = "[1.0.0-alpha.1,1.0.0-rc.1),[2.0.0-beta.1,2.0.0]";
+
+        // Act
+        var result = VersionIntervalSet.Parse(text);
+
+        // Assert
+        Assert.IsNotNull(result);
+        Assert.HasCount(2, result.Intervals);
+
+        // First interval
+        Assert.AreEqual("1.0.0-alpha.1", result.Intervals[0].LowerBound);
+        Assert.AreEqual("1.0.0-rc.1", result.Intervals[0].UpperBound);
+        Assert.IsTrue(result.Intervals[0].LowerInclusive);
+        Assert.IsFalse(result.Intervals[0].UpperInclusive);
+
+        // Second interval  
+        Assert.AreEqual("2.0.0-beta.1", result.Intervals[1].LowerBound);
+        Assert.AreEqual("2.0.0", result.Intervals[1].UpperBound);
+        Assert.IsTrue(result.Intervals[1].LowerInclusive);
+        Assert.IsTrue(result.Intervals[1].UpperInclusive);
+    }
 }
+
+
+

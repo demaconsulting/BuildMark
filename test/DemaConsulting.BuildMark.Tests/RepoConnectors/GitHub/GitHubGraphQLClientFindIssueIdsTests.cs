@@ -22,7 +22,7 @@ using System.Net;
 using System.Text;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Tests for the GitHubGraphQLClient FindIssueIdsLinkedToPullRequestAsync method.
@@ -434,3 +434,6 @@ public class GitHubGraphQLClientFindIssueIdsTests
         }
     }
 }
+
+
+

@@ -25,8 +25,8 @@ sections:
           to override it with mock implementations, enabling deterministic unit tests
           that do not spawn real processes.
         tests:
-          - MockRepoConnector_Constructor_CreatesInstance
-          - GitHubRepoConnector_Constructor_CreatesInstance
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+          - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
 
       - id: BuildMark-RepoConnectorBase-RulesRouting
         title: >-

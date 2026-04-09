@@ -18,13 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.Mock;
 
 /// <summary>
 ///     Tests for the MockRepoConnector class.
@@ -71,14 +71,15 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector and specify a known version
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("v2.0.0");
+        var version = VersionTag.Create("v2.0.0");
 
         // Act - Get build information with explicit version
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert - Verify build information contains expected version
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.AreEqual("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
     }
 
     /// <summary>
@@ -93,14 +94,14 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector without explicit version, relying on tag matching
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("v1.0.0");
+        var version = VersionTag.Create("v1.0.0");
 
         // Act - Get build information for a version that exists in the mock tags
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert - Verify build information is returned successfully
         Assert.IsNotNull(buildInfo, "Build information should be returned for valid version");
-        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
         Assert.IsNotNull(buildInfo.CurrentVersionTag.CommitHash, "Commit hash should be set");
     }
 
@@ -116,7 +117,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector with version that has associated changes
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("2.0.0");
+        var version = VersionTag.Create("2.0.0");
 
         // Act - Get build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -141,7 +142,7 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector and request version with known changes
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("2.0.0");
+        var version = VersionTag.Create("2.0.0");
 
         // Act - Get build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -174,18 +175,18 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
         var rules = new List<RuleConfig>
         {
-            new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-            new RuleConfig { Route = "features" }
+            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+            new() { Route = "features" }
         };
         var sections = new List<SectionConfig>
         {
-            new SectionConfig { Id = "features", Title = "Features" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "features", Title = "Features" },
+            new() { Id = "bugs", Title = "Bugs" }
         };
 
         // Act - Configure the connector with rules
         connector.Configure(rules, sections);
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - Routing was applied (RoutedSections is populated when rules are configured)
         Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be set when rules are configured");
@@ -206,21 +207,21 @@ public class MockRepoConnectorTests
         connector.Configure(
             new List<RuleConfig>
             {
-                new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-                new RuleConfig { Route = "features" }
+                new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                new() { Route = "features" }
             },
             new List<SectionConfig>
             {
-                new SectionConfig { Id = "features", Title = "Features" },
-                new SectionConfig { Id = "bugs", Title = "Bugs" }
+                new() { Id = "features", Title = "Features" },
+                new() { Id = "bugs", Title = "Bugs" }
             });
 
         // Act - Get build information with routing rules configured
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - RoutedSections is populated with the configured sections
         Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should not be null when rules are configured");
-        Assert.AreEqual(2, buildInfo.RoutedSections.Count, "Should have two configured sections");
+        Assert.HasCount(2, buildInfo.RoutedSections, "Should have two configured sections");
 
         var sectionTitles = buildInfo.RoutedSections.Select(s => s.SectionTitle).ToList();
         Assert.Contains("Features", sectionTitles, "Features section should be present");
@@ -241,9 +242,12 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Act - Get build information without rules configured
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - RoutedSections should be null (legacy mode)
         Assert.IsNull(buildInfo.RoutedSections, "RoutedSections should be null when no rules are configured");
     }
 }
+
+
+

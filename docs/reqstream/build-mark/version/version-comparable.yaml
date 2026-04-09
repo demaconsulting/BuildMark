@@ -1,0 +1,52 @@
+---
+# Version Comparable Requirements
+
+sections:
+  - title: VersionComparable Requirements
+    requirements:
+      - id: BuildMark-VersionComparable-Comparison
+        title: >-
+          VersionComparable shall provide analytical comparison of semantic
+          versions with integer comparison for major.minor.patch components.
+        justification: |
+          Proper version ordering requires analytical comparison (1.2.3 < 1.11.2)
+          rather than lexicographic comparison. Using integer comparison ensures
+          correct ordering regardless of the number of digits in version components.
+        tests:
+          - VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
+          - VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
+          - VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
+          - VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
+          - VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
+          - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
+          - VersionComparable_Operators_LessThan_WorksCorrectly
+          - VersionComparable_Operators_GreaterThan_WorksCorrectly
+          - VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
+          - VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
+
+      - id: BuildMark-VersionComparable-PreReleaseComparison
+        title: >-
+          VersionComparable shall correctly order pre-release versions according
+          to Semantic Versioning specification.
+        justification: |
+          Pre-release versions must be ordered correctly per SemVer specification
+          to ensure proper dependency resolution and version range operations.
+          This includes handling complex pre-release identifiers with mixed
+          numeric and text components.
+        tests:
+          - VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
+          - VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
+          - VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
+          - VersionComparable_CompareTo_ShorterPreRelease_IsLess
+          - VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
+
+      - id: BuildMark-VersionComparable-Creation
+        title: >-
+          VersionComparable shall provide factory methods for creating instances
+          from version strings with integer parsing.
+        justification: |
+          Factory methods provide a clean API for creating VersionComparable
+          instances while isolating parsing logic and handling invalid inputs.
+        tests:
+          - VersionComparable_Create_ValidVersion_ReturnsInstance
+          - VersionComparable_TryCreate_InvalidVersion_ReturnsNull

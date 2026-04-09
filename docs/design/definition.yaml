@@ -7,6 +7,7 @@ resource-path:
   - docs/design/build-mark/configuration
   - docs/design/build-mark/self-test
   - docs/design/build-mark/utilities
+  - docs/design/build-mark/version
   - docs/design/build-mark/repo-connectors
   - docs/design/build-mark/repo-connectors/github
   - docs/design/build-mark/repo-connectors/mock
@@ -20,7 +21,7 @@ input-files:
   - docs/design/build-mark/build-notes/build-notes.md
   - docs/design/build-mark/build-notes/build-information.md
   - docs/design/build-mark/build-notes/item-info.md
-  - docs/design/build-mark/build-notes/version-tag.md
+  - docs/design/build-mark/version/version-tag.md
   - docs/design/build-mark/build-notes/web-link.md
   - docs/design/build-mark/cli/cli.md
   - docs/design/build-mark/cli/context.md
@@ -30,8 +31,12 @@ input-files:
   - docs/design/build-mark/utilities/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
   - docs/design/build-mark/utilities/process-runner.md
-  - docs/design/build-mark/utilities/version.md
-  - docs/design/build-mark/utilities/version-interval.md
+  - docs/design/build-mark/version/version.md
+  - docs/design/build-mark/version/version-comparable.md
+  - docs/design/build-mark/version/version-semantic.md
+  - docs/design/build-mark/version/version-tag.md
+  - docs/design/build-mark/version/version-interval.md
+  - docs/design/build-mark/version/version-commit-tag.md
   - docs/design/build-mark/repo-connectors/repo-connectors.md
   - docs/design/build-mark/repo-connectors/repo-connector-base.md
   - docs/design/build-mark/repo-connectors/item-router.md

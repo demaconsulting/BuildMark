@@ -1,4 +1,4 @@
----
+﻿---
 # ReviewMark Configuration File
 needs-review:
   - "**/*.cs"
@@ -74,9 +74,18 @@ reviews:
       - "docs/design/build-mark/utilities/utilities.md"
       - "test/**/Utilities/PathHelpersTests.cs"
       - "test/**/Utilities/ProcessRunnerTests.cs"
-      - "test/**/Utilities/VersionInfoTests.cs"
-      - "test/**/Utilities/VersionIntervalTests.cs"
-      - "test/**/Utilities/VersionIntervalSetTests.cs"
+
+  - id: BuildMark-Version
+    title: Review that BuildMark Version Satisfies Subsystem Requirements
+    paths:
+      - "docs/reqstream/build-mark/version/version.yaml"
+      - "docs/design/build-mark/version/**/*.md"
+      - "test/**/Version/VersionTests.cs"
+      - "test/**/Version/VersionComparableTests.cs"
+      - "test/**/Version/VersionSemanticTests.cs"
+      - "test/**/Version/VersionTagTests.cs"
+      - "test/**/Version/VersionIntervalTests.cs"
+      - "test/**/Version/VersionIntervalSetTests.cs"
 
   - id: BuildMark-RepoConnectors
     title: Review that BuildMark RepoConnectors Satisfies Subsystem Requirements
@@ -145,23 +154,50 @@ reviews:
       - "src/**/Utilities/ProcessRunner.cs"
       - "test/**/Utilities/ProcessRunnerTests.cs"
 
-  - id: BuildMark-Utilities-VersionInfo
-    title: Review that BuildMark Utilities VersionInfo Unit Implementation is Correct
+  # Unit reviews - Version subsystem
+  - id: BuildMark-Version-VersionComparable
+    title: Review that BuildMark Version VersionComparable Unit Implementation is Correct
     paths:
-      - "docs/reqstream/build-mark/utilities/version.yaml"
-      - "docs/design/build-mark/utilities/version.md"
-      - "src/**/Utilities/VersionInfo.cs"
-      - "test/**/Utilities/VersionInfoTests.cs"
+      - "docs/reqstream/build-mark/version/version-comparable.yaml"
+      - "docs/design/build-mark/version/version-comparable.md"
+      - "src/**/Version/VersionComparable.cs"
+      - "test/**/Version/VersionComparableTests.cs"
 
-  - id: BuildMark-Utilities-VersionInterval
-    title: Review that BuildMark Utilities VersionInterval Unit Implementation is Correct
+  - id: BuildMark-Version-VersionSemantic
+    title: Review that BuildMark Version VersionSemantic Unit Implementation is Correct
     paths:
-      - "docs/reqstream/build-mark/utilities/version-interval.yaml"
-      - "docs/design/build-mark/utilities/version-interval.md"
-      - "src/**/Utilities/VersionInterval.cs"
-      - "src/**/Utilities/VersionIntervalSet.cs"
-      - "test/**/Utilities/VersionIntervalTests.cs"
-      - "test/**/Utilities/VersionIntervalSetTests.cs"
+      - "docs/reqstream/build-mark/version/version-semantic.yaml"
+      - "docs/design/build-mark/version/version-semantic.md"
+      - "src/**/Version/VersionSemantic.cs"
+      - "test/**/Version/VersionSemanticTests.cs"
+
+  - id: BuildMark-Version-VersionTag
+    title: Review that BuildMark Version VersionTag Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/version/version-tag.yaml"
+      - "docs/design/build-mark/version/version-tag.md"
+      - "src/**/Version/VersionTag.cs"
+      - "test/**/Version/VersionTagTests.cs"
+
+  - id: BuildMark-Version-VersionInterval
+    title: Review that BuildMark Version VersionInterval Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/version/version-interval.yaml"
+      - "docs/design/build-mark/version/version-interval.md"
+      - "src/**/Version/VersionInterval.cs"
+      - "src/**/Version/VersionIntervalSet.cs"
+      - "test/**/Version/VersionIntervalTests.cs"
+      - "test/**/Version/VersionIntervalSetTests.cs"
+
+  - id: BuildMark-Version-VersionCommitTag
+    title: Review that BuildMark Version VersionCommitTag Unit Implementation is Correct
+    paths:
+      - "docs/reqstream/build-mark/version/version-commit-tag.yaml"
+      - "docs/design/build-mark/version/version-commit-tag.md"
+      - "src/**/Version/VersionCommitTag.cs"
+      - "test/**/BuildNotes/BuildInformationTests.cs"
+
+  # Unit reviews - BuildNotes subsystem
 
   - id: BuildMark-BuildNotes-BuildInformation
     title: Review that BuildMark BuildNotes BuildInformation Unit Implementation is Correct
@@ -177,14 +213,6 @@ reviews:
       - "docs/reqstream/build-mark/build-notes/item-info.yaml"
       - "docs/design/build-mark/build-notes/item-info.md"
       - "src/**/BuildNotes/ItemInfo.cs"
-
-  - id: BuildMark-BuildNotes-VersionTag
-    title: Review that BuildMark BuildNotes VersionTag Unit Implementation is Correct
-    paths:
-      - "docs/reqstream/build-mark/build-notes/version-tag.yaml"
-      - "docs/design/build-mark/build-notes/version-tag.md"
-      - "src/**/BuildNotes/VersionTag.cs"
-      - "test/**/BuildNotes/BuildInformationTests.cs"
 
   - id: BuildMark-BuildNotes-WebLink
     title: Review that BuildMark BuildNotes WebLink Unit Implementation is Correct

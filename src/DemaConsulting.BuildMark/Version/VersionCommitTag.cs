@@ -18,13 +18,13 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.BuildNotes;
+namespace DemaConsulting.BuildMark.Version;
 
 /// <summary>
 ///     Represents a version paired with its corresponding commit hash.
 /// </summary>
-/// <param name="VersionInfo">The version information.</param>
+/// <param name="VersionTag">The version tag information.</param>
 /// <param name="CommitHash">The git commit hash for this version.</param>
-public record VersionTag(VersionInfo VersionInfo, string CommitHash);
+public record VersionCommitTag(VersionTag VersionTag, string CommitHash);

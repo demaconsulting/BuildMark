@@ -18,6 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Globalization;
+
+using DemaConsulting.BuildMark.Version;
+
 namespace DemaConsulting.BuildMark.BuildNotes;
 
 /// <summary>
@@ -30,8 +34,8 @@ namespace DemaConsulting.BuildMark.BuildNotes;
 /// <param name="KnownIssues">Known issues (unfixed or fixed but not in this build).</param>
 /// <param name="CompleteChangelogLink">Optional link to the full changelog (null if not available).</param>
 public record BuildInformation(
-    VersionTag? BaselineVersionTag,
-    VersionTag CurrentVersionTag,
+    VersionCommitTag? BaselineVersionTag,
+    VersionCommitTag CurrentVersionTag,
     List<ItemInfo> Changes,
     List<ItemInfo> Bugs,
     List<ItemInfo> KnownIssues,
@@ -64,7 +68,7 @@ public record BuildInformation(
         var markdown = new System.Text.StringBuilder();
 
         // Add title section
-        markdown.AppendLine($"{heading} Build Report");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{heading} Build Report");
         markdown.AppendLine();
 
         // Add version information section
@@ -113,7 +117,7 @@ public record BuildInformation(
         foreach (var (_, sectionTitle, items) in RoutedSections!)
         {
             // Add section heading
-            markdown.AppendLine($"{subHeading} {sectionTitle}");
+            markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} {sectionTitle}");
             markdown.AppendLine();
 
             // Add item bullets or N/A placeholder when the section is empty
@@ -122,7 +126,7 @@ public record BuildInformation(
                 // Render each item as a markdown link bullet
                 foreach (var issue in items)
                 {
-                    markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
+                    markdown.AppendLine(CultureInfo.InvariantCulture, $"- [{issue.Id}]({issue.Url}) - {issue.Title}");
                 }
             }
             else
@@ -144,18 +148,18 @@ public record BuildInformation(
     private void AppendVersionInformation(System.Text.StringBuilder markdown, string subHeading)
     {
         // Add version information section header and table structure
-        markdown.AppendLine($"{subHeading} Version Information");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} Version Information");
         markdown.AppendLine();
         markdown.AppendLine("| Field | Value |");
         markdown.AppendLine("|-------|-------|");
-        markdown.AppendLine($"| **Version** | {CurrentVersionTag.VersionInfo.Tag} |");
-        markdown.AppendLine($"| **Commit Hash** | {CurrentVersionTag.CommitHash} |");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"| **Version** | {CurrentVersionTag.VersionTag.Tag} |");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"| **Commit Hash** | {CurrentVersionTag.CommitHash} |");
 
         // Add previous version information or N/A if this is the first release
         if (BaselineVersionTag != null)
         {
-            markdown.AppendLine($"| **Previous Version** | {BaselineVersionTag.VersionInfo.Tag} |");
-            markdown.AppendLine($"| **Previous Commit Hash** | {BaselineVersionTag.CommitHash} |");
+            markdown.AppendLine(CultureInfo.InvariantCulture, $"| **Previous Version** | {BaselineVersionTag.VersionTag.Tag} |");
+            markdown.AppendLine(CultureInfo.InvariantCulture, $"| **Previous Commit Hash** | {BaselineVersionTag.CommitHash} |");
         }
         else
         {
@@ -175,7 +179,7 @@ public record BuildInformation(
     private void AppendChangesSection(System.Text.StringBuilder markdown, string subHeading)
     {
         // Add changes section header
-        markdown.AppendLine($"{subHeading} Changes");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} Changes");
         markdown.AppendLine();
 
         // Add change items or N/A if no changes exist
@@ -183,7 +187,7 @@ public record BuildInformation(
         {
             foreach (var issue in Changes)
             {
-                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
+                markdown.AppendLine(CultureInfo.InvariantCulture, $"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
@@ -203,7 +207,7 @@ public record BuildInformation(
     private void AppendBugsFixedSection(System.Text.StringBuilder markdown, string subHeading)
     {
         // Add bugs fixed section header
-        markdown.AppendLine($"{subHeading} Bugs Fixed");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} Bugs Fixed");
         markdown.AppendLine();
 
         // Add bug items or N/A if no bugs were fixed
@@ -211,7 +215,7 @@ public record BuildInformation(
         {
             foreach (var issue in Bugs)
             {
-                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
+                markdown.AppendLine(CultureInfo.InvariantCulture, $"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
@@ -231,7 +235,7 @@ public record BuildInformation(
     private void AppendKnownIssuesSection(System.Text.StringBuilder markdown, string subHeading)
     {
         // Add known issues section header
-        markdown.AppendLine($"{subHeading} Known Issues");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} Known Issues");
         markdown.AppendLine();
 
         // Add known issue items or N/A if no known issues exist
@@ -239,7 +243,7 @@ public record BuildInformation(
         {
             foreach (var issue in KnownIssues)
             {
-                markdown.AppendLine($"- [{issue.Id}]({issue.Url}) - {issue.Title}");
+                markdown.AppendLine(CultureInfo.InvariantCulture, $"- [{issue.Id}]({issue.Url}) - {issue.Title}");
             }
         }
         else
@@ -259,9 +263,9 @@ public record BuildInformation(
     private void AppendCompleteChangelogSection(System.Text.StringBuilder markdown, string subHeading)
     {
         // Add full changelog section header and link
-        markdown.AppendLine($"{subHeading} Full Changelog");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"{subHeading} Full Changelog");
         markdown.AppendLine();
-        markdown.AppendLine($"See the full changelog at [{CompleteChangelogLink!.LinkText}]({CompleteChangelogLink.TargetUrl}).");
+        markdown.AppendLine(CultureInfo.InvariantCulture, $"See the full changelog at [{CompleteChangelogLink!.LinkText}]({CompleteChangelogLink.TargetUrl}).");
         markdown.AppendLine();
     }
 }

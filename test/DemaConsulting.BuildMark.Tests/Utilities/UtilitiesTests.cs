@@ -20,8 +20,9 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.Utilities;
+using DemaConsulting.BuildMark.Version;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Utilities;
 
 /// <summary>
 ///     Subsystem-level tests for the Utilities subsystem.
@@ -143,11 +144,11 @@ public class UtilitiesTests
     public void Utilities_Version_SimpleTag_ParsesCorrectly()
     {
         // Arrange & Act: parse a simple version tag
-        var version = VersionInfo.Create("v1.2.3");
+        var version = VersionTag.Create("v1.2.3");
 
         // Assert: version components are parsed correctly
         Assert.AreEqual("v1.2.3", version.Tag);
-        Assert.AreEqual("1.2.3", version.SemanticVersion);
+        Assert.AreEqual("1.2.3", version.Numbers);
         Assert.IsFalse(version.IsPreRelease);
     }
 
@@ -158,11 +159,11 @@ public class UtilitiesTests
     public void Utilities_Version_PreRelease_DetectsCorrectly()
     {
         // Arrange & Act: parse a pre-release version tag
-        var version = VersionInfo.Create("v2.0.0-beta.1");
+        var version = VersionTag.Create("v2.0.0-beta.1");
 
         // Assert: pre-release is detected
         Assert.IsTrue(version.IsPreRelease);
-        Assert.AreEqual("2.0.0", version.SemanticVersion);
+        Assert.AreEqual("2.0.0", version.Numbers);
         Assert.AreEqual("beta.1", version.PreRelease);
     }
 
@@ -173,7 +174,7 @@ public class UtilitiesTests
     public void Utilities_Version_InvalidTag_ReturnsNull()
     {
         // Arrange & Act: attempt to parse an invalid tag
-        var version = VersionInfo.TryCreate("not-a-version");
+        var version = VersionTag.TryCreate("not-a-version");
 
         // Assert: null is returned
         Assert.IsNull(version);
@@ -241,3 +242,6 @@ public class UtilitiesTests
         Assert.IsEmpty(intervalSet.Intervals);
     }
 }
+
+
+
