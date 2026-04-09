@@ -18,13 +18,13 @@ shared utilities used by concrete connectors.
 
 `RepoConnectorBase` provides:
 
-| Member                                    | Kind              | Description                                              |
-|-------------------------------------------|-------------------|----------------------------------------------------------|
-| `Configure(rules, sections)`              | Public method     | Stores routing rules and section definitions             |
-| `HasRules`                                | Protected bool    | Returns true when at least one rule has been configured  |
-| `ApplyRules(allItems)`                    | Protected method  | Routes items through configured rules into section list  |
-| `RunCommandAsync(command, arguments)`     | Protected virtual | Delegates shell commands to `ProcessRunner.RunAsync`     |
-| `FindVersionIndex(versions, normalized)`  | Protected static  | Locates a version by normalized version string           |
+| Member                                    | Kind              | Description                                          |
+|-------------------------------------------|-------------------|------------------------------------------------------|
+| `Configure(rules, sections)`              | Public method     | Stores routing rules and section definitions         |
+| `HasRules`                                | Protected bool    | True when at least one rule has been configured      |
+| `ApplyRules(allItems)`                    | Protected method  | Routes items into sections using configured rules    |
+| `RunCommandAsync(command, arguments)`     | Protected virtual | Delegates shell commands to `ProcessRunner.RunAsync` |
+| `FindVersionIndex(versions, normalized)`  | Protected static  | Locates a version by normalized version string       |
 
 ### `Configure(rules, sections)`
 

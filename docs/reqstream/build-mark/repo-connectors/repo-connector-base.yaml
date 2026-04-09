@@ -29,7 +29,9 @@ sections:
           - GitHubRepoConnector_Constructor_CreatesInstance
 
       - id: BuildMark-RepoConnectorBase-RulesRouting
-        title: The RepoConnectorBase class shall provide Configure and ApplyRules methods for rules-based section routing.
+        title: >-
+          The RepoConnectorBase class shall provide Configure and ApplyRules methods
+          for rules-based section routing.
         justification: |
           Centralizing routing configuration in the base class avoids duplicating
           Configure/ApplyRules logic in every concrete connector and ensures that

@@ -38,8 +38,8 @@ categorization into `Changes` and `Bugs` is used.
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                                              |
-|---------------------|-----------------------------------------------------------------------------------|
-| `RepoConnectorBase` | Base class providing `FindVersionIndex` and command delegation                    |
-| `Configure` (inherited) | Called by `Validation.RunRulesRouting` to test rules-based routing            |
-| `Validation`        | Instantiates `MockRepoConnector` directly for self-tests                          |
+| Unit / Subsystem         | Role                                                                              |
+|--------------------------|-----------------------------------------------------------------------------------|
+| `RepoConnectorBase`      | Base class providing `FindVersionIndex` and command delegation                    |
+| `Configure` (inherited)  | Called by `Validation.RunRulesRouting` to test rules-based routing                |
+| `Validation`             | Instantiates `MockRepoConnector` directly for self-tests                          |
