@@ -43,6 +43,7 @@ sections:
           - ItemControlsParser_Parse_WithUnknownKey_IgnoresKey
           - ItemControlsParser_Parse_WithUnrecognizedVisibilityValue_IgnoresValue
           - ItemControlsParser_Parse_WithUnrecognizedTypeValue_IgnoresValue
+          - ItemControlsParser_Parse_WithUnrecognizedAffectedVersionsValue_IgnoresValue
 
       - id: BuildMark-ItemControlsParser-HiddenBlock
         title: >-

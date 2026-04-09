@@ -67,7 +67,7 @@ public static class RepoConnectorFactory
     private static bool IsGitHubRepository()
     {
         // Get git remote URL and check if it contains github.com
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").Result;
+        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 }

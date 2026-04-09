@@ -160,7 +160,8 @@ public class MockRepoConnector : RepoConnectorBase
         // Use explicitly specified version if provided
         if (version != null)
         {
-            return (version, currentHash);
+            var versionHash = await GetHashForTagAsync(version.Tag);
+            return (version, versionHash);
         }
 
         // Validate that repository has tags

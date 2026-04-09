@@ -184,7 +184,11 @@ public static class ItemControlsParser
             // affected-versions
             else if (key == "affected-versions" && !string.IsNullOrEmpty(value))
             {
-                affectedVersions = VersionIntervalSet.Parse(value);
+                var parsed = VersionIntervalSet.Parse(value);
+                if (parsed.Intervals.Count > 0)
+                {
+                    affectedVersions = parsed;
+                }
             }
             // Unknown keys/values silently ignored
         }

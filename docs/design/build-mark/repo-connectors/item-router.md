@@ -23,8 +23,25 @@ items assigned to that section.
   sections
 - `sections` (`List<SectionConfig>`) — ordered list of report sections
 
-Items are matched against `RuleConfig` entries in order; the first matching rule
-wins. Items that do not match any rule are placed in a default section.
+#### Algorithm
+
+Rules are evaluated in order; the first matching rule wins. Items that do not match
+any rule are placed in the **default section**, which is the first entry in the
+`sections` list, or `"changes"` if the list is empty.
+
+A route value of `"suppressed"` (case-insensitive) causes the item to be omitted
+entirely from all sections.
+
+Sections not present in the configured `sections` list are created dynamically
+when a rule routes an item to an unknown section ID. This allows rules to introduce
+ad-hoc sections without requiring them to be pre-declared.
+
+#### Rule matching
+
+- A `null` `Match` block is a **catch-all** — the rule matches every item.
+- A non-null `Match` block may specify `Label` and/or `WorkItemType` filter lists.
+  Both lists are matched case-insensitively against the item's `Type` field.
+  All non-empty filter lists must match for the rule to apply.
 
 ## Interactions
 

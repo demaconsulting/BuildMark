@@ -47,13 +47,17 @@ public static class ItemRouter
         // Route each item to the first matching destination.
         foreach (var item in items)
         {
+            // Find the first rule that matches this item, defaulting to the first section.
             var matchingRule = rules.FirstOrDefault(rule => RuleMatches(rule, item));
             var destination = matchingRule?.Route ?? defaultSectionId;
+
+            // Suppressed items are omitted from all sections.
             if (string.Equals(destination, "suppressed", StringComparison.OrdinalIgnoreCase))
             {
                 continue;
             }
 
+            // Retrieve or create the destination bucket for the target section.
             if (!routedItems.TryGetValue(destination, out var bucket))
             {
                 bucket = [];

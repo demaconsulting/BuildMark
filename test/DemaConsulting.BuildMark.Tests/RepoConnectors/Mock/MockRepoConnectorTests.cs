@@ -79,6 +79,7 @@ public class MockRepoConnectorTests
         // Assert - Verify build information contains expected version
         Assert.IsNotNull(buildInfo);
         Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("unknown000hash000", buildInfo.CurrentVersionTag.CommitHash);
     }
 
     /// <summary>

@@ -86,4 +86,17 @@ public class RepoConnectorFactoryTests
         Assert.AreEqual("example-repo", forwardedConfig.Repo);
         Assert.AreEqual("https://api.github.com", forwardedConfig.BaseUrl);
     }
+
+    /// <summary>
+    ///     Test that Create throws NotSupportedException when Azure DevOps type is specified.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException()
+    {
+        // Arrange - create config with Azure DevOps connector type
+        var config = new ConnectorConfig { Type = "azure-devops" };
+
+        // Act and Assert - verify NotSupportedException is thrown
+        Assert.ThrowsExactly<NotSupportedException>(() => RepoConnectorFactory.Create(config));
+    }
 }

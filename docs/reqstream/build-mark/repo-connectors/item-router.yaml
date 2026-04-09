@@ -19,3 +19,7 @@ sections:
           - ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection
           - ItemRouter_Route_SuppressedRouteOmitsMatchingItem
           - RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections
+          - ItemRouter_Route_WithNullMatchBlock_MatchesAllItems
+          - ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
+          - ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection
+          - ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection

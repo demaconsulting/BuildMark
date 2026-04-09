@@ -264,4 +264,20 @@ public class ItemControlsParserTests
         Assert.IsNotNull(result.AffectedVersions);
         Assert.HasCount(1, result.AffectedVersions.Intervals);
     }
+
+    /// <summary>
+    ///     Test that Parse ignores an unrecognized affected-versions value and treats the field as absent.
+    /// </summary>
+    [TestMethod]
+    public void ItemControlsParser_Parse_WithUnrecognizedAffectedVersionsValue_IgnoresValue()
+    {
+        // Arrange - affected-versions value is not a valid version interval
+        var description = "```buildmark\naffected-versions: not-an-interval\n```";
+
+        // Act
+        var result = ItemControlsParser.Parse(description);
+
+        // Assert - unrecognized value is ignored; no valid fields → null result
+        Assert.IsNull(result);
+    }
 }
