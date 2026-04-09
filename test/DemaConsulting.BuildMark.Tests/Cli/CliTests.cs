@@ -20,7 +20,7 @@
 
 using DemaConsulting.BuildMark.Cli;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Cli;
 
 /// <summary>
 ///     Subsystem-level tests for the Cli subsystem.
@@ -307,3 +307,6 @@ public class CliTests
         Assert.AreEqual(1, context.ExitCode);
     }
 }
+
+
+

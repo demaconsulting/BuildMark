@@ -21,7 +21,7 @@
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.Configuration;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Configuration;
 
 /// <summary>
 ///     Subsystem-level tests for the Configuration subsystem.
@@ -133,7 +133,7 @@ public class ConfigurationSubsystemTests
             // Assert: result contains errors and Config is null
             Assert.IsNull(result.Config);
             Assert.IsTrue(result.HasErrors);
-            Assert.IsTrue(result.Issues.Count > 0);
+            Assert.IsNotEmpty(result.Issues);
             Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
         }
         finally
@@ -217,3 +217,6 @@ public class ConfigurationSubsystemTests
         }
     }
 }
+
+
+

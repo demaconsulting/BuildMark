@@ -22,7 +22,7 @@ using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the RepoConnectorFactory class.
@@ -100,3 +100,6 @@ public class RepoConnectorFactoryTests
         Assert.ThrowsExactly<NotSupportedException>(() => RepoConnectorFactory.Create(config));
     }
 }
+
+
+

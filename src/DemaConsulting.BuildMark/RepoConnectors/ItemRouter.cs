@@ -42,7 +42,7 @@ public static class ItemRouter
     {
         // Initialize the output buckets using the configured section order.
         var routedItems = sections.ToDictionary(section => section.Id, _ => new List<ItemInfo>());
-        var defaultSectionId = sections.FirstOrDefault()?.Id ?? "changes";
+        var defaultSectionId = sections.Count > 0 ? sections[0].Id : "changes";
 
         // Route each item to the first matching destination.
         foreach (var item in items)

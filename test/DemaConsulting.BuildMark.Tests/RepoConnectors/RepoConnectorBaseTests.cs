@@ -23,7 +23,7 @@ using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the RepoConnectorBase class.
@@ -50,12 +50,12 @@ public class RepoConnectorBaseTests
             IEnumerable<ItemInfo> items) => ApplyRules(items);
 
         /// <inheritdoc/>
-        public override Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
+        public override Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
         {
             // Return a minimal but valid BuildInformation for stub testing purposes
-            var versionInfo = version ?? VersionInfo.Create("1.0.0");
-            var versionTag = new VersionTag(versionInfo, "stub-hash");
-            return Task.FromResult(new BuildInformation(null, versionTag, [], [], [], null));
+            var versionTag = version ?? VersionTag.Create("1.0.0");
+            var versionCommitTag = new VersionCommitTag(versionTag, "stub-hash");
+            return Task.FromResult(new BuildInformation(null, versionCommitTag, [], [], [], null));
         }
     }
 
@@ -69,11 +69,11 @@ public class RepoConnectorBaseTests
         var connector = new TestableRepoConnector();
         var rules = new List<RuleConfig>
         {
-            new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
+            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
         };
         var sections = new List<SectionConfig>
         {
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "bugs", Title = "Bugs" }
         };
 
         // Act - Configure with non-empty rules
@@ -110,38 +110,41 @@ public class RepoConnectorBaseTests
         connector.Configure(
             new List<RuleConfig>
             {
-                new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-                new RuleConfig { Route = "features" }
+                new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                new() { Route = "features" }
             },
             new List<SectionConfig>
             {
-                new SectionConfig { Id = "features", Title = "Features" },
-                new SectionConfig { Id = "bugs", Title = "Bugs" }
+                new() { Id = "features", Title = "Features" },
+                new() { Id = "bugs", Title = "Bugs" }
             });
 
         // Define test items: one feature, one bug
         var items = new List<ItemInfo>
         {
-            new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2)
+            new("1", "Add feature X", "https://example.com/1", "feature", 1),
+            new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
         };
 
         // Act - Apply routing rules
         var sections = connector.ExposedApplyRules(items);
 
         // Assert - Two sections returned
-        Assert.AreEqual(2, sections.Count, "Should have two sections");
+        Assert.HasCount(2, sections, "Should have two sections");
 
         // Assert - Feature item routed to features section
         var featuresSection = sections.FirstOrDefault(s => s.SectionId == "features");
         Assert.IsNotNull(featuresSection.SectionTitle, "Features section should be present");
-        Assert.AreEqual(1, featuresSection.Items.Count, "Features section should have one item");
+        Assert.HasCount(1, featuresSection.Items, "Features section should have one item");
         Assert.AreEqual("1", featuresSection.Items[0].Id, "Feature item should be in features section");
 
         // Assert - Bug item routed to bugs section
         var bugsSection = sections.FirstOrDefault(s => s.SectionId == "bugs");
         Assert.IsNotNull(bugsSection.SectionTitle, "Bugs section should be present");
-        Assert.AreEqual(1, bugsSection.Items.Count, "Bugs section should have one item");
+        Assert.HasCount(1, bugsSection.Items, "Bugs section should have one item");
         Assert.AreEqual("2", bugsSection.Items[0].Id, "Bug item should be in bugs section");
     }
 }
+
+
+

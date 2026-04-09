@@ -22,7 +22,7 @@ using System.Net;
 using System.Text;
 using System.Text.Json;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Represents a mock commit for testing.
@@ -467,3 +467,6 @@ public sealed class MockGitHubGraphQLHttpMessageHandler : HttpMessageHandler
         };
     }
 }
+
+
+

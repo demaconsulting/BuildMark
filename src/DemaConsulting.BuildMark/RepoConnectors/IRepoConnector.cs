@@ -34,5 +34,5 @@ public interface IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
+    Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null);
 }

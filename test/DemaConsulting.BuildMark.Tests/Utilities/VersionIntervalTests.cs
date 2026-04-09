@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Tests;
-
 using DemaConsulting.BuildMark.Utilities;
+
+namespace DemaConsulting.BuildMark.Tests.Utilities;
 
 /// <summary>
 ///     Tests for VersionInterval.Parse method.
@@ -309,7 +309,7 @@ public class VersionIntervalTests
     {
         // Arrange
         var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
-        var version = VersionInfo.Create("v1.5.0-beta.1");
+        var version = VersionTag.Create("v1.5.0-beta.1");
 
         // Act
         var result = interval!.Contains(version);
@@ -317,4 +317,74 @@ public class VersionIntervalTests
         // Assert
         Assert.IsTrue(result);
     }
+
+    /// <summary>
+    ///     Test that Contains correctly handles pre-release version bounds.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_PreReleaseBounds_HandlesCorrectly()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.2.0-rc.1,1.2.0]");
+
+        // Act & Assert
+        Assert.IsTrue(interval!.Contains("1.2.0-rc.1"));  // Equal to inclusive lower bound
+        Assert.IsTrue(interval!.Contains("1.2.0-rc.2"));  // Between bounds (rc.2 > rc.1)
+        Assert.IsTrue(interval!.Contains("1.2.0"));       // Equal to inclusive upper bound
+        Assert.IsFalse(interval!.Contains("1.2.0-alpha.1")); // Before lower bound (alpha < rc)
+        Assert.IsFalse(interval!.Contains("1.2.1"));     // After upper bound
+        Assert.IsFalse(interval!.Contains("1.1.9"));     // Before lower bound
+    }
+
+    /// <summary>
+    ///     Test that Contains correctly handles pre-release to pre-release intervals.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_PreReleaseToPreRelease_HandlesCorrectly()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.2.0-alpha.1,1.2.0-rc.1)");
+
+        // Act & Assert
+        Assert.IsTrue(interval!.Contains("1.2.0-alpha.1"));  // Equal to inclusive lower bound
+        Assert.IsTrue(interval!.Contains("1.2.0-beta.1"));   // Between bounds
+        Assert.IsFalse(interval!.Contains("1.2.0-rc.1"));   // Equal to exclusive upper bound
+        Assert.IsFalse(interval!.Contains("1.2.0"));        // After upper bound (release > pre-release)
+    }
+
+    /// <summary>
+    ///     Test that Contains correctly orders pre-release versions lexicographically.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_PreReleaseOrdering_UsesLexicographicComparison()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.0.0-alpha.5,1.0.0-alpha.10]");
+
+        // Act & Assert
+        Assert.IsTrue(interval!.Contains("1.0.0-alpha.5"));   // Equal to lower bound
+        Assert.IsTrue(interval!.Contains("1.0.0-alpha.6"));   // Between bounds
+        Assert.IsTrue(interval!.Contains("1.0.0-alpha.10"));  // Equal to upper bound
+        Assert.IsFalse(interval!.Contains("1.0.0-alpha.4"));  // Before lower bound
+        Assert.IsFalse(interval!.Contains("1.0.0-alpha.11")); // After upper bound
+    }
+
+    /// <summary>
+    ///     Test that VersionComparable overload works with pre-release versions.
+    /// </summary>
+    [TestMethod]
+    public void VersionInterval_Contains_VersionComparable_HandlesPreRelease()
+    {
+        // Arrange
+        var interval = VersionInterval.Parse("[1.2.0-rc.1,1.2.0]");
+        var preReleaseVersion = VersionComparable.Create("1.2.0-rc.2");
+        var releaseVersion = VersionComparable.Create("1.2.0");
+
+        // Act & Assert
+        Assert.IsTrue(interval!.Contains(preReleaseVersion));
+        Assert.IsTrue(interval!.Contains(releaseVersion));
+    }
 }
+
+
+

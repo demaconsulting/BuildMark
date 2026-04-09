@@ -1,15 +1,15 @@
 ---
-# Software Unit Requirements for the VersionTag Class
+# Software Unit Requirements for the VersionCommitTag Class
 #
-# VersionTag pairs a parsed BuildMark Version with the commit hash for the tag so
+# VersionCommitTag pairs a parsed BuildMark Version with the commit hash for the tag so
 # BuildInformation can identify the baseline and current release boundaries.
 
 sections:
-  - title: VersionTag Unit Requirements
+  - title: VersionCommitTag Unit Requirements
     requirements:
-      - id: BuildMark-VersionTag-Record
+      - id: BuildMark-VersionCommitTag-Record
         title: >-
-          The VersionTag record shall store a parsed version together with the
+          The VersionCommitTag record shall store a parsed version together with the
           commit hash associated with that version tag.
         justification: |
           BuildMark reports both the semantic version and the commit boundary for

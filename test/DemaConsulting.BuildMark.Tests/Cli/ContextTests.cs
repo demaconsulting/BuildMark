@@ -20,7 +20,7 @@
 
 using DemaConsulting.BuildMark.Cli;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Cli;
 
 /// <summary>
 ///     Tests for the Context class.
@@ -803,3 +803,6 @@ public class ContextTests
         }
     }
 }
+
+
+

@@ -21,7 +21,7 @@
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Utilities;
 
 /// <summary>
 ///     Tests for the ProcessRunner class.
@@ -163,3 +163,6 @@ public class ProcessRunnerTests
         Assert.Contains("failed with exit code", exception.Message);
     }
 }
+
+
+

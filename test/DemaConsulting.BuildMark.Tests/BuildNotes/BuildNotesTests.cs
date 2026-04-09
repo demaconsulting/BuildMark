@@ -18,11 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.BuildNotes;
 
 /// <summary>
 ///     Subsystem-level tests for the BuildNotes subsystem.
@@ -38,7 +37,7 @@ public class BuildNotesTests
     {
         // Arrange: obtain a BuildInformation model from the mock connector
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act: render the model to markdown
         var markdown = buildInfo.ToMarkdown();
@@ -60,7 +59,7 @@ public class BuildNotesTests
     {
         // Arrange: obtain a BuildInformation model that has known issues
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act: render with known issues enabled
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -79,7 +78,7 @@ public class BuildNotesTests
     {
         // Arrange: obtain a BuildInformation model that has a changelog link
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act: render to markdown
         var markdown = buildInfo.ToMarkdown();
@@ -89,3 +88,6 @@ public class BuildNotesTests
         Assert.Contains("ver-1.1.0...v2.0.0", markdown);
     }
 }
+
+
+

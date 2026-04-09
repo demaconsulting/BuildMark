@@ -18,13 +18,12 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 
 /// <summary>
 ///     Tests for the GitHubRepoConnector class.
@@ -109,11 +108,11 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
         Assert.IsNotNull(buildInfo.Changes);
         Assert.IsNotNull(buildInfo.Bugs);
@@ -150,16 +149,16 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("commit3", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have selected v1.1.0 as baseline (previous non-prerelease)
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link
@@ -214,11 +213,11 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
 
         // PRs without linked issues are treated based on their labels
         // PR 100 with "bug" label should be in bugs
@@ -278,7 +277,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -328,16 +327,16 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-rc.1
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-rc.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-rc.1"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("a1b2c3d4", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have skipped 1.1.2-beta.2 (same hash) and selected 1.1.2-beta.1 (different hash)
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("734713bc", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link between beta.1 and rc.1
@@ -380,16 +379,16 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("commit5", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have skipped all pre-releases and selected 1.1.1
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("commit1", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link between 1.1.1 and 1.1.2
@@ -426,16 +425,16 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-beta.2 which doesn't exist in releases yet
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-beta.2"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-beta.2"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should use most recent release with different hash
         Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
     }
 
@@ -470,11 +469,11 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - Process 1.1.2-rc.1
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("1.1.2-rc.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-rc.1"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have null baseline since all previous versions are on the same hash
@@ -525,11 +524,11 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act - This must not throw ArgumentException due to duplicate dictionary key
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - Build info should be valid and not null
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual(sharedMergeCommitSha, buildInfo.CurrentVersionTag.CommitHash);
         Assert.IsNotNull(buildInfo.Changes);
         Assert.IsNotNull(buildInfo.Bugs);
@@ -568,7 +567,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - PR with "debugging" label must NOT be classified as a bug
         Assert.IsNotNull(buildInfo);
@@ -605,7 +604,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - Open issue with "debugging" label must NOT be classified as a known issue
         Assert.IsNotNull(buildInfo);
@@ -637,7 +636,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -669,7 +668,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -702,7 +701,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -735,7 +734,7 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
         Assert.IsNotNull(buildInfo);
@@ -759,13 +758,13 @@ public class GitHubRepoConnectorTests
         var connector = new GitHubRepoConnector();
         var rules = new List<RuleConfig>
         {
-            new RuleConfig { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
-            new RuleConfig { Route = "features" }
+            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+            new() { Route = "features" }
         };
         var sections = new List<SectionConfig>
         {
-            new SectionConfig { Id = "features", Title = "Features" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "features", Title = "Features" },
+            new() { Id = "bugs", Title = "Bugs" }
         };
 
         // Act - Configure the connector with rules (should not throw)
@@ -819,7 +818,7 @@ public class GitHubRepoConnectorTests
         connector.Configure(rules, sections);
 
         // Act: retrieve build information
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: RoutedSections is populated when rules are configured
         Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be populated when rules are configured");
@@ -840,3 +839,6 @@ public class GitHubRepoConnectorTests
         Assert.AreEqual("Bug PR", bugsSection.Items[0].Title);
     }
 }
+
+
+

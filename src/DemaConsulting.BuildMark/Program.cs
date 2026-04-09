@@ -190,12 +190,12 @@ internal static class Program
         }
 
         // Parse build version if provided
-        VersionInfo? buildVersion = null;
+        VersionTag? buildVersion = null;
         if (context.BuildVersion != null)
         {
             try
             {
-                buildVersion = VersionInfo.Create(context.BuildVersion);
+                buildVersion = VersionTag.Create(context.BuildVersion);
             }
             catch (ArgumentException)
             {
@@ -218,11 +218,11 @@ internal static class Program
         }
 
         // Display build information summary
-        context.WriteLine($"Build Version: {buildInfo.CurrentVersionTag.VersionInfo.Tag}");
+        context.WriteLine($"Build Version: {buildInfo.CurrentVersionTag.VersionTag.Tag}");
         context.WriteLine($"Commit Hash: {buildInfo.CurrentVersionTag.CommitHash}");
         if (buildInfo.BaselineVersionTag != null)
         {
-            context.WriteLine($"Previous Version: {buildInfo.BaselineVersionTag.VersionInfo.Tag}");
+            context.WriteLine($"Previous Version: {buildInfo.BaselineVersionTag.VersionTag.Tag}");
             context.WriteLine($"Previous Commit Hash: {buildInfo.BaselineVersionTag.CommitHash}");
         }
         context.WriteLine($"Changes: {buildInfo.Changes.Count}");

@@ -45,3 +45,26 @@ sections:
         tests:
           - VersionInfo_TryCreate_InvalidTag_ReturnsNull
           - VersionInfo_Create_InvalidTag_ThrowsArgumentException
+
+      - id: BuildMark-Version-Comparison
+        title: >-
+          The VersionInfo class shall support analytical version comparison through
+          IComparable<VersionInfo> and standard comparison operators.
+        justification: |
+          Version ordering is essential for sorting releases, determining version
+          ranges, and creating chronological reports. Analytical comparison treats
+          version numbers numerically (1.2.3 < 1.11.2) rather than lexicographically,
+          while pre-release versions are ordered before their corresponding releases.
+        tests:
+          - VersionInfo_CompareTo_IdenticalVersions_ReturnsZero
+          - VersionInfo_CompareTo_FirstVersionLess_ReturnsNegative
+          - VersionInfo_CompareTo_FirstVersionGreater_ReturnsPositive
+          - VersionInfo_CompareTo_NumericComparison_CorrectOrdering
+          - VersionInfo_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering
+          - VersionInfo_CompareTo_PreReleaseLexicographic_CorrectOrdering
+          - VersionInfo_CompareTo_Null_ReturnsPositive
+          - VersionInfo_LessThanOperator_FirstVersionLess_ReturnsTrue
+          - VersionInfo_LessThanOrEqualOperator_Works_ReturnsCorrectly
+          - VersionInfo_GreaterThanOperator_FirstVersionGreater_ReturnsTrue
+          - VersionInfo_GreaterThanOrEqualOperator_Works_ReturnsCorrectly
+          - VersionInfo_ComparisonOperators_Null_HandledCorrectly

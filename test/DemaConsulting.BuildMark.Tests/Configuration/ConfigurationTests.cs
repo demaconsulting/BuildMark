@@ -21,7 +21,7 @@
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.Configuration;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.Configuration;
 
 /// <summary>
 ///     Tests for configuration loading and reporting.
@@ -202,3 +202,6 @@ public class ConfigurationTests
         Assert.AreEqual(1, context.ExitCode);
     }
 }
+
+
+

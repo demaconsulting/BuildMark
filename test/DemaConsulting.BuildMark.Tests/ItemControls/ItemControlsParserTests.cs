@@ -18,9 +18,9 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-namespace DemaConsulting.BuildMark.Tests;
-
 using DemaConsulting.BuildMark.RepoConnectors;
+
+namespace DemaConsulting.BuildMark.Tests.ItemControls;
 
 /// <summary>
 ///     Unit tests for ItemControlsParser.Parse method.
@@ -281,3 +281,6 @@ public class ItemControlsParserTests
         Assert.IsNull(result);
     }
 }
+
+
+

@@ -19,13 +19,13 @@
 // SOFTWARE.
 
 using System.Runtime.InteropServices;
-using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Subsystem tests for the RepoConnectors subsystem.
@@ -72,11 +72,11 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act: retrieve build information for v1.0.0
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
         Assert.IsNotNull(buildInfo.Changes);
         Assert.IsNotNull(buildInfo.Bugs);
@@ -111,13 +111,13 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act: retrieve build information for v2.0.0
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: v1.1.0 is selected as baseline and a changelog link is generated
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.IsNotNull(buildInfo.BaselineVersionTag, "Previous version should be identified");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
         Assert.IsNotNull(buildInfo.CompleteChangelogLink, "Changelog link should be generated");
         Assert.Contains("v1.1.0...v2.0.0", buildInfo.CompleteChangelogLink.TargetUrl);
     }
@@ -167,7 +167,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert: feature PR is in Changes, bug PR is in Bugs
         Assert.IsNotNull(buildInfo);
@@ -206,7 +206,7 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: open issue surfaces as a known issue
         Assert.IsNotNull(buildInfo);
@@ -247,13 +247,13 @@ public class RepoConnectorsTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: baseline should be v1.1.0 (the last release), not v2.0.0-rc.1 (a pre-release)
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionInfo.FullVersion);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
         Assert.IsNotNull(buildInfo.BaselineVersionTag, "Baseline version should be set");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionInfo.FullVersion,
+        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion,
             "Release version should skip pre-releases when selecting baseline");
     }
 
@@ -331,14 +331,14 @@ public class RepoConnectorsTests
     {
         // Arrange: create connector and request a known version
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("2.0.0");
+        var version = VersionTag.Create("2.0.0");
 
         // Act: retrieve build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert: current version tag matches the requested version
         Assert.IsNotNull(buildInfo);
-        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // Actual repository tag
     }
 
     /// <summary>
@@ -349,7 +349,7 @@ public class RepoConnectorsTests
     {
         // Arrange: create connector
         var connector = new MockRepoConnector();
-        var version = VersionInfo.Create("2.0.0");
+        var version = VersionTag.Create("2.0.0");
 
         // Act: retrieve build information
         var buildInfo = await connector.GetBuildInformationAsync(version);
@@ -615,19 +615,19 @@ public class RepoConnectorsTests
     public void RepoConnectors_ItemRouter_MatchingRule_RoutesToSection()
     {
         // Arrange: define sections and rules, then create items to route
-        var sections = new List<Configuration.SectionConfig>
+        var sections = new List<BuildMark.Configuration.SectionConfig>
         {
             new() { Id = "features", Title = "Features" },
             new() { Id = "bugs", Title = "Bugs Fixed" }
         };
 
-        var rules = new List<Configuration.RuleConfig>
+        var rules = new List<BuildMark.Configuration.RuleConfig>
         {
-            new() { Match = new Configuration.RuleMatchConfig { Label = { "feature" } }, Route = "features" },
-            new() { Match = new Configuration.RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
+            new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "feature" } }, Route = "features" },
+            new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
         };
 
-        var items = new List<BuildNotes.ItemInfo>
+        var items = new List<BuildMark.BuildNotes.ItemInfo>
         {
             new("1", "Add feature X", "https://example.com/1", "feature", 1),
             new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
@@ -650,17 +650,17 @@ public class RepoConnectorsTests
     public void RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem()
     {
         // Arrange: define a section and a suppression rule
-        var sections = new List<Configuration.SectionConfig>
+        var sections = new List<BuildMark.Configuration.SectionConfig>
         {
             new() { Id = "changes", Title = "Changes" }
         };
 
-        var rules = new List<Configuration.RuleConfig>
+        var rules = new List<BuildMark.Configuration.RuleConfig>
         {
-            new() { Match = new Configuration.RuleMatchConfig { Label = { "documentation" } }, Route = "suppressed" }
+            new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "documentation" } }, Route = "suppressed" }
         };
 
-        var items = new List<BuildNotes.ItemInfo>
+        var items = new List<BuildMark.BuildNotes.ItemInfo>
         {
             new("3", "Update docs", "https://example.com/3", "documentation", 3)
         };
@@ -672,3 +672,6 @@ public class RepoConnectorsTests
         Assert.IsEmpty(routed["changes"]);
     }
 }
+
+
+

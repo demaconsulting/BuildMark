@@ -22,7 +22,7 @@ using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 
 /// <summary>
 ///     Tests for the ItemRouter class.
@@ -39,17 +39,17 @@ public class ItemRouterTests
         // Arrange
         List<ItemInfo> items =
         [
-            new ItemInfo("1", "Feature", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Bug", "https://example.com/2", "bug", 2)
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
         ];
         List<SectionConfig> sections =
         [
-            new SectionConfig { Id = "changes", Title = "Changes" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
         ];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "bug" } },
                 Route = "bugs"
@@ -73,11 +73,11 @@ public class ItemRouterTests
     public void ItemRouter_Route_SuppressedRouteOmitsMatchingItem()
     {
         // Arrange
-        List<ItemInfo> items = [new ItemInfo("1", "Internal", "https://example.com/1", "internal", 1)];
-        List<SectionConfig> sections = [new SectionConfig { Id = "changes", Title = "Changes" }];
+        List<ItemInfo> items = [new("1", "Internal", "https://example.com/1", "internal", 1)];
+        List<SectionConfig> sections = [new() { Id = "changes", Title = "Changes" }];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "internal" } },
                 Route = "suppressed"
@@ -100,17 +100,17 @@ public class ItemRouterTests
         // Arrange
         List<ItemInfo> items =
         [
-            new ItemInfo("1", "Feature", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Bug", "https://example.com/2", "bug", 2)
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
         ];
         List<SectionConfig> sections =
         [
-            new SectionConfig { Id = "changes", Title = "Changes" },
-            new SectionConfig { Id = "other", Title = "Other" }
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "other", Title = "Other" }
         ];
         List<RuleConfig> rules =
         [
-            new RuleConfig { Match = null, Route = "other" }
+            new() { Match = null, Route = "other" }
         ];
 
         // Act
@@ -130,17 +130,17 @@ public class ItemRouterTests
         // Arrange
         List<ItemInfo> items =
         [
-            new ItemInfo("1", "Feature", "https://example.com/1", "feature", 1),
-            new ItemInfo("2", "Bug", "https://example.com/2", "bug", 2)
+            new("1", "Feature", "https://example.com/1", "feature", 1),
+            new("2", "Bug", "https://example.com/2", "bug", 2)
         ];
         List<SectionConfig> sections =
         [
-            new SectionConfig { Id = "changes", Title = "Changes" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
         ];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { WorkItemType = { "bug" } },
                 Route = "bugs"
@@ -164,15 +164,15 @@ public class ItemRouterTests
     public void ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection()
     {
         // Arrange
-        List<ItemInfo> items = [new ItemInfo("1", "Unknown", "https://example.com/1", "unknown", 1)];
+        List<ItemInfo> items = [new("1", "Unknown", "https://example.com/1", "unknown", 1)];
         List<SectionConfig> sections =
         [
-            new SectionConfig { Id = "changes", Title = "Changes" },
-            new SectionConfig { Id = "bugs", Title = "Bugs" }
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
         ];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "bug" } },
                 Route = "bugs"
@@ -195,11 +195,11 @@ public class ItemRouterTests
     public void ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection()
     {
         // Arrange
-        List<ItemInfo> items = [new ItemInfo("1", "Feature", "https://example.com/1", "feature", 1)];
-        List<SectionConfig> sections = [new SectionConfig { Id = "changes", Title = "Changes" }];
+        List<ItemInfo> items = [new("1", "Feature", "https://example.com/1", "feature", 1)];
+        List<SectionConfig> sections = [new() { Id = "changes", Title = "Changes" }];
         List<RuleConfig> rules =
         [
-            new RuleConfig
+            new()
             {
                 Match = new RuleMatchConfig { Label = { "feature" } },
                 Route = "new-section"
@@ -216,3 +216,6 @@ public class ItemRouterTests
         Assert.AreEqual("1", routedItems["new-section"][0].Id);
     }
 }
+
+
+

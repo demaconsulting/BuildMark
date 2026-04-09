@@ -42,7 +42,7 @@ public static class BuildMarkConfigReader
         // Read the configuration text before parsing.
         var rawLines = await File.ReadAllLinesAsync(filePath).ConfigureAwait(false);
         var lines = CreateLines(rawLines);
-        var issues = new List<ConfigurationIssue>();
+        List<ConfigurationIssue> issues = new();
         var config = ParseFile(filePath, lines, issues);
 
         // Return null config whenever parsing produced one or more errors.
@@ -72,7 +72,7 @@ public static class BuildMarkConfigReader
     private static List<YamlLine> CreateLines(IReadOnlyList<string> rawLines)
     {
         // Keep only non-empty, non-comment lines while retaining source line numbers.
-        var lines = new List<YamlLine>();
+        List<YamlLine> lines = new();
         for (var index = 0; index < rawLines.Count; index++)
         {
             var line = StripInlineComment(rawLines[index]);

@@ -24,7 +24,7 @@ shared utilities used by concrete connectors.
 | `HasRules`                                | Protected bool    | True when at least one rule has been configured      |
 | `ApplyRules(allItems)`                    | Protected method  | Routes items into sections using configured rules    |
 | `RunCommandAsync(command, arguments)`     | Protected virtual | Delegates shell commands to `ProcessRunner.RunAsync` |
-| `FindVersionIndex(versions, normalized)`  | Protected static  | Locates a version by normalized version string       |
+| `FindVersionIndex(versions, targetVersion)`| Protected static  | Locates a version using semantic VersionComparable equality |
 
 ### `Configure(rules, sections)`
 
@@ -44,6 +44,19 @@ Routes the provided items using `ItemRouter.Route`, then assembles an ordered li
 of `(SectionId, SectionTitle, Items)` tuples following the configured section order.
 Any items routed to section IDs not in the configured section list are appended at
 the end using the section ID as the display title.
+
+### `FindVersionIndex(versions, targetVersion)`
+
+Protected static method that finds the index of a `targetVersion` within a list of 
+`VersionTag` instances using **semantic VersionComparable equality**. This design
+ensures that version tags with different prefixes but identical semantic versions
+are considered equal:
+
+- `"v1.2.3"` matches `"VER1.2.3"` and `"Release-1.2.3"`
+- Comparison uses `versions[i].Semantic.Comparable.Equals(targetVersion.Semantic.Comparable)`
+- This prevents version matching failures across different repository tag conventions
+
+Returns the zero-based index if found, or -1 if no semantically equivalent version exists.
 
 The `RunCommandAsync` method is `virtual` so that test subclasses can override it
 with mock implementations that return fixed strings without spawning real processes.

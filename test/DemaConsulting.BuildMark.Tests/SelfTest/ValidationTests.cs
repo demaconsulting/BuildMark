@@ -19,11 +19,10 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Cli;
-using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.SelfTest;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.SelfTest;
 
 /// <summary>
 ///     Tests for the Validation class.
@@ -238,3 +237,6 @@ public class ValidationTests
         Assert.AreEqual(0, context.ExitCode, "Validation should succeed with exit code 0");
     }
 }
+
+
+

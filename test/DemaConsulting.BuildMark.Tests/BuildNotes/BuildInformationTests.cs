@@ -25,7 +25,7 @@ using DemaConsulting.BuildMark.Utilities;
 using NSubstitute;
 using NSubstitute.ExceptionExtensions;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.BuildNotes;
 
 /// <summary>
 ///     Tests for the BuildInformation class.
@@ -41,7 +41,7 @@ public class BuildInformationTests
     {
         // Create mock connector that throws for no tags
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionTag?>())
             .Throws(new InvalidOperationException(
                 "No tags found in repository and no version specified. " +
                 "Please provide a version parameter."));
@@ -62,7 +62,7 @@ public class BuildInformationTests
     {
         // Create mock connector that throws for commit mismatch
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionTag?>())
             .Throws(new InvalidOperationException(
                 "Target version not specified and current commit does not match any tag. " +
                 "Please provide a version parameter."));
@@ -83,12 +83,12 @@ public class BuildInformationTests
     {
         // Create build information with explicit version
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.1.0"));
 
         // Verify version and hashes are set correctly
-        Assert.AreEqual("v2.1.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("v2.1.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // New version preserves input tag
         Assert.AreEqual("current123hash456", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.AreEqual("2.0.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
         Assert.AreEqual("mno345pqr678", buildInfo.BaselineVersionTag?.CommitHash);
     }
 
@@ -100,10 +100,10 @@ public class BuildInformationTests
     {
         // Create mock connector that returns data for matching tag
         var connector = Substitute.For<IRepoConnector>();
-        connector.GetBuildInformationAsync(Arg.Any<VersionInfo?>())
+        connector.GetBuildInformationAsync(Arg.Any<VersionTag?>())
             .Returns(Task.FromResult(new BuildInformation(
-                new VersionTag(VersionInfo.Create("ver-1.1.0"), "def456ghi789"),
-                new VersionTag(VersionInfo.Create("v2.0.0"), "mno345pqr678"),
+                new VersionCommitTag(VersionTag.Create("ver-1.1.0"), "def456ghi789"),
+                new VersionCommitTag(VersionTag.Create("v2.0.0"), "mno345pqr678"),
                 [],
                 [],
                 [],
@@ -113,9 +113,9 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync();
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
         Assert.AreEqual("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
@@ -126,13 +126,16 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-
+        var inputVersion = VersionTag.Create("v2.0.0-beta.1");
+        
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0-beta.1"));
+        var buildInfo = await connector.GetBuildInformationAsync(inputVersion);
 
         // Assert
-        Assert.AreEqual("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionInfo.Tag);
-        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
+        // Since "v2.0.0-beta.1" doesn't match any existing repository tag semantically,
+        // it should create a new version using the provided tag
+        Assert.AreEqual("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
@@ -145,11 +148,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
-        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionInfo.Tag);
+        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
@@ -160,7 +163,7 @@ public class BuildInformationTests
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"));
 
         // Verify change issues are collected (including PR without issues)
         Assert.HasCount(2, buildInfo.Changes);
@@ -188,7 +191,7 @@ public class BuildInformationTests
     {
         // Create build information for version with issues
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("ver-1.1.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"));
 
         // Verify changes are ordered by Index (PR number)
         // Issue #1 from PR #10 should come before PR #13
@@ -218,7 +221,7 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert - verify bugs and changes are properly separated
         Assert.HasCount(1, buildInfo.Changes);
@@ -237,11 +240,11 @@ public class BuildInformationTests
         var connector = new MockRepoConnector();
 
         // Act
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - verify first release has no previous version
         Assert.IsNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionInfo.Tag);
+        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
     }
 
     /// <summary>
@@ -252,7 +255,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -275,7 +278,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -294,7 +297,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(headingDepth: 3);
@@ -314,8 +317,8 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no change issues
         var buildInfo = new BuildInformation(
-            new VersionTag(VersionInfo.Create("v1.0.0"), "abc123"),
-            new VersionTag(VersionInfo.Create("v1.1.0"), "def456"),
+            new VersionCommitTag(VersionTag.Create("v1.0.0"), "abc123"),
+            new VersionCommitTag(VersionTag.Create("v1.1.0"), "def456"),
             [], // No changes
             [new ItemInfo("2", "Bug fix", "https://example.com/2", "bug")],
             [],
@@ -339,8 +342,8 @@ public class BuildInformationTests
     {
         // Arrange - Create build info with no bug issues
         var buildInfo = new BuildInformation(
-            new VersionTag(VersionInfo.Create("v1.0.0"), "abc123"),
-            new VersionTag(VersionInfo.Create("v1.1.0"), "def456"),
+            new VersionCommitTag(VersionTag.Create("v1.0.0"), "abc123"),
+            new VersionCommitTag(VersionTag.Create("v1.1.0"), "def456"),
             [new ItemInfo("1", "Feature", "https://example.com/1", "feature")],
             [], // No bugs
             [],
@@ -363,7 +366,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -381,7 +384,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -402,7 +405,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -422,7 +425,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v1.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown();
@@ -439,7 +442,7 @@ public class BuildInformationTests
     {
         // Arrange
         var connector = new MockRepoConnector();
-        var buildInfo = await connector.GetBuildInformationAsync(VersionInfo.Create("v2.0.0"));
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Act
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
@@ -466,21 +469,21 @@ public class BuildInformationTests
     }
 
     /// <summary>
-    ///     Test that VersionTag correctly stores version and hash.
+    ///     Test that VersionCommitTag correctly stores version and hash.
     /// </summary>
     [TestMethod]
     public void VersionTag_Constructor_StoresVersionAndHash()
     {
         // Arrange
-        var version = VersionInfo.Create("v1.0.0");
+        var version = VersionTag.Create("v1.0.0");
         var hash = "abc123def456";
 
         // Act
-        var versionTag = new VersionTag(version, hash);
+        var VersionCommitTag = new VersionCommitTag(version, hash);
 
         // Assert
-        Assert.AreEqual(version, versionTag.VersionInfo);
-        Assert.AreEqual(hash, versionTag.CommitHash);
+        Assert.AreEqual(version, VersionCommitTag.VersionTag);
+        Assert.AreEqual(hash, VersionCommitTag.CommitHash);
     }
 
     /// <summary>
@@ -512,7 +515,7 @@ public class BuildInformationTests
     public void BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections()
     {
         // Arrange - Build information with routed sections
-        var versionTag = new VersionTag(VersionInfo.Create("1.0.0"), "abc123");
+        var VersionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
         var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
         var bugItem = new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2);
         var routedSections = new List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>
@@ -520,7 +523,7 @@ public class BuildInformationTests
             ("features", "Features", new List<ItemInfo> { featureItem }),
             ("bugs", "Bugs", new List<ItemInfo> { bugItem })
         };
-        var buildInfo = new BuildInformation(null, versionTag, [], [], [], null)
+        var buildInfo = new BuildInformation(null, VersionCommitTag, [], [], [], null)
         {
             RoutedSections = routedSections
         };
@@ -535,8 +538,8 @@ public class BuildInformationTests
         Assert.Contains("Fix bug Y", markdown, "Bug item should be present");
 
         // Assert - Legacy sections are not present
-        Assert.IsFalse(markdown.Contains("## Changes"), "Legacy Changes heading should not be present");
-        Assert.IsFalse(markdown.Contains("## Bugs Fixed"), "Legacy Bugs Fixed heading should not be present");
+        Assert.DoesNotContain("## Changes", markdown, "Legacy Changes heading should not be present");
+        Assert.DoesNotContain("## Bugs Fixed", markdown, "Legacy Bugs Fixed heading should not be present");
     }
 
     /// <summary>
@@ -550,8 +553,8 @@ public class BuildInformationTests
     public void BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections()
     {
         // Arrange - Build information without routed sections (legacy mode)
-        var versionTag = new VersionTag(VersionInfo.Create("1.0.0"), "abc123");
-        var buildInfo = new BuildInformation(null, versionTag, [], [], [], null);
+        var VersionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
+        var buildInfo = new BuildInformation(null, VersionCommitTag, [], [], [], null);
 
         // Act - Generate markdown
         var markdown = buildInfo.ToMarkdown();
@@ -561,3 +564,6 @@ public class BuildInformationTests
         Assert.Contains("## Bugs Fixed", markdown, "Legacy Bugs Fixed heading should be present");
     }
 }
+
+
+

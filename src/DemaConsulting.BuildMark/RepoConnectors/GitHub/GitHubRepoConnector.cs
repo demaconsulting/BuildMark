@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Globalization;
 using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.Utilities;
@@ -82,7 +83,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public override async Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null)
+    public override async Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
     {
         // Get repository metadata using git commands
         var repoUrl = await RunCommandAsync("git", "remote get-url origin");
@@ -141,9 +142,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Build version tags from version and hash info
-        var currentTag = new VersionTag(toVersion, toHash);
+        var currentTag = new VersionCommitTag(toVersion, toHash);
         var baselineTag = fromVersion != null && fromHash != null
-            ? new VersionTag(fromVersion, fromHash)
+            ? new VersionCommitTag(fromVersion, fromHash)
             : null;
 
         // Generate full changelog link for GitHub
@@ -266,7 +267,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         List<ReleaseNode> BranchReleases,
         Dictionary<string, Tag> TagsByName,
         Dictionary<string, ReleaseNode> TagToRelease,
-        List<VersionInfo> ReleaseVersions,
+        List<VersionTag> ReleaseVersions,
         HashSet<string> BranchTagNames);
 
     /// <summary>
@@ -318,7 +319,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // For merged PRs, use MergeCommitSha; for open PRs, use head SHA.
         // Duplicate commit SHAs are handled gracefully by keeping the first PR in collection order per SHA.
         var commitHashToPr = data.PullRequests
-            .Where(p => (p.Merged && p.MergeCommitSha != null) || (!p.Merged && p.HeadSha != null))
+            .Where(p => p is { Merged: true, MergeCommitSha: not null } or { Merged: false, HeadSha: not null })
             .GroupBy(p => p.Merged ? p.MergeCommitSha! : p.HeadSha!)
             .ToDictionary(g => g.Key, g => g.First());
 
@@ -348,12 +349,12 @@ public class GitHubRepoConnector : RepoConnectorBase
             .GroupBy(r => r.TagName!)
             .ToDictionary(g => g.Key, g => g.First());
 
-        // Parse release tags into VersionInfo objects, maintaining release order (newest to oldest).
+        // Parse release tags into VersionTag objects, maintaining release order (newest to oldest).
         // This is used to determine version history and find previous releases.
         var releaseVersions = branchReleases
-            .Select(r => VersionInfo.TryCreate(r.TagName!))
+            .Select(r => VersionTag.TryCreate(r.TagName!))
             .Where(v => v != null)
-            .Cast<VersionInfo>()
+            .Cast<VersionTag>()
             .ToList();
 
         return new LookupData(
@@ -374,8 +375,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (toVersion, toHash).</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    private static (VersionInfo toVersion, string toHash) DetermineTargetVersion(
-        VersionInfo? version,
+    private static (VersionTag toVersion, string toHash) DetermineTargetVersion(
+        VersionTag? version,
         string currentCommitHash,
         LookupData lookupData)
     {
@@ -422,8 +423,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Tuple of (fromVersion, fromHash).</returns>
-    private static (VersionInfo? fromVersion, string? fromHash) DetermineBaselineVersion(
-        VersionInfo toVersion,
+    private static (VersionTag? fromVersion, string? fromHash) DetermineBaselineVersion(
+        VersionTag toVersion,
         string toHash,
         LookupData lookupData)
     {
@@ -434,7 +435,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Find the position of target version in release history
-        var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion.FullVersion);
+        var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion);
 
         // Determine baseline version based on whether target is pre-release
         var fromVersion = toVersion.IsPreRelease
@@ -461,7 +462,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toHash">Commit hash of target version.</param>
     /// <param name="lookupData">Lookup data structures.</param>
     /// <returns>Baseline version or null.</returns>
-    private static VersionInfo? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
+    private static VersionTag? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
     {
         var releaseVersions = lookupData.ReleaseVersions;
 
@@ -514,7 +515,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="toIndex">Index of target version in release history.</param>
     /// <param name="releaseVersions">List of release versions.</param>
     /// <returns>Baseline version or null.</returns>
-    private static VersionInfo? DetermineBaselineForRelease(int toIndex, List<VersionInfo> releaseVersions)
+    private static VersionTag? DetermineBaselineForRelease(int toIndex, List<VersionTag> releaseVersions)
     {
         // Release versions skip pre-releases and use previous non-pre-release as baseline
         var startIndex = DetermineSearchStartIndex(toIndex, releaseVersions.Count);
@@ -556,7 +557,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             return 0;
         }
 
-        // Target is oldest release or no releases exist, no previous release exists
+        // Target is the oldest release or no releases exist, no previous release exists
         return -1;
     }
 
@@ -578,9 +579,9 @@ public class GitHubRepoConnector : RepoConnectorBase
             string repo)
     {
         // Initialize collections for tracking changes
-        var allChangeIds = new HashSet<string>();
-        var bugs = new List<ItemInfo>();
-        var nonBugChanges = new List<ItemInfo>();
+        HashSet<string> allChangeIds = new();
+        List<ItemInfo> bugs = new();
+        List<ItemInfo> nonBugChanges = new();
 
         // Process each commit that has an associated PR
         foreach (var pr in commitsInRange
@@ -628,7 +629,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         foreach (var issueId in linkedIssueIds)
         {
             // Check if issue already processed
-            var issueIdStr = issueId.ToString();
+            var issueIdStr = issueId.ToString(CultureInfo.InvariantCulture);
             if (allChangeIds.Contains(issueIdStr))
             {
                 continue;
@@ -708,7 +709,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     {
         return issues
             .Where(i => i.State == "OPEN")
-            .Select(issue => (issue, issueId: issue.Number.ToString()))
+            .Select(issue => (issue, issueId: issue.Number.ToString(CultureInfo.InvariantCulture)))
             .Where(tuple => !allChangeIds.Contains(tuple.issueId))
             .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
             .OfType<ItemInfo>()
@@ -770,7 +771,7 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Convert TagNode objects to Tag objects with nested commit structure
         return tagNodes
-            .Where(t => t.Name != null && t.Target?.Oid != null)
+            .Where(t => t is { Name: not null, Target.Oid: not null })
             .Select(t => new Tag(t.Name!, new TagCommit(t.Target!.Oid!)))
             .ToList();
     }
@@ -849,7 +850,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     private static List<Commit> GetCommitsInRange(IReadOnlyList<Commit> commits, string? fromHash, string toHash)
     {
         // Initialize collection and state tracking
-        var result = new List<Commit>();
+        List<Commit> result = new();
         var foundTo = false;
 
         // Iterate through commits from newest to oldest
@@ -951,7 +952,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     ///     Applies type override from item controls if specified.
     /// </summary>
     /// <param name="type">Current item type from labels.</param>
-    /// <param name="controls">Parsed item controls (may be null).</param>
+    /// <param name="controls">Parsed item controls (maybe null).</param>
     /// <returns>Final item type string.</returns>
     private static string ApplyTypeOverride(string type, ItemControlsInfo? controls)
     {

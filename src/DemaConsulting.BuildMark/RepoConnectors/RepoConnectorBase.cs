@@ -70,7 +70,7 @@ public abstract class RepoConnectorBase : IRepoConnector
         var routedDict = ItemRouter.Route(allItems.ToList(), _rules, _sections);
 
         // Build ordered list of sections with their items, using configured section order
-        var result = new List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>();
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> result = new();
 
         // Process each configured section in order
         foreach (var section in _sections)
@@ -119,30 +119,30 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
-    public abstract Task<BuildInformation> GetBuildInformationAsync(VersionInfo? version = null);
+    public abstract Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null);
 
     /// <summary>
-    ///     Finds the index of a version in a version list by normalized version string.
+    ///     Finds the index of a version in a version list by normalized comparable version.
     /// </summary>
     /// <param name="versions">List of versions to search.</param>
-    /// <param name="normalizedVersion">Normalized version string to find (e.g., "1.0.0" or "2.0.0-beta.1").</param>
+    /// <param name="targetVersion">Target version to find.</param>
     /// <returns>Index of the version in the list, or -1 if not found.</returns>
     /// <remarks>
-    ///     This method is protected to allow repository connectors to determine version positions
-    ///     when constructing BuildInformation objects.
+    ///     This method compares versions using their VersionComparable, so tags like 'v1.2.3' and 'VER1.2.3' 
+    ///     are considered equal since they both represent version 1.2.3.
     /// </remarks>
-    protected static int FindVersionIndex(List<VersionInfo> versions, string normalizedVersion)
+    protected static int FindVersionIndex(List<VersionTag> versions, VersionTag targetVersion)
     {
-        // Search for version matching the normalized version string
+        // Search for version with matching VersionComparable
         for (var i = 0; i < versions.Count; i++)
         {
-            if (versions[i].FullVersion.Equals(normalizedVersion, StringComparison.OrdinalIgnoreCase))
+            if (versions[i].Semantic.Comparable.Equals(targetVersion.Semantic.Comparable))
             {
                 return i;
             }
         }
 
-        // VersionInfo not found in list
+        // Version not found in list
         return -1;
     }
 }

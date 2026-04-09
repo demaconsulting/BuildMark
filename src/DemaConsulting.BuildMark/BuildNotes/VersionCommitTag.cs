@@ -25,6 +25,6 @@ namespace DemaConsulting.BuildMark.BuildNotes;
 /// <summary>
 ///     Represents a version paired with its corresponding commit hash.
 /// </summary>
-/// <param name="VersionInfo">The version information.</param>
+/// <param name="VersionTag">The version tag information.</param>
 /// <param name="CommitHash">The git commit hash for this version.</param>
-public record VersionTag(VersionInfo VersionInfo, string CommitHash);
+public record VersionCommitTag(VersionTag VersionTag, string CommitHash);

@@ -10,17 +10,17 @@ and passed to `Program`, which calls `ToMarkdown` to render the final file.
 
 ```csharp
 public record BuildInformation(
-    VersionTag? BaselineVersionTag,
-    VersionTag? CurrentVersionTag,
+    VersionCommitTag? BaselineVersionTag,
+    VersionCommitTag? CurrentVersionTag,
     List<ItemInfo> Changes,
     List<ItemInfo> Bugs,
     List<ItemInfo> KnownIssues,
     WebLink? CompleteChangelogLink);
 ```
 
-- `BaselineVersionTag` (`VersionTag?`) — the previous version tag, which is the
+- `BaselineVersionTag` (`VersionCommitTag?`) — the previous version tag, which is the
   lower boundary of the reported range
-- `CurrentVersionTag` (`VersionTag?`) — the version tag being reported
+- `CurrentVersionTag` (`VersionCommitTag?`) — the version tag being reported
 - `Changes` (`List<ItemInfo>`) — feature and other non-bug items in this build
 - `Bugs` (`List<ItemInfo>`) — bug-fix items in this build
 - `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed
@@ -50,7 +50,7 @@ The rendered output contains the following sections:
 
 | Unit / Subsystem    | Role                                                              |
 |---------------------|-------------------------------------------------------------------|
-| `VersionTag`        | Carries version and commit hash for baseline and current entries  |
+| `VersionCommitTag`        | Carries version and commit hash for baseline and current entries  |
 | `ItemInfo`          | Each item in `Changes`, `Bugs`, and `KnownIssues`                 |
 | `WebLink`           | Optional complete-changelog hyperlink                             |
 | `RepoConnectors`    | Connectors assemble and return a `BuildInformation` record        |

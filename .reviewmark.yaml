@@ -145,13 +145,16 @@ reviews:
       - "src/**/Utilities/ProcessRunner.cs"
       - "test/**/Utilities/ProcessRunnerTests.cs"
 
-  - id: BuildMark-Utilities-VersionInfo
-    title: Review that BuildMark Utilities VersionInfo Unit Implementation is Correct
+  - id: BuildMark-Utilities-VersionTag
+    title: Review that BuildMark Utilities VersionTag Unit Implementation is Correct
     paths:
-      - "docs/reqstream/build-mark/utilities/version.yaml"
-      - "docs/design/build-mark/utilities/version.md"
-      - "src/**/Utilities/VersionInfo.cs"
-      - "test/**/Utilities/VersionInfoTests.cs"
+      - "docs/reqstream/build-mark/utilities/version-tag.yaml"
+      - "docs/design/build-mark/utilities/version-tag.md"
+      - "src/**/Utilities/VersionTag.cs"
+      - "src/**/Utilities/VersionSemantic.cs"
+      - "src/**/Utilities/VersionComparable.cs"
+      - "test/**/Utilities/VersionTagEqualityTests.cs"
+      - "test/**/Utilities/VersionComparableTests.cs"
 
   - id: BuildMark-Utilities-VersionInterval
     title: Review that BuildMark Utilities VersionInterval Unit Implementation is Correct
@@ -178,12 +181,12 @@ reviews:
       - "docs/design/build-mark/build-notes/item-info.md"
       - "src/**/BuildNotes/ItemInfo.cs"
 
-  - id: BuildMark-BuildNotes-VersionTag
-    title: Review that BuildMark BuildNotes VersionTag Unit Implementation is Correct
+  - id: BuildMark-BuildNotes-VersionCommitTag
+    title: Review that BuildMark BuildNotes VersionCommitTag Unit Implementation is Correct
     paths:
       - "docs/reqstream/build-mark/build-notes/version-tag.yaml"
       - "docs/design/build-mark/build-notes/version-tag.md"
-      - "src/**/BuildNotes/VersionTag.cs"
+      - "src/**/BuildNotes/VersionCommitTag.cs"
       - "test/**/BuildNotes/BuildInformationTests.cs"
 
   - id: BuildMark-BuildNotes-WebLink

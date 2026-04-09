@@ -36,13 +36,16 @@ BuildMark (System)
 ├── BuildNotes (Subsystem)
 │   ├── BuildInformation (Unit)
 │   ├── ItemInfo (Unit)
-│   ├── VersionTag (Unit)
+│   ├── VersionCommitTag (Unit)
 │   └── WebLink (Unit)
 ├── SelfTest (Subsystem)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
 │   ├── PathHelpers (Unit)
 │   ├── ProcessRunner (Unit)
+│   ├── VersionComparable (Unit)
+│   ├── VersionSemantic (Unit)  
+│   ├── VersionTag (Unit)
 │   ├── VersionInfo (Unit)
 │   ├── VersionInterval (Unit)
 │   └── VersionIntervalSet (Unit)
@@ -84,7 +87,7 @@ src/DemaConsulting.BuildMark/
 ├── BuildNotes/
 │   ├── BuildInformation.cs                  — build information data model
 │   ├── ItemInfo.cs                          — item information data model
-│   ├── VersionTag.cs                        — version tag representation
+│   ├── VersionCommitTag.cs                  — version commit tag representation
 │   └── WebLink.cs                           — web link helper
 ├── Cli/
 │   └── Context.cs                           — command-line argument parser and I/O owner
@@ -93,6 +96,9 @@ src/DemaConsulting.BuildMark/
 ├── Utilities/
 │   ├── PathHelpers.cs                       — safe path combination utilities
 │   ├── ProcessRunner.cs                     — process runner for Git commands
+│   ├── VersionComparable.cs                 — core integer-based version comparison
+│   ├── VersionSemantic.cs                   — semantic version with build metadata
+│   ├── VersionTag.cs                        — repository tag parsing and normalization
 │   ├── VersionInfo.cs                       — semantic version parser and normalized model
 │   ├── VersionInterval.cs                   — single version interval model and parser
 │   └── VersionIntervalSet.cs                — ordered set of version intervals

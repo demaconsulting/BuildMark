@@ -19,11 +19,10 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Cli;
-using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.SelfTest;
 
-namespace DemaConsulting.BuildMark.Tests;
+namespace DemaConsulting.BuildMark.Tests.SelfTest;
 
 /// <summary>
 ///     Subsystem-level tests for the SelfTest subsystem.
@@ -123,7 +122,7 @@ public class SelfTestTests
             // Assert: results file exists and has non-zero content
             Assert.IsTrue(File.Exists(trxFile), "TRX results file should be created");
             var fileInfo = new FileInfo(trxFile);
-            Assert.IsTrue(fileInfo.Length > 0, "TRX results file should have content");
+            Assert.IsGreaterThan(0, fileInfo.Length, "TRX results file should have content");
         }
         finally
         {
@@ -157,7 +156,7 @@ public class SelfTestTests
             // Assert: results file exists and has non-zero content
             Assert.IsTrue(File.Exists(xmlFile), "XML results file should be created");
             var fileInfo = new FileInfo(xmlFile);
-            Assert.IsTrue(fileInfo.Length > 0, "XML results file should have content");
+            Assert.IsGreaterThan(0, fileInfo.Length, "XML results file should have content");
         }
         finally
         {
@@ -169,3 +168,6 @@ public class SelfTestTests
         }
     }
 }
+
+
+
