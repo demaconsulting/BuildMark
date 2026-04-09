@@ -128,7 +128,7 @@ internal static class Validation
                 if (reportContent.Contains("# Build Report") &&
                     reportContent.Contains("## Version Information") &&
                     reportContent.Contains("2.0.0") &&
-                    reportContent.Contains("current123hash456"))
+                    reportContent.Contains("mno345pqr678"))
                 {
                     return null;
                 }
@@ -157,7 +157,7 @@ internal static class Validation
             (logContent, _) =>
             {
                 if (logContent.Contains("Build Version: 2.0.0") &&
-                    logContent.Contains("Commit Hash: current123hash456") &&
+                    logContent.Contains("Commit Hash: mno345pqr678") &&
                     logContent.Contains("Previous Version: ver-1.1.0"))
                 {
                     return null;
