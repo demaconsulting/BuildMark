@@ -82,8 +82,8 @@ public partial record VersionTag(string Tag, VersionSemantic Semantic)
 
         // Get pre-release and metadata strings
         var preRelease = hasPreRelease ? preReleaseGroup.Value : null;
-        var metadata = metadataGroup.Success && !string.IsNullOrEmpty(metadataGroup.Value) 
-            ? metadataGroup.Value 
+        var metadata = metadataGroup.Success && !string.IsNullOrEmpty(metadataGroup.Value)
+            ? metadataGroup.Value
             : null;
 
         // Create comparable version

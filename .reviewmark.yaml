@@ -1,4 +1,4 @@
----
+﻿---
 # ReviewMark Configuration File
 needs-review:
   - "**/*.cs"

@@ -9,14 +9,15 @@ while preserving comparison functionality.
 ## Structure
 
 | Property | Type | Description |
-|----------|------|-------------|
+| -------- | ---- | ----------- |
 | Comparable | VersionComparable | Core comparison logic and version components |
 | Metadata | string? | Build metadata (+metadata) |
-| FullVersion | string | Complete version string (major.minor.patch[-pre-release][+metadata]) |
+| FullVersion | string | Complete version string (major.minor.patch\[-pre-release\]\[+metadata\]) |
 
 ## Delegated Properties
 
 For convenience, the following properties delegate to the `Comparable` instance:
+
 - `Major`, `Minor`, `Patch` - Version number components
 - `PreRelease` - Pre-release identifier
 - `CompareVersion` - Comparison string (excludes metadata)

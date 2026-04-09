@@ -103,7 +103,7 @@ public class VersionTests
         Assert.IsNotNull(comparable1);
         Assert.IsNotNull(comparable2);
         Assert.IsNotNull(comparable3);
-        
+
         Assert.AreEqual("1.2.3", comparable1.CompareVersion);
         Assert.AreEqual("2.0.0-rc.1", comparable2.CompareVersion);
         Assert.AreEqual("1.5.0", comparable3.CompareVersion);

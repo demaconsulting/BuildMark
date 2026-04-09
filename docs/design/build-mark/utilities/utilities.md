@@ -4,7 +4,7 @@
 
 The Utilities subsystem provides shared helper classes used across the BuildMark
 system. It contains `PathHelpers` for safe path combination with traversal
-prevention, `ProcessRunner` for executing external shell commands, and a 
+prevention, `ProcessRunner` for executing external shell commands, and a
 comprehensive version handling hierarchy:
 
 - `VersionComparable` for core integer-based version comparison
@@ -46,23 +46,23 @@ comprehensive version handling hierarchy:
 
 | Member                            | Kind   | Description                                     |
 |-----------------------------------|--------|-------------------------------------------------|
-| `Create(versionString)`           | Method | Parse a version string into VersionComparable   |
-| `TryCreate(versionString)`        | Method | Try parse version string; returns null on failure |
+| `Create(versionString)`           | Method | Parse version string into VersionComparable     |
+| `TryCreate(versionString)`        | Method | Try parse version; returns null on failure      |
 | `CompareTo(other)`                | Method | Compare this version to another analytically    |
 
 `VersionSemantic` exposes the following methods:
 
 | Member                            | Kind   | Description                                     |
 |-----------------------------------|--------|-------------------------------------------------|
-| `Create(versionString)`           | Method | Parse a version string into VersionSemantic     |
-| `TryCreate(versionString)`        | Method | Try parse version string; returns null on failure |
+| `Create(versionString)`           | Method | Parse version string into VersionSemantic       |
+| `TryCreate(versionString)`        | Method | Try parse version; returns null on failure      |
 
 `VersionTag` exposes the following methods:
 
 | Member                            | Kind   | Description                                     |
 |-----------------------------------|--------|-------------------------------------------------|
-| `Create(tagString)`               | Method | Parse a repository tag into VersionTag          |
-| `TryCreate(tagString)`            | Method | Try parse repository tag; returns null on failure |
+| `Create(tagString)`               | Method | Parse repository tag into VersionTag            |
+| `TryCreate(tagString)`            | Method | Try parse tag; returns null on failure          |
 
 `VersionInfo` exposes the following static methods:
 
@@ -73,32 +73,42 @@ comprehensive version handling hierarchy:
 
 `VersionInterval` exposes the following methods:
 
-| Member                         | Kind   | Description                                                   |
-|--------------------------------|--------|---------------------------------------------------------------|
-| `Parse(text)`                  | Method | Parse a single interval token; returns null if invalid        |
-| `Contains(version)`            | Method | Test whether a semantic version string falls inside interval  |
-| `Contains(versionInfo)`        | Method | Test whether a BuildMark `VersionInfo` falls inside interval  |
-| `Contains(versionComparable)`  | Method | Test whether a `VersionComparable` falls inside interval     |
++--------------------------------+--------+-----------------------------------------------------------+
+| Member                         | Kind   | Description                                               |
++================================+========+===========================================================+
+| `Parse(text)`                  | Method | Parse a single interval token; returns null if invalid   |
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(version)`            | Method | Test whether semantic version string falls inside interval|
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(versionInfo)`        | Method | Test whether version falls inside interval               |
++--------------------------------+--------+-----------------------------------------------------------+
+| `Contains(versionComparable)`  | Method | Test whether VersionComparable falls in interval        |
++--------------------------------+--------+-----------------------------------------------------------+
 
 `VersionIntervalSet` exposes the following methods:
 
-| Member                         | Kind   | Description                                                             |
-|--------------------------------|--------|-------------------------------------------------------------------------|
-| `Parse(text)`                  | Method | Parse a comma-separated interval string into an ordered collection      |
-| `Contains(version)`            | Method | Test whether a semantic version string falls inside any contained range |
-| `Contains(versionInfo)`        | Method | Test whether a BuildMark `VersionInfo` falls inside any contained range |
-| `Contains(versionComparable)`  | Method | Test whether a `VersionComparable` falls inside any contained range    |
++--------------------------------+--------+---------------------------------------------------------------------+
+| Member                         | Kind   | Description                                                         |
++================================+========+=====================================================================+
+| `Parse(text)`                  | Method | Parse a comma-separated interval string into an ordered collection  |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(version)`            | Method | Test whether a semantic version string falls inside any range      |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(versionInfo)`        | Method | Test whether version falls inside any range                        |
++--------------------------------+--------+---------------------------------------------------------------------+
+| `Contains(versionComparable)`  | Method | Test whether VersionComparable falls in any range                  |
++--------------------------------+--------+---------------------------------------------------------------------+
 
 ## Interactions
 
-`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark 
+`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
 subsystems. The version hierarchy follows these relationships:
 
 - `VersionComparable` provides core comparison logic (no dependencies)
 - `VersionSemantic` builds on `VersionComparable` adding metadata support
 - `VersionTag` uses `VersionComparable` for parsing repository tags
 - `VersionInfo` provides legacy compatibility by delegating to `VersionSemantic`
-- `VersionInterval` and `VersionIntervalSet` consume `VersionComparable` for 
+- `VersionInterval` and `VersionIntervalSet` consume `VersionComparable` for
   version comparison and containment checks
 
 The subsystem is consumed by any unit that needs safe path combination, external

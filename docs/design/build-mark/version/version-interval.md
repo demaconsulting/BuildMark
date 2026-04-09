@@ -156,8 +156,8 @@ Convenience overload for callers that already hold a parsed BuildMark
 `VersionInterval` and `VersionIntervalSet` are general-purpose utility types.
 They are created by `ItemControlsParser`, stored on `ItemControlsInfo`, and may
 consume BuildMark `VersionInfo` instances through their `Contains(VersionInfo)`
-overloads. 
+overloads.
 
-The implementation uses `VersionComparable` for semantic version parsing and 
-analytical comparison, providing consistent numerical ordering (e.g., 1.2.3 < 1.11.2) 
+The implementation uses `VersionComparable` for semantic version parsing and
+analytical comparison, providing consistent numerical ordering (e.g., 1.2.3 < 1.11.2)
 across the version handling system.

@@ -39,24 +39,6 @@ sections:
         children:
           - BuildMark-ProcessRunner-RunAsync
 
-      - id: BuildMark-Utilities-Version
-        title: The Utilities subsystem shall provide version hierarchy for semantic version handling.
-        justification: |
-          Multiple subsystems need consistent semantic version representation with
-          comparison, metadata support, and repository tag parsing. The version
-          hierarchy (VersionComparable, VersionSemantic, VersionTag) provides
-          separation of concerns and reusable components across the system.
-        tests:
-          - Utilities_Version_SimpleTag_ParsesCorrectly
-          - Utilities_Version_PreRelease_DetectsCorrectly
-          - Utilities_Version_InvalidTag_ReturnsNull
-        children:
-          - BuildMark-VersionComparable-Comparison
-          - BuildMark-VersionSemantic-FullVersion
-          - BuildMark-VersionTag-Formats
-          - BuildMark-Version-Parse
-          - BuildMark-Version-InvalidTag
-
       - id: BuildMark-Utilities-VersionInterval
         title: >-
           The Utilities subsystem shall provide version interval parsing using mathematical

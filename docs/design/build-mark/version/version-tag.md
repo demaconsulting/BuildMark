@@ -10,26 +10,32 @@ tag strings, enabling version equality across different tag formats.**
 
 ## Structure
 
-| Property | Type | Description |
-|----------|------|-------------|
-| Tag | string | Original repository tag |
-| Semantic | VersionSemantic | Parsed semantic version information |
++----------+------------------+------------------------------------+
+| Property | Type             | Description                        |
++==========+==================+====================================+
+| Tag      | string           | Original repository tag            |
++----------+------------------+------------------------------------+
+| Semantic | VersionSemantic  | Parsed semantic version info       |
++----------+------------------+------------------------------------+
 
 ## Delegated Properties
 
 For convenience, the following properties delegate to the `Semantic.Comparable` instance:
+
 - `Major`, `Minor`, `Patch` - Version number components  
 - `PreRelease` - Pre-release identifier
 - `CompareVersion` - Comparison string
 - `Numbers` - Version numbers only (major.minor.patch)
 
 Additional delegated properties from `Semantic`:
+
 - `Metadata` - Build metadata
 - `FullVersion` - Complete semantic version string
 
 ## Tag Format Support
 
 The parser supports various repository tag formats:
+
 - Simple: `1.2.3`, `v1.2.3`, `ver1.2.3`
 - Complex prefixes: `Release_1.2.3`, `MyApp-v1.2.3`
 - Pre-release: `1.2.3-beta`, `1.2.3.rc.1` (dot becomes hyphen)

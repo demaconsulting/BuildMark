@@ -18,13 +18,19 @@ shared utilities used by concrete connectors.
 
 `RepoConnectorBase` provides:
 
-| Member                                    | Kind              | Description                                          |
-|-------------------------------------------|-------------------|------------------------------------------------------|
-| `Configure(rules, sections)`              | Public method     | Stores routing rules and section definitions         |
-| `HasRules`                                | Protected bool    | True when at least one rule has been configured      |
-| `ApplyRules(allItems)`                    | Protected method  | Routes items into sections using configured rules    |
-| `RunCommandAsync(command, arguments)`     | Protected virtual | Delegates shell commands to `ProcessRunner.RunAsync` |
-| `FindVersionIndex(versions, targetVersion)`| Protected static  | Locates a version using semantic VersionComparable equality |
++------------------------------------------+-------------------+-------------------------------------------------------+
+| Member                                   | Kind              | Description                                           |
++==========================================+===================+=======================================================+
+| `Configure(rules, sections)`            | Public method     | Stores routing rules and section definitions         |
++------------------------------------------+-------------------+-------------------------------------------------------+
+| `HasRules`                               | Protected bool    | True when at least one rule has been configured      |
++------------------------------------------+-------------------+-------------------------------------------------------+
+| `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules    |
++------------------------------------------+-------------------+-------------------------------------------------------+
+| `RunCommandAsync(command, arguments)`    | Protected virtual | Delegates shell commands to ProcessRunner            |
++------------------------------------------+-------------------+-------------------------------------------------------+
+| `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality              |
++------------------------------------------+-------------------+-------------------------------------------------------+
 
 ### `Configure(rules, sections)`
 
@@ -47,7 +53,7 @@ the end using the section ID as the display title.
 
 ### `FindVersionIndex(versions, targetVersion)`
 
-Protected static method that finds the index of a `targetVersion` within a list of 
+Protected static method that finds the index of a `targetVersion` within a list of
 `VersionTag` instances using **semantic VersionComparable equality**. This design
 ensures that version tags with different prefixes but identical semantic versions
 are considered equal:

@@ -1,4 +1,4 @@
----
+﻿---
 # Version Semantic Requirements
 
 sections:
@@ -13,7 +13,7 @@ sections:
           does not affect version precedence. VersionSemantic provides this
           complete representation while delegating comparison to VersionComparable.
         tests:
-          - VersionSemantic_Create_WithBuildMetadata_ReturnsInstance  
+          - VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
           - VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
           - VersionSemantic_Properties_DelegateToComparable_Correctly
           - VersionSemantic_ToString_FormatsCompletely_WithAllComponents

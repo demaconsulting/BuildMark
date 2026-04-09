@@ -177,7 +177,7 @@ public class MockRepoConnector : RepoConnectorBase
                 var versionHash = await GetHashForTagAsync(actualTag.Tag);
                 return (actualTag, versionHash ?? currentHash);
             }
-            
+
             // Version not found in repository tags - this is a new version being created
             // Use the provided version tag as-is and current commit hash
             return (version, currentHash);

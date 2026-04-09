@@ -9,7 +9,7 @@ proper semantic version ordering rules with optimized performance for pre-releas
 ## Structure
 
 | Property | Type | Description |
-|----------|------|-------------|
+| -------- | ---- | ----------- |
 | Major | int | Major version number |
 | Minor | int | Minor version number |
 | Patch | int | Patch version number |
@@ -29,7 +29,7 @@ The class implements optimized pre-release comparison through:
 ### Implementation Details
 
 | Component | Description |
-|-----------|-------------|
+| --------- | ----------- |
 | `PreReleaseSegment` | Internal struct storing either numeric or text segment values |
 | `ParsePreReleaseSegments` | Static method parsing pre-release strings into segment arrays |
 | `ComparePreReleaseSegments` | Optimized comparison using pre-parsed segment arrays |
@@ -40,6 +40,7 @@ providing significant performance benefits for sorting and version range operati
 ## Interface
 
 The class implements `IComparable<VersionComparable>` providing analytical comparison:
+
 - Numeric comparison of version numbers (1.2.3 < 1.11.2)
 - Release versions > pre-release versions for same numbers
 - SemVer-compliant pre-release ordering with numeric precedence
@@ -47,6 +48,7 @@ The class implements `IComparable<VersionComparable>` providing analytical compa
 ### Pre-Release Comparison Rules
 
 Pre-release versions follow SemVer specification:
+
 1. Numeric identifiers are compared numerically (5 < 10)
 2. Non-numeric identifiers are compared lexicographically (case-insensitive)
 3. Numeric identifiers have lower precedence than non-numeric
@@ -55,6 +57,7 @@ Pre-release versions follow SemVer specification:
 ## Comparison Operators
 
 Standard comparison operators are overloaded:
+
 - `<`, `<=`, `>`, `>=` delegate to `CompareTo`
 - Natural ordering for use in collections and sorting
 
@@ -78,10 +81,12 @@ var v5 = VersionComparable.Create("1.2.3-alpha.10");
 ## Regex Pattern
 
 The class uses a generated regex pattern for parsing:
-```
+
+```regex
 ^(?<numbers>\d+\.\d+\.\d+)(?:-(?<pre_release>[a-zA-Z0-9.-]+))?$
 ```
 
 This pattern matches:
+
 - Required: major.minor.patch numbers
 - Optional: hyphen followed by pre-release identifier

@@ -21,7 +21,7 @@ input-files:
   - docs/design/build-mark/build-notes/build-notes.md
   - docs/design/build-mark/build-notes/build-information.md
   - docs/design/build-mark/build-notes/item-info.md
-  - docs/design/build-mark/build-notes/version-tag.md
+  - docs/design/build-mark/version/version-tag.md
   - docs/design/build-mark/build-notes/web-link.md
   - docs/design/build-mark/cli/cli.md
   - docs/design/build-mark/cli/context.md

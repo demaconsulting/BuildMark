@@ -6,7 +6,7 @@ sections:
     requirements:
       - id: BuildMark-VersionComparable-Comparison
         title: >-
-          VersionComparable shall provide analytical comparison of semantic 
+          VersionComparable shall provide analytical comparison of semantic
           versions with integer comparison for major.minor.patch components.
         justification: |
           Proper version ordering requires analytical comparison (1.2.3 < 1.11.2)
@@ -26,12 +26,12 @@ sections:
 
       - id: BuildMark-VersionComparable-PreReleaseComparison
         title: >-
-          VersionComparable shall correctly order pre-release versions according 
+          VersionComparable shall correctly order pre-release versions according
           to Semantic Versioning specification.
         justification: |
           Pre-release versions must be ordered correctly per SemVer specification
           to ensure proper dependency resolution and version range operations.
-          This includes handling complex pre-release identifiers with mixed 
+          This includes handling complex pre-release identifiers with mixed
           numeric and text components.
         tests:
           - VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
@@ -45,7 +45,7 @@ sections:
           VersionComparable shall provide factory methods for creating instances
           from version strings with integer parsing.
         justification: |
-          Factory methods provide a clean API for creating VersionComparable 
+          Factory methods provide a clean API for creating VersionComparable
           instances while isolating parsing logic and handling invalid inputs.
         tests:
           - VersionComparable_Create_ValidVersion_ReturnsInstance

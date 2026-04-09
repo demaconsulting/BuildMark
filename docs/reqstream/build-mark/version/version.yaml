@@ -1,41 +1,42 @@
----
-resource-path: docs/reqstream/build-mark/version
-input-files:
+﻿---
+includes:
   - version-comparable.yaml
-  - version-semantic.yaml  
+  - version-semantic.yaml
   - version-tag.yaml
   - version-interval.yaml
   - version-commit-tag.yaml
 
-requirements:
-  - id: BuildMark-Version-Subsystem
-    title: >-
-      Version subsystem shall provide semantic version processing capabilities
-      for BuildMark operations.
-    justification: |
-      The Version subsystem encapsulates all version-related functionality including
-      parsing, comparison, validation, and version range operations. This subsystem
-      ensures consistent semantic versioning behavior across all BuildMark components
-      and provides the foundation for repository version tag processing and build
-      information generation.
-    tests:
-      - VersionComparable_Create_ValidVersions_ReturnsVersionComparable
-      - VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic
-      - VersionTag_Create_ValidTag_ReturnsVersionTag
-      - VersionInterval_Create_ValidInterval_ReturnsVersionInterval
-      - VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+sections:
+  - title: Version Subsystem Requirements
+    requirements:
+      - id: BuildMark-Version-Subsystem
+        title: >-
+          Version subsystem shall provide semantic version processing capabilities
+          for BuildMark operations.
+        justification: |
+          The Version subsystem encapsulates all version-related functionality including
+          parsing, comparison, validation, and version range operations. This subsystem
+          ensures consistent semantic versioning behavior across all BuildMark components
+          and provides the foundation for repository version tag processing and build
+          information generation.
+        tests:
+          - VersionComparable_Create_ValidVersions_ReturnsVersionComparable
+          - VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic
+          - VersionTag_Create_ValidTag_ReturnsVersionTag
+          - VersionInterval_Create_ValidInterval_ReturnsVersionInterval
+          - VersionCommitTag_Constructor_ValidParameters_CreatesInstance
 
-  - id: BuildMark-Version-SemanticVersioning
-    title: >-
-      Version subsystem shall comply with Semantic Versioning 2.0.0 specification
-      for all version processing operations.
-    justification: |
-      Compliance with SemVer 2.0.0 ensures consistent and predictable version
-      comparison behavior that aligns with industry standards and developer
-      expectations. This is critical for proper dependency resolution and
-      version range operations.
-    tests:
-      - VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
-      - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
-      - VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
-      - VersionTag_GetVersionComparable_SemanticTags_ReturnsCorrectComparison
+      - id: BuildMark-Version-SemanticVersioning
+        title: >-
+          Version subsystem shall comply with Semantic Versioning 2.0.0 specification
+          for all version processing operations.
+        justification: |
+          Compliance with SemVer 2.0.0 ensures consistent and predictable version
+          comparison behavior that aligns with industry standards and developer
+          expectations. This is critical for proper dependency resolution and
+          version range operations.
+        tests:
+          - VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
+          - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
+          - VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
+          - VersionTag_GetVersionComparable_SemanticTags_ReturnsCorrectComparison

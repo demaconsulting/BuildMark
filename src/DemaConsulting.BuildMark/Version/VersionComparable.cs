@@ -65,12 +65,12 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
         ///     Gets the numeric value if this segment is numeric, otherwise 0.
         /// </summary>
         private int NumericValue { get; }
-        
+
         /// <summary>
         ///     Gets the text value if this segment is non-numeric, otherwise null.
         /// </summary>
         private string? TextValue { get; }
-        
+
         /// <summary>
         ///     Gets a value indicating whether this segment represents a numeric value.
         /// </summary>
@@ -122,7 +122,7 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
         // Split pre-release string into dot-separated parts
         var parts = preRelease.Split('.');
         var segments = new PreReleaseSegment[parts.Length];
-        
+
         // Convert each part into either numeric or text segment
         for (var i = 0; i < parts.Length; i++)
         {
@@ -186,7 +186,7 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
         // Extract and parse version numbers from regex groups
         var numbersString = match.Groups["numbers"].Value;
         var numberParts = numbersString.Split('.');
-        
+
         // Validate that we have exactly 3 numeric components
         if (numberParts.Length != 3 ||
             !int.TryParse(numberParts[0], out var major) ||
@@ -198,8 +198,8 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
 
         // Extract pre-release identifier if present
         var preReleaseGroup = match.Groups["pre_release"];
-        var preRelease = preReleaseGroup.Success && !string.IsNullOrEmpty(preReleaseGroup.Value) 
-            ? preReleaseGroup.Value 
+        var preRelease = preReleaseGroup.Success && !string.IsNullOrEmpty(preReleaseGroup.Value)
+            ? preReleaseGroup.Value
             : null;
 
         // Create and return comparable version with parsed components
@@ -285,7 +285,7 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
     private static int ComparePreReleaseSegments(PreReleaseSegment[] segments1, PreReleaseSegment[] segments2)
     {
         var minLength = Math.Min(segments1.Length, segments2.Length);
-        
+
         for (var i = 0; i < minLength; i++)
         {
             var comparison = segments1[i].CompareTo(segments2[i]);

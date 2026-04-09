@@ -48,10 +48,14 @@ The rendered output contains the following sections:
 
 ## Interactions
 
-| Unit / Subsystem    | Role                                                              |
-|---------------------|-------------------------------------------------------------------|
-| `VersionCommitTag`        | Carries version and commit hash for baseline and current entries  |
-| `ItemInfo`          | Each item in `Changes`, `Bugs`, and `KnownIssues`                 |
-| `WebLink`           | Optional complete-changelog hyperlink                             |
++--------------------+-------------------------------------------------------------------+
+| Unit / Subsystem   | Role                                                              |
++====================+===================================================================+
+| `VersionCommitTag` | Carries version and commit hash for baseline and current entries |
++--------------------+-------------------------------------------------------------------+
+| `ItemInfo`         | Each item in `Changes`, `Bugs`, and `KnownIssues`                |
++--------------------+-------------------------------------------------------------------+
+| `WebLink`          | Optional complete-changelog hyperlink                            |
++--------------------+-------------------------------------------------------------------+
 | `RepoConnectors`    | Connectors assemble and return a `BuildInformation` record        |
 | `Program`           | Calls `ToMarkdown` to produce the final report file               |

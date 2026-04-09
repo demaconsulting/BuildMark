@@ -31,8 +31,8 @@ public record VersionSemantic(VersionComparable Comparable, string? Metadata)
     /// <summary>
     ///     The full semantic version string (major.minor.patch[-pre-release]+metadata).
     /// </summary>
-    public string FullVersion => string.IsNullOrEmpty(Metadata) 
-        ? Comparable.CompareVersion 
+    public string FullVersion => string.IsNullOrEmpty(Metadata)
+        ? Comparable.CompareVersion
         : $"{Comparable.CompareVersion}+{Metadata}";
 
     /// <summary>

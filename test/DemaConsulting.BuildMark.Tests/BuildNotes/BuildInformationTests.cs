@@ -128,7 +128,7 @@ public class BuildInformationTests
         // Arrange
         var connector = new MockRepoConnector();
         var inputVersion = VersionTag.Create("v2.0.0-beta.1");
-        
+
         // Act
         var buildInfo = await connector.GetBuildInformationAsync(inputVersion);
 

@@ -229,7 +229,7 @@ public class VersionComparableTests
             var current = versions[i];
             var next = versions[i + 1];
             var result = current!.CompareTo(next);
-            
+
             Assert.IsTrue(result < 0, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
         }
     }
