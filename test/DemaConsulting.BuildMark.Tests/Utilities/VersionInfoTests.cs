@@ -42,6 +42,9 @@ public class VersionInfoTests
         // Assert
         Assert.AreEqual("v1.2.3", tagVersion.Tag);
         Assert.AreEqual("1.2.3", tagVersion.FullVersion);
+        Assert.AreEqual("1.2.3", tagVersion.SemanticVersion);
+        Assert.AreEqual("", tagVersion.PreRelease);
+        Assert.AreEqual("", tagVersion.Metadata);
         Assert.IsFalse(tagVersion.IsPreRelease);
     }
 
@@ -81,12 +84,15 @@ public class VersionInfoTests
     [TestMethod]
     public void VersionInfo_Create_AlphaPreRelease_DetectsPreRelease()
     {
-        // Parse a version tag with alpha pre-release
+        // Act
         var tagVersion = VersionInfo.Create("v2.0.0-alpha.1");
 
-        // Verify pre-release is detected correctly
+        // Assert
         Assert.AreEqual("v2.0.0-alpha.1", tagVersion.Tag);
         Assert.AreEqual("2.0.0-alpha.1", tagVersion.FullVersion);
+        Assert.AreEqual("2.0.0", tagVersion.SemanticVersion);
+        Assert.AreEqual("alpha.1", tagVersion.PreRelease);
+        Assert.AreEqual("", tagVersion.Metadata);
         Assert.IsTrue(tagVersion.IsPreRelease);
     }
 
@@ -177,6 +183,9 @@ public class VersionInfoTests
         // Assert
         Assert.AreEqual("v1.0.0+arch", tagVersion.Tag);
         Assert.AreEqual("1.0.0+arch", tagVersion.FullVersion);
+        Assert.AreEqual("1.0.0", tagVersion.SemanticVersion);
+        Assert.AreEqual("", tagVersion.PreRelease);
+        Assert.AreEqual("arch", tagVersion.Metadata);
         Assert.IsFalse(tagVersion.IsPreRelease);
     }
 
@@ -222,6 +231,9 @@ public class VersionInfoTests
         // Assert
         Assert.AreEqual("Rel_1.2.3-rc.4+build.5", tagVersion.Tag);
         Assert.AreEqual("1.2.3-rc.4+build.5", tagVersion.FullVersion);
+        Assert.AreEqual("1.2.3", tagVersion.SemanticVersion);
+        Assert.AreEqual("rc.4", tagVersion.PreRelease);
+        Assert.AreEqual("build.5", tagVersion.Metadata);
         Assert.IsTrue(tagVersion.IsPreRelease);
     }
 

@@ -20,7 +20,7 @@ and `Run`, which accepts an existing `Context` and performs the main execution l
 | `Version` | `string` | The tool version read from assembly attributes |
 
 The version is resolved at startup by inspecting `AssemblyInformationalVersionAttribute`
-first, then falling back to `AssemblyVersionAttribute`, and finally defaulting to
+first, then falling back to `assembly.GetName().Version`, and finally defaulting to
 `"0.0.0"` if neither attribute is present.
 
 ## Methods
@@ -39,11 +39,12 @@ Executes the main program logic against an already-constructed `Context`. The
 method applies the following priority order:
 
 1. If `context.Version` is set, print the version string and return.
-2. If `context.Help` is set, print the usage message and return.
-3. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
-4. If `context.Lint` is set, call `BuildMarkConfigReader.ReadAsync`, call
+2. Print the application banner (version and copyright).
+3. If `context.Help` is set, print the usage message and return.
+4. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
+5. If `context.Lint` is set, call `BuildMarkConfigReader.ReadAsync`, call
    `result.ReportTo(context)`, and return.
-5. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
+6. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
 
 The exit code is managed through `context.ExitCode` rather than as a return value.
 

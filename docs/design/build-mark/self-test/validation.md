@@ -56,6 +56,13 @@ and collected correctly into the `Changes` and `Bugs` lists of `BuildInformation
 Uses `MockRepoConnector` to verify that known issues are included in the markdown
 report when the `--include-known-issues` flag is set.
 
+### `RunRulesRouting`
+
+Creates a `MockRepoConnector` configured with routing rules that direct items labelled
+`bug` to a `bugs` section and all other items to a `features` section. Generates a
+`BuildInformation` record, calls `ToMarkdown`, writes the output to a temporary file,
+and verifies the file contains both `## Features` and `## Bugs` section headings.
+
 ## Interactions
 
 - `Context` provides output methods, `ResultsFile`, and the exit code sink.
