@@ -26,7 +26,7 @@ required for standard Azure DevOps fields because `AzureDevOpsRestClient` suppli
 `JsonSerializerOptions` instance with `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`,
 which maps those PascalCase property names to the Azure DevOps camelCase JSON field
 names automatically. The sole exception is `AzureDevOpsWorkItem.Fields`, which is
-deserialized as a `Dictionary<string, string>` and preserves the dotted
+deserialized as a `Dictionary<string, object?>` and preserves the dotted
 field-reference-name keys (e.g. `System.WorkItemType`) verbatim.
 
 ### `AzureDevOpsRepository`
@@ -46,7 +46,7 @@ Fields: `commitId`, `comment`
 Pull request data returned by the pull requests endpoint.
 
 Fields: `pullRequestId`, `title`, `url`, `status`, `mergeCommitId`,
-`sourceRefName`, `workItemRefs`, `description`
+`sourceRefName`, `description`
 
 ### `AzureDevOpsWorkItem`
 
@@ -64,6 +64,18 @@ Key dictionary entries:
 | `System.Description`          | Work item description body (HTML or plain text)   |
 | `Custom.Visibility`           | Optional visibility override (`public`/`internal`)|
 | `Custom.AffectedVersions`     | Optional affected version range expression        |
+
+### `AzureDevOpsWorkItemRef`
+
+Work item id reference returned by WIQL queries and pull request work item links.
+
+Fields: `id`, `url`
+
+### `AzureDevOpsRef`
+
+Git reference (tag or branch) returned by the Azure DevOps refs endpoint.
+
+Fields: `name`, `objectId`
 
 ### `AzureDevOpsWorkItemQuery`
 

@@ -40,7 +40,7 @@ and are preserved as-is without any naming transformation.
 The client provides the following methods for retrieving the repository data needed
 to build a `BuildInformation` record:
 
-### `GetRepositoryAsync(organization, project, repository)`
+### `GetRepositoryAsync(repository)`
 
 Fetches repository metadata for the specified repository.
 
@@ -49,10 +49,18 @@ Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
 remote URL.
 
-### `GetCommitsAsync(repositoryId, fromCommit?, toCommit?)`
+### `GetTagsAsync(repositoryId)`
 
-Fetches the complete paginated commit history for the repository. Optional
-`fromCommit` and `toCommit` parameters restrict the range when provided.
+Fetches all tag references for the specified repository.
+
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&api-version=7.1`
+
+Returns a list of `AzureDevOpsRef` records, each containing the full reference name
+(e.g. `refs/tags/v1.0.0`) and the commit SHA it points to.
+
+### `GetCommitsAsync(repositoryId)`
+
+Fetches the complete paginated commit history for the repository.
 
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api-version=7.1`
 
