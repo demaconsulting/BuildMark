@@ -302,8 +302,7 @@ public static class BuildMarkConfigReader
             var value = GetScalarValue(entry.Value);
             switch (key)
             {
-                case "organization-url":
-                case "organizationurl":
+                case "url":
                     organizationUrl = value;
                     break;
 

@@ -190,7 +190,7 @@ public class ConfigurationTests
             connector:
               type: azure-devops
               azure-devops:
-                organization-url: https://dev.azure.com/myorg
+                url: https://dev.azure.com/myorg
                 organization: myorg
                 project: myproject
                 repository: myrepo
@@ -235,7 +235,7 @@ public class ConfigurationTests
             connector:
               type: azure-devops
               azure-devops:
-                organizationurl: https://dev.azure.com/myorg
+                url: https://dev.azure.com/myorg
                 org: myorg
                 project: myproject
                 repo: myrepo

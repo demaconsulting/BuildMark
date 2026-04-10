@@ -230,7 +230,7 @@ public class ConfigurationSubsystemTests
             connector:
               type: azure-devops
               azure-devops:
-                organization-url: https://dev.azure.com/acme
+                url: https://dev.azure.com/acme
                 organization: acme
                 project: my-project
                 repository: my-repo
