@@ -30,10 +30,16 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 public static class RepoConnectorFactory
 {
     /// <summary>
-    ///     Creates a repository connector based on the current environment.
+    ///     Asynchronously creates a repository connector based on the current environment.
     /// </summary>
     /// <param name="config">Optional connector configuration.</param>
-    /// <returns>Repository connector instance.</returns>
+    /// <returns>A task that resolves to the appropriate repository connector instance.</returns>
+    /// <remarks>
+    ///     This asynchronous variant performs git remote URL inspection by awaiting
+    ///     <see cref="ProcessRunner.TryRunAsync" /> to detect GitHub repositories when no
+    ///     GitHub Actions environment variables are present. Use <see cref="Create" /> when
+    ///     async execution is not possible (noting that it skips the git remote check).
+    /// </remarks>
     public static async Task<IRepoConnector> CreateAsync(ConnectorConfig? config = null)
     {
         // Honor explicit connector selection when configuration is available.

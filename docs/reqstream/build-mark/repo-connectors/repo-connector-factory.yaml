@@ -2,21 +2,40 @@
 # Software Unit Requirements for the RepoConnectorFactory Class
 #
 # RepoConnectorFactory creates the appropriate IRepoConnector implementation
-# based on the runtime environment (GitHub Actions environment variables,
-# or git remote URL inspection).
+# based on the runtime environment (GitHub Actions environment variables, or,
+# for the async path, git remote URL inspection).
 
 sections:
   - title: RepoConnectorFactory Unit Requirements
     requirements:
       - id: BuildMark-RepoConnectorFactory-Create
-        title: The RepoConnectorFactory class shall create the appropriate repository connector for the environment.
+        title: >-
+          The RepoConnectorFactory class shall synchronously create the appropriate repository
+          connector based on environment variables.
         justification: |
-          The factory encapsulates connector selection logic so that the Program class
-          does not need to know which connector to use. The correct connector is chosen
-          automatically based on GitHub Actions environment variables or git remote URL.
+          The synchronous factory method encapsulates connector selection logic for callers
+          that cannot use async/await. It selects the correct connector based on GitHub
+          Actions environment variables, avoiding sync-over-async deadlock risks by
+          skipping the git remote URL check.
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException
+
+      - id: BuildMark-RepoConnectorFactory-CreateAsync
+        title: >-
+          The RepoConnectorFactory class shall asynchronously create the appropriate repository
+          connector based on environment variables or git remote URL inspection.
+        justification: |
+          The async factory method is the preferred creation path. It auto-detects the
+          environment using GitHub Actions environment variables and, as a fallback,
+          awaits git remote URL inspection via ProcessRunner to determine whether the
+          repository is hosted on GitHub. Async execution avoids deadlock risks when
+          calling ProcessRunner.TryRunAsync.
+        tests:
+          - RepoConnectorFactory_CreateAsync_ReturnsConnector
+          - RepoConnectorFactory_CreateAsync_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectorFactory_CreateAsync_WithAzureDevOpsType_ThrowsNotSupportedException
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
@@ -28,3 +47,4 @@ sections:
           effect. This pattern extends naturally to future connector types.
         tests:
           - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+          - RepoConnectorFactory_CreateAsync_WithConnectorConfig_ForwardsGitHubConfiguration
