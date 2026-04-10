@@ -273,18 +273,23 @@ public static class BuildMarkConfigReader
     }
 
     /// <summary>
-    ///     Parses the Azure DevOps connector block.
+    ///     Gets an optional scalar value from the specified YAML node.
     /// </summary>
-    /// <param name="filePath">The configuration file path.</param>
-    /// <param name="node">The YAML node for the Azure DevOps connector.</param>
-    /// <param name="issues">The collected issues.</param>
-    /// <returns>The parsed Azure DevOps connector configuration.</returns>
+    /// <param name="node">The YAML node to extract a value from.</param>
+    /// <returns>The scalar value, or null if the value is empty or whitespace.</returns>
     private static string? GetOptionalScalarValue(YamlNode node)
     {
         var value = GetScalarValue(node);
         return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
+    /// <summary>
+    ///     Parses the Azure DevOps connector block.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML node for the Azure DevOps connector.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The parsed Azure DevOps connector configuration.</returns>
     private static AzureDevOpsConnectorConfig ParseAzureDevOpsConnector(
         string filePath,
         YamlNode node,
