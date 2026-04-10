@@ -116,9 +116,9 @@ sections:
     requirements:
       - id: BuildMark-AzureDevOpsConnectorConfig-Properties
         title: >-
-          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization,
-          Project, and Repository properties that override the corresponding
-          auto-detected values in AzureDevOpsRepoConnector.
+          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Project, and
+          Repository properties that override the corresponding auto-detected
+          values in AzureDevOpsRepoConnector.
         justification: |
           Teams using Azure DevOps where auto-detection from the Git remote URL is
           unreliable need a way to specify the organization URL, project, and
