@@ -162,6 +162,31 @@ public class ProcessRunnerTests
         // Assert - Verify exception message contains useful information
         Assert.Contains("failed with exit code", exception.Message);
     }
+
+    /// <summary>
+    ///     Test that RunAsync throws a descriptive InvalidOperationException when command is not found.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: ProcessRunner.RunAsync with a command that does not exist
+    ///     What the assertions prove: The method wraps the underlying error in an InvalidOperationException
+    ///     with a message identifying the missing command
+    /// </remarks>
+    [TestMethod]
+    public async Task ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException()
+    {
+        // Arrange - Use a command that definitely doesn't exist
+        var command = "nonexistent_command_12345678";
+        var arguments = "";
+
+        // Act & Assert - Verify InvalidOperationException is thrown with the command name
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await ProcessRunner.RunAsync(command, arguments));
+
+        // Assert - Verify exception message identifies the missing command
+        Assert.IsTrue(
+            exception.Message.Contains(command, StringComparison.Ordinal),
+            "Exception message should identify the command that was not found");
+    }
 }
 
 
