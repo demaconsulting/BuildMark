@@ -77,7 +77,6 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     {
         // Get repository metadata using git commands
         var repoUrl = await RunCommandAsync("git", "remote get-url origin");
-        var branch = await RunCommandAsync("git", "rev-parse --abbrev-ref HEAD");
         var currentCommitHash = await RunCommandAsync("git", "rev-parse HEAD");
 
         // Parse Azure DevOps organization, project, and repository from URL
@@ -93,7 +92,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         using var restClient = CreateRestClient(organizationUrl, project, token, isBearer);
 
         // Fetch all data from Azure DevOps
-        var adoData = await FetchAzureDevOpsDataAsync(restClient, repository, branch.Trim());
+        var adoData = await FetchAzureDevOpsDataAsync(restClient, repository);
 
         // Build lookup dictionaries and mappings
         var lookupData = BuildLookupData(adoData, project, organizationUrl);
@@ -171,12 +170,10 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="restClient">Azure DevOps REST client.</param>
     /// <param name="repository">Repository name.</param>
-    /// <param name="branch">Branch name.</param>
     /// <returns>Container with all fetched Azure DevOps data.</returns>
     private static async Task<AzureDevOpsData> FetchAzureDevOpsDataAsync(
         AzureDevOpsRestClient restClient,
-        string repository,
-        string branch)
+        string repository)
     {
         // Fetch all data in parallel
         var tagsTask = restClient.GetTagsAsync(repository);

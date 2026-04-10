@@ -23,7 +23,6 @@ sections:
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
-          - RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
