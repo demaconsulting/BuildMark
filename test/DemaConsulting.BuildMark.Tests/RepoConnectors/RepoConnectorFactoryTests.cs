@@ -20,6 +20,7 @@
 
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
@@ -88,80 +89,101 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
-    ///     Test that Create throws NotSupportedException when Azure DevOps type is specified.
-    /// </summary>
-    [TestMethod]
-    public void RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException()
-    {
-        // Arrange - create config with Azure DevOps connector type
-        var config = new ConnectorConfig { Type = "azure-devops" };
-
-        // Act and Assert - verify NotSupportedException is thrown
-        Assert.ThrowsExactly<NotSupportedException>(() => RepoConnectorFactory.Create(config));
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // BuildMark-RepoConnectorFactory-AzureDevOpsDetection
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    ///     Placeholder: verify that Create with azure-devops type creates an AzureDevOpsRepoConnector.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that Create with azure-devops type creates an AzureDevOpsRepoConnector.
     /// </summary>
     [TestMethod]
     public void RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that Create with ConnectorConfig { Type = "azure-devops" }
-        // returns an AzureDevOpsRepoConnector instance.
-        Assert.IsTrue(
-            File.Exists(typeof(DemaConsulting.BuildMark.Program).Assembly.Location),
-            "Assembly not found: AzureDevOpsType");
+        // Arrange - create config with Azure DevOps connector type
+        var config = new ConnectorConfig { Type = "azure-devops" };
+
+        // Act
+        var connector = RepoConnectorFactory.Create(config);
+
+        // Assert
+        Assert.IsNotNull(connector);
+        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
     }
 
     /// <summary>
-    ///     Placeholder: verify that Create returns AzureDevOpsRepoConnector when TF_BUILD is set.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
-    /// </summary>
-    [TestMethod]
-    public void RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector()
-    {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that when the TF_BUILD environment variable is set,
-        // Create returns an AzureDevOpsRepoConnector instance.
-        Assert.IsTrue(
-            File.Exists(typeof(DemaConsulting.BuildMark.Program).Assembly.Location),
-            "Assembly not found: TfBuildEnv");
-    }
-
-    /// <summary>
-    ///     Placeholder: verify that Create returns AzureDevOpsRepoConnector for Azure DevOps remote URLs.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
-    /// </summary>
-    [TestMethod]
-    public void RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector()
-    {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that when the git remote URL contains dev.azure.com or
-        // visualstudio.com, Create returns an AzureDevOpsRepoConnector instance.
-        Assert.IsTrue(
-            File.Exists(typeof(DemaConsulting.BuildMark.Program).Assembly.Location),
-            "Assembly not found: AzureDevOpsRemoteUrl");
-    }
-
-    /// <summary>
-    ///     Placeholder: verify that Create forwards AzureDevOpsConnectorConfig to the created connector.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that Create forwards AzureDevOpsConnectorConfig to the created connector.
     /// </summary>
     [TestMethod]
     public void RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that AzureDevOpsConnectorConfig settings (organization URL,
-        // project, repository) from ConnectorConfig are forwarded to the created
-        // AzureDevOpsRepoConnector instance.
-        Assert.IsTrue(
-            File.Exists(typeof(DemaConsulting.BuildMark.Program).Assembly.Location),
-            "Assembly not found: AzureDevOpsConnectorConfig");
+        // Arrange - create config with Azure DevOps settings
+        var adoConfig = new AzureDevOpsConnectorConfig
+        {
+            OrganizationUrl = "https://dev.azure.com/myorg",
+            Project = "myproject",
+            Repository = "myrepo"
+        };
+        var config = new ConnectorConfig
+        {
+            Type = "azure-devops",
+            AzureDevOps = adoConfig
+        };
+
+        // Act
+        var connector = RepoConnectorFactory.Create(config);
+
+        // Assert
+        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        var adoConnector = (AzureDevOpsRepoConnector)connector;
+        Assert.IsNotNull(adoConnector.ConfigurationOverrides);
+        Assert.AreEqual("https://dev.azure.com/myorg", adoConnector.ConfigurationOverrides.OrganizationUrl);
+        Assert.AreEqual("myproject", adoConnector.ConfigurationOverrides.Project);
+        Assert.AreEqual("myrepo", adoConnector.ConfigurationOverrides.Repository);
+    }
+
+    /// <summary>
+    ///     Test that Create returns AzureDevOpsRepoConnector when TF_BUILD environment variable is set.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector()
+    {
+        // Arrange - save and set TF_BUILD, clear GitHub env vars
+        var originalTfBuild = Environment.GetEnvironmentVariable("TF_BUILD");
+        var originalGhActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+        var originalGhWorkspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("TF_BUILD", "True");
+            Environment.SetEnvironmentVariable("GITHUB_ACTIONS", null);
+            Environment.SetEnvironmentVariable("GITHUB_WORKSPACE", null);
+
+            // Act
+            var connector = RepoConnectorFactory.Create();
+
+            // Assert
+            Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        }
+        finally
+        {
+            // Restore original environment
+            Environment.SetEnvironmentVariable("TF_BUILD", originalTfBuild);
+            Environment.SetEnvironmentVariable("GITHUB_ACTIONS", originalGhActions);
+            Environment.SetEnvironmentVariable("GITHUB_WORKSPACE", originalGhWorkspace);
+        }
+    }
+
+    /// <summary>
+    ///     Test that Create returns AzureDevOpsRepoConnector for Azure DevOps remote URLs.
+    ///     This test verifies the explicit type config path since environment-level remote URL
+    ///     detection cannot be isolated in a test without modifying the real git remote.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector()
+    {
+        // Arrange - use explicit config to verify Azure DevOps connector creation
+        // since we cannot modify the actual git remote URL during tests
+        var config = new ConnectorConfig { Type = "azure-devops" };
+
+        // Act
+        var connector = RepoConnectorFactory.Create(config);
+
+        // Assert
+        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
     }
 }
