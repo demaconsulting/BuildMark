@@ -21,16 +21,28 @@
 namespace DemaConsulting.BuildMark.Configuration;
 
 /// <summary>
-///     Represents the placeholder Azure DevOps connector settings.
+///     Represents the Azure DevOps connector settings.
 /// </summary>
 public sealed record AzureDevOpsConnectorConfig
 {
     /// <summary>
-    ///     Returns a stable description for the placeholder configuration.
+    ///     Gets or sets the Azure DevOps organization URL override
+    ///     (e.g., "https://dev.azure.com/myorg").
     /// </summary>
-    /// <returns>The placeholder description.</returns>
-    public override string ToString()
-    {
-        return nameof(AzureDevOpsConnectorConfig);
-    }
+    public string? OrganizationUrl { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the Azure DevOps organization name override.
+    /// </summary>
+    public string? Organization { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the Azure DevOps project name override.
+    /// </summary>
+    public string? Project { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the repository name override within the project.
+    /// </summary>
+    public string? Repository { get; init; }
 }
