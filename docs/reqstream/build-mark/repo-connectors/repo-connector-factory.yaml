@@ -3,24 +3,24 @@
 #
 # RepoConnectorFactory creates the appropriate IRepoConnector implementation
 # based on the runtime environment (GitHub Actions environment variables and
-# git remote URL inspection using fully async operations).
+# git remote URL inspection using sync-over-async pattern safe in console apps).
 
 sections:
   - title: RepoConnectorFactory Unit Requirements
     requirements:
-      - id: BuildMark-RepoConnectorFactory-CreateAsync
+      - id: BuildMark-RepoConnectorFactory-Create
         title: >-
-          The RepoConnectorFactory class shall asynchronously create the appropriate repository
+          The RepoConnectorFactory class shall create the appropriate repository
           connector based on environment variables and git remote URL inspection.
         justification: |
           The factory method encapsulates connector selection logic, auto-detecting
           the environment using GitHub Actions environment variables and git remote
-          URL inspection. The method is fully asynchronous, avoiding sync-over-async
-          patterns throughout the codebase.
+          URL inspection. Uses sync-over-async pattern which is safe in console
+          applications as there is no synchronization context that could cause deadlocks.
         tests:
-          - RepoConnectorFactory_CreateAsync_ReturnsConnector
-          - RepoConnectorFactory_CreateAsync_ReturnsGitHubConnectorForThisRepo
-          - RepoConnectorFactory_CreateAsync_WithAzureDevOpsType_ThrowsNotSupportedException
+          - RepoConnectorFactory_Create_ReturnsConnector
+          - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
@@ -31,4 +31,4 @@ sections:
           so that owner, repository, and base URL overrides from .buildmark.yaml take
           effect. This pattern extends naturally to future connector types.
         tests:
-          - RepoConnectorFactory_CreateAsync_WithConnectorConfig_ForwardsGitHubConfiguration
+          - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration

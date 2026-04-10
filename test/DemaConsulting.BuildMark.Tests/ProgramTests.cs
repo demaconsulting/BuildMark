@@ -43,10 +43,10 @@ public class ProgramTests
     }
 
     /// <summary>
-    ///     Test that RunAsync with version flag outputs version to console.
+    ///     Test that Run with version flag outputs version to console.
     /// </summary>
     [TestMethod]
-    public async Task Program_RunAsync_VersionFlag_OutputsVersionToConsole()
+    public void Program_Run_VersionFlag_OutputsVersionToConsole()
     {
         // Create context with version flag
         using var context = Context.Create(["-v"]);
@@ -59,7 +59,7 @@ public class ProgramTests
         try
         {
             // Run program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Verify version is written to console
             var output = writer.ToString();
@@ -73,10 +73,10 @@ public class ProgramTests
     }
 
     /// <summary>
-    ///     Test that RunAsync with help flag outputs help message.
+    ///     Test that Run with help flag outputs help message.
     /// </summary>
     [TestMethod]
-    public async Task Program_RunAsync_HelpFlag_OutputsHelpMessage()
+    public void Program_Run_HelpFlag_OutputsHelpMessage()
     {
         // Create context with help flag and silent mode to capture output
         using var context = Context.Create(["-h"]);
@@ -89,7 +89,7 @@ public class ProgramTests
         try
         {
             // Run program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Verify help is written to console
             var output = writer.ToString();
@@ -105,10 +105,10 @@ public class ProgramTests
     }
 
     /// <summary>
-    ///     Test that RunAsync with validate flag outputs validation message.
+    ///     Test that Run with validate flag outputs validation message.
     /// </summary>
     [TestMethod]
-    public async Task Program_RunAsync_ValidateFlag_OutputsValidationMessage()
+    public void Program_Run_ValidateFlag_OutputsValidationMessage()
     {
         // Create context with validate flag
         using var context = Context.Create(["--validate"]);
@@ -121,7 +121,7 @@ public class ProgramTests
         try
         {
             // Run program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Verify validation message is written to console
             var output = writer.ToString();
@@ -135,10 +135,10 @@ public class ProgramTests
     }
 
     /// <summary>
-    ///     Test that RunAsync with report and include-known-issues flags generates report with known issues.
+    ///     Test that Run with report and include-known-issues flags generates report with known issues.
     /// </summary>
     [TestMethod]
-    public async Task Program_RunAsync_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues()
+    public void Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues()
     {
         // Create temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -158,7 +158,7 @@ public class ProgramTests
             try
             {
                 // Run program
-                await Program.RunAsync(context);
+                Program.Run(context);
 
                 // Verify report file was created
                 Assert.IsTrue(File.Exists(reportFile));
@@ -183,16 +183,16 @@ public class ProgramTests
     }
 
     /// <summary>
-    ///     Test that RunAsync with lint flag succeeds when no configuration file is present.
+    ///     Test that Run with lint flag succeeds when no configuration file is present.
     /// </summary>
     [TestMethod]
-    public async Task Program_RunAsync_LintFlagWithoutConfiguration_LeavesExitCodeAtZero()
+    public void Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero()
     {
         // Arrange
         using var context = Context.Create(["--lint", "--silent"]);
 
         // Act
-        await Program.RunAsync(context);
+        Program.Run(context);
 
         // Assert
         Assert.AreEqual(0, context.ExitCode);

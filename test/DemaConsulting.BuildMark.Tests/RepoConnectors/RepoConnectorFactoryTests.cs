@@ -31,13 +31,13 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 public class RepoConnectorFactoryTests
 {
     /// <summary>
-    ///     Test that CreateAsync returns a connector instance.
+    ///     Test that Create returns a connector instance.
     /// </summary>
     [TestMethod]
-    public async Task RepoConnectorFactory_CreateAsync_ReturnsConnector()
+    public void RepoConnectorFactory_Create_ReturnsConnector()
     {
         // Create a repository connector
-        var connector = await RepoConnectorFactory.CreateAsync();
+        var connector = RepoConnectorFactory.Create();
 
         // Verify connector is created successfully
         Assert.IsNotNull(connector);
@@ -45,23 +45,23 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync returns GitHubRepoConnector for this repository.
+    ///     Test that Create returns GitHubRepoConnector for this repository.
     /// </summary>
     [TestMethod]
-    public async Task RepoConnectorFactory_CreateAsync_ReturnsGitHubConnectorForThisRepo()
+    public void RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo()
     {
         // Create connector for this repository
-        var connector = await RepoConnectorFactory.CreateAsync();
+        var connector = RepoConnectorFactory.Create();
 
         // Verify GitHub connector is returned
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
 
     /// <summary>
-    ///     Test that CreateAsync forwards GitHub connector configuration to the created connector.
+    ///     Test that Create forwards GitHub connector configuration to the created connector.
     /// </summary>
     [TestMethod]
-    public async Task RepoConnectorFactory_CreateAsync_WithConnectorConfig_ForwardsGitHubConfiguration()
+    public void RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration()
     {
         // Arrange
         var config = new ConnectorConfig
@@ -76,7 +76,7 @@ public class RepoConnectorFactoryTests
         };
 
         // Act
-        var connector = await RepoConnectorFactory.CreateAsync(config);
+        var connector = RepoConnectorFactory.Create(config);
 
         // Assert
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
@@ -88,16 +88,16 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
-    ///     Test that CreateAsync throws NotSupportedException when Azure DevOps type is specified.
+    ///     Test that Create throws NotSupportedException when Azure DevOps type is specified.
     /// </summary>
     [TestMethod]
-    public async Task RepoConnectorFactory_CreateAsync_WithAzureDevOpsType_ThrowsNotSupportedException()
+    public void RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException()
     {
         // Arrange - create config with Azure DevOps connector type
         var config = new ConnectorConfig { Type = "azure-devops" };
 
         // Act and Assert - verify NotSupportedException is thrown
-        await Assert.ThrowsExactlyAsync<NotSupportedException>(async () => await RepoConnectorFactory.CreateAsync(config));
+        Assert.ThrowsExactly<NotSupportedException>(() => RepoConnectorFactory.Create(config));
     }
 }
 

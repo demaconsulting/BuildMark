@@ -33,8 +33,8 @@ public static class RepoConnectorFactory
     ///     Creates a repository connector based on the current environment.
     /// </summary>
     /// <param name="config">Optional connector configuration.</param>
-    /// <returns>Task resolving to a repository connector instance.</returns>
-    public static async Task<IRepoConnector> CreateAsync(ConnectorConfig? config = null)
+    /// <returns>Repository connector instance.</returns>
+    public static IRepoConnector Create(ConnectorConfig? config = null)
     {
         // Honor explicit connector selection when configuration is available.
         if (config?.Type != null &&
@@ -51,7 +51,7 @@ public static class RepoConnectorFactory
         }
 
         // Check if git remote points to GitHub
-        if (await IsGitHubRepositoryAsync())
+        if (IsGitHubRepository())
         {
             return new GitHubRepoConnector(config?.GitHub);
         }
@@ -63,11 +63,13 @@ public static class RepoConnectorFactory
     /// <summary>
     ///     Checks if the current repository is a GitHub repository.
     /// </summary>
-    /// <returns>Task resolving to true if GitHub repository.</returns>
-    private static async Task<bool> IsGitHubRepositoryAsync()
+    /// <returns>True if GitHub repository.</returns>
+    private static bool IsGitHubRepository()
     {
         // Get git remote URL and check if it contains github.com
-        var output = await ProcessRunner.TryRunAsync("git", "remote get-url origin");
+        // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
+        // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
+        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 }

@@ -55,7 +55,7 @@ internal static class Program
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>Exit code: 0 for success, non-zero for failure.</returns>
-    private static async Task<int> Main(string[] args)
+    private static int Main(string[] args)
     {
         try
         {
@@ -63,7 +63,7 @@ internal static class Program
             using var context = Context.Create(args);
 
             // Run the program logic
-            await RunAsync(context);
+            Run(context);
 
             // Return the exit code from the context
             return context.ExitCode;
@@ -71,19 +71,19 @@ internal static class Program
         catch (ArgumentException ex)
         {
             // Print expected argument exceptions and return error code
-            await Console.Error.WriteLineAsync($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
             return 1;
         }
         catch (InvalidOperationException ex)
         {
             // Print expected operation exceptions and return error code
-            await Console.Error.WriteLineAsync($"Error: {ex.Message}");
+            Console.Error.WriteLine($"Error: {ex.Message}");
             return 1;
         }
         catch (Exception ex)
         {
             // Print unexpected exceptions and re-throw to generate event logs
-            await Console.Error.WriteLineAsync($"Unexpected error: {ex.Message}");
+            Console.Error.WriteLine($"Unexpected error: {ex.Message}");
             throw;
         }
     }
@@ -92,7 +92,7 @@ internal static class Program
     ///     Runs the program logic based on the provided context.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
-    public static async Task RunAsync(Context context)
+    public static void Run(Context context)
     {
         // Priority 1: Version query
         if (context.Version)
@@ -114,20 +114,20 @@ internal static class Program
         // Priority 3: Self-Validation
         if (context.Validate)
         {
-            await Validation.RunAsync(context);
+            Validation.Run(context);
             return;
         }
 
         // Priority 4: Configuration linting
         if (context.Lint)
         {
-            var loadResult = await LoadConfigurationAsync();
+            var loadResult = LoadConfiguration();
             loadResult.ReportTo(context);
             return;
         }
 
         // Priority 5: Build notes processing
-        await ProcessBuildNotesAsync(context);
+        ProcessBuildNotes(context);
     }
 
     /// <summary>
@@ -167,10 +167,10 @@ internal static class Program
     ///     Processes build notes and generates markdown output.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
-    private static async Task ProcessBuildNotesAsync(Context context)
+    private static void ProcessBuildNotes(Context context)
     {
         // Load the optional configuration before attempting report generation.
-        var loadResult = await LoadConfigurationAsync();
+        var loadResult = LoadConfiguration();
         loadResult.ReportTo(context);
         if (loadResult.HasErrors)
         {
@@ -178,9 +178,7 @@ internal static class Program
         }
 
         // Create repository connector using factory if provided, otherwise use the configured connector.
-        var connector = context.ConnectorFactory != null
-            ? await context.ConnectorFactory.Invoke()
-            : await RepoConnectorFactory.CreateAsync(loadResult.Config?.Connector);
+        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
 
         // Configure routing rules on the connector when not using a test factory
         if (context.ConnectorFactory == null && connector is RepoConnectorBase configurableConnector)
@@ -211,7 +209,7 @@ internal static class Program
         BuildInformation buildInfo;
         try
         {
-            buildInfo = await connector.GetBuildInformationAsync(buildVersion);
+            buildInfo = connector.GetBuildInformationAsync(buildVersion).GetAwaiter().GetResult();
         }
         catch (InvalidOperationException ex)
         {
@@ -238,7 +236,7 @@ internal static class Program
             try
             {
                 var markdown = buildInfo.ToMarkdown(context.ReportDepth, context.IncludeKnownIssues);
-                await File.WriteAllTextAsync(context.ReportFile, markdown);
+                File.WriteAllText(context.ReportFile, markdown);
                 context.WriteLine("Build report generated successfully.");
             }
             // Generic catch is justified here to handle any file system exception gracefully
@@ -253,9 +251,9 @@ internal static class Program
     /// <summary>
     ///     Loads the optional repository configuration.
     /// </summary>
-    /// <returns>Task resolving to the configuration load result.</returns>
-    private static async Task<ConfigurationLoadResult> LoadConfigurationAsync()
+    /// <returns>The configuration load result.</returns>
+    private static ConfigurationLoadResult LoadConfiguration()
     {
-        return await BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory);
+        return BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory).GetAwaiter().GetResult();
     }
 }

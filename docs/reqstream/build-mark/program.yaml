@@ -14,7 +14,7 @@ sections:
           Users need to quickly identify the version of the tool they are using for
           troubleshooting and compatibility verification.
         tests:
-          - Program_RunAsync_VersionFlag_OutputsVersionToConsole
+          - Program_Run_VersionFlag_OutputsVersionToConsole
           - Program_Version_ReturnsValidVersion
 
       - id: BuildMark-Program-Help
@@ -23,7 +23,7 @@ sections:
           Users need access to command-line usage documentation without requiring
           external resources.
         tests:
-          - Program_RunAsync_HelpFlag_OutputsHelpMessage
+          - Program_Run_HelpFlag_OutputsHelpMessage
 
       - id: BuildMark-Program-Validate
         title: The Program class shall support --validate flag to invoke the self-validation framework.
@@ -31,7 +31,7 @@ sections:
           Provides a built-in mechanism to verify the tool is functioning correctly
           in the deployment environment.
         tests:
-          - Program_RunAsync_ValidateFlag_OutputsValidationMessage
+          - Program_Run_ValidateFlag_OutputsValidationMessage
 
       - id: BuildMark-Program-Lint
         title: The Program class shall support a --lint flag to validate the .buildmark.yaml configuration file.
@@ -40,7 +40,7 @@ sections:
           without running a full build. The --lint flag reads and validates .buildmark.yaml,
           reports any issues to the user, and exits without generating a report.
         tests:
-          - Program_RunAsync_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+          - Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
 
       - id: BuildMark-Program-Report
         title: The Program class shall generate build notes markdown reports when --report is specified.
@@ -49,4 +49,4 @@ sections:
           class orchestrates the repository connector, gathering of build information,
           and generation of the output markdown report.
         tests:
-          - Program_RunAsync_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+          - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues

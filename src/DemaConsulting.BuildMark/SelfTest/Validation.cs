@@ -38,7 +38,7 @@ internal static class Validation
     ///     Runs self-validation tests and optionally writes results to a file.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
-    public static async Task RunAsync(Context context)
+    public static void Run(Context context)
     {
         // Print validation header
         PrintValidationHeader(context);
@@ -50,14 +50,14 @@ internal static class Validation
         };
 
         // Create mock connector factory
-        var mockFactory = () => Task.FromResult<IRepoConnector>(new MockRepoConnector());
+        var mockFactory = () => new MockRepoConnector() as IRepoConnector;
 
         // Run core functionality tests
-        await RunMarkdownReportGenerationAsync(context, testResults, mockFactory);
-        await RunGitIntegrationAsync(context, testResults, mockFactory);
-        await RunIssueTrackingAsync(context, testResults, mockFactory);
-        await RunKnownIssuesReportingAsync(context, testResults, mockFactory);
-        await RunRulesRoutingAsync(context, testResults);
+        RunMarkdownReportGeneration(context, testResults, mockFactory);
+        RunGitIntegration(context, testResults, mockFactory);
+        RunIssueTracking(context, testResults, mockFactory);
+        RunKnownIssuesReporting(context, testResults, mockFactory);
+        RunRulesRouting(context, testResults);
 
         // Calculate totals
         var totalTests = testResults.Results.Count;
@@ -108,12 +108,12 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     /// <param name="mockFactory">The mock connector factory.</param>
-    private static async Task RunMarkdownReportGenerationAsync(
+    private static void RunMarkdownReportGeneration(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
-        Func<Task<IRepoConnector>> mockFactory)
+        Func<IRepoConnector> mockFactory)
     {
-        await RunValidationTestAsync(
+        RunValidationTest(
             context,
             testResults,
             "BuildMark_MarkdownReportGeneration",
@@ -144,12 +144,12 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     /// <param name="mockFactory">The mock connector factory.</param>
-    private static async Task RunGitIntegrationAsync(
+    private static void RunGitIntegration(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
-        Func<Task<IRepoConnector>> mockFactory)
+        Func<IRepoConnector> mockFactory)
     {
-        await RunValidationTestAsync(
+        RunValidationTest(
             context,
             testResults,
             "BuildMark_GitIntegration",
@@ -174,12 +174,12 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     /// <param name="mockFactory">The mock connector factory.</param>
-    private static async Task RunIssueTrackingAsync(
+    private static void RunIssueTracking(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
-        Func<Task<IRepoConnector>> mockFactory)
+        Func<IRepoConnector> mockFactory)
     {
-        await RunValidationTestAsync(
+        RunValidationTest(
             context,
             testResults,
             "BuildMark_IssueTracking",
@@ -203,12 +203,12 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
     /// <param name="mockFactory">The mock connector factory.</param>
-    private static async Task RunKnownIssuesReportingAsync(
+    private static void RunKnownIssuesReporting(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
-        Func<Task<IRepoConnector>> mockFactory)
+        Func<IRepoConnector> mockFactory)
     {
-        await RunValidationTestAsync(
+        RunValidationTest(
             context,
             testResults,
             "BuildMark_KnownIssuesReporting",
@@ -236,7 +236,7 @@ internal static class Validation
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <param name="testResults">The test results collection.</param>
-    private static async Task RunRulesRoutingAsync(
+    private static void RunRulesRouting(
         Context context,
         DemaConsulting.TestResults.TestResults testResults)
     {
@@ -258,10 +258,10 @@ internal static class Validation
                 });
 
             // Return the configured connector as the interface type
-            return Task.FromResult<IRepoConnector>(mc);
+            return (IRepoConnector)mc;
         };
 
-        await RunValidationTestAsync(
+        RunValidationTest(
             context,
             testResults,
             "BuildMark_RulesRouting",
@@ -293,11 +293,11 @@ internal static class Validation
     /// <param name="mockFactory">The mock connector factory.</param>
     /// <param name="reportFileName">Optional report file name to generate.</param>
     /// <param name="validator">Function to validate test results. Returns null on success or error message on failure.</param>
-    private static async Task RunValidationTestAsync(
+    private static void RunValidationTest(
         Context context,
         DemaConsulting.TestResults.TestResults testResults,
         string testName,
-        Func<Task<IRepoConnector>> mockFactory,
+        Func<IRepoConnector> mockFactory,
         string? reportFileName,
         Func<string, string?, string?> validator)
     {
@@ -334,7 +334,7 @@ internal static class Validation
             int exitCode;
             using (var testContext = Context.Create([.. args], mockFactory))
             {
-                await Program.RunAsync(testContext);
+                Program.Run(testContext);
                 exitCode = testContext.ExitCode;
             }
 
@@ -342,9 +342,9 @@ internal static class Validation
             if (exitCode == 0)
             {
                 // Read log and report contents
-                var logContent = await File.ReadAllTextAsync(logFile);
+                var logContent = File.ReadAllText(logFile);
                 var reportContent = reportFile != null && File.Exists(reportFile)
-                    ? await File.ReadAllTextAsync(reportFile)
+                    ? File.ReadAllText(reportFile)
                     : null;
 
                 // Validate the results

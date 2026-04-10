@@ -264,7 +264,7 @@ public class IntegrationTests
     ///     Test that the report generates a markdown file with version information.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_GeneratesMarkdownWithVersionInformation()
+    public void IntegrationTest_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -273,14 +273,14 @@ public class IntegrationTests
             // Create context with mock connector injected for deterministic output
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report file contains markdown title and version information
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("# Build Report", content);
             Assert.Contains("## Version Information", content);
             Assert.Contains("2.0.0", content);
@@ -298,7 +298,7 @@ public class IntegrationTests
     ///     Test that the report contains changes and bug fixes with hyperlinks.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks()
+    public void IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -307,14 +307,14 @@ public class IntegrationTests
             // Create context with mock connector injected for deterministic output
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report contains changes and bug fixes sections with linked items
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("## Changes", content);
             Assert.Contains("## Bugs Fixed", content);
             Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
@@ -332,7 +332,7 @@ public class IntegrationTests
     ///     Test that the report shows the version range from the previous release.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease()
+    public void IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -341,14 +341,14 @@ public class IntegrationTests
             // Create context with mock connector injected for deterministic output
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report identifies the previous version as the baseline of the version range
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("Previous Version", content);
             Assert.Contains("ver-1.1.0", content);
         }
@@ -365,7 +365,7 @@ public class IntegrationTests
     ///     Test that the report includes known issues when the flag is set.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet()
+    public void IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -374,14 +374,14 @@ public class IntegrationTests
             // Create context with mock connector and include-known-issues flag
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report includes a known issues section
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("## Known Issues", content);
         }
         finally
@@ -397,7 +397,7 @@ public class IntegrationTests
     ///     Test that report-depth 2 uses level-two headings in the report.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings()
+    public void IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -406,14 +406,14 @@ public class IntegrationTests
             // Create context with mock connector and report depth 2
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--report-depth", "2", "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report uses level-two heading for the title and level-three for sections
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("## Build Report", content);
             Assert.Contains("### Version Information", content);
         }
@@ -448,7 +448,7 @@ public class IntegrationTests
     ///     Test that the tool consumes the .buildmark.yaml configuration file during report generation.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration()
+    public void IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -457,14 +457,14 @@ public class IntegrationTests
             // Create context with mock connector (configuration loading executes as part of report generation)
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program which loads configuration before generating the report
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: tool succeeds and produces a report (configuration was loaded without error)
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.IsFalse(string.IsNullOrWhiteSpace(content));
             Assert.Contains("# Build Report", content);
         }
@@ -481,7 +481,7 @@ public class IntegrationTests
     ///     Test that the tool uses the configured repository connector to fetch build data.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_UsesConnectorForBuildData()
+    public void IntegrationTest_Report_UsesConnectorForBuildData()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -490,14 +490,14 @@ public class IntegrationTests
             // Create context with mock connector injected via connector factory
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report contains data sourced from the mock connector
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("Update documentation", content);
             Assert.Contains("Fix bug in Y", content);
         }
@@ -514,7 +514,7 @@ public class IntegrationTests
     ///     Test that the report contains section definitions matching expected structure.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_ContainsSectionDefinitions()
+    public void IntegrationTest_Report_ContainsSectionDefinitions()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -523,14 +523,14 @@ public class IntegrationTests
             // Create context with mock connector
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: report contains the expected section headings
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             Assert.Contains("## Version Information", content);
             Assert.Contains("## Changes", content);
             Assert.Contains("## Bugs Fixed", content);
@@ -548,7 +548,7 @@ public class IntegrationTests
     ///     Test that items are routed to the correct report sections by type.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_RoutesItemsToCorrectSections()
+    public void IntegrationTest_Report_RoutesItemsToCorrectSections()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -557,14 +557,14 @@ public class IntegrationTests
             // Create context with mock connector (which provides items of different types)
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
+                () => new MockRepoConnector());
 
             // Act: run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Assert: bug items appear in Bugs Fixed section; non-bug items appear in Changes section
             Assert.AreEqual(0, context.ExitCode);
-            var content = await File.ReadAllTextAsync(reportFile);
+            var content = File.ReadAllText(reportFile);
             var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
             var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
             Assert.IsGreaterThanOrEqualTo(0, changesStart, "Report must contain Changes section");
@@ -591,10 +591,10 @@ public class IntegrationTests
     ///     Test that the tool recognizes a buildmark code block in item descriptions.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_RecognizesBuildmarkCodeBlock()
+    public void IntegrationTest_Report_RecognizesBuildmarkCodeBlock()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with buildmark type override was reclassified (proves block was recognized)
         Assert.Contains("Reclassified as bug", content);
@@ -604,10 +604,10 @@ public class IntegrationTests
     ///     Test that the tool supports a visibility field in the buildmark block.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_VisibilityFieldControlsInclusion()
+    public void IntegrationTest_Report_VisibilityFieldControlsInclusion()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: public-visibility item is included; internal-visibility item is excluded
         Assert.Contains("Public feature X", content);
@@ -618,10 +618,10 @@ public class IntegrationTests
     ///     Test that the tool includes an item when visibility is set to public.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_PublicVisibility_IncludesItem()
+    public void IntegrationTest_Report_PublicVisibility_IncludesItem()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with visibility: public is present in the report
         Assert.Contains("Public feature X", content);
@@ -631,10 +631,10 @@ public class IntegrationTests
     ///     Test that the tool excludes an item when visibility is set to internal.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_InternalVisibility_ExcludesItem()
+    public void IntegrationTest_Report_InternalVisibility_ExcludesItem()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with visibility: internal does not appear in the report
         Assert.DoesNotContain("Internal refactoring", content);
@@ -644,10 +644,10 @@ public class IntegrationTests
     ///     Test that the tool supports a type field in the buildmark block to override classification.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_TypeFieldOverridesClassification()
+    public void IntegrationTest_Report_TypeFieldOverridesClassification()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item originally typed as feature was reclassified to bug (appears in Bugs Fixed)
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
@@ -665,10 +665,10 @@ public class IntegrationTests
     ///     Test that the tool classifies an item as a bug fix when type is set to bug.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed()
+    public void IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with type: bug override appears in the Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
@@ -681,10 +681,10 @@ public class IntegrationTests
     ///     Test that the tool classifies an item as a feature when type is set to feature.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_TypeFeature_PlacesItemInChanges()
+    public void IntegrationTest_Report_TypeFeature_PlacesItemInChanges()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with type: feature override appears in the Changes section
         var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
@@ -699,10 +699,10 @@ public class IntegrationTests
     ///     Test that the tool supports an affected-versions field in the buildmark block.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully()
+    public void IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with affected-versions field is included in the report
         // (the affected-versions field was parsed without error and the item was processed)
@@ -713,11 +713,11 @@ public class IntegrationTests
     ///     Test that the affected-versions field uses interval notation.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation()
+    public void IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation()
     {
         // Arrange: generate a report using the controls mock connector
         // (the connector creates an item with interval notation "[1.0.0, 2.0.0)")
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: the item with interval notation was parsed and routed to Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
@@ -730,10 +730,10 @@ public class IntegrationTests
     ///     Test that the tool recognizes a buildmark block wrapped in an HTML comment.
     /// </summary>
     [TestMethod]
-    public async Task IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized()
+    public void IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized()
     {
         // Arrange: generate a report using the controls mock connector
-        var content = await GenerateControlsMockReportAsync();
+        var content = GenerateControlsMockReport();
 
         // Assert: item with HTML-comment-wrapped buildmark block is recognized and processed
         // The hidden block specifies type: bug, so the item should appear in Bugs Fixed section
@@ -746,8 +746,8 @@ public class IntegrationTests
     /// <summary>
     ///     Generates a report using the ControlsMockConnector and returns the report content.
     /// </summary>
-    /// <returns>Task resolving to the markdown report content string.</returns>
-    private static async Task<string> GenerateControlsMockReportAsync()
+    /// <returns>The markdown report content string.</returns>
+    private static string GenerateControlsMockReport()
     {
         var reportFile = Path.GetTempFileName();
         try
@@ -755,14 +755,14 @@ public class IntegrationTests
             // Create context with controls mock connector
             using var context = Context.Create(
                 ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => Task.FromResult<IRepoConnector>(new ControlsMockConnector()));
+                () => new ControlsMockConnector());
 
             // Run the program
-            await Program.RunAsync(context);
+            Program.Run(context);
 
             // Verify success and return content
             Assert.AreEqual(0, context.ExitCode);
-            return await File.ReadAllTextAsync(reportFile);
+            return File.ReadAllText(reportFile);
         }
         finally
         {

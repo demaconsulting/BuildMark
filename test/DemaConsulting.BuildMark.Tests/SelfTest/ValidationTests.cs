@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Cli;
-using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.SelfTest;
 
@@ -32,10 +31,10 @@ namespace DemaConsulting.BuildMark.Tests.SelfTest;
 public class ValidationTests
 {
     /// <summary>
-    ///     Test that Validation.RunAsync writes TRX results file when specified.
+    ///     Test that Validation.Run writes TRX results file when specified.
     /// </summary>
     [TestMethod]
-    public async Task Validation_RunAsync_WithTrxResultsFile_WritesTrxFile()
+    public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange
         var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
@@ -58,12 +57,14 @@ public class ValidationTests
                 Console.SetError(errorWriter);
 
                 // Act
-                using var context = Context.Create(args, () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
-                await Validation.RunAsync(context);
+                using var context = Context.Create(args, () => new MockRepoConnector());
+                Validation.Run(context);
+
+                // Assert - Verify TRX file was created
                 Assert.IsTrue(File.Exists(trxFile), "TRX file should be created");
 
                 // Verify TRX file contains expected content
-                var trxContent = await File.ReadAllTextAsync(trxFile);
+                var trxContent = File.ReadAllText(trxFile);
                 Assert.Contains("TestRun", trxContent);
                 Assert.Contains("BuildMark Self-Validation", trxContent);
             }
@@ -85,10 +86,10 @@ public class ValidationTests
     }
 
     /// <summary>
-    ///     Test that Validation.RunAsync writes JUnit XML results file when specified.
+    ///     Test that Validation.Run writes JUnit XML results file when specified.
     /// </summary>
     [TestMethod]
-    public async Task Validation_RunAsync_WithXmlResultsFile_WritesJUnitFile()
+    public void Validation_Run_WithXmlResultsFile_WritesJUnitFile()
     {
         // Arrange
         var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
@@ -111,14 +112,14 @@ public class ValidationTests
                 Console.SetError(errorWriter);
 
                 // Act
-                using var context = Context.Create(args, () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
-                await Validation.RunAsync(context);
+                using var context = Context.Create(args, () => new MockRepoConnector());
+                Validation.Run(context);
 
                 // Assert - Verify XML file was created
                 Assert.IsTrue(File.Exists(xmlFile), "XML file should be created");
 
                 // Verify XML file contains expected content
-                var xmlContent = await File.ReadAllTextAsync(xmlFile);
+                var xmlContent = File.ReadAllText(xmlFile);
                 Assert.Contains("testsuites", xmlContent);
                 Assert.Contains("BuildMark Self-Validation", xmlContent);
             }
@@ -140,10 +141,10 @@ public class ValidationTests
     }
 
     /// <summary>
-    ///     Test that Validation.RunAsync handles unsupported results file extension.
+    ///     Test that Validation.Run handles unsupported results file extension.
     /// </summary>
     [TestMethod]
-    public async Task Validation_RunAsync_WithUnsupportedResultsFileExtension_ShowsError()
+    public void Validation_Run_WithUnsupportedResultsFileExtension_ShowsError()
     {
         // Arrange
         var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
@@ -163,8 +164,8 @@ public class ValidationTests
                 Console.SetError(errorWriter);
 
                 // Act
-                using var context = Context.Create(args, () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
-                await Validation.RunAsync(context);
+                using var context = Context.Create(args, () => new MockRepoConnector());
+                Validation.Run(context);
 
                 // Assert - Verify error message in error output (WriteError writes to Console.Error)
                 var output = errorWriter.ToString();
@@ -187,10 +188,10 @@ public class ValidationTests
     }
 
     /// <summary>
-    ///     Test that Validation.RunAsync handles write failure for results file.
+    ///     Test that Validation.Run handles write failure for results file.
     /// </summary>
     [TestMethod]
-    public async Task Validation_RunAsync_WithInvalidResultsFilePath_ShowsError()
+    public void Validation_Run_WithInvalidResultsFilePath_ShowsError()
     {
         // Arrange
         var invalidPath = Path.Combine("/invalid_path_that_does_not_exist_12345678", "results.trx");
@@ -205,8 +206,8 @@ public class ValidationTests
             Console.SetError(errorWriter);
 
             // Act
-            using var context = Context.Create(args, () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
-            await Validation.RunAsync(context);
+            using var context = Context.Create(args, () => new MockRepoConnector());
+            Validation.Run(context);
 
             // Assert - Verify error message in error output (WriteError writes to Console.Error)
             var output = errorWriter.ToString();
@@ -220,17 +221,17 @@ public class ValidationTests
     }
 
     /// <summary>
-    ///     Test that Validation.RunAsync completes successfully when no results file is specified.
+    ///     Test that Validation.Run completes successfully when no results file is specified.
     /// </summary>
     [TestMethod]
-    public async Task Validation_RunAsync_WithoutResultsFile_CompletesSuccessfully()
+    public void Validation_Run_WithoutResultsFile_CompletesSuccessfully()
     {
         // Arrange - no --results argument
         var args = new[] { "--validate", "--silent" };
 
         // Act
-        using var context = Context.Create(args, () => Task.FromResult<IRepoConnector>(new MockRepoConnector()));
-        await Validation.RunAsync(context);
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
 
         // Assert - validation should complete without error
         Assert.AreEqual(0, context.ExitCode, "Validation should succeed with exit code 0");

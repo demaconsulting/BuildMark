@@ -33,10 +33,10 @@ sections:
           the correct connector implementation, enabling future extensibility with additional
           repository connector types.
         tests:
-          - RepoConnectors_Factory_CreateAsync_ReturnsConnector
-          - RepoConnectors_Factory_CreateAsync_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectors_Factory_Create_ReturnsConnector
+          - RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo
         children:
-          - BuildMark-RepoConnectorFactory-CreateAsync
+          - BuildMark-RepoConnectorFactory-Create
 
       - id: BuildMark-RepoConnectors-ItemRouter
         title: >-
