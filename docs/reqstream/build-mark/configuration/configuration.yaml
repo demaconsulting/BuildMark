@@ -51,8 +51,10 @@ sections:
           selected connector.
         tests:
           - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
+          - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
         children:
           - BuildMark-GitHubConnectorConfig-Properties
+          - BuildMark-AzureDevOpsConnectorConfig-Properties
 
   - title: BuildMarkConfigReader Unit Requirements
     requirements:
@@ -109,3 +111,17 @@ sections:
           in the configuration file.
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+
+  - title: AzureDevOpsConnectorConfig Unit Requirements
+    requirements:
+      - id: BuildMark-AzureDevOpsConnectorConfig-Properties
+        title: >-
+          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization,
+          Project, and Repository properties that override the corresponding
+          auto-detected values in AzureDevOpsRepoConnector.
+        justification: |
+          Teams using Azure DevOps where auto-detection from the Git remote URL is
+          unreliable need a way to specify the organization URL, project, and
+          repository name explicitly in the configuration file.
+        tests:
+          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration

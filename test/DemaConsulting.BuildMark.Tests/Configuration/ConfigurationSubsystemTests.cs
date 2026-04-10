@@ -213,7 +213,47 @@ public class ConfigurationSubsystemTests
             Directory.Delete(directory, recursive: true);
         }
     }
+
+    /// <summary>
+    ///     Test that the Configuration subsystem parses Azure DevOps connector settings from a valid file.
+    /// </summary>
+    [TestMethod]
+    public async Task Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings()
+    {
+        // Arrange: create a temporary directory with a valid .buildmark.yaml containing Azure DevOps settings
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                organization-url: https://dev.azure.com/acme
+                organization: acme
+                project: my-project
+                repository: my-repo
+            """);
+
+        try
+        {
+            // Act: read the configuration
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert: Azure DevOps connector settings are parsed correctly
+            Assert.IsNotNull(result.Config);
+            Assert.IsFalse(result.HasErrors);
+            Assert.AreEqual("azure-devops", result.Config.Connector?.Type);
+            Assert.AreEqual("https://dev.azure.com/acme", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.AreEqual("acme", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.AreEqual("my-project", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.AreEqual("my-repo", result.Config.Connector?.AzureDevOps?.Repository);
+        }
+        finally
+        {
+            // Cleanup temporary directory
+            Directory.Delete(directory, recursive: true);
+        }
+    }
 }
-
-
-
