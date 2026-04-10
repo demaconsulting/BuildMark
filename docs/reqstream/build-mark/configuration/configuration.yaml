@@ -53,7 +53,6 @@ sections:
           - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
         children:
           - BuildMark-GitHubConnectorConfig-Properties
-          - BuildMark-AzureDevOpsConnectorConfig-Properties
 
   - title: BuildMarkConfigReader Unit Requirements
     requirements:
@@ -110,16 +109,3 @@ sections:
           in the configuration file.
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
-
-  - title: AzureDevOpsConnectorConfig Unit Requirements
-    requirements:
-      - id: BuildMark-AzureDevOpsConnectorConfig-Properties
-        title: >-
-          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization, Project,
-          and Repository properties that configure the Azure DevOps connector.
-        justification: |
-          Teams using Azure DevOps need a way to specify the organization URL, project name,
-          and repository name in the configuration file so that the connector can locate the
-          correct Azure DevOps repository without relying solely on git remote URL inspection.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_AzureDevOpsFile_ReturnsParsedAzureDevOpsConfiguration

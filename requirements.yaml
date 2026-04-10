@@ -21,7 +21,6 @@ includes:
   - docs/reqstream/build-mark/repo-connectors/item-controls-parser.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml
   - docs/reqstream/build-mark/repo-connectors/github/github-repo-connector.yaml
-  - docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.yaml
   - docs/reqstream/build-mark/repo-connectors/mock/mock-repo-connector.yaml
   - docs/reqstream/build-mark/configuration/configuration.yaml
   - docs/reqstream/ots/mstest.yaml
