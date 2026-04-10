@@ -198,7 +198,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     private static LookupData BuildLookupData(AzureDevOpsData data, string project, string organizationUrl)
     {
         // Build a set of commit hashes in the current branch
-        var branchCommitHashes = new HashSet<string>(data.Commits.Select(c => c.CommitId));
+        var branchCommitHashes = new HashSet<string>(data.Commits.Select(c => c.CommitId), StringComparer.Ordinal);
 
         // Build tag-to-commit mapping, stripping "refs/tags/" prefix
         var tagToCommitHash = data.Tags

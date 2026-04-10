@@ -45,8 +45,14 @@ internal sealed class MockableAzureDevOpsRepoConnector : AzureDevOpsRepoConnecto
     /// <summary>
     ///     Initializes a new instance of the <see cref="MockableAzureDevOpsRepoConnector"/> class.
     /// </summary>
-    /// <param name="mockHttpClient">Optional mock HttpClient for REST API requests.</param>
-    /// <param name="config">Optional Azure DevOps connector configuration.</param>
+    /// <param name="mockHttpClient">
+    ///     Optional mock HttpClient for REST API requests. When provided, the connector
+    ///     uses this client instead of creating a real authenticated client.
+    /// </param>
+    /// <param name="config">
+    ///     Optional Azure DevOps connector configuration with organization URL, project,
+    ///     and repository overrides.
+    /// </param>
     public MockableAzureDevOpsRepoConnector(
         HttpClient? mockHttpClient = null,
         AzureDevOpsConnectorConfig? config = null) : base(config)

@@ -211,17 +211,28 @@ internal static class WorkItemMapper
 
     /// <summary>
     ///     Gets a string field value from a work item's fields dictionary.
+    ///     Handles values that may be stored as string, JsonElement, or other types.
     /// </summary>
     /// <param name="workItem">Azure DevOps work item.</param>
     /// <param name="fieldName">Field reference name.</param>
-    /// <returns>Field value as string, or null if not present.</returns>
+    /// <returns>Field value as string, or null if not present or empty.</returns>
     internal static string? GetFieldValue(AzureDevOpsWorkItem workItem, string fieldName)
     {
-        if (workItem.Fields.TryGetValue(fieldName, out var value) && value != null)
+        if (!workItem.Fields.TryGetValue(fieldName, out var value) || value == null)
         {
-            return value.ToString();
+            return null;
         }
 
-        return null;
+        // Handle JsonElement values from deserialization
+        if (value is System.Text.Json.JsonElement jsonElement)
+        {
+            return jsonElement.ValueKind == System.Text.Json.JsonValueKind.String
+                ? jsonElement.GetString()
+                : jsonElement.ToString();
+        }
+
+        // Handle direct string values
+        var result = value.ToString();
+        return string.IsNullOrEmpty(result) ? null : result;
     }
 }
