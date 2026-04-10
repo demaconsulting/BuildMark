@@ -110,7 +110,7 @@ src/DemaConsulting.BuildMark/
 │   └── VersionCommitTag.cs                  — version commit tag representation
 ├── Configuration/
 │   ├── BuildMarkConfig.cs                   — top-level configuration data model
-│   ├── BuildMarkConfigReader.cs             — reads and deserializes .buildmark.yaml
+│   ├── BuildMarkConfigReader.cs             — reads and parses .buildmark.yaml using YamlDotNet
 │   ├── ConfigurationLoadResult.cs           — holds config and any load issues
 │   ├── ConfigurationIssue.cs                — single issue with location and severity
 │   ├── ConnectorConfig.cs                   — connector envelope data model

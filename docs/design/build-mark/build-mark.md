@@ -96,7 +96,9 @@ BuildMark is composed of seven subsystems and a top-level entry point:
 ### Configuration File
 
 `BuildMarkConfigReader.ReadAsync(path)` looks for a `.buildmark.yaml` file at the
-supplied path (normally the repository root). The method always returns a
+supplied path (normally the repository root). The file is parsed using the
+YamlDotNet library's representation model (`YamlStream`), then the resulting node
+tree is walked to build the configuration objects. The method always returns a
 `ConfigurationLoadResult`:
 
 - If the file is absent, `Config` is `null` and `Issues` is empty; the tool

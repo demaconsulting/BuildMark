@@ -3,9 +3,10 @@
 ## Overview
 
 The Configuration subsystem is responsible for reading and parsing the optional
-`.buildmark.yaml` file located in the repository root. It deserializes the YAML
-content into a strongly-typed `BuildMarkConfig` object and surfaces any parse
-errors or validation warnings through a `ConfigurationLoadResult` record that
+`.buildmark.yaml` file located in the repository root. It uses the YamlDotNet
+library to parse the YAML content, then walks the resulting representation model
+to build a strongly-typed `BuildMarkConfig` object. Any parse errors or
+validation warnings are surfaced through a `ConfigurationLoadResult` record that
 `Program` consumes during startup.
 
 When no `.buildmark.yaml` file is present, `BuildMarkConfigReader` returns a

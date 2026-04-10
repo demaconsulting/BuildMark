@@ -188,6 +188,43 @@ rules:
   - route: changes
 ```
 
+Example `.buildmark.yaml` for Azure DevOps:
+
+```yaml
+# Repository Connector Settings
+connector:
+  # Type of repository
+  type: azure-devops
+
+  # Azure DevOps settings
+  azure-devops:
+    organization-url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+
+# Build Notes sections
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+
+# Item routing rules
+rules:
+  # Bug work-items get routed to the 'bugs-fixed' section
+  - match:
+      work-item-type: [Bug]
+    route: bugs-fixed
+
+  # Task and Epic work-items get suppressed
+  - match:
+      work-item-type: [Task, Epic]
+    route: suppressed
+
+  # Everything else gets routed to the 'changes' section
+  - route: changes
+```
+
 ## Connector Settings
 
 The `connector` section declares how BuildMark connects to source-control and work-item systems.
