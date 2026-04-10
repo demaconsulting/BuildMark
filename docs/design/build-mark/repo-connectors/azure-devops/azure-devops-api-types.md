@@ -14,8 +14,19 @@ process safely and predictably.
 - Carry pagination metadata (`AzureDevOpsCollectionResponse<T>`)
 - Preserve work item description (`System.Description`) and custom fields
   (`Custom.Visibility`, `Custom.AffectedVersions`) for item-controls parsing
+- Provide `System.Text.Json`-compatible record definitions so that
+  `AzureDevOpsRestClient` can deserialize API responses without reflection
+  workarounds or third-party JSON libraries
 
 ## Key Types
+
+All record types are defined as C# `record` types with init-only properties. All
+property names match the Azure DevOps camelCase JSON field names directly so that no
+`[JsonPropertyName]` attributes are required; `AzureDevOpsRestClient` supplies a
+`JsonSerializerOptions` instance with `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`
+that handles the PascalCase-to-camelCase mapping automatically. The sole exception is
+`AzureDevOpsWorkItem.Fields`, which is deserialized as a `Dictionary<string, string>`
+and preserves the dotted field-reference-name keys (e.g. `System.WorkItemType`) verbatim.
 
 ### `AzureDevOpsRepository`
 

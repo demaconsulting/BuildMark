@@ -21,6 +21,20 @@ The client authenticates using either:
 The authentication scheme is selected automatically based on the token source
 resolved by `AzureDevOpsRepoConnector`.
 
+## JSON Deserialization
+
+The client uses `System.Net.Http.Json` extension methods (part of the .NET runtime) to
+deserialize Azure DevOps REST API responses. Specifically, each HTTP response body is
+decoded by calling `HttpContent.ReadFromJsonAsync<T>()` with a shared
+`JsonSerializerOptions` instance configured with
+`PropertyNamingPolicy = JsonNamingPolicy.CamelCase`. This matches the camelCase
+field names returned by the Azure DevOps API without requiring per-property
+`[JsonPropertyName]` attributes on the response records.
+
+The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary — its keys are
+Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
+and are preserved as-is without any naming transformation.
+
 ## Methods
 
 The client provides the following methods for retrieving the repository data needed
