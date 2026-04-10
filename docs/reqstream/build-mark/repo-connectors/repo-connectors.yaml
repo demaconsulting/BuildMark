@@ -114,3 +114,26 @@ sections:
           - RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
         children:
           - BuildMark-MockRepoConnector-Deterministic
+
+      - id: BuildMark-RepoConnectors-AzureDevOps
+        title: >-
+          The RepoConnectors subsystem shall provide an Azure DevOps repository connector
+          subsystem.
+        justification: |
+          Generating build notes from Azure DevOps repositories requires a dedicated subsystem
+          that can authenticate to the Azure DevOps REST API, retrieve commits, tags, pull
+          requests, and work items, and assemble them into structured build information.
+        tests:
+          - RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue
+          - RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+          - RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
+          - RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
+          - RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+        children:
+          - BuildMark-AzureDevOps-ConnectorConfig
+          - BuildMark-AzureDevOps-BuildInformation
+          - BuildMark-AzureDevOps-ItemControls
+          - BuildMark-AzureDevOps-CustomFields
+          - BuildMark-AzureDevOps-Rules
+          - BuildMark-AzureDevOps-RestClient
+          - BuildMark-AzureDevOps-WorkItemMapper

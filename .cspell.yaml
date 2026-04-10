@@ -16,6 +16,10 @@ language: en
 words:
   - ACCESSTOKEN
   - Anson
+  - pullrequests
+  - wiql
+  - WIQL
+  - workitems
   - Blockquotes
   - buildmark
   - BuildMark

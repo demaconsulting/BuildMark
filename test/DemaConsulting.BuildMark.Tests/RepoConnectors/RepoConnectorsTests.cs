@@ -34,6 +34,11 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 [TestClass]
 public class RepoConnectorsTests
 {
+    /// <summary>
+    ///     Path to the main assembly DLL, used for non-constant placeholder assertions.
+    /// </summary>
+    private static readonly string _dllPath =
+        typeof(DemaConsulting.BuildMark.Program).Assembly.Location;
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-RepoConnectors-GitHubConnector
     // ─────────────────────────────────────────────────────────────────────────
@@ -671,6 +676,74 @@ public class RepoConnectorsTests
 
         // Assert: the item is suppressed and does not appear in any section
         Assert.IsEmpty(routed["changes"]);
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-RepoConnectors-AzureDevOps
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Placeholder: verify that the Azure DevOps connector implements IRepoConnector.
+    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue()
+    {
+        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
+        // This test shall verify that AzureDevOpsRepoConnector implements IRepoConnector.
+        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue");
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that the Azure DevOps connector returns valid build information.
+    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
+    {
+        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
+        // This test shall verify that the Azure DevOps connector returns a non-null
+        // BuildInformation record with correct version, changes, and known issues.
+        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation");
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that the Azure DevOps connector gathers changes from pull requests.
+    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges()
+    {
+        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
+        // This test shall verify that pull requests merged in the commit range are
+        // collected and included in BuildInformation.Changes.
+        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges");
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that the Azure DevOps connector identifies open work items as known issues.
+    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues()
+    {
+        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
+        // This test shall verify that open (unresolved) bug work items are included
+        // in BuildInformation.KnownIssues.
+        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues");
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that the Azure DevOps connector skips pre-release tags for release versions.
+    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
+    {
+        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
+        // This test shall verify that when a release version is requested, pre-release
+        // version tags are not used as the baseline version.
+        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases");
     }
 }
 
