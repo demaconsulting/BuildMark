@@ -198,7 +198,7 @@ connector:
 
   # Azure DevOps settings
   azure-devops:
-    organization-url: https://dev.azure.com/myorg
+    url: https://dev.azure.com/myorg
     project: MyProject
     repository: MyRepo
 
@@ -258,7 +258,7 @@ BuildMark resolves the Azure DevOps access token automatically in this order:
 
 | Key | Required | Description |
 | :-- | :------- | :---------- |
-| `organization-url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
+| `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
 

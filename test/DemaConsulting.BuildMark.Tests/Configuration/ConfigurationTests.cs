@@ -175,6 +175,166 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that a valid Azure DevOps connector block is parsed into the configuration model.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                organization: myorg
+                project: myproject
+                repository: myrepo
+            sections:
+              - id: changes
+                title: Changes
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNotNull(result.Config);
+            Assert.IsFalse(result.HasErrors);
+            Assert.AreEqual("azure-devops", result.Config.Connector?.Type);
+            Assert.AreEqual("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.AreEqual("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.AreEqual("myproject", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.AreEqual("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that Azure DevOps connector block with alternate key aliases is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                org: myorg
+                project: myproject
+                repo: myrepo
+            sections:
+              - id: changes
+                title: Changes
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNotNull(result.Config);
+            Assert.IsFalse(result.HasErrors);
+            Assert.AreEqual("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.AreEqual("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.AreEqual("myproject", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.AreEqual("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that an unsupported key inside the Azure DevOps connector block produces an error.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsUnsupportedKey_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                unknown-key: some-value
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNull(result.Config);
+            Assert.IsTrue(result.HasErrors);
+            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("Unsupported Azure DevOps connector key", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that a non-mapping Azure DevOps connector node produces an error.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsNonMapping_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops: not-a-mapping
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNull(result.Config);
+            Assert.IsTrue(result.HasErrors);
+            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("YAML mapping", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
     ///     Test that reporting an error issue sets the context exit code.
     /// </summary>
     [TestMethod]

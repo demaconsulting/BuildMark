@@ -17,6 +17,7 @@ words:
   - ACCESSTOKEN
   - Anson
   - hostnames
+  - myorg
   - myproject
   - myrepo
   - pullrequest

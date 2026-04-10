@@ -229,7 +229,7 @@ connector:
 
   # Azure DevOps settings
   azure-devops:
-    organization-url: https://dev.azure.com/myorg
+    url: https://dev.azure.com/myorg
     project: MyProject
     repository: MyRepo
 
