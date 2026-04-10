@@ -163,6 +163,8 @@ sections:
               information directly from source control history and work items.
             tests:
               - IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation
+            children:
+              - BuildMark-RepoConnectors-AzureDevOps
 
           - id: BuildMark-AzureDevOps-IssueTracking
             title: The tool shall track work items and pull requests from Azure DevOps.
@@ -173,6 +175,8 @@ sections:
               requests.
             tests:
               - IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks
+            children:
+              - BuildMark-RepoConnectors-AzureDevOps
 
           - id: BuildMark-AzureDevOps-VersionTags
             title: The tool shall identify changes between version tags in Azure DevOps repositories.
@@ -183,6 +187,8 @@ sections:
               changes between releases.
             tests:
               - IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease
+            children:
+              - BuildMark-RepoConnectors-AzureDevOps
 
       - title: Configuration File
         requirements:
