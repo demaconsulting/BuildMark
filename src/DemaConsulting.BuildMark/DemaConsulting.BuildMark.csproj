@@ -51,6 +51,7 @@
     <PackageReference Include="DemaConsulting.TestResults" Version="1.7.0" />
     <PackageReference Include="GraphQL.Client" Version="6.1.0" />
     <PackageReference Include="GraphQL.Client.Serializer.SystemTextJson" Version="6.1.0" />
+    <PackageReference Include="YamlDotNet" Version="17.0.1" />
   </ItemGroup>
 
   <!-- Build Tool Dependencies -->

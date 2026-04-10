@@ -120,10 +120,7 @@ public class ConfigurationSubsystemTests
         var filePath = Path.Combine(directory, ".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
-            """
-            connector:
-             type: github
-            """);
+            "connector:\n\ttype: github\n");
 
         try
         {
