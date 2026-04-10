@@ -7,10 +7,10 @@
 
 ## Methods
 
-### `CreateAsync(ConnectorConfig? config) → Task<IRepoConnector>`
+### `Create(ConnectorConfig? config) → IRepoConnector`
 
-The preferred factory method. Accepts an optional `ConnectorConfig` from the
-parsed `.buildmark.yaml` file and asynchronously returns the appropriate
+The factory method accepts an optional `ConnectorConfig` from the
+parsed `.buildmark.yaml` file and returns the appropriate
 `IRepoConnector` implementation:
 
 - If `config?.Type` is `"azure-devops"`, a `NotSupportedException` is thrown
@@ -23,24 +23,18 @@ environment to confirm GitHub is appropriate, using the following signals:
 
 1. The `GITHUB_ACTIONS` environment variable is non-empty.
 2. The `GITHUB_WORKSPACE` environment variable is non-empty.
-3. The git remote URL (obtained by awaiting `ProcessRunner.TryRunAsync("git",
-   "remote get-url origin")`) contains `github.com`.
-
-### `Create(ConnectorConfig? config) → IRepoConnector`
-
-A synchronous fallback factory method that skips the git remote URL check to
-avoid sync-over-async deadlock risks. It applies the same connector-config
-validation and `GITHUB_ACTIONS`/`GITHUB_WORKSPACE` environment-variable checks
-as `CreateAsync`, but defaults directly to `GitHubRepoConnector` when no
-environment variables are detected.
+3. The git remote URL (obtained using sync-over-async pattern via
+   `ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult()`)
+   contains `github.com`. This pattern is safe in console applications as there
+   is no synchronization context that could cause deadlocks.
 
 ## Interactions
 
-| Unit / Subsystem        | Role                                                                          |
-|-------------------------|-------------------------------------------------------------------------------|
-| `IRepoConnector`        | Return type of `Create` and `CreateAsync`                                     |
-| `ConnectorConfig`       | Optional envelope passed to `Create`/`CreateAsync`; type discriminates result |
-| `GitHubConnectorConfig` | Forwarded to `GitHubRepoConnector` as `config?.GitHub`                        |
-| `GitHubRepoConnector`   | The concrete connector returned for GitHub repositories                        |
-| `ProcessRunner`         | Used via `TryRunAsync` by `CreateAsync` to inspect the git remote URL         |
-| `Program`               | Calls `RepoConnectorFactory.CreateAsync(result.Config?.Connector)`            |
+| Unit / Subsystem | Role |
+| ---------------- | ---- |
+| `IRepoConnector` | Return type of `Create` |
+| `ConnectorConfig` | Optional envelope passed to `Create`; type discriminates result |
+| `GitHubConnectorConfig` | Forwarded to `GitHubRepoConnector` as `config?.GitHub` |
+| `GitHubRepoConnector` | The concrete connector returned for GitHub repositories |
+| `ProcessRunner` | Used via sync-over-async by `Create` to inspect git remote URL |
+| `Program` | Calls `RepoConnectorFactory.Create(result.Config?.Connector)` |
