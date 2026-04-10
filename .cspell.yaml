@@ -16,6 +16,10 @@ language: en
 words:
   - ACCESSTOKEN
   - Anson
+  - hostnames
+  - myproject
+  - myrepo
+  - pullrequest
   - pullrequests
   - wiql
   - WIQL
