@@ -1,7 +1,8 @@
 # Introduction
 
 This document provides the detailed design for BuildMark, a .NET command-line tool
-that generates markdown build notes from GitHub repository metadata.
+that generates markdown build notes from Git repository metadata, including GitHub
+and Azure DevOps repositories.
 
 ## Purpose
 
@@ -70,6 +71,11 @@ BuildMark (System)
     │   ├── GitHubRepoConnector (Unit)
     │   ├── GitHubGraphQLClient (Unit)
     │   └── GitHubGraphQLTypes (Unit)
+    ├── AzureDevOps (Subsystem)
+    │   ├── AzureDevOpsRepoConnector (Unit)
+    │   ├── AzureDevOpsRestClient (Unit)
+    │   ├── AzureDevOpsApiTypes (Unit)
+    │   └── WorkItemMapper (Unit)
     └── Mock (Subsystem)
         └── MockRepoConnector (Unit)
 ```
@@ -109,7 +115,7 @@ src/DemaConsulting.BuildMark/
 │   ├── ConfigurationIssue.cs                — single issue with location and severity
 │   ├── ConnectorConfig.cs                   — connector envelope data model
 │   ├── GitHubConnectorConfig.cs             — GitHub connector settings data model
-│   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings (future)
+│   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings data model
 │   ├── SectionConfig.cs                     — report section definition data model
 │   └── RuleConfig.cs                        — routing rule data model
 └── RepoConnectors/
@@ -123,6 +129,11 @@ src/DemaConsulting.BuildMark/
     │   ├── GitHubRepoConnector.cs           — GitHub API integration
     │   ├── GitHubGraphQLClient.cs           — GraphQL API client
     │   └── GitHubGraphQLTypes.cs            — GraphQL type definitions
+    ├── AzureDevOps/
+    │   ├── AzureDevOpsRepoConnector.cs      — Azure DevOps API integration
+    │   ├── AzureDevOpsRestClient.cs         — REST API client
+    │   ├── AzureDevOpsApiTypes.cs           — REST API type definitions
+    │   └── WorkItemMapper.cs               — work item to ItemInfo mapper
     └── Mock/
         └── MockRepoConnector.cs             — mock repository connector for self-test
 ```

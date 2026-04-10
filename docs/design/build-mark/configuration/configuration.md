@@ -66,11 +66,11 @@ problem with its file path, line number, severity, and description.
 
 `ConnectorConfig` carries the following properties:
 
-| Member        | Kind     | Description                                                         |
-|---------------|----------|---------------------------------------------------------------------|
-| `Type`        | Property | Connector type: `"github"` or `"azure-devops"`                      |
-| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` is `"github"` |
-| `AzureDevOps` | Property | Reserved for future use; `null` in the current release              |
+| Member        | Kind     | Description                                                                     |
+|---------------|----------|---------------------------------------------------------------------------------|
+| `Type`        | Property | Connector type: `"github"` or `"azure-devops"`                                  |
+| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` is `"github"`             |
+| `AzureDevOps` | Property | Optional `AzureDevOpsConnectorConfig`; present when `Type` is `"azure-devops"`  |
 
 `GitHubConnectorConfig` carries the following properties:
 
@@ -80,8 +80,14 @@ problem with its file path, line number, severity, and description.
 | `Repo`    | Property | Repository name override                                            |
 | `BaseUrl` | Property | Optional GitHub Enterprise API base URL; `null` uses the public API |
 
-`AzureDevOpsConnectorConfig` is a placeholder for future Azure DevOps connector settings.
-No properties are defined in the current release.
+`AzureDevOpsConnectorConfig` carries the following properties:
+
+| Member            | Kind     | Description                                                                   |
+|-------------------|----------|-------------------------------------------------------------------------------|
+| `OrganizationUrl` | Property | Azure DevOps organization URL (e.g. `https://dev.azure.com/myorg`)            |
+| `Organization`    | Property | Organization name (derived from `OrganizationUrl` when not explicitly set)    |
+| `Project`         | Property | Azure DevOps project name                                                     |
+| `Repository`      | Property | Repository name within the project                                            |
 
 `SectionConfig` carries the following properties:
 
@@ -99,8 +105,9 @@ No properties are defined in the current release.
 
 ## Interactions
 
-| Unit / Subsystem        | Role                                                                                       |
-|-------------------------|--------------------------------------------------------------------------------------------|
-| `Program`               | Calls `BuildMarkConfigReader.ReadAsync`; calls `result.ReportTo(context)`                  |
-| `RepoConnectorFactory`  | Receives `ConnectorConfig` from `result.Config` to select the connector                    |
-| `GitHubRepoConnector`   | Receives routing lists; reads `GitHubConnectorConfig` from `result.Config.Connector.GitHub`|
+| Unit / Subsystem           | Role                                                                          |
+|----------------------------|-------------------------------------------------------------------------------|
+| `Program`                  | Calls `BuildMarkConfigReader.ReadAsync`; calls `result.ReportTo(context)`     |
+| `RepoConnectorFactory`     | Receives `ConnectorConfig` from `result.Config` to select the connector       |
+| `GitHubRepoConnector`      | Reads `GitHubConnectorConfig` from `result.Config.Connector.GitHub`           |
+| `AzureDevOpsRepoConnector` | Reads `AzureDevOpsConnectorConfig` from `result.Config.Connector.AzureDevOps` |

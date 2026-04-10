@@ -159,15 +159,15 @@ enabling version-controlled configuration.
 The file has three top-level sections:
 
 - **`connector`** — declares the repository connector type and per-connector settings such as URL
-  overrides and repository identifiers. Current releases support the `github` connector. Azure
-  DevOps connector values are reserved for future support and are not yet implemented.
+  overrides and repository identifiers. Current releases support the `github` and `azure-devops`
+  connectors.
 - **`sections`** — defines the ordered list of sections that will appear in the generated build
   notes, each identified by an `id` and a `title`.
 - **`rules`** — an ordered list of match/route rules. Each rule can match on `label` and/or
   `work-item-type`, and routes matched items to a named section or to `suppressed` to exclude them.
   Rules are evaluated in order and the first match wins. A rule with no `match` key is a catch-all.
 
-Example `.buildmark.yaml`:
+Example `.buildmark.yaml` for GitHub:
 
 ```yaml
 # Repository Connector Settings
@@ -220,11 +220,52 @@ rules:
   - route: changes
 ```
 
-GitHub authentication is not configured in `.buildmark.yaml`. BuildMark currently resolves a token
-from `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`.
+Example `.buildmark.yaml` for Azure DevOps:
 
-Azure DevOps connector configuration is reserved for future support and should not be used with the
-current release.
+```yaml
+# Repository Connector Settings
+connector:
+  type: azure-devops
+
+  # Azure DevOps settings
+  azure-devops:
+    organization-url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+
+# Build Notes sections
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+
+# Item routing rules
+rules:
+  # Bug work-items get routed to the 'bugs-fixed' section
+  - match:
+      work-item-type: [Bug]
+    route: bugs-fixed
+
+  # Task and Epic work-items get suppressed
+  - match:
+      work-item-type: [Task, Epic]
+    route: suppressed
+
+  # Everything else gets routed to the 'changes' section
+  - route: changes
+```
+
+### Authentication
+
+Authentication tokens are not configured in `.buildmark.yaml`. BuildMark resolves them automatically
+from environment variables at runtime.
+
+**GitHub**: resolves a token from `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`.
+
+**Azure DevOps**: resolves a token from `AZURE_DEVOPS_PAT`, then `AZURE_DEVOPS_TOKEN`, then
+`AZURE_DEVOPS_EXT_PAT`, then `SYSTEM_ACCESSTOKEN` (Azure Pipelines), then
+`az account get-access-token` (Azure CLI).
 
 For more detail see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
 

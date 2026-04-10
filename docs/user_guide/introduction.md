@@ -9,7 +9,7 @@ making it easy to integrate release documentation into your CI/CD pipelines and 
 ## Key Features
 
 - **Git Integration**: Analyze Git repository history and tags
-- **GitHub Integration**: Extract bug fixes and changes from GitHub issues and pull requests
+- **Issue Tracking**: Extract bug fixes and changes from GitHub and Azure DevOps issues and pull requests
 - **Markdown Reports**: Generate human-readable build notes from repository data
 - **Customizable Output**: Configure report depth and version ranges
 - **CI/CD Integration**: Automate build notes generation in your pipelines
@@ -108,6 +108,19 @@ export GITHUB_TOKEN=ghp_abc123...
 buildmark --build-version v1.2.3 --report build-notes.md
 ```
 
+## With Azure DevOps Token
+
+For Azure DevOps repositories, provide a Personal Access Token (PAT):
+
+```bash
+# Using Personal Access Token
+export AZURE_DEVOPS_PAT=your-pat-token...
+buildmark --build-version v1.2.3 --report build-notes.md
+```
+
+In Azure Pipelines, the pipeline service connection token is picked up automatically from
+`SYSTEM_ACCESSTOKEN` when you grant the pipeline permission to access it.
+
 ## Including Known Issues
 
 To include known issues in the report:
@@ -179,22 +192,38 @@ rules:
 
 The `connector` section declares how BuildMark connects to source-control and work-item systems.
 
-The `type` key currently supports only the GitHub connector. Azure DevOps values are reserved for
-future support and are not yet implemented.
+The `type` key selects the connector:
 
 | Value | Description |
 | :---- | :---------- |
-| `github` | GitHub only |
+| `github` | GitHub or GitHub Enterprise |
+| `azure-devops` | Azure DevOps (cloud or on-premises) |
 
 ### GitHub connector settings
 
-BuildMark currently resolves the GitHub access token automatically from `GH_TOKEN`, then
+BuildMark resolves the GitHub access token automatically from `GH_TOKEN`, then
 `GITHUB_TOKEN`, then `gh auth token`.
 
 | Key | Required | Description |
 | :-- | :------- | :---------- |
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
+
+### Azure DevOps connector settings
+
+BuildMark resolves the Azure DevOps access token automatically in this order:
+
+1. `AZURE_DEVOPS_PAT` environment variable (Personal Access Token)
+2. `AZURE_DEVOPS_TOKEN` environment variable (PAT or Entra ID token)
+3. `AZURE_DEVOPS_EXT_PAT` environment variable (Azure DevOps CLI extension variable)
+4. `SYSTEM_ACCESSTOKEN` environment variable (Azure Pipelines service connection)
+5. `az account get-access-token` (Azure CLI, if logged in)
+
+| Key | Required | Description |
+| :-- | :------- | :---------- |
+| `organization-url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
+| `project` | Yes | Azure DevOps project name. |
+| `repository` | Yes | Repository name within the project. |
 
 ## Report Sections
 
@@ -402,6 +431,25 @@ Integrate BuildMark into your CI/CD pipeline to automatically generate build not
     path: docs/build-notes.md
 ```
 
+```yaml
+# Azure Pipelines example
+- task: CmdLine@2
+  displayName: Generate Build Notes
+  env:
+    SYSTEM_ACCESSTOKEN: $(System.AccessToken)
+  inputs:
+    script: |
+      buildmark \
+        --build-version $(Build.BuildNumber) \
+        --report docs/build-notes.md
+
+- task: PublishBuildArtifacts@1
+  displayName: Upload Build Notes
+  inputs:
+    pathToPublish: docs/build-notes.md
+    artifactName: build-notes
+```
+
 ## Release Documentation
 
 Generate build notes for a specific release:
@@ -509,9 +557,12 @@ Provides a link to the full changelog on GitHub comparing the baseline and curre
 
 # Extended Item Controls
 
-BuildMark supports an optional `buildmark` code block embedded in GitHub issue and pull request
-descriptions. This block gives developers fine-grained control over visibility, type classification,
-and affected-version ranges without requiring custom labels or special GitHub fields.
+BuildMark supports an optional `buildmark` code block embedded in GitHub and Azure DevOps issue and
+pull request descriptions. This block gives developers fine-grained control over visibility, type
+classification, and affected-version ranges without requiring custom labels or special fields.
+
+Azure DevOps work items additionally support native custom fields as an alternative mechanism for
+the same controls.
 
 ## BuildMark Code Block Format
 
@@ -625,6 +676,17 @@ affected-versions: (,1.0.1],[1.1.0,1.2.0)
 
 This matches all versions up to and including `1.0.1`, and also versions from `1.1.0` up to
 (but not including) `1.2.0`.
+
+## Azure DevOps Custom Fields
+
+Azure DevOps work items support the same visibility and version controls through native custom
+fields, as an alternative to embedding `buildmark` code blocks in descriptions. When both a custom
+field and a `buildmark` block are present, the custom field takes precedence.
+
+| Custom Field | Equivalent | Description |
+| :----------- | :--------- | :---------- |
+| `Custom.Visibility` | `visibility` | Set to `public` or `internal` to override default visibility. |
+| `Custom.AffectedVersions` | `affected-versions` | Version interval set using the same interval notation. |
 
 # Version Selection Rules
 
@@ -763,6 +825,18 @@ Examples of recognized version tags:
 - Verify the token has appropriate permissions (read access to repositories)
 - Wait for the rate limit to reset (typically one hour)
 - Use a GitHub token to increase rate limits from 60 to 5000 requests per hour
+
+## Azure DevOps API Issues
+
+**Problem**: Azure DevOps API authentication failures or access denied errors
+
+**Solutions**:
+
+- Set the `AZURE_DEVOPS_PAT` environment variable with a valid Personal Access Token
+- Verify the PAT has **Code (Read)** and **Work Items (Read)** permissions
+- In Azure Pipelines, ensure `SYSTEM_ACCESSTOKEN` is passed to the task and the pipeline
+  has been granted permission to access the repository
+- For Entra ID tokens, verify the token is not expired (they are valid for one hour)
 
 ## Report Generation Issues
 

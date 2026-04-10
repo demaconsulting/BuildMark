@@ -9,10 +9,10 @@ report sections, and `ItemControlsParser` with `ItemControlsInfo` for parsing
 metadata embedded in repository item descriptions.
 
 Concrete connector implementations are organized into subsystems: the `GitHub`
-subsystem provides the production GitHub GraphQL connector, and the `Mock`
+subsystem provides the production GitHub GraphQL connector, the `AzureDevOps`
+subsystem provides the production Azure DevOps REST connector, and the `Mock`
 subsystem provides the in-memory connector used by the built-in `--validate`
-self-test. Future connectors (e.g. Azure DevOps) will each have their own
-subsystem alongside `GitHub` and `Mock`.
+self-test.
 
 ## Units
 
@@ -31,10 +31,11 @@ subsystem alongside `GitHub` and `Mock`.
 
 ## Subsystems
 
-| Subsystem | Folder                      | Contents                                                           |
-|-----------|-----------------------------|--------------------------------------------------------------------|
-| `GitHub`  | `RepoConnectors/GitHub/`    | `GitHubRepoConnector`, `GitHubGraphQLClient`, `GitHubGraphQLTypes` |
-| `Mock`    | `RepoConnectors/Mock/`      | `MockRepoConnector` (used by `--validate` self-test)               |
+- **`GitHub`** — `RepoConnectors/GitHub/` — `GitHubRepoConnector`, `GitHubGraphQLClient`,
+  `GitHubGraphQLTypes`
+- **`AzureDevOps`** — `RepoConnectors/AzureDevOps/` — `AzureDevOpsRepoConnector`,
+  `AzureDevOpsRestClient`, `AzureDevOpsApiTypes`, `WorkItemMapper`
+- **`Mock`** — `RepoConnectors/Mock/` — `MockRepoConnector` (used by `--validate` self-test)
 
 ## Interfaces
 
