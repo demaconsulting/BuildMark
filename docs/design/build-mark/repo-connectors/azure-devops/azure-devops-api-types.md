@@ -20,13 +20,14 @@ process safely and predictably.
 
 ## Key Types
 
-All record types are defined as C# `record` types with init-only properties. All
-property names match the Azure DevOps camelCase JSON field names directly so that no
-`[JsonPropertyName]` attributes are required; `AzureDevOpsRestClient` supplies a
-`JsonSerializerOptions` instance with `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`
-that handles the PascalCase-to-camelCase mapping automatically. The sole exception is
-`AzureDevOpsWorkItem.Fields`, which is deserialized as a `Dictionary<string, string>`
-and preserves the dotted field-reference-name keys (e.g. `System.WorkItemType`) verbatim.
+All record types are defined as C# `record` types with init-only properties using
+conventional PascalCase property names. No `[JsonPropertyName]` attributes are
+required for standard Azure DevOps fields because `AzureDevOpsRestClient` supplies a
+`JsonSerializerOptions` instance with `PropertyNamingPolicy = JsonNamingPolicy.CamelCase`,
+which maps those PascalCase property names to the Azure DevOps camelCase JSON field
+names automatically. The sole exception is `AzureDevOpsWorkItem.Fields`, which is
+deserialized as a `Dictionary<string, string>` and preserves the dotted
+field-reference-name keys (e.g. `System.WorkItemType`) verbatim.
 
 ### `AzureDevOpsRepository`
 
