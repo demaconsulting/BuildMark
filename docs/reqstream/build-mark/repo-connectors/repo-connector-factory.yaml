@@ -15,23 +15,26 @@ sections:
           The RepoConnectorFactory class shall create the appropriate repository
           connector based on environment variables and git remote URL inspection.
         justification: |
-          The factory method encapsulates connector selection logic, auto-detecting
-          the environment using GitHub Actions environment variables and git remote
-          URL inspection. Uses sync-over-async pattern; BuildMark is distributed as
-          a .NET tool and is not intended for consumption as a library by external
-          callers, so this reflects the tool-oriented execution model.
+          The factory method encapsulates connector selection logic, auto-detecting the
+          environment using CI environment variables (GITHUB_ACTIONS, TF_BUILD) and git
+          remote URL inspection. It creates a GitHubRepoConnector for GitHub repositories
+          and an AzureDevOpsRepoConnector for Azure DevOps repositories. Uses sync-over-async
+          pattern; BuildMark is distributed as a .NET tool and is not intended for consumption
+          as a library by external callers, so this reflects the tool-oriented execution model.
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
-          - RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException
+          - RepoConnectorFactory_Create_WithAzureDevOpsType_ReturnsAzureDevOpsConnector
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
           The RepoConnectorFactory class shall accept an optional ConnectorConfig and forward
           connector-specific settings to the created connector.
         justification: |
-          The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector
-          so that owner, repository, and base URL overrides from .buildmark.yaml take
-          effect. This pattern extends naturally to future connector types.
+          The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector,
+          and AzureDevOpsConnectorConfig (when present) to AzureDevOpsRepoConnector, so that
+          owner, repository, and URL overrides from .buildmark.yaml take effect. This pattern
+          extends naturally to future connector types.
         tests:
           - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+          - RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration

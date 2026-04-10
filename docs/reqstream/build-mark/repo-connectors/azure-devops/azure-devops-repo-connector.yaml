@@ -1,0 +1,99 @@
+---
+# Software Unit Requirements for the AzureDevOpsRepoConnector Class
+#
+# The AzureDevOpsRepoConnector class connects to Azure DevOps using the REST API
+# to retrieve commits, tags, pull requests, and work items, assembling them into
+# structured BuildInformation for report generation.
+
+sections:
+  - title: AzureDevOpsRepoConnector Unit Requirements
+    requirements:
+      - id: BuildMark-AzureDevOps-ConnectorConfig
+        title: >-
+          The AzureDevOpsRepoConnector class shall accept an optional
+          AzureDevOpsConnectorConfig to configure the organization URL, project, and
+          repository.
+        justification: |
+          When a .buildmark.yaml file provides Azure DevOps connector settings, the connector
+          must use the configured organization URL, project, and repository name instead of
+          auto-detecting them from the Git remote URL. CLI arguments remain as a fallback
+          when the config values are absent.
+        tests:
+          - AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+
+      - id: BuildMark-AzureDevOps-BuildInformation
+        title: >-
+          The AzureDevOpsRepoConnector class shall retrieve build information from an
+          Azure DevOps repository.
+        justification: |
+          The primary purpose of the AzureDevOpsRepoConnector is to assemble BuildInformation
+          from Azure DevOps repository data. It must correctly identify the current version tag,
+          the baseline (previous) version tag, and the changes between them, correctly
+          handling pre-release tags and version selection edge cases.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithWorkItems_IdentifiesKnownIssues
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+          - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+
+      - id: BuildMark-AzureDevOps-ItemControls
+        title: >-
+          The AzureDevOpsRepoConnector class shall apply item controls to override
+          visibility, type, and affected-version metadata for pull requests and work items.
+        justification: |
+          The Azure DevOps connector is responsible for translating raw Azure DevOps data into
+          the BuildInformation model. Applying item controls at this layer ensures that
+          visibility and type overrides are consistently enforced regardless of work item type,
+          and that affected-version data is captured and stored on each ItemInfo for downstream
+          use. Controls may be extracted from a buildmark code block in the description body or
+          from native Azure DevOps custom fields.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+
+      - id: BuildMark-AzureDevOps-RestClient
+        title: >-
+          The AzureDevOpsRepoConnector class shall use a REST API client for Azure DevOps
+          API interactions.
+        justification: |
+          The Azure DevOps REST API provides access to repository data including commits,
+          tags, pull requests, and work items. The REST client handles authentication,
+          pagination, error handling, and response parsing to provide reliable data retrieval
+          from the Azure DevOps API.
+        tests:
+          - AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
+          - AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTagNodes
+          - AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems
+
+      - id: BuildMark-AzureDevOps-WorkItemMapper
+        title: >-
+          The WorkItemMapper class shall map Azure DevOps work item types and fields to
+          the BuildMark item model.
+        justification: |
+          Azure DevOps uses work item types (Bug, Task, Epic, User Story, etc.) rather than
+          labels for item classification. The WorkItemMapper translates these types and any
+          custom fields (such as Custom.Visibility and Custom.AffectedVersions) into the
+          BuildMark ItemInfo model used by all connectors.
+        tests:
+          - WorkItemMapper_MapWorkItem_BugType_ClassifiesAsBug
+          - WorkItemMapper_MapWorkItem_UserStoryType_ClassifiesAsFeature
+          - WorkItemMapper_MapWorkItem_CustomVisibilityField_AppliesVisibilityOverride
+          - WorkItemMapper_MapWorkItem_CustomAffectedVersionsField_ParsesIntervalSet
+
+      - id: BuildMark-AzureDevOps-Rules
+        title: >-
+          The AzureDevOpsRepoConnector class shall apply configured routing rules and
+          sections to distribute assembled items into the appropriate report sections.
+        justification: |
+          When a .buildmark.yaml file provides routing rules and section definitions, the
+          connector must delegate to RepoConnectorBase.ApplyRules so that items are distributed
+          according to the operator-supplied rules rather than the default work-item-type-derived
+          categorization. This allows teams to customize which items appear in which sections of
+          the generated build notes.
+        tests:
+          - AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
