@@ -64,8 +64,8 @@ public static class BuildMarkConfigReader
         catch (YamlException ex)
         {
             // Convert YamlDotNet parse errors into ConfigurationIssue records.
-            var line = (int)ex.Start.Line + 1;
-            AddError(issues, filePath, line, ex.InnerException?.Message ?? ex.Message);
+            var line = (int)(ex.Start.Line + 1);
+            AddError(issues, filePath, line > 0 ? line : 1, ex.InnerException?.Message ?? ex.Message);
             return new ConfigurationLoadResult(null, issues);
         }
 

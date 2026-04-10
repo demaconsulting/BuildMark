@@ -166,6 +166,7 @@ public class ConfigurationTests
             Assert.IsNull(result.Config);
             Assert.IsTrue(result.HasErrors);
             Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("tab", result.Issues[0].Description, StringComparison.OrdinalIgnoreCase);
         }
         finally
         {
