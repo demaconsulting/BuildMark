@@ -14,8 +14,8 @@ Markdown Build Notes Generation Tool
 ## Overview
 
 BuildMark is a .NET command-line tool that generates comprehensive markdown build notes reports from Git repository
-history and GitHub issues. It analyzes commits, pull requests, and issues to create human-readable build notes,
-making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
+history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
+notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
 For a detailed explanation of how BuildMark works internally, see the
 [Theory of Operations](https://github.com/demaconsulting/BuildMark/blob/main/THEORY-OF-OPERATIONS.md).
@@ -24,7 +24,7 @@ For a detailed explanation of how BuildMark works internally, see the
 
 - 📄 **Git Integration** - Analyze Git repository history and tags
 - 📝 **Markdown Reports** - Generate human-readable build notes from repository data
-- 🐛 **Issue Tracking** - Extract bug fixes and changes from GitHub issues and pull requests
+- 🐛 **Issue Tracking** - Extract bug fixes and changes from GitHub and Azure DevOps issues and pull requests
 - 🎯 **Customizable Output** - Configure report depth and version ranges
 - 🚀 **CI/CD Integration** - Automate build notes generation in your pipelines
 - 🌐 **Multi-Platform** - Support for Windows, Linux, macOS with .NET 8, 9, and 10
