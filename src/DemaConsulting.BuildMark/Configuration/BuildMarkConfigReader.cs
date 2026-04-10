@@ -175,7 +175,7 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "azure-devops":
-                    azureDevOps = ParseAzureDevOpsConnector(entry.Value);
+                    azureDevOps = ParseAzureDevOpsConnector(filePath, entry.Value, issues);
                     break;
 
                 default:
@@ -275,13 +275,66 @@ public static class BuildMarkConfigReader
     /// <summary>
     ///     Parses the Azure DevOps connector block.
     /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
     /// <param name="node">The YAML node for the Azure DevOps connector.</param>
+    /// <param name="issues">The collected issues.</param>
     /// <returns>The parsed Azure DevOps connector configuration.</returns>
-    private static AzureDevOpsConnectorConfig ParseAzureDevOpsConnector(YamlNode node)
+    private static AzureDevOpsConnectorConfig ParseAzureDevOpsConnector(
+        string filePath,
+        YamlNode node,
+        List<ConfigurationIssue> issues)
     {
-        // Accept the block without extracting properties (placeholder).
-        _ = node;
-        return new AzureDevOpsConnectorConfig();
+        // The Azure DevOps connector value must be a mapping node.
+        if (node is not YamlMappingNode mapping)
+        {
+            AddError(issues, filePath, GetLine(node), "Azure DevOps connector must be a YAML mapping.");
+            return new AzureDevOpsConnectorConfig();
+        }
+
+        string? organizationUrl = null;
+        string? organization = null;
+        string? project = null;
+        string? repository = null;
+
+        foreach (var entry in mapping.Children)
+        {
+            var key = GetScalarValue(entry.Key);
+            var value = GetScalarValue(entry.Value);
+            switch (key)
+            {
+                case "organization-url":
+                case "organizationurl":
+                    organizationUrl = value;
+                    break;
+
+                case "organization":
+                case "org":
+                    organization = value;
+                    break;
+
+                case "project":
+                    project = value;
+                    break;
+
+                case "repository":
+                case "repo":
+                    repository = value;
+                    break;
+
+                default:
+                    AddError(issues, filePath, GetLine(entry.Key),
+                        $"Unsupported Azure DevOps connector key '{key}'.");
+                    break;
+            }
+        }
+
+        return new AzureDevOpsConnectorConfig
+        {
+            OrganizationUrl = organizationUrl,
+            Organization = organization,
+            Project = project,
+            Repository = repository
+        };
     }
 
     /// <summary>
