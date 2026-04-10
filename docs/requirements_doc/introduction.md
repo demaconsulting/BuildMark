@@ -5,9 +5,9 @@ This document contains the requirements for the BuildMark project.
 ## Purpose
 
 BuildMark is a .NET command-line tool that generates comprehensive markdown build notes reports from
-Git repository history and GitHub issues. It analyzes commits, pull requests, and issues to create
-human-readable build notes, making it easy to integrate release documentation into CI/CD pipelines
-and documentation workflows.
+Git repository history and issue-tracking systems. It analyzes commits, pull requests, and issues to
+create human-readable build notes, making it easy to integrate release documentation into CI/CD
+pipelines and documentation workflows.
 
 ## Scope
 
@@ -16,6 +16,7 @@ This requirements document covers:
 - Command-line interface and options
 - Git repository integration
 - GitHub integration for issues and pull requests
+- Azure DevOps integration for work items and pull requests
 - Markdown report generation capabilities
 - Validation and self-testing features
 - Data models and repository connectors

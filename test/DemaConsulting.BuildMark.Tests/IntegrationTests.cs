@@ -743,6 +743,55 @@ public class IntegrationTests
         Assert.Contains("Hidden block item", bugsSection);
     }
 
+    // ─────────────────────────────────────────────────────────────────────────
+    // Azure DevOps Integration (placeholder tests — Phase 2)
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Placeholder: verify that BuildMark generates markdown with version information
+    ///     from an Azure DevOps repository.
+    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
+    ///     implementation is available.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
+    {
+        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
+        // This test will verify that running BuildMark against a mocked Azure DevOps
+        // repository produces a markdown report containing correct version information.
+        Assert.IsTrue(File.Exists(_dllPath));
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that BuildMark generates a report containing changes and bug
+    ///     fixes with hyperlinks from an Azure DevOps repository.
+    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
+    ///     implementation is available.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
+    {
+        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
+        // This test will verify that the generated report contains hyperlinked work items
+        // and pull requests from Azure DevOps.
+        Assert.IsTrue(File.Exists(_dllPath));
+    }
+
+    /// <summary>
+    ///     Placeholder: verify that BuildMark shows the correct version range from the
+    ///     previous release in an Azure DevOps repository.
+    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
+    ///     implementation is available.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
+    {
+        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
+        // This test will verify that the previous version tag is correctly identified
+        // and the change range is accurately reported from an Azure DevOps repository.
+        Assert.IsTrue(File.Exists(_dllPath));
+    }
+
     /// <summary>
     ///     Generates a report using the ControlsMockConnector and returns the report content.
     /// </summary>

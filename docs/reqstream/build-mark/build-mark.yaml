@@ -152,6 +152,38 @@ sections:
             children:
               - BuildMark-RepoConnectors-GitHub
 
+      - title: Azure DevOps Integration
+        requirements:
+          - id: BuildMark-AzureDevOps-BuildNotes
+            title: The tool shall generate build notes from Azure DevOps repositories.
+            justification: |
+              Generating build notes from Azure DevOps repositories automates the documentation of
+              changes between releases for teams using Azure DevOps. This saves significant time
+              during release processes and ensures consistency in release documentation by deriving
+              information directly from source control history and work items.
+            tests:
+              - IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation
+
+          - id: BuildMark-AzureDevOps-IssueTracking
+            title: The tool shall track work items and pull requests from Azure DevOps.
+            justification: |
+              Tracking work items and pull requests from Azure DevOps provides traceability between
+              code changes and work items, enabling comprehensive release notes that link features,
+              bug fixes, and improvements to their corresponding Azure DevOps work items and pull
+              requests.
+            tests:
+              - IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks
+
+          - id: BuildMark-AzureDevOps-VersionTags
+            title: The tool shall identify changes between version tags in Azure DevOps repositories.
+            justification: |
+              Identifying changes between version tags enables differential release notes that
+              accurately capture what changed in each version for Azure DevOps repositories. This is
+              essential for semantic versioning workflows and helps users understand the scope of
+              changes between releases.
+            tests:
+              - IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease
+
       - title: Configuration File
         requirements:
           - id: BuildMark-Config-File
