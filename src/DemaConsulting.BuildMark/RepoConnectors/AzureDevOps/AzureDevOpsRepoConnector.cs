@@ -657,50 +657,18 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Parses Azure DevOps organization URL, project, and repository from a git remote URL.
     /// </summary>
+    /// <remarks>
+    ///     Supports Azure DevOps Services (dev.azure.com, visualstudio.com) and on-premises
+    ///     Azure DevOps Server instances. HTTPS URLs are detected by locating the <c>_git</c>
+    ///     path segment: the segment before <c>_git</c> is the project, the segment after is the
+    ///     repository, and everything before the project forms the organization URL.
+    ///     SSH URLs use the <c>git@ssh.dev.azure.com:v3/org/project/repo</c> format.
+    /// </remarks>
     /// <param name="url">Git remote URL.</param>
     /// <returns>Tuple of (organizationUrl, project, repository).</returns>
     internal static (string organizationUrl, string project, string repository) ParseAzureDevOpsUrl(string url)
     {
         url = url.Trim();
-
-        // Handle dev.azure.com HTTPS URLs: https://dev.azure.com/org/project/_git/repo
-        if (url.Contains("dev.azure.com", StringComparison.OrdinalIgnoreCase))
-        {
-            var uri = new Uri(url);
-            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (segments.Length >= 4 && segments[2].Equals("_git", StringComparison.OrdinalIgnoreCase))
-            {
-                var org = segments[0];
-                var project = segments[1];
-                var repo = segments[3];
-                if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
-                {
-                    repo = repo[..^4];
-                }
-
-                return ($"https://dev.azure.com/{org}", project, repo);
-            }
-        }
-
-        // Handle visualstudio.com HTTPS URLs: https://org.visualstudio.com/project/_git/repo
-        if (url.Contains("visualstudio.com", StringComparison.OrdinalIgnoreCase))
-        {
-            var uri = new Uri(url);
-            var hostParts = uri.Host.Split('.');
-            var org = hostParts[0];
-            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-            if (segments.Length >= 3 && segments[1].Equals("_git", StringComparison.OrdinalIgnoreCase))
-            {
-                var project = segments[0];
-                var repo = segments[2];
-                if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
-                {
-                    repo = repo[..^4];
-                }
-
-                return ($"https://dev.azure.com/{org}", project, repo);
-            }
-        }
 
         // Handle SSH URLs: git@ssh.dev.azure.com:v3/org/project/repo
         if (url.StartsWith("git@ssh.dev.azure.com:", StringComparison.OrdinalIgnoreCase))
@@ -716,6 +684,38 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
                 }
 
                 return ($"https://dev.azure.com/{parts[1]}", parts[2], repo);
+            }
+        }
+
+        // Handle HTTPS URLs by locating the _git path segment
+        // Supports dev.azure.com, visualstudio.com, and on-premises Azure DevOps Server
+        if (url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
+            url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
+        {
+            var uri = new Uri(url);
+            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+            // Find the _git segment to anchor the parse
+            var gitIndex = Array.FindIndex(segments,
+                s => s.Equals("_git", StringComparison.OrdinalIgnoreCase));
+
+            if (gitIndex >= 1 && gitIndex + 1 < segments.Length)
+            {
+                var project = segments[gitIndex - 1];
+                var repo = segments[gitIndex + 1];
+                if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
+                {
+                    repo = repo[..^4];
+                }
+
+                // Build organization URL from scheme://authority and path segments before the project
+                var baseUrl = uri.GetLeftPart(UriPartial.Authority);
+                var orgSegments = segments.Take(gitIndex - 1).ToArray();
+                var orgUrl = orgSegments.Length > 0
+                    ? $"{baseUrl}/{string.Join("/", orgSegments)}"
+                    : baseUrl;
+
+                return (orgUrl, project, repo);
             }
         }
 

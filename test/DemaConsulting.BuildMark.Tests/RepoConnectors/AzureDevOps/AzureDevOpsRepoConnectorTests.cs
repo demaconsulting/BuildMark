@@ -796,6 +796,133 @@ public class AzureDevOpsRepoConnectorTests
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-AzureDevOps-UrlParsing
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Verify that a dev.azure.com HTTPS URL is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComHttps_ReturnsCorrectComponents()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://dev.azure.com/myorg/myproject/_git/myrepo");
+
+        // Assert
+        Assert.AreEqual("https://dev.azure.com/myorg", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that a dev.azure.com HTTPS URL with .git suffix is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComWithGitSuffix_StripsGitSuffix()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://dev.azure.com/myorg/myproject/_git/myrepo.git");
+
+        // Assert
+        Assert.AreEqual("https://dev.azure.com/myorg", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that a visualstudio.com HTTPS URL is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_VisualStudioComHttps_ReturnsCorrectComponents()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://myorg.visualstudio.com/myproject/_git/myrepo");
+
+        // Assert
+        Assert.AreEqual("https://myorg.visualstudio.com", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that an SSH URL is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "git@ssh.dev.azure.com:v3/myorg/myproject/myrepo");
+
+        // Assert
+        Assert.AreEqual("https://dev.azure.com/myorg", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that an on-premises Azure DevOps Server URL is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremServer_ReturnsCorrectComponents()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://devops.mycompany.com/DefaultCollection/myproject/_git/myrepo");
+
+        // Assert
+        Assert.AreEqual("https://devops.mycompany.com/DefaultCollection", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that an on-premises Azure DevOps Server URL with a custom port is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithPort_ReturnsCorrectComponents()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://devops.internal.net:8080/tfs/DefaultCollection/myproject/_git/myrepo");
+
+        // Assert
+        Assert.AreEqual("https://devops.internal.net:8080/tfs/DefaultCollection", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that an on-premises Azure DevOps Server URL with .git suffix is parsed correctly.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithGitSuffix_StripsGitSuffix()
+    {
+        // Act
+        var (orgUrl, project, repo) = AzureDevOpsRepoConnector.ParseAzureDevOpsUrl(
+            "https://devops.mycompany.com/DefaultCollection/myproject/_git/myrepo.git");
+
+        // Assert
+        Assert.AreEqual("https://devops.mycompany.com/DefaultCollection", orgUrl);
+        Assert.AreEqual("myproject", project);
+        Assert.AreEqual("myrepo", repo);
+    }
+
+    /// <summary>
+    ///     Verify that an unsupported URL format throws ArgumentException.
+    /// </summary>
+    [TestMethod]
+    public void AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_UnsupportedFormat_ThrowsArgumentException()
+    {
+        // Act / Assert
+        Assert.ThrowsExactly<ArgumentException>(() =>
+            AzureDevOpsRepoConnector.ParseAzureDevOpsUrl("https://example.com/not-a-valid-url"));
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // Helper Methods
     // ─────────────────────────────────────────────────────────────────────────
 

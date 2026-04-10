@@ -94,7 +94,8 @@ Main entry point. Performs the following steps:
 1. Get repository metadata (URL, branch, current commit hash) from Git.
 2. Determine the organization URL, project, and repository name — from
    `AzureDevOpsConnectorConfig` if provided, otherwise parsed from the Git remote
-   URL (supports both `dev.azure.com` and `visualstudio.com` URL formats).
+   URL (supports `dev.azure.com`, `visualstudio.com`, and on-premises Azure
+   DevOps Server URL formats by locating the `_git` path segment).
 3. Resolve the Azure DevOps authentication token (see Authentication above).
 4. Create an `AzureDevOpsRestClient` with the resolved organization URL and token.
 5. Fetch all tags via `GET /git/repositories/{id}/refs?filter=refs/tags`. Using the
