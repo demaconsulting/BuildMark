@@ -279,6 +279,12 @@ public static class BuildMarkConfigReader
     /// <param name="node">The YAML node for the Azure DevOps connector.</param>
     /// <param name="issues">The collected issues.</param>
     /// <returns>The parsed Azure DevOps connector configuration.</returns>
+    private static string? GetOptionalScalarValue(YamlNode node)
+    {
+        var value = GetScalarValue(node);
+        return string.IsNullOrWhiteSpace(value) ? null : value;
+    }
+
     private static AzureDevOpsConnectorConfig ParseAzureDevOpsConnector(
         string filePath,
         YamlNode node,
@@ -299,7 +305,7 @@ public static class BuildMarkConfigReader
         foreach (var entry in mapping.Children)
         {
             var key = GetScalarValue(entry.Key);
-            var value = GetScalarValue(entry.Value);
+            var value = GetOptionalScalarValue(entry.Value);
             switch (key)
             {
                 case "url":
