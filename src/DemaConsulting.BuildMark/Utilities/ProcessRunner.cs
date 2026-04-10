@@ -136,8 +136,8 @@ internal static class ProcessRunner
     /// <returns>Configured <see cref="ProcessStartInfo" />.</returns>
     private static ProcessStartInfo CreateStartInfo(string command, string arguments)
     {
-        // On Windows, route through cmd.exe so .cmd/.bat scripts are found
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+        // On Windows, route non-empty commands through cmd.exe so .cmd/.bat scripts are found
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(command))
         {
             return new ProcessStartInfo
             {
