@@ -710,9 +710,9 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
 
                 // Build organization URL from scheme://authority and path segments before the project
                 var baseUrl = uri.GetLeftPart(UriPartial.Authority);
-                var orgSegments = segments.Take(gitIndex - 1).ToArray();
-                var orgUrl = orgSegments.Length > 0
-                    ? $"{baseUrl}/{string.Join("/", orgSegments)}"
+                var orgPath = string.Join("/", segments.Take(gitIndex - 1));
+                var orgUrl = orgPath.Length > 0
+                    ? $"{baseUrl}/{orgPath}"
                     : baseUrl;
 
                 return (orgUrl, project, repo);
