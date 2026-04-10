@@ -25,9 +25,10 @@ environment to confirm GitHub is appropriate, using the following signals:
 2. The `GITHUB_WORKSPACE` environment variable is non-empty.
 3. The git remote URL (obtained using sync-over-async pattern via
    `ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult()`)
-   contains `github.com`. This pattern is safe because BuildMark is delivered
-   exclusively as a .NET tool and is never called from a library context where
-   a synchronization context could cause deadlocks.
+   contains `github.com`. BuildMark is distributed as a .NET tool and is not
+   intended for consumption as a library by external callers, so this design
+   reflects the tool-oriented execution model rather than a guarantee that
+   synchronization-context-related deadlocks are impossible in every host.
 
 ## Interactions
 
