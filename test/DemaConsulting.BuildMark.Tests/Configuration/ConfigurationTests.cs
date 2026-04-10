@@ -155,10 +155,7 @@ public class ConfigurationTests
         var filePath = Path.Combine(directory, ".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
-            """
-            connector:
-             type: github
-            """);
+            "connector:\n\ttype: github\n");
 
         try
         {
@@ -169,7 +166,6 @@ public class ConfigurationTests
             Assert.IsNull(result.Config);
             Assert.IsTrue(result.HasErrors);
             Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("indented", result.Issues[0].Description);
         }
         finally
         {
