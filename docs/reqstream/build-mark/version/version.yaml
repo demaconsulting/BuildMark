@@ -20,11 +20,7 @@ sections:
           and provides the foundation for repository version tag processing and build
           information generation.
         tests:
-          - VersionComparable_Create_ValidVersions_ReturnsVersionComparable
-          - VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic
-          - VersionTag_Create_ValidTag_ReturnsVersionTag
-          - VersionInterval_Create_ValidInterval_ReturnsVersionInterval
-          - VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+          - Version_Subsystem_CreateAllVersionTypes_WorksCorrectly
         children:
           - BuildMark-VersionComparable-Comparison
           - BuildMark-VersionComparable-PreReleaseComparison
@@ -48,10 +44,7 @@ sections:
           expectations. This is critical for proper dependency resolution and
           version range operations.
         tests:
-          - VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
-          - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
-          - VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
-          - VersionTag_GetVersionComparable_SemanticTags_ReturnsCorrectComparison
+          - Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly
         children:
           - BuildMark-VersionComparable-Comparison
           - BuildMark-VersionComparable-PreReleaseComparison

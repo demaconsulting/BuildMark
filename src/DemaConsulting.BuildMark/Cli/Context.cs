@@ -91,9 +91,9 @@ internal sealed class Context : IDisposable
     public int ExitCode => _hasErrors ? 1 : 0;
 
     /// <summary>
-    ///     Gets the repository connector factory for creating connectors.
+    ///     Gets the repository connector factory for creating connectors asynchronously.
     /// </summary>
-    public Func<RepoConnectors.IRepoConnector>? ConnectorFactory { get; private init; }
+    public Func<Task<RepoConnectors.IRepoConnector>>? ConnectorFactory { get; private init; }
 
     /// <summary>
     ///     Private constructor - use Create factory method instead.
@@ -117,10 +117,10 @@ internal sealed class Context : IDisposable
     ///     Creates a Context instance from command-line arguments with optional connector factory.
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
-    /// <param name="connectorFactory">Optional repository connector factory for testing.</param>
+    /// <param name="connectorFactory">Optional asynchronous repository connector factory for testing.</param>
     /// <returns>A new Context instance.</returns>
     /// <exception cref="ArgumentException">Thrown when arguments are invalid.</exception>
-    public static Context Create(string[] args, Func<RepoConnectors.IRepoConnector>? connectorFactory)
+    public static Context Create(string[] args, Func<Task<RepoConnectors.IRepoConnector>>? connectorFactory)
     {
         var parser = new ArgumentParser();
         parser.ParseArguments(args);

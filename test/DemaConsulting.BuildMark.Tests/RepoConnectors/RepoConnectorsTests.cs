@@ -459,10 +459,10 @@ public class RepoConnectorsTests
     ///     Test that the factory creates a non-null connector instance.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_Factory_Create_ReturnsConnector()
+    public async Task RepoConnectors_Factory_CreateAsync_ReturnsConnector()
     {
         // Act: create a connector via the factory
-        var connector = RepoConnectorFactory.Create();
+        var connector = await RepoConnectorFactory.CreateAsync();
 
         // Assert: a valid IRepoConnector instance is returned
         Assert.IsNotNull(connector);
@@ -473,10 +473,10 @@ public class RepoConnectorsTests
     ///     Test that the factory returns a GitHubRepoConnector for this repository.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo()
+    public async Task RepoConnectors_Factory_CreateAsync_ReturnsGitHubConnectorForThisRepo()
     {
         // Act: create a connector via the factory
-        var connector = RepoConnectorFactory.Create();
+        var connector = await RepoConnectorFactory.CreateAsync();
 
         // Assert: the factory selects the GitHub connector for this GitHub-hosted repository
         Assert.IsInstanceOfType<GitHubRepoConnector>(connector);

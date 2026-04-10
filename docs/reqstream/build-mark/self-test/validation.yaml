@@ -15,9 +15,9 @@ sections:
           core BuildMark behaviors and produces a pass/fail summary to support tool
           qualification activities.
         tests:
-          - Validation_Run_WithTrxResultsFile_WritesTrxFile
-          - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-          - Validation_Run_WithoutResultsFile_CompletesSuccessfully
+          - Validation_RunAsync_WithTrxResultsFile_WritesTrxFile
+          - Validation_RunAsync_WithXmlResultsFile_WritesJUnitFile
+          - Validation_RunAsync_WithoutResultsFile_CompletesSuccessfully
 
       - id: BuildMark-Validation-TrxOutput
         title: The Validation class shall write TRX format test results when a .trx results file is specified.
@@ -26,8 +26,8 @@ sections:
           Studio Test Explorer, and Azure DevOps pipelines, providing native support
           for .NET development environments.
         tests:
-          - Validation_Run_WithTrxResultsFile_WritesTrxFile
-          - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+          - Validation_RunAsync_WithTrxResultsFile_WritesTrxFile
+          - Validation_RunAsync_WithUnsupportedResultsFileExtension_ShowsError
 
       - id: BuildMark-Validation-JUnitOutput
         title: The Validation class shall write JUnit XML format test results when an .xml results file is specified.
@@ -36,6 +36,6 @@ sections:
           testing tools. Supporting this format ensures BuildMark can integrate with
           diverse toolchains beyond the Microsoft ecosystem.
         tests:
-          - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-          - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
-          - Validation_Run_WithInvalidResultsFilePath_ShowsError
+          - Validation_RunAsync_WithXmlResultsFile_WritesJUnitFile
+          - Validation_RunAsync_WithUnsupportedResultsFileExtension_ShowsError
+          - Validation_RunAsync_WithInvalidResultsFilePath_ShowsError
