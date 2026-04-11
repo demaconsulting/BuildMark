@@ -26,7 +26,7 @@ problem with its file path, line number, severity, and description.
 | `ConfigurationIssue`        | `Configuration/ConfigurationIssue.cs`         | Single issue with location and severity|
 | `ConnectorConfig`           | `Configuration/ConnectorConfig.cs`            | Connector envelope data model          |
 | `GitHubConnectorConfig`     | `Configuration/GitHubConnectorConfig.cs`      | GitHub connector settings data model   |
-| `AzureDevOpsConnectorConfig`| `Configuration/AzureDevOpsConnectorConfig.cs` | Azure DevOps connector settings       |
+| `AzureDevOpsConnectorConfig`| `Configuration/AzureDevOpsConnectorConfig.cs` | Azure DevOps connector settings        |
 | `SectionConfig`             | `Configuration/SectionConfig.cs`              | Report section definition data model   |
 | `RuleConfig`                | `Configuration/RuleConfig.cs`                 | Item routing rule data model           |
 
