@@ -16,4 +16,4 @@ sections:
           the current and baseline release tags. The record keeps those values
           paired so range calculations and report rendering stay consistent.
         tests:
-          - VersionTag_Constructor_StoresVersionAndHash
+          - VersionCommitTag_Constructor_StoresVersionAndHash

@@ -24,3 +24,17 @@ sections:
           - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
           - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
           - BuildInformation_ToMarkdown_UsesBulletLists
+
+      - id: BuildMark-BuildInformation-RoutedSections
+        title: >-
+          The BuildInformation class shall render custom report sections from
+          RoutedSections when routing rules are configured.
+        justification: |
+          When connector routing rules are active, items are distributed into
+          custom sections rather than the default Changes/Bugs/KnownIssues
+          categorization. ToMarkdown must render those custom sections when
+          RoutedSections is populated, and fall back to the default sections
+          when it is null.
+        tests:
+          - BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
+          - BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections

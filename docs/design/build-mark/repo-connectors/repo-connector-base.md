@@ -75,4 +75,4 @@ implementations that return fixed strings without spawning real processes.
 - `GitHubRepoConnector` is a concrete implementation that inherits this base.
 - `AzureDevOpsRepoConnector` is a concrete implementation that inherits this base.
 - `MockRepoConnector` is a test implementation that overrides
-  `RunCommandAsync`.
+  `GetBuildInformationAsync` with in-memory data.

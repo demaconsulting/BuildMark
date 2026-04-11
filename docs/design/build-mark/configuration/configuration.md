@@ -54,8 +54,15 @@ problem with its file path, line number, severity, and description.
 |---------------|----------|----------------------------------------------------|
 | `FilePath`    | Property | Path to the file containing the issue              |
 | `Line`        | Property | Line number (1-based) of the issue                 |
-| `Severity`    | Property | `Error` or `Warning`                               |
+| `Severity`    | Property | `ConfigurationIssueSeverity` enum value            |
 | `Description` | Property | Human-readable description of the issue            |
+
+`ConfigurationIssueSeverity` is a public enum with two values:
+
+| Value     | Description                                              |
+|-----------|----------------------------------------------------------|
+| `Warning` | Non-fatal issue; tool continues and exit code is 0       |
+| `Error`   | Fatal issue; tool reports all errors, exits with code 1  |
 
 `BuildMarkConfig` carries the following properties:
 
