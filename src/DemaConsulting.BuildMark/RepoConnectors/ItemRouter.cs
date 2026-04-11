@@ -41,7 +41,7 @@ public static class ItemRouter
         IReadOnlyList<SectionConfig> sections)
     {
         // Initialize the output buckets using the configured section order.
-        var routedItems = sections.ToDictionary(section => section.Id, _ => new List<ItemInfo>());
+        var routedItems = sections.ToDictionary<SectionConfig, string, List<ItemInfo>>(section => section.Id, _ => []);
         var defaultSectionId = sections.Count > 0 ? sections[0].Id : "changes";
 
         // Route each item to the first matching destination.

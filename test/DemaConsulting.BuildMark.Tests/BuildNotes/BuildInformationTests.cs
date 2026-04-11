@@ -519,11 +519,11 @@ public class BuildInformationTests
         var VersionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
         var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
         var bugItem = new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2);
-        var routedSections = new List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>
-        {
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> routedSections =
+        [
             ("features", "Features", new List<ItemInfo> { featureItem }),
             ("bugs", "Bugs", new List<ItemInfo> { bugItem })
-        };
+        ];
         var buildInfo = new BuildInformation(null, VersionCommitTag, [], [], [], null)
         {
             RoutedSections = routedSections

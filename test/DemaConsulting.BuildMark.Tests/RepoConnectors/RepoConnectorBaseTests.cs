@@ -68,14 +68,14 @@ public class RepoConnectorBaseTests
     {
         // Arrange - Create testable connector and define rules
         var connector = new TestableRepoConnector();
-        var rules = new List<RuleConfig>
-        {
+        List<RuleConfig> rules =
+        [
             new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
-        };
-        var sections = new List<SectionConfig>
-        {
+        ];
+        List<SectionConfig> sections =
+        [
             new() { Id = "bugs", Title = "Bugs" }
-        };
+        ];
 
         // Act - Configure with non-empty rules
         connector.Configure(rules, sections);
@@ -109,23 +109,21 @@ public class RepoConnectorBaseTests
         // Arrange - Create testable connector with rules that route bugs to bugs and everything else to features
         var connector = new TestableRepoConnector();
         connector.Configure(
-            new List<RuleConfig>
-            {
+            [
                 new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
                 new() { Route = "features" }
-            },
-            new List<SectionConfig>
-            {
+            ],
+            [
                 new() { Id = "features", Title = "Features" },
                 new() { Id = "bugs", Title = "Bugs" }
-            });
+            ]);
 
         // Define test items: one feature, one bug
-        var items = new List<ItemInfo>
-        {
+        List<ItemInfo> items =
+        [
             new("1", "Add feature X", "https://example.com/1", "feature", 1),
             new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
-        };
+        ];
 
         // Act - Apply routing rules
         var sections = connector.ExposedApplyRules(items);
@@ -153,13 +151,13 @@ public class RepoConnectorBaseTests
     public void RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex()
     {
         // Arrange - Create version tags with different prefixes but same semantic version
-        var tags = new List<VersionCommitTag>
-        {
+        List<VersionCommitTag> tags =
+        [
             new(VersionTag.Create("v1.0.0")!, "hash1"),
             new(VersionTag.Create("VER1.2.3")!, "hash2"),
             new(VersionTag.Create("Release_1.2.3")!, "hash3"),
             new(VersionTag.Create("v2.0.0")!, "hash4")
-        };
+        ];
 
         // Target version to find (different prefix but same semantic version as index 1 and 2)
         var targetVersion = VersionComparable.Create("1.2.3");

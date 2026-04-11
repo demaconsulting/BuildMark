@@ -535,14 +535,14 @@ public class AzureDevOpsRepoConnectorTests
     {
         // Arrange
         var connector = new AzureDevOpsRepoConnector();
-        var rules = new List<RuleConfig>
-        {
+        List<RuleConfig> rules =
+        [
             new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
-        };
-        var sections = new List<SectionConfig>
-        {
+        ];
+        List<SectionConfig> sections =
+        [
             new() { Id = "bugs", Title = "Bugs" }
-        };
+        ];
 
         // Act
         connector.Configure(rules, sections);
@@ -578,16 +578,14 @@ public class AzureDevOpsRepoConnectorTests
 
         // Configure routing rules
         connector.Configure(
-            new List<RuleConfig>
-            {
+            [
                 new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
                 new() { Route = "features" }
-            },
-            new List<SectionConfig>
-            {
+            ],
+            [
                 new() { Id = "features", Title = "Features" },
                 new() { Id = "bugs", Title = "Bugs" }
-            });
+            ]);
 
         // Act
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));

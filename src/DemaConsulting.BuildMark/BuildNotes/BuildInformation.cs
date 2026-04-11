@@ -42,6 +42,10 @@ public record BuildInformation(
     WebLink? CompleteChangelogLink)
 {
     /// <summary>
+    ///     Markdown placeholder for empty sections.
+    /// </summary>
+    private const string NoItemsPlaceholder = "- N/A";
+    /// <summary>
     ///     Gets or initializes the custom routed sections when rules are configured.
     ///     When non-null and non-empty, <see cref="ToMarkdown"/> renders these sections instead of the legacy
     ///     Changes/Bugs/KnownIssues sections.
@@ -131,8 +135,7 @@ public record BuildInformation(
             }
             else
             {
-                // Indicate no items in this section
-                markdown.AppendLine("- N/A");
+                markdown.AppendLine(NoItemsPlaceholder);
             }
 
             // Add blank line after section
@@ -192,7 +195,7 @@ public record BuildInformation(
         }
         else
         {
-            markdown.AppendLine("- N/A");
+            markdown.AppendLine(NoItemsPlaceholder);
         }
 
         // Add blank line after section
@@ -220,7 +223,7 @@ public record BuildInformation(
         }
         else
         {
-            markdown.AppendLine("- N/A");
+            markdown.AppendLine(NoItemsPlaceholder);
         }
 
         // Add blank line after section
@@ -248,7 +251,7 @@ public record BuildInformation(
         }
         else
         {
-            markdown.AppendLine("- N/A");
+            markdown.AppendLine(NoItemsPlaceholder);
         }
 
         // Add blank line after section

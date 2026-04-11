@@ -173,16 +173,16 @@ public class MockRepoConnectorTests
     {
         // Arrange - Create connector and define rules
         var connector = new MockRepoConnector();
-        var rules = new List<RuleConfig>
-        {
+        List<RuleConfig> rules =
+        [
             new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
             new() { Route = "features" }
-        };
-        var sections = new List<SectionConfig>
-        {
+        ];
+        List<SectionConfig> sections =
+        [
             new() { Id = "features", Title = "Features" },
             new() { Id = "bugs", Title = "Bugs" }
-        };
+        ];
 
         // Act - Configure the connector with rules
         connector.Configure(rules, sections);
@@ -205,16 +205,14 @@ public class MockRepoConnectorTests
         // Arrange - Create connector with routing rules
         var connector = new MockRepoConnector();
         connector.Configure(
-            new List<RuleConfig>
-            {
+            [
                 new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
                 new() { Route = "features" }
-            },
-            new List<SectionConfig>
-            {
+            ],
+            [
                 new() { Id = "features", Title = "Features" },
                 new() { Id = "bugs", Title = "Bugs" }
-            });
+            ]);
 
         // Act - Get build information with routing rules configured
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));

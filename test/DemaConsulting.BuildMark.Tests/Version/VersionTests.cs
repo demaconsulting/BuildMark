@@ -45,9 +45,9 @@ public class VersionTests
         Assert.IsNotNull(simple);
         Assert.IsNotNull(preRelease);
         Assert.IsNotNull(complex);
-        Assert.IsInstanceOfType(simple, typeof(VersionComparable));
-        Assert.IsInstanceOfType(preRelease, typeof(VersionComparable));
-        Assert.IsInstanceOfType(complex, typeof(VersionComparable));
+        Assert.IsInstanceOfType<VersionComparable>(simple);
+        Assert.IsInstanceOfType<VersionComparable>(preRelease);
+        Assert.IsInstanceOfType<VersionComparable>(complex);
     }
 
     /// <summary>
@@ -65,9 +65,9 @@ public class VersionTests
         Assert.IsNotNull(simple);
         Assert.IsNotNull(withMetadata);
         Assert.IsNotNull(complex);
-        Assert.IsInstanceOfType(simple, typeof(VersionSemantic));
-        Assert.IsInstanceOfType(withMetadata, typeof(VersionSemantic));
-        Assert.IsInstanceOfType(complex, typeof(VersionSemantic));
+        Assert.IsInstanceOfType<VersionSemantic>(simple);
+        Assert.IsInstanceOfType<VersionSemantic>(withMetadata);
+        Assert.IsInstanceOfType<VersionSemantic>(complex);
     }
 
     /// <summary>
@@ -85,9 +85,9 @@ public class VersionTests
         Assert.IsNotNull(simple);
         Assert.IsNotNull(prefixed);
         Assert.IsNotNull(complex);
-        Assert.IsInstanceOfType(simple, typeof(VersionTag));
-        Assert.IsInstanceOfType(prefixed, typeof(VersionTag));
-        Assert.IsInstanceOfType(complex, typeof(VersionTag));
+        Assert.IsInstanceOfType<VersionTag>(simple);
+        Assert.IsInstanceOfType<VersionTag>(prefixed);
+        Assert.IsInstanceOfType<VersionTag>(complex);
     }
 
     /// <summary>
@@ -105,9 +105,9 @@ public class VersionTests
         Assert.IsNotNull(inclusive);
         Assert.IsNotNull(exclusive);
         Assert.IsNotNull(mixed);
-        Assert.IsInstanceOfType(inclusive, typeof(VersionInterval));
-        Assert.IsInstanceOfType(exclusive, typeof(VersionInterval));
-        Assert.IsInstanceOfType(mixed, typeof(VersionInterval));
+        Assert.IsInstanceOfType<VersionInterval>(inclusive);
+        Assert.IsInstanceOfType<VersionInterval>(exclusive);
+        Assert.IsInstanceOfType<VersionInterval>(mixed);
     }
 
     /// <summary>
@@ -125,7 +125,7 @@ public class VersionTests
 
         // Assert
         Assert.IsNotNull(versionCommitTag);
-        Assert.IsInstanceOfType(versionCommitTag, typeof(VersionCommitTag));
+        Assert.IsInstanceOfType<VersionCommitTag>(versionCommitTag);
         Assert.AreEqual(versionTag, versionCommitTag.VersionTag);
         Assert.AreEqual(commitHash, versionCommitTag.CommitHash);
     }
