@@ -37,6 +37,16 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     private readonly AzureDevOpsConnectorConfig? _config;
 
     /// <summary>
+    ///     Item visibility: public (force-include in report).
+    /// </summary>
+    private const string VisibilityPublic = "public";
+
+    /// <summary>
+    ///     Item visibility: internal (exclude from report).
+    /// </summary>
+    private const string VisibilityInternal = "internal";
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="AzureDevOpsRepoConnector"/> class.
     /// </summary>
     /// <param name="config">Optional Azure DevOps connector overrides.</param>
@@ -521,8 +531,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         var controls = ItemControlsParser.Parse(pr.Description);
 
         // Exclude if internal
-        var forceInclude = controls?.Visibility == "public";
-        if (!forceInclude && controls?.Visibility == "internal")
+        var forceInclude = controls?.Visibility == VisibilityPublic;
+        if (!forceInclude && controls?.Visibility == VisibilityInternal)
         {
             return;
         }
