@@ -130,7 +130,7 @@ internal sealed class AzureDevOpsRestClient : IDisposable
     /// <returns>List of tag references.</returns>
     public async Task<List<AzureDevOpsRef>> GetTagsAsync(string repositoryId)
     {
-        var url = $"{_organizationUrl}/{_project}/_apis/git/repositories/{repositoryId}/refs?filter=tags&api-version={ApiVersion}";
+        var url = $"{_organizationUrl}/{_project}/_apis/git/repositories/{repositoryId}/refs?filter=tags&peelTags=true&api-version={ApiVersion}";
         var response = await _httpClient.GetAsync(url).ConfigureAwait(false);
         response.EnsureSuccessStatusCode();
 

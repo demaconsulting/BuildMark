@@ -88,10 +88,18 @@ internal sealed record AzureDevOpsWorkItemRef(
 ///     Git reference (tag or branch) returned by the Azure DevOps refs endpoint.
 /// </summary>
 /// <param name="Name">Full reference name (e.g., refs/tags/v1.0.0).</param>
-/// <param name="ObjectId">Commit SHA that this reference points to.</param>
+/// <param name="ObjectId">Object SHA that this reference points to (tag object for annotated tags, commit for lightweight tags).</param>
+/// <param name="PeeledObjectId">Commit SHA for annotated tags (resolved through the tag object). Null for lightweight tags.</param>
 internal sealed record AzureDevOpsRef(
     string Name,
-    string ObjectId);
+    string ObjectId,
+    string? PeeledObjectId = null)
+{
+    /// <summary>
+    ///     Gets the commit SHA this reference resolves to, preferring the peeled object ID for annotated tags.
+    /// </summary>
+    public string CommitId => PeeledObjectId ?? ObjectId;
+}
 
 /// <summary>
 ///     Generic wrapper for paginated collection responses from the Azure DevOps REST API.

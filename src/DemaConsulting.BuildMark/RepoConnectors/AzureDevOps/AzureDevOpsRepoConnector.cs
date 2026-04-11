@@ -200,14 +200,15 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         // Build a set of commit hashes in the current branch
         var branchCommitHashes = new HashSet<string>(data.Commits.Select(c => c.CommitId), StringComparer.Ordinal);
 
-        // Build tag-to-commit mapping, stripping "refs/tags/" prefix
+        // Build tag-to-commit mapping, stripping "refs/tags/" prefix.
+        // Use CommitId which prefers PeeledObjectId (annotated tags) over ObjectId (lightweight tags).
         var tagToCommitHash = data.Tags
-            .Where(t => branchCommitHashes.Contains(t.ObjectId))
+            .Where(t => branchCommitHashes.Contains(t.CommitId))
             .ToDictionary(
                 t => t.Name.StartsWith("refs/tags/", StringComparison.OrdinalIgnoreCase)
                     ? t.Name["refs/tags/".Length..]
                     : t.Name,
-                t => t.ObjectId);
+                t => t.CommitId);
 
         // Parse tags into VersionTag objects, ordered by version (newest first)
         var tagVersions = tagToCommitHash.Keys
