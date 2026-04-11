@@ -47,7 +47,12 @@ public class GitHubRepoConnector : RepoConnectorBase
         { "enhancement", "feature" },
         { "documentation", "documentation" },
         { "performance", "performance" },
-        { "security", "security" }
+        { "security", "security" },
+        { "dependencies", "dependencies" },
+        { "renovate", "dependencies" },
+        { "dependabot", "dependencies" },
+        { "internal", "internal" },
+        { "chore", "internal" }
     };
 
     /// <summary>

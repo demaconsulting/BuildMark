@@ -221,7 +221,12 @@ public static class BuildMarkConfigReader
             switch (key)
             {
                 case "file":
-                    file = GetScalarValue(entry.Value);
+                    file = GetOptionalScalarValue(entry.Value);
+                    if (file == null)
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Report file must be a non-empty string.");
+                    }
                     break;
 
                 case "depth":

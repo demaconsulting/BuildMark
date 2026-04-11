@@ -182,7 +182,7 @@ internal static class Program
 
         // Resolve effective report options: CLI arguments override config file values
         var effectiveReportFile = context.ReportFile ?? effectiveConfig.Report?.File;
-        var effectiveReportDepth = context.ReportDepth != 1 ? context.ReportDepth : (effectiveConfig.Report?.Depth ?? 1);
+        var effectiveReportDepth = context.ReportDepth ?? effectiveConfig.Report?.Depth ?? 1;
         var effectiveIncludeKnownIssues = context.IncludeKnownIssues || (effectiveConfig.Report?.IncludeKnownIssues ?? false);
 
         // Create repository connector using factory if provided, otherwise use the configured connector.

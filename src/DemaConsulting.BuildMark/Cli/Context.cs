@@ -71,9 +71,9 @@ internal sealed class Context : IDisposable
     public string? ReportFile { get; private init; }
 
     /// <summary>
-    ///     Gets the report markdown depth.
+    ///     Gets the report markdown depth, or null when not specified on the command line.
     /// </summary>
-    public int ReportDepth { get; private init; } = 1;
+    public int? ReportDepth { get; private init; }
 
     /// <summary>
     ///     Gets a value indicating whether to include known issues in the report.
@@ -211,9 +211,9 @@ internal sealed class Context : IDisposable
         public string? ReportFile { get; private set; }
 
         /// <summary>
-        ///     Gets the report markdown depth.
+        ///     Gets the report markdown depth, or null when not specified on the command line.
         /// </summary>
-        public int ReportDepth { get; private set; } = 1;
+        public int? ReportDepth { get; private set; }
 
         /// <summary>
         ///     Gets a value indicating whether to include known issues in the report.
