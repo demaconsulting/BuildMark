@@ -172,7 +172,7 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
             title = pr.Title,
             url = $"https://dev.azure.com/org/project/_git/repo/pullrequest/{pr.PullRequestId}",
             status = pr.Status,
-            mergeCommitId = pr.MergeCommitId,
+            lastMergeCommit = pr.MergeCommitId != null ? new { commitId = pr.MergeCommitId } : null,
             sourceRefName = "refs/heads/feature",
             description = pr.Description
         });

@@ -41,13 +41,23 @@ internal sealed record AzureDevOpsCommit(
     string Comment);
 
 /// <summary>
+///     Minimal Git commit reference containing only the commit SHA.
+/// </summary>
+/// <param name="CommitId">Full commit SHA hash.</param>
+internal sealed record AzureDevOpsGitCommitRef(
+    string CommitId);
+
+/// <summary>
 ///     Pull request data returned by the Azure DevOps pull requests endpoint.
 /// </summary>
 /// <param name="PullRequestId">Pull request identifier.</param>
 /// <param name="Title">Pull request title.</param>
 /// <param name="Url">Pull request web URL.</param>
 /// <param name="Status">Pull request status (active, completed, abandoned).</param>
-/// <param name="MergeCommitId">Merge commit SHA when completed, null otherwise.</param>
+/// <param name="LastMergeCommit">
+///     The commit of the most recent pull request merge. Null when the merge is in progress or was unsuccessful.
+///     This field is populated for all merge strategies (no-fast-forward, squash, rebase, rebase-merge).
+/// </param>
 /// <param name="SourceRefName">Source branch reference name.</param>
 /// <param name="Description">Pull request description body.</param>
 internal sealed record AzureDevOpsPullRequest(
@@ -55,9 +65,15 @@ internal sealed record AzureDevOpsPullRequest(
     string Title,
     string? Url,
     string Status,
-    string? MergeCommitId,
+    AzureDevOpsGitCommitRef? LastMergeCommit,
     string? SourceRefName,
-    string? Description);
+    string? Description)
+{
+    /// <summary>
+    ///     Gets the merge commit SHA from the last merge commit reference, or null if not available.
+    /// </summary>
+    public string? MergeCommitId => LastMergeCommit?.CommitId;
+}
 
 /// <summary>
 ///     Work item data returned by the Azure DevOps work items endpoint with all fields expanded.
