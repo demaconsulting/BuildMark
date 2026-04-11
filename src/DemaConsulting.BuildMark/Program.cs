@@ -177,16 +177,24 @@ internal static class Program
             return;
         }
 
+        // Use the default configuration when no file was found (absence of errors means file is simply missing)
+        var effectiveConfig = loadResult.Config ?? BuildMarkConfig.CreateDefault();
+
+        // Resolve effective report options: CLI arguments override config file values
+        var effectiveReportFile = context.ReportFile ?? effectiveConfig.Report?.File;
+        var effectiveReportDepth = context.ReportDepth ?? effectiveConfig.Report?.Depth ?? 1;
+        var effectiveIncludeKnownIssues = context.IncludeKnownIssues || (effectiveConfig.Report?.IncludeKnownIssues ?? false);
+
         // Create repository connector using factory if provided, otherwise use the configured connector.
-        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
+        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(effectiveConfig.Connector);
 
         // Configure routing rules on the connector when not using a test factory
         if (context.ConnectorFactory == null && connector is RepoConnectorBase configurableConnector)
         {
             // Pass rules and sections from configuration to the connector
             configurableConnector.Configure(
-                loadResult.Config?.Rules ?? [],
-                loadResult.Config?.Sections ?? []);
+                effectiveConfig.Rules,
+                effectiveConfig.Sections);
         }
 
         // Parse build version if provided
@@ -230,13 +238,13 @@ internal static class Program
         context.WriteLine($"Known Issues: {buildInfo.KnownIssues.Count}");
 
         // Export markdown report if requested
-        if (context.ReportFile != null)
+        if (effectiveReportFile != null)
         {
-            context.WriteLine($"Writing build report to {context.ReportFile}...");
+            context.WriteLine($"Writing build report to {effectiveReportFile}...");
             try
             {
-                var markdown = buildInfo.ToMarkdown(context.ReportDepth, context.IncludeKnownIssues);
-                File.WriteAllText(context.ReportFile, markdown);
+                var markdown = buildInfo.ToMarkdown(effectiveReportDepth, effectiveIncludeKnownIssues);
+                File.WriteAllText(effectiveReportFile, markdown);
                 context.WriteLine("Build report generated successfully.");
             }
             // Generic catch is justified here to handle any file system exception gracefully

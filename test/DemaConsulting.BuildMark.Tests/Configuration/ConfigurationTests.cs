@@ -358,6 +358,122 @@ public class ConfigurationTests
         // Assert
         Assert.AreEqual(1, context.ExitCode);
     }
+
+    /// <summary>
+    ///     Test that the default configuration contains the expected sections and routing rules.
+    /// </summary>
+    [TestMethod]
+    public void BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection()
+    {
+        // Act
+        var config = BuildMarkConfig.CreateDefault();
+
+        // Assert - verify sections have correct IDs and titles
+        Assert.HasCount(3, config.Sections);
+        Assert.AreEqual("changes", config.Sections[0].Id);
+        Assert.AreEqual("Changes", config.Sections[0].Title);
+        Assert.AreEqual("bugs-fixed", config.Sections[1].Id);
+        Assert.AreEqual("Bugs Fixed", config.Sections[1].Title);
+        Assert.AreEqual("dependency-updates", config.Sections[2].Id);
+        Assert.AreEqual("Dependency Updates", config.Sections[2].Title);
+
+        // Assert - verify rules have correct routes and match conditions
+        Assert.HasCount(6, config.Rules);
+
+        Assert.AreEqual("dependency-updates", config.Rules[0].Route);
+        Assert.Contains("dependencies", config.Rules[0].Match!.Label);
+        Assert.Contains("renovate", config.Rules[0].Match!.Label);
+        Assert.Contains("dependabot", config.Rules[0].Match!.Label);
+
+        Assert.AreEqual("bugs-fixed", config.Rules[1].Route);
+        Assert.Contains("Bug", config.Rules[1].Match!.WorkItemType);
+
+        Assert.AreEqual("bugs-fixed", config.Rules[2].Route);
+        Assert.Contains("bug", config.Rules[2].Match!.Label);
+        Assert.Contains("defect", config.Rules[2].Match!.Label);
+        Assert.Contains("regression", config.Rules[2].Match!.Label);
+
+        Assert.AreEqual("suppressed", config.Rules[3].Route);
+        Assert.Contains("internal", config.Rules[3].Match!.Label);
+        Assert.Contains("chore", config.Rules[3].Match!.Label);
+
+        Assert.AreEqual("suppressed", config.Rules[4].Route);
+        Assert.Contains("Task", config.Rules[4].Match!.WorkItemType);
+        Assert.Contains("Epic", config.Rules[4].Match!.WorkItemType);
+
+        Assert.AreEqual("changes", config.Rules[5].Route);
+        Assert.IsNull(config.Rules[5].Match);
+    }
+    /// <summary>
+    ///     Test that a valid report section is parsed into the report configuration model.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            report:
+              file: build-notes.md
+              depth: 2
+              include-known-issues: true
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNotNull(result.Config);
+            Assert.IsFalse(result.HasErrors);
+            Assert.IsNotNull(result.Config.Report);
+            Assert.AreEqual("build-notes.md", result.Config.Report.File);
+            Assert.AreEqual(2, result.Config.Report.Depth);
+            Assert.AreEqual(true, result.Config.Report.IncludeKnownIssues);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that an invalid report depth produces an error issue.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            report:
+              depth: -1
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNull(result.Config);
+            Assert.IsTrue(result.HasErrors);
+            Assert.Contains("positive integer", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
 }
 
 

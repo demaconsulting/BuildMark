@@ -111,6 +111,7 @@ public static class BuildMarkConfigReader
 
         var config = new BuildMarkConfig();
         ConnectorConfig? connector = null;
+        ReportConfig? report = null;
 
         foreach (var entry in root.Children)
         {
@@ -129,13 +130,17 @@ public static class BuildMarkConfigReader
                     ParseRules(filePath, entry.Value, config.Rules, issues);
                     break;
 
+                case "report":
+                    report = ParseReport(filePath, entry.Value, issues);
+                    break;
+
                 default:
                     AddError(issues, filePath, GetLine(entry.Key), $"Unsupported top-level key '{key}'.");
                     break;
             }
         }
 
-        return config with { Connector = connector };
+        return config with { Connector = connector, Report = report };
     }
 
     /// <summary>
@@ -185,6 +190,84 @@ public static class BuildMarkConfigReader
         }
 
         return connector with { GitHub = gitHub, AzureDevOps = azureDevOps };
+    }
+
+    /// <summary>
+    ///     Parses the report block.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML node for the report block.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The parsed report configuration.</returns>
+    private static ReportConfig ParseReport(
+        string filePath,
+        YamlNode node,
+        List<ConfigurationIssue> issues)
+    {
+        // The report value must be a mapping node.
+        if (node is not YamlMappingNode mapping)
+        {
+            AddError(issues, filePath, GetLine(node), "Report must be a YAML mapping.");
+            return new ReportConfig();
+        }
+
+        string? file = null;
+        int? depth = null;
+        bool? includeKnownIssues = null;
+
+        foreach (var entry in mapping.Children)
+        {
+            var key = GetScalarValue(entry.Key);
+            switch (key)
+            {
+                case "file":
+                    file = GetOptionalScalarValue(entry.Value);
+                    if (file == null)
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Report file must be a non-empty string.");
+                    }
+                    break;
+
+                case "depth":
+                    var depthStr = GetScalarValue(entry.Value);
+                    if (!int.TryParse(depthStr, out var depthValue) || depthValue < 1)
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Report depth must be a positive integer.");
+                    }
+                    else
+                    {
+                        depth = depthValue;
+                    }
+                    break;
+
+                case "include-known-issues":
+                    var boolStr = GetScalarValue(entry.Value);
+                    if (!bool.TryParse(boolStr, out var boolValue))
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Report include-known-issues must be 'true' or 'false'.");
+                    }
+                    else
+                    {
+                        includeKnownIssues = boolValue;
+                    }
+                    break;
+
+                default:
+                    AddError(issues, filePath, GetLine(entry.Key),
+                        $"Unsupported report key '{key}'.");
+                    break;
+            }
+        }
+
+        return new ReportConfig
+        {
+            File = file,
+            Depth = depth,
+            IncludeKnownIssues = includeKnownIssues
+        };
     }
 
     /// <summary>

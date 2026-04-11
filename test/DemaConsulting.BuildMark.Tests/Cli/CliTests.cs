@@ -44,7 +44,7 @@ public class CliTests
         Assert.IsFalse(context.Validate);
         Assert.IsNull(context.BuildVersion);
         Assert.IsNull(context.ReportFile);
-        Assert.AreEqual(1, context.ReportDepth);
+        Assert.IsNull(context.ReportDepth);
         Assert.IsFalse(context.IncludeKnownIssues);
         Assert.IsNull(context.ResultsFile);
         Assert.AreEqual(0, context.ExitCode);
