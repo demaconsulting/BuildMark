@@ -191,7 +191,7 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
         int pullRequestId,
         params int[] workItemIds)
     {
-        var refs = workItemIds.Select(id => new { id, url = $"https://dev.azure.com/org/project/_apis/wit/workitems/{id}" });
+        var refs = workItemIds.Select(id => new { id = id.ToString(), url = $"https://dev.azure.com/org/project/_apis/wit/workitems/{id}" });
         var json = JsonSerializer.Serialize(new { count = workItemIds.Length, value = refs });
         return AddResponse($"pullrequests/{pullRequestId}/workitems", json);
     }

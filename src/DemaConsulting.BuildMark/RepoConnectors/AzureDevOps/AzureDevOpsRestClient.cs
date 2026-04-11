@@ -22,6 +22,7 @@ using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using System.Text;
 using System.Text.Json;
+using System.Text.Json.Serialization;
 
 namespace DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 
@@ -40,7 +41,8 @@ internal sealed class AzureDevOpsRestClient : IDisposable
     /// </summary>
     private static readonly JsonSerializerOptions JsonOptions = new()
     {
-        PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+        PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+        NumberHandling = JsonNumberHandling.AllowReadingFromString
     };
 
     /// <summary>

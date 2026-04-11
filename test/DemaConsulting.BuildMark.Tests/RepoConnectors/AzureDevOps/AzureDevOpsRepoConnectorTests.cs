@@ -748,6 +748,54 @@ public class AzureDevOpsRepoConnectorTests
         Assert.AreEqual(302, query.WorkItems[2].Id);
     }
 
+    /// <summary>
+    ///     Verify that GetPullRequestWorkItemsAsync deserializes string-valued ids
+    ///     as returned by the Azure DevOps PR work items endpoint.
+    /// </summary>
+    [TestMethod]
+    public async Task AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_StringValuedIds_DeserializesCorrectly()
+    {
+        // Arrange - raw JSON matching the real Azure DevOps response format where id is a string
+        const string json = """{"count":2,"value":[{"id":"1234","url":"https://dev.azure.com/org/project/_apis/wit/workItems/1234"},{"id":"5678","url":"https://dev.azure.com/org/project/_apis/wit/workItems/5678"}]}""";
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddResponse("pullrequests/101/workitems", json);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act
+        var workItemRefs = await client.GetPullRequestWorkItemsAsync("repo-id", 101);
+
+        // Assert
+        Assert.IsNotNull(workItemRefs);
+        Assert.AreEqual(2, workItemRefs.Count);
+        Assert.AreEqual(1234, workItemRefs[0].Id);
+        Assert.AreEqual(5678, workItemRefs[1].Id);
+    }
+
+    /// <summary>
+    ///     Verify that QueryWorkItemsAsync deserializes string-valued ids
+    ///     when the WIQL endpoint returns them as strings.
+    /// </summary>
+    [TestMethod]
+    public async Task AzureDevOpsRestClient_QueryWorkItemsAsync_StringValuedIds_DeserializesCorrectly()
+    {
+        // Arrange - raw JSON with string-valued ids
+        const string json = """{"workItems":[{"id":"300","url":"https://dev.azure.com/org/project/_apis/wit/workItems/300"},{"id":"301","url":"https://dev.azure.com/org/project/_apis/wit/workItems/301"}]}""";
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddResponse("wit/wiql", json);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act
+        var query = await client.QueryWorkItemsAsync("SELECT [System.Id] FROM workitems WHERE [System.WorkItemType] = 'Bug'");
+
+        // Assert
+        Assert.IsNotNull(query);
+        Assert.AreEqual(2, query.WorkItems.Count);
+        Assert.AreEqual(300, query.WorkItems[0].Id);
+        Assert.AreEqual(301, query.WorkItems[1].Id);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-AzureDevOps-WorkItemMapper
     // ─────────────────────────────────────────────────────────────────────────
