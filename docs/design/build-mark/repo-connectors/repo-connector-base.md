@@ -27,7 +27,7 @@ shared utilities used by concrete connectors.
 +------------------------------------------+-------------------+-------------------------------------------------------+
 | `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules    |
 +------------------------------------------+-------------------+-------------------------------------------------------+
-| `RunCommandAsync(command, arguments)`    | Protected virtual | Delegates shell commands to ProcessRunner            |
+| `RunCommandAsync(command, params arguments)` | Protected virtual | Delegates shell commands to ProcessRunner            |
 +------------------------------------------+-------------------+-------------------------------------------------------+
 | `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality              |
 +------------------------------------------+-------------------+-------------------------------------------------------+
@@ -72,5 +72,6 @@ with mock implementations that return fixed strings without spawning real proces
 - `ProcessRunner` is used by `RunCommandAsync` to execute shell commands in the
   Utilities subsystem.
 - `GitHubRepoConnector` is a concrete implementation that inherits this base.
+- `AzureDevOpsRepoConnector` is a concrete implementation that inherits this base.
 - `MockRepoConnector` is a test implementation that overrides
   `RunCommandAsync`.

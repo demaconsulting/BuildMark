@@ -32,7 +32,7 @@ using the following signals, checked in order:
 5. The git remote URL contains `github.com` — creates a `GitHubRepoConnector`.
 
 The git remote URL is obtained using the sync-over-async pattern via
-`ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult()`.
+`ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult()`.
 BuildMark is distributed as a .NET tool and is not intended for consumption as a
 library by external callers, so this design reflects the tool-oriented execution
 model rather than a guarantee that synchronization-context-related deadlocks are
