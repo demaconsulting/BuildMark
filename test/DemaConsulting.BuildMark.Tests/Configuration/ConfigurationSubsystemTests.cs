@@ -29,6 +29,11 @@ namespace DemaConsulting.BuildMark.Tests.Configuration;
 [TestClass]
 public class ConfigurationSubsystemTests
 {
+    /// <summary>
+    ///     Gets or sets the test context for the current test run.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
+
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-Configuration-Read
     // ─────────────────────────────────────────────────────────────────────────
@@ -58,7 +63,8 @@ public class ConfigurationSubsystemTests
               - match:
                   label: [feature]
                 route: changes
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -120,7 +126,8 @@ public class ConfigurationSubsystemTests
         var filePath = Path.Combine(directory, ".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
-            "connector:\n\ttype: github\n");
+            "connector:\n\ttype: github\n",
+            TestContext.CancellationToken);
 
         try
         {
@@ -192,7 +199,8 @@ public class ConfigurationSubsystemTests
                 owner: acme-org
                 repo: my-project
                 base-url: https://api.github.example.com
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -234,7 +242,8 @@ public class ConfigurationSubsystemTests
                 organization: acme
                 project: my-project
                 repository: my-repo
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {

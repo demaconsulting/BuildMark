@@ -409,7 +409,7 @@ public class VersionComparableTests
         var result = numericVersion!.CompareTo(nonNumericVersion);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.0.0-1 should be less than 1.0.0-alpha (numeric < non-numeric)");
+        Assert.IsLessThan(result, 0, "1.0.0-1 should be less than 1.0.0-alpha (numeric < non-numeric)");
     }
 
     /// <summary>
@@ -426,7 +426,7 @@ public class VersionComparableTests
         var result = shorterVersion!.CompareTo(longerVersion);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.0.0-alpha should be less than 1.0.0-alpha.1 (shorter is less)");
+        Assert.IsLessThan(result, 0, "1.0.0-alpha should be less than 1.0.0-alpha.1 (shorter is less)");
     }
 
     /// <summary>
@@ -442,9 +442,9 @@ public class VersionComparableTests
         var test4 = VersionComparable.Create("1.0.0-alpha.beta.1");
 
         // Act & Assert
-        Assert.IsTrue(test1!.CompareTo(test2) < 0, "alpha.1.2 < alpha.1.10 (numeric segment comparison)");
-        Assert.IsTrue(test2!.CompareTo(test3) < 0, "alpha.1.10 < alpha.2.1 (first numeric difference wins)");
-        Assert.IsTrue(test3!.CompareTo(test4) < 0, "alpha.2.1 < alpha.beta.1 (numeric < non-numeric)");
+        Assert.IsLessThan(test1!.CompareTo(test2), 0, "alpha.1.2 < alpha.1.10 (numeric segment comparison)");
+        Assert.IsLessThan(test2!.CompareTo(test3), 0, "alpha.1.10 < alpha.2.1 (first numeric difference wins)");
+        Assert.IsLessThan(test3!.CompareTo(test4), 0, "alpha.2.1 < alpha.beta.1 (numeric < non-numeric)");
     }
 }
 

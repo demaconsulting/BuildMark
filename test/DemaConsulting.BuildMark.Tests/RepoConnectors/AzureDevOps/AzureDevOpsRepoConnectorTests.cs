@@ -163,13 +163,13 @@ public class AzureDevOpsRepoConnectorTests
         Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
 
         // Bug work item should be in bugs
-        Assert.IsTrue(buildInfo.Bugs.Count >= 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.Bugs.Count, 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
         var bugItem = buildInfo.Bugs.FirstOrDefault(b => b.Id == "200");
         Assert.IsNotNull(bugItem, "Work item 200 should be categorized as a bug");
         Assert.AreEqual("Bug fix work item", bugItem.Title);
 
         // Feature work item should be in changes
-        Assert.IsTrue(buildInfo.Changes.Count >= 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.Changes.Count, 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
         var featureItem = buildInfo.Changes.FirstOrDefault(c => c.Id == "201");
         Assert.IsNotNull(featureItem, "Work item 201 should be categorized as a change");
         Assert.AreEqual("New feature work item", featureItem.Title);
@@ -198,7 +198,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(buildInfo.KnownIssues.Count >= 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        Assert.IsGreaterThanOrEqualTo(buildInfo.KnownIssues.Count, 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Id == "301");
         Assert.IsNotNull(knownIssue, "Work item 301 should be a known issue");
         Assert.AreEqual("Known open bug", knownIssue.Title);
@@ -350,8 +350,8 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert - the internal item should not appear in bugs or changes
         Assert.IsNotNull(buildInfo);
-        Assert.IsFalse(buildInfo.Bugs.Any(b => b.Id == "200"), "Internal item should be excluded from bugs");
-        Assert.IsFalse(buildInfo.Changes.Any(c => c.Id == "200"), "Internal item should be excluded from changes");
+        Assert.DoesNotContain(b => b.Id == "200", buildInfo.Bugs, "Internal item should be excluded from bugs");
+        Assert.DoesNotContain(c => c.Id == "200", buildInfo.Changes, "Internal item should be excluded from changes");
     }
 
     /// <summary>
@@ -384,8 +384,9 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert - the public item should appear in changes
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(
-            buildInfo.Changes.Any(c => c.Id == "200"),
+        Assert.Contains(
+            c => c.Id == "200",
+            buildInfo.Changes,
             "Public item should be included in changes");
     }
 
@@ -419,8 +420,9 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert - User Story should be classified as bug due to override
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(
-            buildInfo.Bugs.Any(b => b.Id == "200"),
+        Assert.Contains(
+            b => b.Id == "200",
+            buildInfo.Bugs,
             "Item with type:bug override should appear in bugs");
     }
 
@@ -454,11 +456,13 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert - Bug should be classified as feature due to override
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(
-            buildInfo.Changes.Any(c => c.Id == "200"),
+        Assert.Contains(
+            c => c.Id == "200",
+            buildInfo.Changes,
             "Item with type:feature override should appear in changes");
-        Assert.IsFalse(
-            buildInfo.Bugs.Any(b => b.Id == "200"),
+        Assert.DoesNotContain(
+            b => b.Id == "200",
+            buildInfo.Bugs,
             "Item with type:feature override should NOT appear in bugs");
     }
 

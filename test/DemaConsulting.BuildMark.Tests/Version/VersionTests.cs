@@ -175,11 +175,11 @@ public class VersionTests
         var version6 = VersionComparable.Create("1.0.0");
 
         // Assert - SemVer precedence is maintained
-        Assert.IsTrue(version1!.CompareTo(version2) < 0, "1.0.0-alpha < 1.0.0-alpha.1");
-        Assert.IsTrue(version2!.CompareTo(version3) < 0, "1.0.0-alpha.1 < 1.0.0-alpha.beta");
-        Assert.IsTrue(version3!.CompareTo(version4) < 0, "1.0.0-alpha.beta < 1.0.0-beta");
-        Assert.IsTrue(version4!.CompareTo(version5) < 0, "1.0.0-beta < 1.0.0-beta.2");
-        Assert.IsTrue(version5!.CompareTo(version6) < 0, "1.0.0-beta.2 < 1.0.0");
+        Assert.IsLessThan(version1!.CompareTo(version2), 0, "1.0.0-alpha < 1.0.0-alpha.1");
+        Assert.IsLessThan(version2!.CompareTo(version3), 0, "1.0.0-alpha.1 < 1.0.0-alpha.beta");
+        Assert.IsLessThan(version3!.CompareTo(version4), 0, "1.0.0-alpha.beta < 1.0.0-beta");
+        Assert.IsLessThan(version4!.CompareTo(version5), 0, "1.0.0-beta < 1.0.0-beta.2");
+        Assert.IsLessThan(version5!.CompareTo(version6), 0, "1.0.0-beta.2 < 1.0.0");
     }
 
     /// <summary>
@@ -209,7 +209,7 @@ public class VersionTests
         Assert.AreEqual("1.5.0", comparable3.CompareVersion);
 
         // Assert - Version ordering works as expected
-        Assert.IsTrue(comparable1.CompareTo(comparable3) < 0); // 1.2.3 < 1.5.0
-        Assert.IsTrue(comparable3.CompareTo(comparable2) < 0); // 1.5.0 < 2.0.0-rc.1
+        Assert.IsLessThan(comparable1.CompareTo(comparable3), 0); // 1.2.3 < 1.5.0
+        Assert.IsLessThan(comparable3.CompareTo(comparable2), 0); // 1.5.0 < 2.0.0-rc.1
     }
 }
