@@ -31,6 +31,11 @@ public sealed record BuildMarkConfig
     public ConnectorConfig? Connector { get; init; }
 
     /// <summary>
+    ///     Gets or sets the optional report configuration.
+    /// </summary>
+    public ReportConfig? Report { get; init; }
+
+    /// <summary>
     ///     Gets the configured report sections.
     /// </summary>
     public List<SectionConfig> Sections { get; } = [];

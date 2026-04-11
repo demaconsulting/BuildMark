@@ -404,6 +404,76 @@ public class ConfigurationTests
         Assert.AreEqual("changes", config.Rules[5].Route);
         Assert.IsNull(config.Rules[5].Match);
     }
+    /// <summary>
+    ///     Test that a valid report section is parsed into the report configuration model.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            report:
+              file: build-notes.md
+              depth: 2
+              include-known-issues: true
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNotNull(result.Config);
+            Assert.IsFalse(result.HasErrors);
+            Assert.IsNotNull(result.Config.Report);
+            Assert.AreEqual("build-notes.md", result.Config.Report.File);
+            Assert.AreEqual(2, result.Config.Report.Depth);
+            Assert.AreEqual(true, result.Config.Report.IncludeKnownIssues);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that an invalid report depth produces an error issue.
+    /// </summary>
+    [TestMethod]
+    public async Task BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            report:
+              depth: -1
+            """);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.IsNull(result.Config);
+            Assert.IsTrue(result.HasErrors);
+            Assert.Contains("positive integer", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
 }
 
 
