@@ -313,3 +313,18 @@ reviews:
       - "docs/design/build-mark/repo-connectors/item-router.md"
       - "src/**/RepoConnectors/ItemRouter.cs"
       - "test/**/RepoConnectors/ItemRouterTests.cs"
+
+  - id: BuildMark-RepoConnectors-AzureDevOps
+    title: Review that BuildMark RepoConnectors AzureDevOps Subsystem Design is Correct
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.yaml"
+      - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops.md"
+      - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md"
+      - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md"
+      - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md"
+      - "docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md"
+      - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs"
+      - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs"
+      - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs"
+      - "src/**/RepoConnectors/AzureDevOps/WorkItemMapper.cs"
+      - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnectorTests.cs"

@@ -14,7 +14,17 @@ language: en
 
 # Project-specific technical terms and tool names
 words:
+  - ACCESSTOKEN
   - Anson
+  - hostnames
+  - myorg
+  - myproject
+  - myrepo
+  - pullrequest
+  - pullrequests
+  - wiql
+  - WIQL
+  - workitems
   - Blockquotes
   - buildmark
   - BuildMark

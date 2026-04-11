@@ -110,8 +110,14 @@ Main entry point. Performs the following steps:
    Enterprise).
 5. Fetch all tags, commits, releases, issues (with body), and pull requests (with
    body) via GraphQL.
-6. Determine the target version tag (highest tag matching `version`, or latest).
-7. Determine the baseline version tag (highest tag below the target).
+6. If a version is provided explicitly, use it directly with the current commit
+   hash as the target. Otherwise, determine the target version from GitHub
+   Releases: use the most recent release whose tag matches the current commit
+   hash. Throws `InvalidOperationException` if no release matches.
+7. Determine the baseline version from GitHub Releases: find the highest release
+   version below the target (for full releases) or the most recent release with
+   a different commit hash (for pre-releases). Returns `null` baseline if no
+   prior release exists.
 8. Get all commits between the baseline and target.
 9. Collect changes and bugs from pull requests merged in the commit range,
    applying item controls overrides from description bodies.

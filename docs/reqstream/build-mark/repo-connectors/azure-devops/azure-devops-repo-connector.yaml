@@ -1,0 +1,126 @@
+---
+# Software Unit Requirements for the AzureDevOps Subsystem
+#
+# The AzureDevOps subsystem provides the production connector for Azure DevOps
+# repositories. It includes AzureDevOpsRepoConnector (main connector),
+# AzureDevOpsRestClient (REST API client), AzureDevOpsApiTypes (type definitions),
+# and WorkItemMapper (work item to ItemInfo mapper).
+
+sections:
+  - title: AzureDevOps Unit Requirements
+    requirements:
+      - id: BuildMark-AzureDevOps-UrlParsing
+        title: >-
+          The AzureDevOpsRepoConnector class shall parse organization URL, project, and repository
+          from Azure DevOps Services and on-premises Azure DevOps Server git remote URLs.
+        justification: |
+          The connector must support both cloud Azure DevOps Services (dev.azure.com,
+          visualstudio.com) and on-premises Azure DevOps Server instances. A unified URL
+          parser using the _git path segment anchor handles all HTTPS URL formats, while
+          SSH URLs use the git@ssh.dev.azure.com:v3 format.
+        tests:
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComHttps_ReturnsCorrectComponents
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComWithGitSuffix_StripsGitSuffix
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_VisualStudioComHttps_ReturnsCorrectComponents
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremServer_ReturnsCorrectComponents
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithPort_ReturnsCorrectComponents
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithGitSuffix_StripsGitSuffix
+          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_UnsupportedFormat_ThrowsArgumentException
+
+      - id: BuildMark-AzureDevOps-ConnectorConfig
+        title: >-
+          The AzureDevOpsRepoConnector class shall accept an optional AzureDevOpsConnectorConfig
+          to override the organization URL, project, and repository name.
+        justification: |
+          When a .buildmark.yaml file provides Azure DevOps connector settings, the connector
+          must use the configured organization URL, project, and repository name instead of
+          auto-detecting them from the Git remote URL.
+        tests:
+          - AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+
+      - id: BuildMark-AzureDevOps-BuildInformation
+        title: The AzureDevOpsRepoConnector class shall retrieve build information from an Azure DevOps repository.
+        justification: |
+          The primary purpose of the AzureDevOpsRepoConnector is to assemble BuildInformation
+          from Azure DevOps repository data using the REST API, correctly identifying the current
+          version tag, the baseline (previous) version tag, and the changes between them.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersion
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenWorkItems_IdentifiesKnownIssues
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+          - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+
+      - id: BuildMark-AzureDevOps-ItemControls
+        title: >-
+          The AzureDevOpsRepoConnector class shall apply item controls extracted from work item
+          description bodies to override visibility, type, and affected-version metadata.
+        justification: |
+          The Azure DevOps connector must translate raw Azure DevOps data into the BuildInformation
+          model. Applying item controls at this layer ensures that visibility and type overrides from
+          buildmark code blocks in work item descriptions are consistently enforced.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+
+      - id: BuildMark-AzureDevOps-CustomFields
+        title: >-
+          The WorkItemMapper class shall read Custom.Visibility and Custom.AffectedVersions
+          custom fields from Azure DevOps work items to control item visibility and version ranges.
+        justification: |
+          Azure DevOps work items support native custom fields for visibility and version range
+          metadata. These fields provide a more natural Azure DevOps-native alternative to
+          buildmark code blocks for teams that prefer not to embed YAML in descriptions.
+          Custom fields take precedence over buildmark blocks when both are present.
+        tests:
+          - WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls
+          - WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet
+          - WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock
+
+      - id: BuildMark-AzureDevOps-Rules
+        title: >-
+          The AzureDevOpsRepoConnector class shall apply configured routing rules and sections
+          to distribute assembled items into the appropriate report sections.
+        justification: |
+          When a .buildmark.yaml file provides routing rules and section definitions,
+          the connector must delegate to RepoConnectorBase.ApplyRules so that items are
+          distributed according to the operator-supplied rules, supporting work-item-type
+          matching for Azure DevOps work items.
+        tests:
+          - AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+
+      - id: BuildMark-AzureDevOps-RestClient
+        title: The AzureDevOpsRepoConnector class shall use a REST client for Azure DevOps API interactions.
+        justification: |
+          The Azure DevOps REST API provides efficient access to repository data including
+          commits, tags, pull requests, and work items. The REST client handles pagination,
+          authentication, and response parsing to provide reliable data retrieval.
+        tests:
+          - AzureDevOpsRestClient_GetRepositoryAsync_ValidResponse_ReturnsRepository
+          - AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits
+          - AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_ValidResponse_ReturnsWorkItemRefs
+          - AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems
+          - AzureDevOpsRestClient_QueryWorkItemsAsync_ValidWiql_ReturnsWorkItemIds
+
+      - id: BuildMark-AzureDevOps-WorkItemMapper
+        title: >-
+          The WorkItemMapper class shall map Azure DevOps work items to ItemInfo objects,
+          applying type normalization and state-based filtering.
+        justification: |
+          Azure DevOps work items use platform-specific type names and state values that must
+          be normalized to the BuildMark ItemInfo model. The mapper centralizes this translation
+          logic to ensure consistent type classification and state filtering across all connector
+          operations.
+        tests:
+          - WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
+          - WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem
+          - WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem
+          - WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue
+          - WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse
+          - WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName

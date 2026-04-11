@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
 
@@ -40,7 +41,13 @@ public static class RepoConnectorFactory
         if (config?.Type != null &&
             config.Type.Equals("azure-devops", StringComparison.OrdinalIgnoreCase))
         {
-            throw new NotSupportedException("Azure DevOps connector support is not yet implemented.");
+            return new AzureDevOpsRepoConnector(config.AzureDevOps);
+        }
+
+        // Check for Azure DevOps Pipelines environment variable
+        if (!string.IsNullOrEmpty(Environment.GetEnvironmentVariable("TF_BUILD")))
+        {
+            return new AzureDevOpsRepoConnector(config?.AzureDevOps);
         }
 
         // Check for GitHub Actions environment variables
@@ -48,6 +55,12 @@ public static class RepoConnectorFactory
             !string.IsNullOrEmpty(Environment.GetEnvironmentVariable("GITHUB_WORKSPACE")))
         {
             return new GitHubRepoConnector(config?.GitHub);
+        }
+
+        // Check if git remote points to Azure DevOps
+        if (IsAzureDevOpsRepository())
+        {
+            return new AzureDevOpsRepoConnector(config?.AzureDevOps);
         }
 
         // Check if git remote points to GitHub
@@ -69,7 +82,22 @@ public static class RepoConnectorFactory
         // Get git remote URL and check if it contains github.com
         // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
         // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
+        var output = ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult();
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    ///     Checks if the current repository is an Azure DevOps repository.
+    /// </summary>
+    /// <returns>True if Azure DevOps repository.</returns>
+    private static bool IsAzureDevOpsRepository()
+    {
+        // Get git remote URL and check if it contains Azure DevOps hostnames
+        // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
+        // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
+        var output = ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult();
+        return output != null &&
+               (output.Contains("dev.azure.com", StringComparison.OrdinalIgnoreCase) ||
+                output.Contains("visualstudio.com", StringComparison.OrdinalIgnoreCase));
     }
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2026 DEMA Consulting
+// Copyright (c) DEMA Consulting
 // 
 // Permission is hereby granted, free of charge, to any person obtaining a copy
 // of this software and associated documentation files (the "Software"), to deal
@@ -18,18 +18,19 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-using DemaConsulting.BuildMark.RepoConnectors.GitHub;
+using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 
-namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
+namespace DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 
 /// <summary>
-///     Mock implementation of GitHubRepoConnector for testing purposes.
+///     Mock implementation of AzureDevOpsRepoConnector for testing purposes.
 /// </summary>
 /// <remarks>
-///     This class allows tests to mock both git command execution and GitHub GraphQL API calls
-///     by overriding the RunCommandAsync and CreateGraphQLClient methods.
+///     This class allows tests to mock both git command execution and Azure DevOps REST API calls
+///     by overriding the RunCommandAsync and CreateRestClient methods.
 /// </remarks>
-internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
+internal sealed class MockableAzureDevOpsRepoConnector : AzureDevOpsRepoConnector
 {
     /// <summary>
     ///     Mock responses for RunCommandAsync.
@@ -37,15 +38,24 @@ internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
     private readonly Dictionary<string, string> _commandResponses = [];
 
     /// <summary>
-    ///     Mock HttpClient for GraphQL requests.
+    ///     Mock HttpClient for REST API requests.
     /// </summary>
     private readonly HttpClient? _mockHttpClient;
 
     /// <summary>
-    ///     Initializes a new instance of the <see cref="MockableGitHubRepoConnector"/> class.
+    ///     Initializes a new instance of the <see cref="MockableAzureDevOpsRepoConnector"/> class.
     /// </summary>
-    /// <param name="mockHttpClient">Optional mock HttpClient for GraphQL requests.</param>
-    public MockableGitHubRepoConnector(HttpClient? mockHttpClient = null)
+    /// <param name="mockHttpClient">
+    ///     Optional mock HttpClient for REST API requests. When provided, the connector
+    ///     uses this client instead of creating a real authenticated client.
+    /// </param>
+    /// <param name="config">
+    ///     Optional Azure DevOps connector configuration with organization URL, project,
+    ///     and repository overrides.
+    /// </param>
+    public MockableAzureDevOpsRepoConnector(
+        HttpClient? mockHttpClient = null,
+        AzureDevOpsConnectorConfig? config = null) : base(config)
     {
         _mockHttpClient = mockHttpClient;
     }
@@ -73,17 +83,21 @@ internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
     }
 
     /// <summary>
-    ///     Creates a GitHub GraphQL client for API operations.
+    ///     Creates an Azure DevOps REST client for API operations.
     /// </summary>
-    /// <param name="token">GitHub personal access token for authentication.</param>
-    /// <returns>A new GitHubGraphQLClient instance.</returns>
-    internal override GitHubGraphQLClient CreateGraphQLClient(string token)
+    /// <param name="organizationUrl">Azure DevOps organization URL.</param>
+    /// <param name="project">Azure DevOps project name.</param>
+    /// <param name="token">Authentication token.</param>
+    /// <param name="isBearer">True for Bearer auth, false for Basic (PAT) auth.</param>
+    /// <returns>A new AzureDevOpsRestClient instance.</returns>
+    internal override AzureDevOpsRestClient CreateRestClient(
+        string organizationUrl,
+        string project,
+        string token,
+        bool isBearer)
     {
         return _mockHttpClient != null
-            ? new GitHubGraphQLClient(_mockHttpClient)
-            : base.CreateGraphQLClient(token);
+            ? new AzureDevOpsRestClient(_mockHttpClient, organizationUrl, project)
+            : base.CreateRestClient(organizationUrl, project, token, isBearer);
     }
 }
-
-
-

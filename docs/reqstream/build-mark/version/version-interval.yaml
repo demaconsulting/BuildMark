@@ -76,4 +76,4 @@ sections:
           - VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue
           - VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse
           - VersionIntervalSet_Contains_EmptySet_ReturnsFalse
-          - VersionIntervalSet_Contains_Version_DelegatesToSemanticVersion
+          - VersionIntervalSet_Contains_VersionTag_DelegatesToVersionNumbers

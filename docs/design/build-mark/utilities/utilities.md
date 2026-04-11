@@ -28,10 +28,10 @@ the separate `Version` subsystem.
 
 `ProcessRunner` exposes the following static methods:
 
-| Member                            | Kind   | Description                                             |
-|-----------------------------------|--------|---------------------------------------------------------|
-| `RunAsync(command, arguments)`    | Method | Run a process and return stdout; throws on failure      |
-| `TryRunAsync(command, arguments)` | Method | Run a process and return stdout, or null on any failure |
+| Member                                  | Kind   | Description                                             |
+|-----------------------------------------|--------|---------------------------------------------------------|
+| `RunAsync(command, params arguments)`   | Method | Run a process and return stdout; throws on failure      |
+| `TryRunAsync(command, params arguments)`| Method | Run a process and return stdout, or null on any failure |
 
 ## Interactions
 

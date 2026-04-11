@@ -23,7 +23,6 @@ sections:
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
-          - RepoConnectorFactory_Create_WithAzureDevOpsType_ThrowsNotSupportedException
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
@@ -35,3 +34,18 @@ sections:
           effect. This pattern extends naturally to future connector types.
         tests:
           - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+
+      - id: BuildMark-RepoConnectorFactory-AzureDevOpsDetection
+        title: >-
+          The RepoConnectorFactory class shall detect Azure DevOps environments and create an
+          AzureDevOpsRepoConnector when appropriate.
+        justification: |
+          The factory must auto-detect Azure DevOps Pipelines environments by checking the
+          TF_BUILD environment variable and git remote URLs containing dev.azure.com or
+          visualstudio.com. It must also support explicit configuration via ConnectorConfig
+          with type "azure-devops" and forward AzureDevOpsConnectorConfig to the created connector.
+        tests:
+          - RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector
+          - RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector
+          - RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector
+          - RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration

@@ -3,9 +3,10 @@
 ## Overview
 
 The Configuration subsystem is responsible for reading and parsing the optional
-`.buildmark.yaml` file located in the repository root. It deserializes the YAML
-content into a strongly-typed `BuildMarkConfig` object and surfaces any parse
-errors or validation warnings through a `ConfigurationLoadResult` record that
+`.buildmark.yaml` file located in the repository root. It uses the YamlDotNet
+library to parse the YAML content, then walks the resulting representation model
+to build a strongly-typed `BuildMarkConfig` object. Any parse errors or
+validation warnings are surfaced through a `ConfigurationLoadResult` record that
 `Program` consumes during startup.
 
 When no `.buildmark.yaml` file is present, `BuildMarkConfigReader` returns a
@@ -25,7 +26,7 @@ problem with its file path, line number, severity, and description.
 | `ConfigurationIssue`        | `Configuration/ConfigurationIssue.cs`         | Single issue with location and severity|
 | `ConnectorConfig`           | `Configuration/ConnectorConfig.cs`            | Connector envelope data model          |
 | `GitHubConnectorConfig`     | `Configuration/GitHubConnectorConfig.cs`      | GitHub connector settings data model   |
-| `AzureDevOpsConnectorConfig`| `Configuration/AzureDevOpsConnectorConfig.cs` | Azure DevOps connector settings stub   |
+| `AzureDevOpsConnectorConfig`| `Configuration/AzureDevOpsConnectorConfig.cs` | Azure DevOps connector settings        |
 | `SectionConfig`             | `Configuration/SectionConfig.cs`              | Report section definition data model   |
 | `RuleConfig`                | `Configuration/RuleConfig.cs`                 | Item routing rule data model           |
 
@@ -53,8 +54,15 @@ problem with its file path, line number, severity, and description.
 |---------------|----------|----------------------------------------------------|
 | `FilePath`    | Property | Path to the file containing the issue              |
 | `Line`        | Property | Line number (1-based) of the issue                 |
-| `Severity`    | Property | `Error` or `Warning`                               |
+| `Severity`    | Property | `ConfigurationIssueSeverity` enum value            |
 | `Description` | Property | Human-readable description of the issue            |
+
+`ConfigurationIssueSeverity` is a public enum with two values:
+
+| Value     | Description                                              |
+|-----------|----------------------------------------------------------|
+| `Warning` | Non-fatal issue; tool continues and exit code is 0       |
+| `Error`   | Fatal issue; tool reports all errors, exits with code 1  |
 
 `BuildMarkConfig` carries the following properties:
 
@@ -66,11 +74,11 @@ problem with its file path, line number, severity, and description.
 
 `ConnectorConfig` carries the following properties:
 
-| Member        | Kind     | Description                                                         |
-|---------------|----------|---------------------------------------------------------------------|
-| `Type`        | Property | Connector type: `"github"` or `"azure-devops"`                      |
-| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` is `"github"` |
-| `AzureDevOps` | Property | Reserved for future use; `null` in the current release              |
+| Member        | Kind     | Description                                                                     |
+|---------------|----------|---------------------------------------------------------------------------------|
+| `Type`        | Property | Connector type: `"github"` or `"azure-devops"`                                  |
+| `GitHub`      | Property | Optional `GitHubConnectorConfig`; present when `Type` is `"github"`             |
+| `AzureDevOps` | Property | Optional `AzureDevOpsConnectorConfig`; present when `Type` is `"azure-devops"`  |
 
 `GitHubConnectorConfig` carries the following properties:
 
@@ -80,8 +88,14 @@ problem with its file path, line number, severity, and description.
 | `Repo`    | Property | Repository name override                                            |
 | `BaseUrl` | Property | Optional GitHub Enterprise API base URL; `null` uses the public API |
 
-`AzureDevOpsConnectorConfig` is a placeholder for future Azure DevOps connector settings.
-No properties are defined in the current release.
+`AzureDevOpsConnectorConfig` carries the following properties:
+
+| Member            | Kind     | Description                                                                   |
+|-------------------|----------|-------------------------------------------------------------------------------|
+| `OrganizationUrl` | Property | Azure DevOps organization URL (e.g. `https://dev.azure.com/myorg`)            |
+| `Organization`    | Property | Organization name (derived from `OrganizationUrl` when not explicitly set)    |
+| `Project`         | Property | Azure DevOps project name                                                     |
+| `Repository`      | Property | Repository name within the project                                            |
 
 `SectionConfig` carries the following properties:
 
@@ -99,8 +113,9 @@ No properties are defined in the current release.
 
 ## Interactions
 
-| Unit / Subsystem        | Role                                                                                       |
-|-------------------------|--------------------------------------------------------------------------------------------|
-| `Program`               | Calls `BuildMarkConfigReader.ReadAsync`; calls `result.ReportTo(context)`                  |
-| `RepoConnectorFactory`  | Receives `ConnectorConfig` from `result.Config` to select the connector                    |
-| `GitHubRepoConnector`   | Receives routing lists; reads `GitHubConnectorConfig` from `result.Config.Connector.GitHub`|
+| Unit / Subsystem           | Role                                                                          |
+|----------------------------|-------------------------------------------------------------------------------|
+| `Program`                  | Calls `BuildMarkConfigReader.ReadAsync`; calls `result.ReportTo(context)`     |
+| `RepoConnectorFactory`     | Receives `ConnectorConfig` from `result.Config` to select the connector       |
+| `GitHubRepoConnector`      | Reads `GitHubConnectorConfig` from `result.Config.Connector.GitHub`           |
+| `AzureDevOpsRepoConnector` | Reads `AzureDevOpsConnectorConfig` from `result.Config.Connector.AzureDevOps` |

@@ -41,7 +41,9 @@ public class ProcessRunnerTests
     {
         // Arrange - Set up a simple echo command that will succeed
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "echo";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c echo test" : "test";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "echo", "test" }
+            : new[] { "test" };
 
         // Act - Execute the command
         var result = await ProcessRunner.TryRunAsync(command, arguments);
@@ -64,10 +66,9 @@ public class ProcessRunnerTests
     {
         // Arrange - Use a command that definitely doesn't exist
         var command = "nonexistent_command_12345678";
-        var arguments = "";
 
         // Act - Attempt to execute the non-existent command
-        var result = await ProcessRunner.TryRunAsync(command, arguments);
+        var result = await ProcessRunner.TryRunAsync(command);
 
         // Assert - Verify null is returned for invalid command
         Assert.IsNull(result, "TryRunAsync should return null for non-existent command");
@@ -87,7 +88,9 @@ public class ProcessRunnerTests
         // On Windows: "cmd /c exit 1" exits with code 1
         // On Unix: "sh -c 'exit 1'" exits with code 1
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "sh";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c 'exit 1'";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "exit", "1" }
+            : new[] { "-c", "exit 1" };
 
         // Act - Execute the command that will fail
         var result = await ProcessRunner.TryRunAsync(command, arguments);
@@ -109,10 +112,9 @@ public class ProcessRunnerTests
         // Arrange - Use a command with malformed arguments that may cause issues
         // Using an empty string as command which should cause an exception
         var command = "";
-        var arguments = "";
 
         // Act - Attempt to execute with problematic input
-        var result = await ProcessRunner.TryRunAsync(command, arguments);
+        var result = await ProcessRunner.TryRunAsync(command);
 
         // Assert - Verify null is returned when exception occurs
         Assert.IsNull(result, "TryRunAsync should return null when exception occurs");
@@ -130,7 +132,9 @@ public class ProcessRunnerTests
     {
         // Arrange - Set up a simple echo command that will succeed
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "echo";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c echo test123" : "test123";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "echo", "test123" }
+            : new[] { "test123" };
 
         // Act - Execute the command
         var result = await ProcessRunner.RunAsync(command, arguments);
@@ -153,7 +157,9 @@ public class ProcessRunnerTests
     {
         // Arrange - Set up a command that will fail
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "sh";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c 'exit 1'";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "exit", "1" }
+            : new[] { "-c", "exit 1" };
 
         // Act & Assert - Verify exception is thrown and inspect it
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(
@@ -161,6 +167,30 @@ public class ProcessRunnerTests
 
         // Assert - Verify exception message contains useful information
         Assert.Contains("failed with exit code", exception.Message);
+    }
+
+    /// <summary>
+    ///     Test that RunAsync throws a descriptive InvalidOperationException when command is not found.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: ProcessRunner.RunAsync with a command that does not exist
+    ///     What the assertions prove: The method wraps the underlying error in an InvalidOperationException
+    ///     with a message identifying the missing command
+    /// </remarks>
+    [TestMethod]
+    public async Task ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException()
+    {
+        // Arrange - Use a command that definitely doesn't exist
+        var command = "nonexistent_command_12345678";
+
+        // Act & Assert - Verify InvalidOperationException is thrown with the command name
+        var exception = await Assert.ThrowsAsync<InvalidOperationException>(
+            async () => await ProcessRunner.RunAsync(command));
+
+        // Assert - Verify exception message identifies the missing command
+        Assert.IsTrue(
+            exception.Message.Contains(command, StringComparison.Ordinal),
+            "Exception message should identify the command that was not found");
     }
 }
 
