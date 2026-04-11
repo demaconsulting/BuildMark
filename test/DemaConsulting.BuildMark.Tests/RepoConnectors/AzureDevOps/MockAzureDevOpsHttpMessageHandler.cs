@@ -35,8 +35,9 @@ internal record MockAdoCommit(string CommitId, string Comment = "commit");
 ///     Represents a mock tag reference for Azure DevOps testing.
 /// </summary>
 /// <param name="Name">Tag name (without refs/tags/ prefix).</param>
-/// <param name="ObjectId">Commit SHA hash that this tag points to.</param>
-internal record MockAdoTag(string Name, string ObjectId);
+/// <param name="ObjectId">Object SHA hash (tag object for annotated tags, commit for lightweight tags).</param>
+/// <param name="PeeledObjectId">Commit SHA hash for annotated tags. Null for lightweight tags.</param>
+internal record MockAdoTag(string Name, string ObjectId, string? PeeledObjectId = null);
 
 /// <summary>
 ///     Represents a mock pull request for Azure DevOps testing.
@@ -138,7 +139,8 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
         var tagValues = tags.Select(t => new
         {
             name = $"refs/tags/{t.Name}",
-            objectId = t.ObjectId
+            objectId = t.ObjectId,
+            peeledObjectId = t.PeeledObjectId
         });
 
         var json = JsonSerializer.Serialize(new { count = tags.Length, value = tagValues });

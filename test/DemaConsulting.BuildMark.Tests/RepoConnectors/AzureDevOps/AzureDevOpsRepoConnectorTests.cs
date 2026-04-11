@@ -239,6 +239,71 @@ public class AzureDevOpsRepoConnectorTests
     }
 
     /// <summary>
+    ///     Verify that annotated tags (with peeledObjectId) resolve to the correct commit.
+    /// </summary>
+    [TestMethod]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_AnnotatedTags_ResolvesToPeeledCommit()
+    {
+        // Arrange - Annotated tags have objectId pointing to the tag object, peeledObjectId to the commit
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v2.0.0", "tag-object-3", "commit3"),
+                new MockAdoTag("v1.0.0", "tag-object-1", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit3"),
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockConnector(mockHttpClient, "commit3");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert - Tags should resolve via peeledObjectId, not the tag object SHA
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.AreEqual("commit3", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.AreEqual("commit1", buildInfo.BaselineVersionTag.CommitHash);
+    }
+
+    /// <summary>
+    ///     Verify that mixed annotated and lightweight tags both resolve correctly.
+    /// </summary>
+    [TestMethod]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_MixedTagTypes_ResolvesCorrectly()
+    {
+        // Arrange - Mix of annotated (with peeledObjectId) and lightweight (without) tags
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v2.0.0", "tag-object-2", "commit2"),
+                new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockConnector(mockHttpClient, "commit2");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert - Both tag types should resolve to correct commits
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.AreEqual("commit2", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.AreEqual("commit1", buildInfo.BaselineVersionTag.CommitHash);
+    }
+
+    /// <summary>
     ///     Verify that AzureDevOpsRepoConnector implements IRepoConnector.
     /// </summary>
     [TestMethod]
