@@ -3,9 +3,11 @@
 ## Overview
 
 BuildMark is a .NET command-line tool that generates markdown build notes from
-GitHub repository metadata. It queries GitHub's GraphQL API to retrieve commits,
-issues, pull requests, and version tags, then formats the results as a structured
-markdown report suitable for embedding in release documentation.
+Git repository metadata hosted on GitHub or Azure DevOps. It queries the
+appropriate platform API — GitHub's GraphQL API or the Azure DevOps REST API — to
+retrieve commits, issues or work items, pull requests, and version tags, then
+formats the results as a structured markdown report suitable for embedding in
+release documentation.
 
 ## System Architecture
 
@@ -23,15 +25,16 @@ BuildMark is composed of seven subsystems and a top-level entry point:
 
 ## External Interfaces
 
-| Interface            | Direction | Protocol / Format                                        |
-|----------------------|-----------|----------------------------------------------------------|
-| Command line         | Input     | POSIX-style flags parsed by `Context`                    |
-| `.buildmark.yaml`    | Input     | YAML file read from the repository root                  |
-| GitHub GraphQL       | Output    | HTTPS POST to `https://api.github.com/graphql`           |
-| Markdown report      | Output    | File written to `--report` path, UTF-8 markdown          |
-| Log file             | Output    | Optional file written to `--log` path, plain text        |
-| Test results         | Output    | TRX or JUnit XML written to `--results` path             |
-| Exit code            | Output    | 0 = success, 1 = error                                   |
+| Interface            | Direction | Protocol / Format                                          |
+|----------------------|-----------|------------------------------------------------------------|
+| Command line         | Input     | POSIX-style flags parsed by `Context`                      |
+| `.buildmark.yaml`    | Input     | YAML file read from the repository root                    |
+| GitHub GraphQL       | Output    | HTTPS POST to `https://api.github.com/graphql`             |
+| Azure DevOps REST    | Output    | HTTPS GET/POST to Azure DevOps `_apis` endpoints (v6.0)   |
+| Markdown report      | Output    | File written to `--report` path, UTF-8 markdown            |
+| Log file             | Output    | Optional file written to `--log` path, plain text          |
+| Test results         | Output    | TRX or JUnit XML written to `--results` path               |
+| Exit code            | Output    | 0 = success, 1 = error                                     |
 
 ## Data Flow
 
@@ -59,16 +62,19 @@ BuildMark is composed of seven subsystems and a top-level entry point:
                               │                                              │
                               ▼                                              │
                    RepoConnectorFactory ◄────────────────────────────────────┘
-                    (uses ConnectorConfig)
+                    (uses ConnectorConfig + environment detection)
                               │
-                              ▼
-                   GitHubRepoConnector   ←─── GitHub GraphQL API
-                              │                (fetches body of issues and PRs)
-                              │  ← applies SectionConfig / RuleConfig via ItemRouter
-                              ▼
-                   ItemControlsParser (ItemControls)
-                              │  ← applied per-issue and per-PR
+                      ┌───────┴───────┐
+                      ▼               ▼
+           GitHubRepoConnector  AzureDevOpsRepoConnector
+              ←── GitHub           ←── Azure DevOps
+                GraphQL API            REST API (v6.0)
+                      │               │
+                      ▼               ▼
+                   ItemControlsParser / WorkItemMapper
+                              │  ← applied per-issue/PR/work-item
                               │  ← overrides visibility, type, affected-versions
+                              │  ← applies SectionConfig / RuleConfig via ItemRouter
                               ▼
                    BuildNotes.BuildInformation.ToMarkdown()
                               │
@@ -82,7 +88,10 @@ BuildMark is composed of seven subsystems and a top-level entry point:
 - **Platform support**: Windows, Linux, macOS
 - **Packaging**: Published as a .NET global tool (`dotnet tool install`)
 - **Authentication**: GitHub token supplied via `GH_TOKEN` environment variable,
-  `GITHUB_TOKEN` environment variable, or `gh auth token` CLI fallback
+  `GITHUB_TOKEN` environment variable, or `gh auth token` CLI fallback; Azure
+  DevOps token supplied via `AZURE_DEVOPS_PAT`, `AZURE_DEVOPS_TOKEN`,
+  `AZURE_DEVOPS_EXT_PAT`, or `SYSTEM_ACCESSTOKEN` environment variables, or
+  `az account get-access-token` CLI fallback
 - **No GUI**: All interaction is through the command line; no interactive prompts
 - **Self-contained**: The tool operates without any configuration file; an optional
   `.buildmark.yaml` file in the repository root enables connector selection and
@@ -121,8 +130,11 @@ follows:
 - `BuildMarkConfig.Connector` — optional `ConnectorConfig` carrying the connector
   `Type` (`"github"` or `"azure-devops"`), a `GitHub` property holding a
   `GitHubConnectorConfig` for GitHub-based operation, and an `AzureDevOps`
-  placeholder. The `GitHubConnectorConfig` is passed to `GitHubRepoConnector`
-  and may supply `Owner`, `Repo`, and `BaseUrl` overrides. The full
+  property holding an `AzureDevOpsConnectorConfig` for Azure DevOps-based
+  operation. The `GitHubConnectorConfig` is passed to `GitHubRepoConnector`
+  and may supply `Owner`, `Repo`, and `BaseUrl` overrides. The
+  `AzureDevOpsConnectorConfig` is passed to `AzureDevOpsRepoConnector` and may
+  supply `OrganizationUrl`, `Project`, and `Repository` overrides. The full
   `ConnectorConfig` is also passed to `RepoConnectorFactory` to select the
   appropriate connector implementation.
 - `BuildMarkConfig.Sections` — ordered list of `SectionConfig` objects (each with
@@ -147,13 +159,35 @@ The connector retrieves:
 The `body` field of issues and pull requests is fetched so that `ItemControlsParser`
 can extract embedded `buildmark` blocks.
 
+### Azure DevOps REST Client
+
+`AzureDevOpsRepoConnector` uses `AzureDevOpsRestClient` to issue paginated REST API
+requests over HTTPS against Azure DevOps API v6.0 endpoints. Authentication is via
+a `Basic` authorization header (for PAT tokens) or a `Bearer` authorization header
+(for Entra ID / `SYSTEM_ACCESSTOKEN` tokens). The connector retrieves:
+
+- All tags via the refs endpoint (with `peelTags=true` to resolve annotated tags)
+- Complete commit history (paginated)
+- All pull requests (paginated)
+- Work items linked to pull requests
+- Open work items via WIQL query (for known-issues data)
+
+The `System.Description` field of work items and the description body of pull
+requests are passed to `ItemControlsParser` for extracting embedded `buildmark`
+blocks. Additionally, `Custom.Visibility` and `Custom.AffectedVersions` custom
+fields on work items provide an Azure DevOps-native alternative to buildmark blocks.
+
 ### Item Controls
 
 When `GitHubRepoConnector` processes each issue or pull request, it passes the
-description body to `ItemControlsParser.Parse`. If a `buildmark` code block is
-present (including when hidden inside an HTML comment), the parser returns an
-`ItemControlsInfo` record that carries optional overrides for `Visibility`, `Type`,
-and `AffectedVersions`.
+description body to `ItemControlsParser.Parse`. When `AzureDevOpsRepoConnector`
+processes work items and pull requests, `WorkItemMapper` and the connector call
+`ItemControlsParser.Parse` on the description body and also read
+`Custom.Visibility` and `Custom.AffectedVersions` custom fields. If a `buildmark`
+code block is present (including when hidden inside an HTML comment), the parser
+returns an `ItemControlsInfo` record that carries optional overrides for
+`Visibility`, `Type`, and `AffectedVersions`. For Azure DevOps work items,
+custom fields take precedence over buildmark blocks when both are present.
 
 The connector applies these overrides as follows:
 
