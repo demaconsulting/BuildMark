@@ -44,7 +44,7 @@ to build a `BuildInformation` record:
 
 Fetches repository metadata for the specified repository.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=6.0`
 
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
 remote URL.
@@ -53,7 +53,7 @@ remote URL.
 
 Fetches all tag references for the specified repository.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&api-version=6.0`
 
 Returns a list of `AzureDevOpsRef` records, each containing the full reference name
 (e.g. `refs/tags/v1.0.0`) and the commit SHA it points to.
@@ -62,7 +62,7 @@ Returns a list of `AzureDevOpsRef` records, each containing the full reference n
 
 Fetches the complete paginated commit history for the repository.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api-version=6.0`
 
 Returns a list of `AzureDevOpsCommit` records. Automatically follows continuation
 tokens to retrieve all pages.
@@ -72,7 +72,7 @@ tokens to retrieve all pages.
 Fetches all pull requests with the specified status for the repository. Supports
 `all`, `active`, `completed`, and `abandoned` status values.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests?searchCriteria.status={status}&api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests?searchCriteria.status={status}&api-version=6.0`
 
 Returns a list of `AzureDevOpsPullRequest` records. Automatically follows
 continuation tokens to retrieve all pages.
@@ -81,7 +81,7 @@ continuation tokens to retrieve all pages.
 
 Fetches the work items linked to a specific pull request.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests/{prId}/workitems?api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests/{prId}/workitems?api-version=6.0`
 
 Returns a list of work item id references from the
 `AzureDevOpsCollectionResponse<WorkItemRef>`.
@@ -91,7 +91,7 @@ Returns a list of work item id references from the
 Batch-fetches work item details for a list of work item ids. Splits requests into
 batches of 200 ids as required by the Azure DevOps API.
 
-Endpoint: `GET /{organization}/{project}/_apis/wit/workitems?ids={ids}&$expand=all&api-version=7.1`
+Endpoint: `GET /{organization}/{project}/_apis/wit/workitems?ids={ids}&$expand=all&api-version=6.0`
 
 Returns a list of `AzureDevOpsWorkItem` records with all fields expanded.
 
@@ -100,7 +100,7 @@ Returns a list of `AzureDevOpsWorkItem` records with all fields expanded.
 Executes a WIQL (Work Item Query Language) query and returns the matching work item
 id references.
 
-Endpoint: `POST /{organization}/{project}/_apis/wit/wiql?api-version=7.1`
+Endpoint: `POST /{organization}/{project}/_apis/wit/wiql?api-version=6.0`
 
 Returns an `AzureDevOpsWorkItemQuery` record containing the list of matching work
 item id references.

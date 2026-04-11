@@ -33,7 +33,7 @@ internal sealed class AzureDevOpsRestClient : IDisposable
     /// <summary>
     ///     Azure DevOps REST API version used for all requests.
     /// </summary>
-    private const string ApiVersion = "7.1";
+    private const string ApiVersion = "6.0";
 
     /// <summary>
     ///     Shared JSON serializer options configured for Azure DevOps camelCase responses.
