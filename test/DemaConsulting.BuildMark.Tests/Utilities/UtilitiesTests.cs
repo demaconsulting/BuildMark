@@ -94,7 +94,9 @@ public class UtilitiesTests
     {
         // Arrange: choose a portable echo command
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "echo";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c echo subsystem_test" : "subsystem_test";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "echo", "subsystem_test" }
+            : new[] { "subsystem_test" };
 
         // Act: run the command
         var result = await ProcessRunner.RunAsync(command, arguments);
@@ -111,7 +113,7 @@ public class UtilitiesTests
     public async Task Utilities_ProcessRunner_InvalidCommand_ReturnsNull()
     {
         // Arrange & Act: run a non-existent command
-        var result = await ProcessRunner.TryRunAsync("nonexistent_utility_test_12345", "");
+        var result = await ProcessRunner.TryRunAsync("nonexistent_utility_test_12345");
 
         // Assert: null is returned
         Assert.IsNull(result);
@@ -125,7 +127,9 @@ public class UtilitiesTests
     {
         // Arrange: a command that exits with code 1
         var command = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "cmd" : "sh";
-        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "/c exit 1" : "-c \"exit 1\"";
+        var arguments = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+            ? new[] { "/c", "exit", "1" }
+            : new[] { "-c", "exit 1" };
 
         // Act & Assert: InvalidOperationException is thrown
         var exception = await Assert.ThrowsAsync<InvalidOperationException>(

@@ -76,9 +76,9 @@ internal sealed class MockableAzureDevOpsRepoConnector : AzureDevOpsRepoConnecto
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
     /// <returns>Command output.</returns>
-    protected override Task<string> RunCommandAsync(string command, string arguments)
+    protected override Task<string> RunCommandAsync(string command, params string[] arguments)
     {
-        var key = $"{command} {arguments}";
+        var key = $"{command} {string.Join(" ", arguments)}";
         return Task.FromResult(_commandResponses.TryGetValue(key, out var response) ? response : string.Empty);
     }
 

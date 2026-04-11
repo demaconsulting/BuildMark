@@ -76,8 +76,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     public override async Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
     {
         // Get repository metadata using git commands
-        var repoUrl = await RunCommandAsync("git", "remote get-url origin");
-        var currentCommitHash = await RunCommandAsync("git", "rev-parse HEAD");
+        var repoUrl = await RunCommandAsync("git", "remote", "get-url", "origin");
+        var currentCommitHash = await RunCommandAsync("git", "rev-parse", "HEAD");
 
         // Parse Azure DevOps organization, project, and repository from URL
         var (parsedOrgUrl, parsedProject, parsedRepo) = ParseAzureDevOpsUrl(repoUrl);
@@ -637,7 +637,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         // Fall back to Azure CLI
         try
         {
-            var result = await RunCommandAsync("az", "account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv");
+            var result = await RunCommandAsync("az", "account", "get-access-token", "--resource", "499b84ac-1321-427f-aa17-267ca6975798", "--query", "accessToken", "-o", "tsv");
             if (!string.IsNullOrEmpty(result?.Trim()))
             {
                 return (result.Trim(), true);
