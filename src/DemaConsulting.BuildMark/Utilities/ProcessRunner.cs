@@ -37,7 +37,7 @@ internal static class ProcessRunner
     /// <param name="arguments">Command arguments.</param>
     /// <returns>Command output.</returns>
     /// <exception cref="InvalidOperationException">Thrown when command fails or is not found.</exception>
-    public static async Task<string> RunAsync(string command, string arguments)
+    public static async Task<string> RunAsync(string command, params string[] arguments)
     {
         // Configure process to capture output, routing through cmd on Windows
         var startInfo = CreateStartInfo(command, arguments);
@@ -84,8 +84,9 @@ internal static class ProcessRunner
         // Throw exception if command failed
         if (process.ExitCode != 0)
         {
+            var args = string.Join(" ", arguments);
             throw new InvalidOperationException(
-                $"Command '{command} {arguments}' failed with exit code {process.ExitCode}: {error}");
+                $"Command '{command} {args}' failed with exit code {process.ExitCode}: {error}");
         }
 
         // Return captured output
@@ -98,7 +99,7 @@ internal static class ProcessRunner
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
     /// <returns>Command output, or null if the command fails.</returns>
-    public static async Task<string?> TryRunAsync(string command, string arguments)
+    public static async Task<string?> TryRunAsync(string command, params string[] arguments)
     {
         try
         {
@@ -129,36 +130,42 @@ internal static class ProcessRunner
     /// <remarks>
     ///     On Windows, commands are routed through <c>cmd /c</c> so that
     ///     <c>.cmd</c> and <c>.bat</c> scripts (such as the Azure CLI) are
-    ///     resolved correctly.
+    ///     resolved correctly. The <see cref="ProcessStartInfo.ArgumentList" />
+    ///     collection is used so that the Process class handles argument quoting
+    ///     correctly.
     /// </remarks>
     /// <param name="command">Command to run.</param>
     /// <param name="arguments">Command arguments.</param>
     /// <returns>Configured <see cref="ProcessStartInfo" />.</returns>
-    private static ProcessStartInfo CreateStartInfo(string command, string arguments)
+    private static ProcessStartInfo CreateStartInfo(string command, string[] arguments)
     {
-        // On Windows, route non-empty commands through cmd.exe so .cmd/.bat scripts are found
-        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(command))
+        var startInfo = new ProcessStartInfo
         {
-            return new ProcessStartInfo
-            {
-                FileName = "cmd",
-                Arguments = $"/c \"{command}\" {arguments}",
-                RedirectStandardOutput = true,
-                RedirectStandardError = true,
-                UseShellExecute = false,
-                CreateNoWindow = true
-            };
-        }
-
-        // On non-Windows platforms, invoke the command directly
-        return new ProcessStartInfo
-        {
-            FileName = command,
-            Arguments = arguments,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
             UseShellExecute = false,
             CreateNoWindow = true
         };
+
+        // On Windows, route non-empty commands through cmd.exe so .cmd/.bat scripts are found
+        if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(command))
+        {
+            startInfo.FileName = "cmd";
+            startInfo.ArgumentList.Add("/c");
+            startInfo.ArgumentList.Add(command);
+        }
+        else
+        {
+            // On non-Windows platforms, invoke the command directly
+            startInfo.FileName = command;
+        }
+
+        // Add all arguments using ArgumentList for correct quoting
+        foreach (var arg in arguments)
+        {
+            startInfo.ArgumentList.Add(arg);
+        }
+
+        return startInfo;
     }
 }

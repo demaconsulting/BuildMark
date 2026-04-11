@@ -87,9 +87,9 @@ public class GitHubRepoConnector : RepoConnectorBase
     public override async Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
     {
         // Get repository metadata using git commands
-        var repoUrl = await RunCommandAsync("git", "remote get-url origin");
-        var branch = await RunCommandAsync("git", "rev-parse --abbrev-ref HEAD");
-        var currentCommitHash = await RunCommandAsync("git", "rev-parse HEAD");
+        var repoUrl = await RunCommandAsync("git", "remote", "get-url", "origin");
+        var branch = await RunCommandAsync("git", "rev-parse", "--abbrev-ref", "HEAD");
+        var currentCommitHash = await RunCommandAsync("git", "rev-parse", "HEAD");
 
         // Parse owner and repo from URL
         var (parsedOwner, parsedRepo) = ParseGitHubUrl(repoUrl);
@@ -1032,7 +1032,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Fall back to gh auth token
         try
         {
-            return await RunCommandAsync("gh", "auth token");
+            return await RunCommandAsync("gh", "auth", "token");
         }
         catch (InvalidOperationException)
         {

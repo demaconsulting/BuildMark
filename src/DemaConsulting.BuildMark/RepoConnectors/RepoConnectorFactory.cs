@@ -82,7 +82,7 @@ public static class RepoConnectorFactory
         // Get git remote URL and check if it contains github.com
         // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
         // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
+        var output = ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult();
         return output != null && output.Contains("github.com", StringComparison.OrdinalIgnoreCase);
     }
 
@@ -95,7 +95,7 @@ public static class RepoConnectorFactory
         // Get git remote URL and check if it contains Azure DevOps hostnames
         // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
         // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
-        var output = ProcessRunner.TryRunAsync("git", "remote get-url origin").GetAwaiter().GetResult();
+        var output = ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult();
         return output != null &&
                (output.Contains("dev.azure.com", StringComparison.OrdinalIgnoreCase) ||
                 output.Contains("visualstudio.com", StringComparison.OrdinalIgnoreCase));
