@@ -260,10 +260,12 @@ public class VersionTagTests
         var tag1 = VersionTag.Create("v1.2.3");
         var tag2 = VersionTag.Create("VER1.2.3");
         var tag3 = VersionTag.Create("Release_1.2.3");
+        var tag4 = VersionTag.Create("release/1.2.3");
 
         // Act & Assert
         Assert.AreEqual(tag1.Semantic.Comparable, tag2.Semantic.Comparable);
         Assert.AreEqual(tag1.Semantic.Comparable, tag3.Semantic.Comparable);
+        Assert.AreEqual(tag1.Semantic.Comparable, tag4.Semantic.Comparable);
         Assert.AreEqual(tag2.Semantic.Comparable, tag3.Semantic.Comparable);
     }
 
@@ -282,6 +284,59 @@ public class VersionTagTests
         Assert.IsTrue(tag1.Semantic.Comparable < tag2.Semantic.Comparable, "alpha < beta");
         Assert.IsTrue(tag2.Semantic.Comparable < tag3.Semantic.Comparable, "beta < release");
         Assert.IsTrue(tag1.Semantic.Comparable < tag3.Semantic.Comparable, "alpha < release");
+    }
+
+    /// <summary>
+    ///     Test that VersionTag parses tags with path-separator prefix correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionTag_Create_PathSeparatorPrefix_ParsesCorrectly()
+    {
+        // Arrange & Act
+        var versionTag = VersionTag.Create("release/1.2.3");
+
+        // Assert
+        Assert.AreEqual("release/1.2.3", versionTag.Tag);
+        Assert.AreEqual("1.2.3", versionTag.FullVersion);
+        Assert.AreEqual("1.2.3", versionTag.Numbers);
+        Assert.AreEqual("", versionTag.PreRelease);
+        Assert.IsFalse(versionTag.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that VersionTag parses tags with path-separator prefix and pre-release correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionTag_Create_PathSeparatorPrefixWithPreRelease_ParsesCorrectly()
+    {
+        // Arrange & Act
+        var versionTag = VersionTag.Create("release/1.2.3-rc.4");
+
+        // Assert
+        Assert.AreEqual("release/1.2.3-rc.4", versionTag.Tag);
+        Assert.AreEqual("1.2.3-rc.4", versionTag.FullVersion);
+        Assert.AreEqual("1.2.3", versionTag.Numbers);
+        Assert.AreEqual("rc.4", versionTag.PreRelease);
+        Assert.AreEqual("1.2.3-rc.4", versionTag.CompareVersion);
+        Assert.IsTrue(versionTag.IsPreRelease);
+    }
+
+    /// <summary>
+    ///     Test that VersionTag parses tags with multi-level path-separator prefix correctly.
+    /// </summary>
+    [TestMethod]
+    public void VersionTag_Create_MultiLevelPathPrefix_ParsesCorrectly()
+    {
+        // Arrange & Act
+        var versionTag = VersionTag.Create("builds/release/1.2.3-beta.1+build.99");
+
+        // Assert
+        Assert.AreEqual("builds/release/1.2.3-beta.1+build.99", versionTag.Tag);
+        Assert.AreEqual("1.2.3-beta.1+build.99", versionTag.FullVersion);
+        Assert.AreEqual("1.2.3", versionTag.Numbers);
+        Assert.AreEqual("beta.1", versionTag.PreRelease);
+        Assert.AreEqual("build.99", versionTag.Metadata);
+        Assert.IsTrue(versionTag.IsPreRelease);
     }
 }
 

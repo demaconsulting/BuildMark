@@ -38,6 +38,7 @@ The parser supports various repository tag formats:
 
 - Simple: `1.2.3`, `v1.2.3`, `ver1.2.3`
 - Complex prefixes: `Release_1.2.3`, `MyApp-v1.2.3`
+- Path-separator prefixes: `release/1.2.3`, `builds/release/1.2.3`
 - Pre-release: `1.2.3-beta`, `1.2.3.rc.1` (dot becomes hyphen)
 - Metadata: `1.2.3+build.123`
 
@@ -47,7 +48,7 @@ The parser supports various repository tag formats:
 identical semantic versions are considered equal. This enables repository connectors
 to correctly identify versions regardless of tagging conventions:
 
-- `"v1.2.3"` equals `"VER1.2.3"` equals `"Release-1.2.3"`
+- `"v1.2.3"` equals `"VER1.2.3"` equals `"Release-1.2.3"` equals `"release/1.2.3"`
 - Equality is determined by `Semantic.Comparable.Equals()`
 - FindVersionIndex in RepoConnectorBase uses this semantic comparison
 

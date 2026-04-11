@@ -34,12 +34,14 @@ public partial record VersionTag(string Tag, VersionSemantic Semantic)
     ///     Regex pattern for parsing version tags with optional prefix, pre-release, and build metadata.
     ///     Format: [prefix]major.minor.patch[.|-)prerelease][+build-metadata]
     ///     Accepts both dot and hyphen as pre-release separators.
+    ///     Prefix may contain path separators (/) to support hierarchical tags (e.g., Azure DevOps).
     ///     Examples: 
     ///     - Rel_1.2.3.rc.4+build.5 -> version: 1.2.3, pre-release: rc.4, metadata: build.5
     ///     - v2.0.0-alpha.1 -> version: 2.0.0, pre-release: alpha.1
+    ///     - release/1.2.3-rc.4 -> version: 1.2.3, pre-release: rc.4
     /// </summary>
     /// <returns>Compiled regex for parsing tags.</returns>
-    [GeneratedRegex(@"^(?:[a-zA-Z_-]+)?(?<numbers>\d+\.\d+\.\d+)(?<separator>[-.])?(?<pre_release>[a-zA-Z0-9.-]+?)?(?:\+(?<metadata>[a-zA-Z0-9.-]+))?$")]
+    [GeneratedRegex(@"^(?:[a-zA-Z_/-]+)?(?<numbers>\d+\.\d+\.\d+)(?<separator>[-.])?(?<pre_release>[a-zA-Z0-9.-]+?)?(?:\+(?<metadata>[a-zA-Z0-9.-]+))?$")]
     private static partial Regex TagPattern();
 
     /// <summary>
