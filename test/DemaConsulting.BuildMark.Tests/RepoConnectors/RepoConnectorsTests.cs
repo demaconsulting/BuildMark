@@ -618,23 +618,23 @@ public class RepoConnectorsTests
     public void RepoConnectors_ItemRouter_MatchingRule_RoutesToSection()
     {
         // Arrange: define sections and rules, then create items to route
-        var sections = new List<BuildMark.Configuration.SectionConfig>
-        {
+        List<BuildMark.Configuration.SectionConfig> sections =
+        [
             new() { Id = "features", Title = "Features" },
             new() { Id = "bugs", Title = "Bugs Fixed" }
-        };
+        ];
 
-        var rules = new List<BuildMark.Configuration.RuleConfig>
-        {
+        List<BuildMark.Configuration.RuleConfig> rules =
+        [
             new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "feature" } }, Route = "features" },
             new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
-        };
+        ];
 
-        var items = new List<BuildMark.BuildNotes.ItemInfo>
-        {
+        List<BuildMark.BuildNotes.ItemInfo> items =
+        [
             new("1", "Add feature X", "https://example.com/1", "feature", 1),
             new("2", "Fix bug Y", "https://example.com/2", "bug", 2)
-        };
+        ];
 
         // Act: route the items
         var routed = ItemRouter.Route(items, rules, sections);
@@ -653,20 +653,20 @@ public class RepoConnectorsTests
     public void RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem()
     {
         // Arrange: define a section and a suppression rule
-        var sections = new List<BuildMark.Configuration.SectionConfig>
-        {
+        List<BuildMark.Configuration.SectionConfig> sections =
+        [
             new() { Id = "changes", Title = "Changes" }
-        };
+        ];
 
-        var rules = new List<BuildMark.Configuration.RuleConfig>
-        {
+        List<BuildMark.Configuration.RuleConfig> rules =
+        [
             new() { Match = new BuildMark.Configuration.RuleMatchConfig { Label = { "documentation" } }, Route = "suppressed" }
-        };
+        ];
 
-        var items = new List<BuildMark.BuildNotes.ItemInfo>
-        {
+        List<BuildMark.BuildNotes.ItemInfo> items =
+        [
             new("3", "Update docs", "https://example.com/3", "documentation", 3)
-        };
+        ];
 
         // Act: route the items
         var routed = ItemRouter.Route(items, rules, sections);

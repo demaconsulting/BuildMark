@@ -757,16 +757,16 @@ public class GitHubRepoConnectorTests
     {
         // Arrange - Create connector and define rules
         var connector = new GitHubRepoConnector();
-        var rules = new List<RuleConfig>
-        {
+        List<RuleConfig> rules =
+        [
             new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
             new() { Route = "features" }
-        };
-        var sections = new List<SectionConfig>
-        {
+        ];
+        List<SectionConfig> sections =
+        [
             new() { Id = "features", Title = "Features" },
             new() { Id = "bugs", Title = "Bugs" }
-        };
+        ];
 
         // Act - Configure the connector with rules (should not throw)
         connector.Configure(rules, sections);
@@ -806,16 +806,16 @@ public class GitHubRepoConnectorTests
         connector.SetCommandResponse("gh auth token", "test-token");
 
         // Configure routing rules: bugs → "bugs" section, everything else → "features" section
-        var rules = new List<RuleConfig>
-        {
+        List<RuleConfig> rules =
+        [
             new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
             new() { Route = "features" }
-        };
-        var sections = new List<SectionConfig>
-        {
+        ];
+        List<SectionConfig> sections =
+        [
             new() { Id = "features", Title = "Features" },
             new() { Id = "bugs", Title = "Bugs Fixed" }
-        };
+        ];
         connector.Configure(rules, sections);
 
         // Act: retrieve build information

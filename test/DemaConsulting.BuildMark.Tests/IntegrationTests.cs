@@ -882,8 +882,8 @@ public class IntegrationTests
             };
 
             // Process each item through ItemControlsParser (same as real connectors)
-            var changes = new List<ItemInfo>();
-            var bugs = new List<ItemInfo>();
+            List<ItemInfo> changes = [];
+            List<ItemInfo> bugs = [];
 
             foreach (var (id, title, defaultType, description) in items)
             {
