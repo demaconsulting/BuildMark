@@ -6,6 +6,10 @@ resource-path:
 input-files:
   - docs/user_guide/title.txt
   - docs/user_guide/introduction.md
+  - docs/user_guide/configuration.md
+  - docs/user_guide/cli-reference.md
+  - docs/user_guide/item-controls.md
+  - docs/user_guide/advanced-topics.md
 
 template: template.html
 

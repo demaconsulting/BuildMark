@@ -17,19 +17,19 @@ BuildMark is a .NET command-line tool that generates comprehensive markdown buil
 history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
 notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
-For a detailed explanation of how BuildMark works internally, see the
-[Theory of Operations](https://github.com/demaconsulting/BuildMark/blob/main/THEORY-OF-OPERATIONS.md).
+For detailed documentation, see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
 
 ## Features
 
-- 📄 **Git Integration** - Analyze Git repository history and tags
-- 📝 **Markdown Reports** - Generate human-readable build notes from repository data
-- 🐛 **Issue Tracking** - Extract bug fixes and changes from GitHub and Azure DevOps issues and pull requests
-- 🎯 **Customizable Output** - Configure report depth and version ranges
-- 🚀 **CI/CD Integration** - Automate build notes generation in your pipelines
-- 🌐 **Multi-Platform** - Support for Windows, Linux, macOS with .NET 8, 9, and 10
-- ✅ **Self-Validation** - Built-in tests without requiring external tools
-- 📊 **Detailed Reporting** - Track changes, bug fixes, and known issues between versions
+- 📄 **Git Integration** — Analyze Git repository history, tags, and branches
+- 📝 **Markdown Reports** — Generate structured build notes from repository data
+- 🐛 **Issue Tracking** — Extract changes and bug fixes from GitHub and Azure DevOps
+- 🔀 **Configurable Routing** — Route items into custom report sections by label or work-item type
+- 🎯 **Customizable Output** — Configure report depth, sections, and known-issue inclusion
+- 🚀 **CI/CD Ready** — Automate build notes generation in GitHub Actions and Azure Pipelines
+- 🌐 **Multi-Platform** — Windows, Linux, and macOS with .NET 8, 9, and 10
+- ✅ **Self-Validation** — Built-in qualification tests without external tooling
+- 📊 **Dependency Updates** — Built-in tracking of dependency changes from Dependabot and Renovate
 
 ## Installation
 
@@ -152,109 +152,15 @@ buildmark --validate --results validation-results.trx
 
 ## Configuration File
 
-BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root. This file
-separates persistent repository settings from runtime arguments, simplifying CI invocations and
-enabling version-controlled configuration.
+BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root, with
+sections for connector settings, report sections, routing rules, and report options.
 
-The file has three top-level sections:
+When no configuration file is present, BuildMark applies built-in defaults that include
+Changes, Bugs Fixed, and Dependency Updates sections with pre-wired routing rules for
+common label and work-item patterns.
 
-- **`connector`** — declares the repository connector type and per-connector settings such as URL
-  overrides and repository identifiers. Current releases support the `github` and `azure-devops`
-  connectors.
-- **`sections`** — defines the ordered list of sections that will appear in the generated build
-  notes, each identified by an `id` and a `title`.
-- **`rules`** — an ordered list of match/route rules. Each rule can match on `label` and/or
-  `work-item-type`, and routes matched items to a named section or to `suppressed` to exclude them.
-  Rules are evaluated in order and the first match wins. A rule with no `match` key is a catch-all.
-
-Example `.buildmark.yaml` for GitHub:
-
-```yaml
-# Repository Connector Settings
-connector:
-  # Type of repository
-  type: github
-
-  # GitHub settings
-  github:
-    url: https://github.mycompany.com   # optional; defaults to https://api.github.com
-    repository: owner/repo
-
-# Build Notes sections
-sections:
-  - id: changes
-    title: Changes
-  - id: bugs-fixed
-    title: Bugs Fixed
-  - id: dependency-updates
-    title: Dependency Updates
-
-# Item routing rules
-rules:
-  # Labels of 'dependencies', 'renovate', or 'dependabot' get routed to the 'dependency-updates' section
-  - match:
-      label: [dependencies, renovate, dependabot]
-    route: dependency-updates
-
-  # Bug work-items get routed to the 'bugs-fixed' section
-  - match:
-      work-item-type: [Bug]
-    route: bugs-fixed
-
-  # Labels of 'bug', 'defect', or 'regression' get routed to the 'bugs-fixed' section
-  - match:
-      label: [bug, defect, regression]
-    route: bugs-fixed
-
-  # Labels of 'internal' or 'chore' get suppressed
-  - match:
-      label: [internal, chore]
-    route: suppressed
-
-  # Task and Epic work-items get suppressed
-  - match:
-      work-item-type: [Task, Epic]
-    route: suppressed
-
-  # Everything else gets routed to the 'changes' section
-  - route: changes
-```
-
-Example `.buildmark.yaml` for Azure DevOps:
-
-```yaml
-# Repository Connector Settings
-connector:
-  type: azure-devops
-
-  # Azure DevOps settings
-  azure-devops:
-    url: https://dev.azure.com/myorg
-    project: MyProject
-    repository: MyRepo
-
-# Build Notes sections
-sections:
-  - id: changes
-    title: Changes
-  - id: bugs-fixed
-    title: Bugs Fixed
-
-# Item routing rules
-rules:
-  # Bug work-items get routed to the 'bugs-fixed' section
-  - match:
-      work-item-type: [Bug]
-    route: bugs-fixed
-
-  # Task and Epic work-items get suppressed
-  - match:
-      work-item-type: [Task, Epic]
-    route: suppressed
-
-  # Everything else gets routed to the 'changes' section
-  - route: changes
-```
+For configuration details and examples, see the
+[User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
 
 ### Authentication
 
@@ -310,101 +216,25 @@ On validation failure the tool will exit with a non-zero exit code.
 
 ## Extended Item Controls
 
-BuildMark supports an optional `buildmark` code block in GitHub issue and pull request descriptions
-to control how each item appears in the generated build notes.
+BuildMark supports an optional `buildmark` code block in issue and pull request descriptions
+to control visibility, type classification, and affected-version ranges. Azure DevOps work items
+additionally support native custom fields for the same controls.
 
-### BuildMark Code Block
-
-Add a fenced `buildmark` block anywhere in an issue or PR description:
-
-````markdown
-```buildmark
-visibility: public
-type: feature
-affected-versions: (,1.0.1],[1.1.0,1.2.0)
-```
-````
-
-The block can be hidden using HTML comment syntax if desired:
-
-````markdown
-<!--
-```buildmark
-visibility: internal
-```
--->
-````
-
-### Visibility Control
-
-The `visibility` field overrides the default visibility rules:
-
-- `public` - Force-include the item in build notes regardless of other settings
-- `internal` - Force-exclude the item from build notes regardless of labels or tags
-
-When `visibility` is not specified, the default rules apply: merged pull requests and linked
-issues are included in build notes. Standard issue labels (`bug`, `defect`, `feature`, etc.)
-are used to classify entries, but unlabeled or non-standard-labeled items may still be included.
-
-### Type Override
-
-The `type` field overrides the item classification used in build notes:
-
-- `bug` - Classify the item as a bug fix
-- `feature` - Classify the item as a new feature or change
-
-When `type` is not specified, BuildMark infers the type from GitHub issue labels.
-
-### Affected Versions
-
-The `affected-versions` field encodes which versions are affected by the change,
-using mathematical interval notation with comma-separated ranges:
-
-```text
-affected-versions: (,1.0.1],[1.1.0,1.2.0),(1.2.5,2.0.0],[3.0.0,)
-```
-
-- `[` / `]` — inclusive bound
-- `(` / `)` — exclusive bound
-- Empty lower bound — no minimum version (e.g., `(,1.0.1]` means up to and including `1.0.1`)
-- Empty upper bound — no maximum version (e.g., `[3.0.0,)` means `3.0.0` and later)
+For details, see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
 
 ## Report Format
 
 The generated markdown report includes:
 
-1. **Build Report Header** - Title with version information
-2. **Version Information** - Current version, baseline version, and commit details
-3. **Changes** - List of non-bug changes implemented in this build
-4. **Bugs Fixed** - List of bugs resolved in this build
-5. **Known Issues** - Optional list of known issues (when `--include-known-issues` is specified)
-6. **Complete Changelog** - Link to the full changelog on GitHub (when available)
+1. **Build Report** — title heading
+2. **Version Information** — current version, baseline version, and commit hashes
+3. **Routed Sections** — items distributed by routing rules (e.g., Changes, Bugs Fixed,
+   Dependency Updates), or legacy Changes/Bugs Fixed sections when no rules are configured
+4. **Known Issues** — open bugs (when `--include-known-issues` is specified)
+5. **Full Changelog** — link to the platform compare view between versions (when available)
 
-Example report structure:
-
-```markdown
-# Build Report
-
-## Version Information
-
-**Version:** 1.2.3
-**Baseline Version:** 1.2.0
-**Commit:** abc123def456
-
-## Changes
-
-- [#42](https://github.com/owner/repo/pull/42): Add new feature X
-- [#43](https://github.com/owner/repo/pull/43): Improve performance of Y
-
-## Bugs Fixed
-
-- [#40](https://github.com/owner/repo/issues/40): Fix crash when Z is null
-- [#41](https://github.com/owner/repo/issues/41): Correct validation logic
-
-## Complete Changelog
-
-[View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
-```
+Sections with no items are omitted. When routing rules are active, the section order and titles
+are determined by the configuration.
 
 ## Project Practices
 
