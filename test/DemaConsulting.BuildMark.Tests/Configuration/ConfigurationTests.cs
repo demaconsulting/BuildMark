@@ -368,20 +368,41 @@ public class ConfigurationTests
         // Act
         var config = BuildMarkConfig.CreateDefault();
 
-        // Assert - verify sections
+        // Assert - verify sections have correct IDs and titles
         Assert.HasCount(3, config.Sections);
         Assert.AreEqual("changes", config.Sections[0].Id);
+        Assert.AreEqual("Changes", config.Sections[0].Title);
         Assert.AreEqual("bugs-fixed", config.Sections[1].Id);
+        Assert.AreEqual("Bugs Fixed", config.Sections[1].Title);
         Assert.AreEqual("dependency-updates", config.Sections[2].Id);
+        Assert.AreEqual("Dependency Updates", config.Sections[2].Title);
 
-        // Assert - verify rules
+        // Assert - verify rules have correct routes and match conditions
         Assert.HasCount(6, config.Rules);
+
         Assert.AreEqual("dependency-updates", config.Rules[0].Route);
+        Assert.Contains("dependencies", config.Rules[0].Match!.Label);
+        Assert.Contains("renovate", config.Rules[0].Match!.Label);
+        Assert.Contains("dependabot", config.Rules[0].Match!.Label);
+
         Assert.AreEqual("bugs-fixed", config.Rules[1].Route);
+        Assert.Contains("Bug", config.Rules[1].Match!.WorkItemType);
+
         Assert.AreEqual("bugs-fixed", config.Rules[2].Route);
+        Assert.Contains("bug", config.Rules[2].Match!.Label);
+        Assert.Contains("defect", config.Rules[2].Match!.Label);
+        Assert.Contains("regression", config.Rules[2].Match!.Label);
+
         Assert.AreEqual("suppressed", config.Rules[3].Route);
+        Assert.Contains("internal", config.Rules[3].Match!.Label);
+        Assert.Contains("chore", config.Rules[3].Match!.Label);
+
         Assert.AreEqual("suppressed", config.Rules[4].Route);
+        Assert.Contains("Task", config.Rules[4].Match!.WorkItemType);
+        Assert.Contains("Epic", config.Rules[4].Match!.WorkItemType);
+
         Assert.AreEqual("changes", config.Rules[5].Route);
+        Assert.IsNull(config.Rules[5].Match);
     }
 }
 
