@@ -150,7 +150,7 @@ internal static class ProcessRunner
         // On Windows, route non-empty commands through cmd.exe so .cmd/.bat scripts are found
         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && !string.IsNullOrWhiteSpace(command))
         {
-            startInfo.FileName = "cmd";
+            startInfo.FileName = Path.Combine(Environment.SystemDirectory, "cmd.exe");
             startInfo.ArgumentList.Add("/c");
             startInfo.ArgumentList.Add(command);
         }

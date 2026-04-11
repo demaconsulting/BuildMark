@@ -37,6 +37,16 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     private readonly AzureDevOpsConnectorConfig? _config;
 
     /// <summary>
+    ///     Item visibility: public (force-include in report).
+    /// </summary>
+    private const string VisibilityPublic = "public";
+
+    /// <summary>
+    ///     Item visibility: internal (exclude from report).
+    /// </summary>
+    private const string VisibilityInternal = "internal";
+
+    /// <summary>
     ///     Initializes a new instance of the <see cref="AzureDevOpsRepoConnector"/> class.
     /// </summary>
     /// <param name="config">Optional Azure DevOps connector overrides.</param>
@@ -521,8 +531,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         var controls = ItemControlsParser.Parse(pr.Description);
 
         // Exclude if internal
-        var forceInclude = controls?.Visibility == "public";
-        if (!forceInclude && controls?.Visibility == "internal")
+        var forceInclude = controls?.Visibility == VisibilityPublic;
+        if (!forceInclude && controls?.Visibility == VisibilityInternal)
         {
             return;
         }
@@ -674,18 +684,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         // Handle SSH URLs: git@ssh.dev.azure.com:v3/org/project/repo
         if (url.StartsWith("git@ssh.dev.azure.com:", StringComparison.OrdinalIgnoreCase))
         {
-            var path = url["git@ssh.dev.azure.com:".Length..];
-            var parts = path.Split('/');
-            if (parts.Length >= 4 && parts[0] == "v3")
-            {
-                var repo = parts[3];
-                if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
-                {
-                    repo = repo[..^4];
-                }
-
-                return ($"https://dev.azure.com/{parts[1]}", parts[2], repo);
-            }
+            return ParseSshUrl(url);
         }
 
         // Handle HTTPS URLs by locating the _git path segment
@@ -693,34 +692,72 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         if (url.StartsWith("https://", StringComparison.OrdinalIgnoreCase) ||
             url.StartsWith("http://", StringComparison.OrdinalIgnoreCase))
         {
-            var uri = new Uri(url);
-            var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
-
-            // Find the _git segment to anchor the parse
-            var gitIndex = Array.FindIndex(segments,
-                s => s.Equals("_git", StringComparison.OrdinalIgnoreCase));
-
-            if (gitIndex >= 1 && gitIndex + 1 < segments.Length)
-            {
-                var project = segments[gitIndex - 1];
-                var repo = segments[gitIndex + 1];
-                if (repo.EndsWith(".git", StringComparison.OrdinalIgnoreCase))
-                {
-                    repo = repo[..^4];
-                }
-
-                // Build organization URL from scheme://authority and path segments before the project
-                var baseUrl = uri.GetLeftPart(UriPartial.Authority);
-                var orgPath = string.Join("/", segments.Take(gitIndex - 1));
-                var orgUrl = orgPath.Length > 0
-                    ? $"{baseUrl}/{orgPath}"
-                    : baseUrl;
-
-                return (orgUrl, project, repo);
-            }
+            return ParseHttpUrl(url);
         }
 
         throw new ArgumentException($"Unsupported Azure DevOps URL format: {url}", nameof(url));
+    }
+
+    /// <summary>
+    ///     Parses an SSH-format Azure DevOps URL into its components.
+    /// </summary>
+    /// <param name="url">SSH URL in the format git@ssh.dev.azure.com:v3/org/project/repo.</param>
+    /// <returns>Tuple of (organizationUrl, project, repository).</returns>
+    private static (string organizationUrl, string project, string repository) ParseSshUrl(string url)
+    {
+        var path = url["git@ssh.dev.azure.com:".Length..];
+        var parts = path.Split('/');
+        if (parts.Length >= 4 && parts[0] == "v3")
+        {
+            var repo = TrimGitSuffix(parts[3]);
+            return ($"https://dev.azure.com/{parts[1]}", parts[2], repo);
+        }
+
+        throw new ArgumentException($"Unsupported Azure DevOps URL format: {url}", nameof(url));
+    }
+
+    /// <summary>
+    ///     Parses an HTTP/HTTPS-format Azure DevOps URL into its components.
+    /// </summary>
+    /// <param name="url">HTTP or HTTPS URL containing a _git path segment.</param>
+    /// <returns>Tuple of (organizationUrl, project, repository).</returns>
+    private static (string organizationUrl, string project, string repository) ParseHttpUrl(string url)
+    {
+        var uri = new Uri(url);
+        var segments = uri.AbsolutePath.Split('/', StringSplitOptions.RemoveEmptyEntries);
+
+        // Find the _git segment to anchor the parse
+        var gitIndex = Array.FindIndex(segments,
+            s => s.Equals("_git", StringComparison.OrdinalIgnoreCase));
+
+        if (gitIndex >= 1 && gitIndex + 1 < segments.Length)
+        {
+            var project = segments[gitIndex - 1];
+            var repo = TrimGitSuffix(segments[gitIndex + 1]);
+
+            // Build organization URL from scheme://authority and path segments before the project
+            var baseUrl = uri.GetLeftPart(UriPartial.Authority);
+            var orgPath = string.Join("/", segments.Take(gitIndex - 1));
+            var orgUrl = orgPath.Length > 0
+                ? $"{baseUrl}/{orgPath}"
+                : baseUrl;
+
+            return (orgUrl, project, repo);
+        }
+
+        throw new ArgumentException($"Unsupported Azure DevOps URL format: {url}", nameof(url));
+    }
+
+    /// <summary>
+    ///     Removes a trailing ".git" suffix from a repository name if present.
+    /// </summary>
+    /// <param name="name">Repository name that may end with ".git".</param>
+    /// <returns>The repository name without the ".git" suffix.</returns>
+    private static string TrimGitSuffix(string name)
+    {
+        return name.EndsWith(".git", StringComparison.OrdinalIgnoreCase)
+            ? name[..^4]
+            : name;
     }
 
     /// <summary>

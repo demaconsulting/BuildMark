@@ -230,29 +230,11 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "depth":
-                    var depthStr = GetScalarValue(entry.Value);
-                    if (!int.TryParse(depthStr, out var depthValue) || depthValue < 1)
-                    {
-                        AddError(issues, filePath, GetLine(entry.Value),
-                            "Report depth must be a positive integer.");
-                    }
-                    else
-                    {
-                        depth = depthValue;
-                    }
+                    depth = ParseReportDepth(filePath, entry.Value, issues);
                     break;
 
                 case "include-known-issues":
-                    var boolStr = GetScalarValue(entry.Value);
-                    if (!bool.TryParse(boolStr, out var boolValue))
-                    {
-                        AddError(issues, filePath, GetLine(entry.Value),
-                            "Report include-known-issues must be 'true' or 'false'.");
-                    }
-                    else
-                    {
-                        includeKnownIssues = boolValue;
-                    }
+                    includeKnownIssues = ParseReportIncludeKnownIssues(filePath, entry.Value, issues);
                     break;
 
                 default:
@@ -268,6 +250,52 @@ public static class BuildMarkConfigReader
             Depth = depth,
             IncludeKnownIssues = includeKnownIssues
         };
+    }
+
+    /// <summary>
+    ///     Parses the report depth value from a YAML node.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML node for the depth value.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The parsed depth value, or null if invalid.</returns>
+    private static int? ParseReportDepth(
+        string filePath,
+        YamlNode node,
+        List<ConfigurationIssue> issues)
+    {
+        var depthStr = GetScalarValue(node);
+        if (!int.TryParse(depthStr, out var depthValue) || depthValue < 1)
+        {
+            AddError(issues, filePath, GetLine(node),
+                "Report depth must be a positive integer.");
+            return null;
+        }
+
+        return depthValue;
+    }
+
+    /// <summary>
+    ///     Parses the report include-known-issues value from a YAML node.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML node for the include-known-issues value.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The parsed boolean value, or null if invalid.</returns>
+    private static bool? ParseReportIncludeKnownIssues(
+        string filePath,
+        YamlNode node,
+        List<ConfigurationIssue> issues)
+    {
+        var boolStr = GetScalarValue(node);
+        if (!bool.TryParse(boolStr, out var boolValue))
+        {
+            AddError(issues, filePath, GetLine(node),
+                "Report include-known-issues must be 'true' or 'false'.");
+            return null;
+        }
+
+        return boolValue;
     }
 
     /// <summary>

@@ -30,6 +30,11 @@ namespace DemaConsulting.BuildMark.Tests.Configuration;
 public class ConfigurationTests
 {
     /// <summary>
+    ///     Gets or sets the test context for the current test run.
+    /// </summary>
+    public TestContext TestContext { get; set; } = null!;
+
+    /// <summary>
     ///     Test that missing configuration files return an empty result.
     /// </summary>
     [TestMethod]
@@ -81,7 +86,8 @@ public class ConfigurationTests
               - match:
                   label: [feature]
                 route: changes
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -124,7 +130,8 @@ public class ConfigurationTests
               type: github
               github:
                 repository: invalid
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -155,7 +162,8 @@ public class ConfigurationTests
         var filePath = Path.Combine(directory, ".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
-            "connector:\n\ttype: github\n");
+            "connector:\n\ttype: github\n",
+            TestContext.CancellationToken);
 
         try
         {
@@ -197,7 +205,8 @@ public class ConfigurationTests
             sections:
               - id: changes
                 title: Changes
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -242,7 +251,8 @@ public class ConfigurationTests
             sections:
               - id: changes
                 title: Changes
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -280,7 +290,8 @@ public class ConfigurationTests
               type: azure-devops
               azure-devops:
                 unknown-key: some-value
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -315,7 +326,8 @@ public class ConfigurationTests
             connector:
               type: azure-devops
               azure-devops: not-a-mapping
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -421,7 +433,8 @@ public class ConfigurationTests
               file: build-notes.md
               depth: 2
               include-known-issues: true
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
@@ -434,7 +447,7 @@ public class ConfigurationTests
             Assert.IsNotNull(result.Config.Report);
             Assert.AreEqual("build-notes.md", result.Config.Report.File);
             Assert.AreEqual(2, result.Config.Report.Depth);
-            Assert.AreEqual(true, result.Config.Report.IncludeKnownIssues);
+            Assert.IsTrue(result.Config.Report.IncludeKnownIssues);
         }
         finally
         {
@@ -457,7 +470,8 @@ public class ConfigurationTests
             """
             report:
               depth: -1
-            """);
+            """,
+            TestContext.CancellationToken);
 
         try
         {
