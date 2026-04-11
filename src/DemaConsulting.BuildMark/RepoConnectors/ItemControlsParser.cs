@@ -27,14 +27,15 @@ namespace DemaConsulting.BuildMark.RepoConnectors;
 /// <summary>
 ///     Parses item controls from issue or pull request descriptions.
 /// </summary>
-public static class ItemControlsParser
+public static partial class ItemControlsParser
 {
     /// <summary>
     ///     Regex pattern for matching HTML comment delimiters.
     ///     Strips only the comment delimiters (not content), so that a buildmark block
     ///     wrapped in an HTML comment is still visible to the parser after stripping.
     /// </summary>
-    private static readonly Regex HtmlCommentDelimitersRegex = new(@"<!--|-->", RegexOptions.Compiled);
+    [GeneratedRegex(@"<!--|-->")]
+    private static partial Regex HtmlCommentDelimitersRegex();
 
     /// <summary>
     ///     Valid visibility value: public.
@@ -71,7 +72,7 @@ public static class ItemControlsParser
 
         // Strip HTML comment delimiters (<!-- and -->) so that a buildmark block
         // wrapped in an HTML comment is exposed and can be detected by the parser
-        var stripped = HtmlCommentDelimitersRegex.Replace(description, string.Empty);
+        var stripped = HtmlCommentDelimitersRegex().Replace(description, string.Empty);
 
         // Locate buildmark code fence: line starting with 3+ backticks followed by "buildmark"
         // The fence delimiter is 3+ backticks followed immediately by "buildmark" (case-insensitive)
@@ -156,42 +157,11 @@ public static class ItemControlsParser
         // Parse each line as "key: value" (split on first ':')
         foreach (var rawLine in blockLines)
         {
-            var line = rawLine.TrimEnd('\r').Trim();
-            if (string.IsNullOrEmpty(line))
+            var (key, value) = ParseKeyValue(rawLine);
+            if (key != null)
             {
-                continue;
+                ApplyBlockLineValue(key, value!, ref visibility, ref type, ref affectedVersions);
             }
-
-            // Split on first ':'
-            var colonIdx = line.IndexOf(':');
-            if (colonIdx < 0)
-            {
-                continue;
-            }
-
-            var key = line[..colonIdx].Trim().ToLowerInvariant();
-            var value = line[(colonIdx + 1)..].Trim();
-
-            // Keys: "visibility" → "public"/"internal"
-            if (key == "visibility" && (value == VisibilityPublic || value == VisibilityInternal))
-            {
-                visibility = value;
-            }
-            // type → "bug"/"feature"
-            else if (key == "type" && (value == TypeBug || value == TypeFeature))
-            {
-                type = value;
-            }
-            // affected-versions
-            else if (key == "affected-versions" && !string.IsNullOrEmpty(value))
-            {
-                var parsed = VersionIntervalSet.Parse(value);
-                if (parsed.Intervals.Count > 0)
-                {
-                    affectedVersions = parsed;
-                }
-            }
-            // Unknown keys/values silently ignored
         }
 
         // Return ItemControlsInfo if any recognized key found, else null
@@ -201,5 +171,63 @@ public static class ItemControlsParser
         }
 
         return new ItemControlsInfo(visibility, type, affectedVersions);
+    }
+
+    /// <summary>
+    ///     Extracts a key-value pair from a single line by splitting on the first colon.
+    /// </summary>
+    /// <param name="rawLine">Raw line from the buildmark block.</param>
+    /// <returns>Tuple of (lowercased key, trimmed value), or (null, null) if line is not a valid key-value pair.</returns>
+    private static (string? key, string? value) ParseKeyValue(string rawLine)
+    {
+        var line = rawLine.TrimEnd('\r').Trim();
+        if (string.IsNullOrEmpty(line))
+        {
+            return (null, null);
+        }
+
+        var colonIdx = line.IndexOf(':');
+        if (colonIdx < 0)
+        {
+            return (null, null);
+        }
+
+        return (line[..colonIdx].Trim().ToLowerInvariant(), line[(colonIdx + 1)..].Trim());
+    }
+
+    /// <summary>
+    ///     Applies a recognized key-value pair to the appropriate output parameter.
+    /// </summary>
+    /// <param name="key">Lowercased key from the buildmark block line.</param>
+    /// <param name="value">Trimmed value from the buildmark block line.</param>
+    /// <param name="visibility">Current visibility value (updated if key is "visibility").</param>
+    /// <param name="type">Current type value (updated if key is "type").</param>
+    /// <param name="affectedVersions">Current affected versions (updated if key is "affected-versions").</param>
+    private static void ApplyBlockLineValue(
+        string key,
+        string value,
+        ref string? visibility,
+        ref string? type,
+        ref VersionIntervalSet? affectedVersions)
+    {
+        switch (key)
+        {
+            case "visibility" when value is VisibilityPublic or VisibilityInternal:
+                visibility = value;
+                break;
+
+            case "type" when value is TypeBug or TypeFeature:
+                type = value;
+                break;
+
+            case "affected-versions" when !string.IsNullOrEmpty(value):
+                var parsed = VersionIntervalSet.Parse(value);
+                if (parsed.Intervals.Count > 0)
+                {
+                    affectedVersions = parsed;
+                }
+
+                break;
+        }
     }
 }

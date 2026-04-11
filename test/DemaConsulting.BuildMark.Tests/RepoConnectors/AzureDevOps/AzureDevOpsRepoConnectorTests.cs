@@ -163,13 +163,13 @@ public class AzureDevOpsRepoConnectorTests
         Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
 
         // Bug work item should be in bugs
-        Assert.IsGreaterThanOrEqualTo(buildInfo.Bugs.Count, 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Bugs.Count, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
         var bugItem = buildInfo.Bugs.FirstOrDefault(b => b.Id == "200");
         Assert.IsNotNull(bugItem, "Work item 200 should be categorized as a bug");
         Assert.AreEqual("Bug fix work item", bugItem.Title);
 
         // Feature work item should be in changes
-        Assert.IsGreaterThanOrEqualTo(buildInfo.Changes.Count, 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Changes.Count, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
         var featureItem = buildInfo.Changes.FirstOrDefault(c => c.Id == "201");
         Assert.IsNotNull(featureItem, "Work item 201 should be categorized as a change");
         Assert.AreEqual("New feature work item", featureItem.Title);
@@ -198,7 +198,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(buildInfo);
-        Assert.IsGreaterThanOrEqualTo(buildInfo.KnownIssues.Count, 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        Assert.IsGreaterThanOrEqualTo(1, buildInfo.KnownIssues.Count, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Id == "301");
         Assert.IsNotNull(knownIssue, "Work item 301 should be a known issue");
         Assert.AreEqual("Known open bug", knownIssue.Title);

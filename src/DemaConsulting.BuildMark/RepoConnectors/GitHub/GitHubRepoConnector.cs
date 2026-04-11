@@ -37,22 +37,37 @@ public class GitHubRepoConnector : RepoConnectorBase
     private readonly GitHubConnectorConfig? _config;
 
     /// <summary>
+    ///     Item type classification: feature.
+    /// </summary>
+    private const string ItemTypeFeature = "feature";
+
+    /// <summary>
+    ///     Item type classification: dependencies.
+    /// </summary>
+    private const string ItemTypeDependencies = "dependencies";
+
+    /// <summary>
+    ///     Item type classification: internal.
+    /// </summary>
+    private const string ItemTypeInternal = "internal";
+
+    /// <summary>
     ///     Mapping of label keywords to their normalized item types.
     /// </summary>
     private static readonly Dictionary<string, string> LabelTypeMap = new()
     {
         { "bug", "bug" },
         { "defect", "bug" },
-        { "feature", "feature" },
-        { "enhancement", "feature" },
+        { ItemTypeFeature, ItemTypeFeature },
+        { "enhancement", ItemTypeFeature },
         { "documentation", "documentation" },
         { "performance", "performance" },
         { "security", "security" },
-        { "dependencies", "dependencies" },
-        { "renovate", "dependencies" },
-        { "dependabot", "dependencies" },
-        { "internal", "internal" },
-        { "chore", "internal" }
+        { ItemTypeDependencies, ItemTypeDependencies },
+        { "renovate", ItemTypeDependencies },
+        { "dependabot", ItemTypeDependencies },
+        { ItemTypeInternal, ItemTypeInternal },
+        { "chore", ItemTypeInternal }
     };
 
     /// <summary>
@@ -901,7 +916,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Exclude item if visibility is "internal"
         // Note: "public" explicitly force-includes the item, so it takes precedence
         var forceInclude = controls?.Visibility == "public";
-        if (!forceInclude && controls?.Visibility == "internal")
+        if (!forceInclude && controls?.Visibility == ItemTypeInternal)
         {
             return null;
         }
@@ -935,7 +950,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         // Exclude item if visibility is "internal"
         // Note: "public" explicitly force-includes the item, so it takes precedence
         var forceInclude = controls?.Visibility == "public";
-        if (!forceInclude && controls?.Visibility == "internal")
+        if (!forceInclude && controls?.Visibility == ItemTypeInternal)
         {
             return null;
         }
@@ -967,9 +982,9 @@ public class GitHubRepoConnector : RepoConnectorBase
             return "bug";
         }
 
-        if (controls?.Type == "feature")
+        if (controls?.Type == ItemTypeFeature)
         {
-            return "feature";
+            return ItemTypeFeature;
         }
 
         return type;
