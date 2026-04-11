@@ -331,13 +331,12 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Build a set of commit SHAs in the current branch.
         // This is used for efficient filtering of branch-related tags.
-        var branchCommitShas = new HashSet<string>(data.Commits.Select(c => c.Sha));
+        var branchCommitShas = data.Commits.Select(c => c.Sha).ToHashSet();
 
         // Build a set of tags filtered to those on the current branch.
         // This is used for efficient filtering of branch-related releases.
-        var branchTagNames = new HashSet<string>(
-            data.Tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
-                .Select(t => t.Name));
+        var branchTagNames = data.Tags.Where(t => branchCommitShas.Contains(t.Commit.Sha))
+                .Select(t => t.Name).ToHashSet();
 
         // Build an ordered list of releases on the current branch.
         // This is used to select the prior release version for identifying changes in the build.

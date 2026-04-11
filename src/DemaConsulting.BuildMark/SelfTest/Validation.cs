@@ -246,16 +246,14 @@ internal static class Validation
             // Create a mock connector with rules that route bugs to a bugs section and everything else to features
             var mc = new MockRepoConnector();
             mc.Configure(
-                new List<RuleConfig>
-                {
+                [
                     new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
                     new() { Route = "features" }
-                },
-                new List<SectionConfig>
-                {
+                ],
+                [
                     new() { Id = "features", Title = "Features" },
                     new() { Id = "bugs", Title = "Bugs" }
-                });
+                ]);
 
             // Return the configured connector as the interface type
             return (IRepoConnector)mc;
@@ -311,12 +309,12 @@ internal static class Validation
             var reportFile = reportFileName != null ? PathHelpers.SafePathCombine(tempDir.DirectoryPath, reportFileName) : null;
 
             // Build command line arguments
-            var args = new List<string>
-            {
+            List<string> args =
+            [
                 "--silent",
                 "--log", logFile,
                 "--build-version", "2.0.0"
-            };
+            ];
 
             if (reportFile != null)
             {
