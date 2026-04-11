@@ -20,8 +20,10 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.BuildMark.Version;
@@ -34,11 +36,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 [TestClass]
 public class RepoConnectorsTests
 {
-    /// <summary>
-    ///     Path to the main assembly DLL, used for non-constant placeholder assertions.
-    /// </summary>
-    private static readonly string _dllPath =
-        typeof(DemaConsulting.BuildMark.Program).Assembly.Location;
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-RepoConnectors-GitHubConnector
     // ─────────────────────────────────────────────────────────────────────────
@@ -683,67 +680,153 @@ public class RepoConnectorsTests
     // ─────────────────────────────────────────────────────────────────────────
 
     /// <summary>
-    ///     Placeholder: verify that the Azure DevOps connector implements IRepoConnector.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that the Azure DevOps connector implements the IRepoConnector interface.
     /// </summary>
     [TestMethod]
     public void RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that AzureDevOpsRepoConnector implements IRepoConnector.
-        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue");
+        // Arrange: create an AzureDevOpsRepoConnector instance
+        var connector = new AzureDevOpsRepoConnector();
+
+        // Assert: it satisfies the public IRepoConnector interface
+        Assert.IsInstanceOfType<IRepoConnector>(connector);
     }
 
     /// <summary>
-    ///     Placeholder: verify that the Azure DevOps connector returns valid build information.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that the Azure DevOps connector returns valid build information from mocked API data.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
+    public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that the Azure DevOps connector returns a non-null
-        // BuildInformation record with correct version, changes, and known issues.
-        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation");
+        // Arrange: set up a mocked REST handler with a single tag and commit
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
+            .AddCommitsResponse(new MockAdoCommit("abc123"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockAdoConnector(mockHttpClient, "abc123");
+
+        // Act: retrieve build information for v1.0.0
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert: build information is complete and accurate
+        Assert.IsNotNull(buildInfo);
+        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.AreEqual("abc123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.IsNotNull(buildInfo.Changes);
+        Assert.IsNotNull(buildInfo.Bugs);
+        Assert.IsNotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
-    ///     Placeholder: verify that the Azure DevOps connector gathers changes from pull requests.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that the Azure DevOps connector gathers changes from pull requests.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges()
+    public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that pull requests merged in the commit range are
-        // collected and included in BuildInformation.Changes.
-        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges");
+        // Arrange: set up two versions with a PR merged between them
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v1.1.0", "commit2"),
+                new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse(
+                new MockAdoPullRequest(100, "Add feature", "completed", "commit2"))
+            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddWorkItemsResponse(
+                new MockAdoWorkItem(200, "Feature work item", "User Story"))
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockAdoConnector(mockHttpClient, "commit2");
+
+        // Act: retrieve build information for v1.1.0
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
+
+        // Assert: changes include the work item from the PR
+        Assert.IsNotNull(buildInfo);
+        Assert.IsTrue(buildInfo.Changes.Count > 0, "Changes should include items from merged PRs");
     }
 
     /// <summary>
-    ///     Placeholder: verify that the Azure DevOps connector identifies open work items as known issues.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that the Azure DevOps connector identifies open work items as known issues.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues()
+    public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that open (unresolved) bug work items are included
-        // in BuildInformation.KnownIssues.
-        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues");
+        // Arrange: set up a version with an open bug from WIQL query
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
+            .AddCommitsResponse(new MockAdoCommit("abc123"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse(500)
+            .AddWorkItemsResponse(
+                new MockAdoWorkItem(500, "Open bug", "Bug", "Active"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockAdoConnector(mockHttpClient, "abc123");
+
+        // Act: retrieve build information for v1.0.0
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert: known issues include the open bug
+        Assert.IsNotNull(buildInfo);
+        Assert.IsTrue(buildInfo.KnownIssues.Count > 0, "KnownIssues should include open bug work items");
     }
 
     /// <summary>
-    ///     Placeholder: verify that the Azure DevOps connector skips pre-release tags for release versions.
-    ///     Phase 2: Implement once AzureDevOpsRepoConnector is available.
+    ///     Test that the Azure DevOps connector skips pre-release tags for release versions.
     /// </summary>
     [TestMethod]
-    public void RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
+    public async Task RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
     {
-        // Phase 2: Implement when AzureDevOpsRepoConnector is created.
-        // This test shall verify that when a release version is requested, pre-release
-        // version tags are not used as the baseline version.
-        Assert.IsTrue(File.Exists(_dllPath), "RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases");
+        // Arrange: set up a release version with a pre-release between it and the previous release
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v2.0.0", "commit3"),
+                new MockAdoTag("v2.0.0-rc.1", "commit2"),
+                new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit3"),
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockAdoConnector(mockHttpClient, "commit3");
+
+        // Act: retrieve build information for v2.0.0 (a release version)
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert: baseline should be v1.0.0, skipping the pre-release v2.0.0-rc.1
+        Assert.IsNotNull(buildInfo);
+        Assert.IsNotNull(buildInfo.BaselineVersionTag);
+        Assert.AreEqual("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+    }
+
+    /// <summary>
+    ///     Creates a mock Azure DevOps connector with pre-configured git command responses.
+    /// </summary>
+    /// <param name="mockHttpClient">Mock HTTP client for REST API.</param>
+    /// <param name="currentCommitHash">Current commit hash to return from git rev-parse HEAD.</param>
+    /// <returns>Configured MockableAzureDevOpsRepoConnector.</returns>
+    private static MockableAzureDevOpsRepoConnector CreateMockAdoConnector(
+        HttpClient mockHttpClient,
+        string currentCommitHash)
+    {
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin",
+            "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", currentCommitHash);
+        connector.SetCommandResponse(
+            "az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv",
+            "mock-token");
+        return connector;
     }
 }
 

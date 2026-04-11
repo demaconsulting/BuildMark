@@ -70,8 +70,8 @@ Fetches the complete paginated commit history for the repository.
 
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api-version=6.0`
 
-Returns a list of `AzureDevOpsCommit` records. Automatically follows continuation
-tokens to retrieve all pages.
+Returns a list of `AzureDevOpsCommit` records. Automatically paginates using
+`$top` and `$skip` query parameters to retrieve all pages.
 
 ### `GetPullRequestsAsync(repositoryId, status)`
 
@@ -80,8 +80,8 @@ Fetches all pull requests with the specified status for the repository. Supports
 
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests?searchCriteria.status={status}&api-version=6.0`
 
-Returns a list of `AzureDevOpsPullRequest` records. Automatically follows
-continuation tokens to retrieve all pages.
+Returns a list of `AzureDevOpsPullRequest` records. Automatically paginates using
+`$top` and `$skip` query parameters to retrieve all pages.
 
 ### `GetPullRequestWorkItemsAsync(repositoryId, pullRequestId)`
 

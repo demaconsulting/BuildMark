@@ -15,21 +15,19 @@ parsed `.buildmark.yaml` file and returns the appropriate
 
 - If `config?.Type` is `"azure-devops"`, returns a new `AzureDevOpsRepoConnector`
   initialized with `config?.AzureDevOps`.
-- Otherwise, returns a new `GitHubRepoConnector` initialized with
-  `config?.GitHub` (which may be `null` if no connector config was supplied).
 
-In the absence of a `ConnectorConfig`, the method auto-detects the environment
-using the following signals, checked in order:
+When `config?.Type` is not `"azure-devops"` (including when `config` is `null`
+or `Type` is `null`), the method auto-detects the environment using the
+following signals, checked in order:
 
 1. The `TF_BUILD` environment variable is non-empty — indicates Azure DevOps
    Pipelines; creates an `AzureDevOpsRepoConnector`.
-2. The git remote URL contains `dev.azure.com` or `visualstudio.com` — creates
+2. The `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable is non-empty
+   — creates a `GitHubRepoConnector`.
+3. The git remote URL contains `dev.azure.com` or `visualstudio.com` — creates
    an `AzureDevOpsRepoConnector`.
-3. The `GITHUB_ACTIONS` environment variable is non-empty — creates a
-   `GitHubRepoConnector`.
-4. The `GITHUB_WORKSPACE` environment variable is non-empty — creates a
-   `GitHubRepoConnector`.
-5. The git remote URL contains `github.com` — creates a `GitHubRepoConnector`.
+4. The git remote URL contains `github.com` — creates a `GitHubRepoConnector`.
+5. None of the above matched — defaults to a `GitHubRepoConnector`.
 
 The git remote URL is obtained using the sync-over-async pattern via
 `ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult()`.
