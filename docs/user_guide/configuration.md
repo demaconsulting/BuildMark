@@ -79,9 +79,16 @@ sections:
     title: Changes
   - id: bugs-fixed
     title: Bugs Fixed
+  - id: dependency-updates
+    title: Dependency Updates
 
 # Item routing rules
 rules:
+  # Labels of 'dependencies', 'renovate', or 'dependabot' get routed to the 'dependency-updates' section
+  - match:
+      label: [dependencies, renovate, dependabot]
+    route: dependency-updates
+
   # Bug work-items get routed to the 'bugs-fixed' section
   - match:
       work-item-type: [Bug]

@@ -32,7 +32,7 @@ Integrate BuildMark into your CI/CD pipeline to automatically generate build not
   inputs:
     script: |
       buildmark \
-        --build-version $(Build.BuildNumber) \
+        --build-version $(GitVersion.SemVer) \
         --report docs/build-notes.md
 
 - task: PublishBuildArtifacts@1
@@ -92,10 +92,12 @@ Shows the current version, baseline version (previous version), and commit infor
 ```markdown
 ## Version Information
 
-**Version:** 1.2.3
-**Baseline Version:** 1.2.0
-**Commit:** abc123def456
-**Commit Date:** 2024-01-15
+| Field | Value |
+|-------|-------|
+| **Version** | 1.2.3 |
+| **Commit Hash** | abc123def456 |
+| **Previous Version** | 1.2.0 |
+| **Previous Commit Hash** | 789012abc345 |
 ```
 
 ## Changes
@@ -117,13 +119,25 @@ Each change entry includes:
 
 ## Bugs Fixed
 
-Lists all bugs resolved in this build, extracted from GitHub issues labeled as bugs:
+Lists all bugs resolved in this build, extracted from issues labeled as bugs:
 
 ```markdown
 ## Bugs Fixed
 
 - [#40](https://github.com/owner/repo/issues/40): Fix crash when Z is null
 - [#41](https://github.com/owner/repo/issues/41): Correct validation logic
+```
+
+## Dependency Updates
+
+When a Dependency Updates section is configured (included in the built-in defaults), dependency
+changes from tools like Dependabot and Renovate are grouped separately:
+
+```markdown
+## Dependency Updates
+
+- [#45](https://github.com/owner/repo/pull/45): Bump lodash from 4.17.20 to 4.17.21
+- [#46](https://github.com/owner/repo/pull/46): Update NuGet packages
 ```
 
 ## Known Issues
@@ -214,12 +228,14 @@ BuildMark recognizes version tags with various formats:
 - Simple format: `1.2.3`
 - V-prefix: `v1.2.3`
 - Custom prefixes: `ver-1.2.3`, `release_1.2.3`
+- Path-based prefixes: `release/1.2.3`, `builds/release/1.2.3`
 - Pre-release suffixes: `-alpha.1`, `-beta.2`, `-rc.1`, `.pre.1`
 - Build metadata: `+build.123`, `+linux.x64`
 
 Examples of recognized version tags:
 
 - `1.0.0`, `v1.0.0`, `ver-1.0.0`
+- `release/1.2.3`, `builds/release/1.2.3-beta.1+build.99`
 - `2.0.0-beta.1`, `v2.0.0-rc.2`
 - `1.2.3+build.456`, `v2.0.0-rc.1+linux`
 
@@ -237,6 +253,16 @@ Examples of recognized version tags:
 - **Use read-only tokens**: BuildMark only needs read access to the GitHub API
 - **Don't commit tokens**: Never commit tokens to version control
 - **Set appropriate rate limits**: Be aware of GitHub API rate limits
+
+## Azure DevOps Integration
+
+- **Use Personal Access Tokens**: Set `AZURE_DEVOPS_PAT` with **Code (Read)** and
+  **Work Items (Read)** scopes
+- **Azure Pipelines**: Pass `SYSTEM_ACCESSTOKEN` to the task and grant the pipeline
+  permission to access the repository
+- **Entra ID tokens**: Be aware that tokens expire after one hour; prefer PATs for
+  long-running pipelines
+- **On-premises**: Set the `url` in `.buildmark.yaml` to your Azure DevOps Server URL
 
 ## CI/CD Best Practices
 
