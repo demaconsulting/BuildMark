@@ -27,9 +27,12 @@ The client uses `System.Net.Http.Json` extension methods (part of the .NET runti
 deserialize Azure DevOps REST API responses. Specifically, each HTTP response body is
 decoded by calling `HttpContent.ReadFromJsonAsync<T>()` with a shared
 `JsonSerializerOptions` instance configured with
-`PropertyNamingPolicy = JsonNamingPolicy.CamelCase`. This matches the camelCase
-field names returned by the Azure DevOps API without requiring per-property
-`[JsonPropertyName]` attributes on the response records.
+`PropertyNamingPolicy = JsonNamingPolicy.CamelCase` and
+`NumberHandling = JsonNumberHandling.AllowReadingFromString`. The camelCase policy
+matches the camelCase field names returned by the Azure DevOps API without requiring
+per-property `[JsonPropertyName]` attributes on the response records. The
+`AllowReadingFromString` setting handles numeric fields (such as work item IDs) that
+the API may return as JSON string values rather than JSON numbers.
 
 The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary — its keys are
 Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
@@ -53,10 +56,13 @@ remote URL.
 
 Fetches all tag references for the specified repository.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&api-version=6.0`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&peelTags=true&api-version=6.0`
 
 Returns a list of `AzureDevOpsRef` records, each containing the full reference name
-(e.g. `refs/tags/v1.0.0`) and the commit SHA it points to.
+(e.g. `refs/tags/v1.0.0`), the object SHA it points to, and for annotated tags the
+peeled commit SHA. The `peelTags=true` query parameter instructs the API to resolve
+annotated tag objects to their underlying commit SHA, which is returned in the
+`peeledObjectId` field.
 
 ### `GetCommitsAsync(repositoryId)`
 
