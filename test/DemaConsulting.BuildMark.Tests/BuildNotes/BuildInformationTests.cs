@@ -473,7 +473,7 @@ public class BuildInformationTests
     ///     Test that VersionCommitTag correctly stores version and hash.
     /// </summary>
     [TestMethod]
-    public void VersionTag_Constructor_StoresVersionAndHash()
+    public void VersionCommitTag_Constructor_StoresVersionAndHash()
     {
         // Arrange
         var version = VersionTag.Create("v1.0.0");

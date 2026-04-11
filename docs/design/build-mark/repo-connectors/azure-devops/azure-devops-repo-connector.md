@@ -16,11 +16,13 @@ construct a `BuildInformation` record.
 
 The connector resolves the Azure DevOps token using the following priority order:
 
-1. `AZURE_DEVOPS_PAT` environment variable
-2. `AZURE_DEVOPS_TOKEN` environment variable
-3. `AZURE_DEVOPS_EXT_PAT` environment variable
+1. `AZURE_DEVOPS_PAT` environment variable — authenticated as Basic (PAT)
+2. `AZURE_DEVOPS_TOKEN` environment variable — authenticated as Basic (PAT)
+3. `AZURE_DEVOPS_EXT_PAT` environment variable — authenticated as Basic (PAT)
 4. `SYSTEM_ACCESSTOKEN` environment variable (set automatically by Azure Pipelines)
-5. Output of `az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798`
+   — authenticated as Bearer
+5. Output of `az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv`
+   — authenticated as Bearer
 
 If no token is found, the connector throws `InvalidOperationException`.
 
@@ -75,13 +77,19 @@ The `AzureDevOpsRestClient` returns the following record types:
 
 - **`AzureDevOpsRepository`** — repository metadata including id, name, and remoteUrl.
 - **`AzureDevOpsCommit`** — commit data including commitId and comment.
+- **`AzureDevOpsGitCommitRef`** — minimal commit reference containing only commitId.
 - **`AzureDevOpsPullRequest`** — pull request data including pullRequestId, title,
-  url, status, mergeCommitId, sourceRefName, and description.
+  url, status, lastMergeCommit (an `AzureDevOpsGitCommitRef` object representing
+  the most recent merge commit), sourceRefName, and description. Exposes a computed
+  `MergeCommitId` property that returns `LastMergeCommit?.CommitId`.
 - **`AzureDevOpsWorkItem`** — work item data including id and a fields dictionary
   containing System.Title, System.WorkItemType, System.State, System.Description,
   Custom.Visibility, and Custom.AffectedVersions.
 - **`AzureDevOpsWorkItemQuery`** — result of a WIQL query, containing a list of
   work item id references.
+- **`AzureDevOpsRef`** — git reference including name, objectId, and
+  peeledObjectId. Exposes a computed `CommitId` property that returns
+  `PeeledObjectId ?? ObjectId`, resolving annotated tags to their commit SHA.
 - **`AzureDevOpsCollectionResponse<T>`** — wraps paginated responses with a count
   and value list.
 
@@ -98,9 +106,11 @@ Main entry point. Performs the following steps:
    DevOps Server URL formats by locating the `_git` path segment).
 3. Resolve the Azure DevOps authentication token (see Authentication above).
 4. Create an `AzureDevOpsRestClient` with the resolved organization URL and token.
-5. Fetch all tags via `GET /git/repositories/{id}/refs?filter=refs/tags`. Using the
-   REST API bypasses shallow-checkout limitations that would otherwise prevent Git
-   from enumerating remote tags.
+5. Fetch all tags via `GET /git/repositories/{id}/refs?filter=tags&peelTags=true`.
+   The `peelTags=true` parameter resolves annotated tags to their underlying commit
+   SHA (returned in the `peeledObjectId` field). Using the REST API bypasses
+   shallow-checkout limitations that would otherwise prevent Git from enumerating
+   remote tags.
 6. Fetch the complete commit history via `GET /git/repositories/{id}/commits`.
 7. Fetch all pull requests via
    `GET /git/repositories/{id}/pullrequests?searchCriteria.status=all`.

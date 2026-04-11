@@ -6,10 +6,10 @@
 creates the `Context` object from command-line arguments, and dispatches execution
 to the appropriate handler based on the parsed flags.
 
-The unit contains two public methods: `Main`, which is called by the .NET runtime,
-and `Run`, which accepts an existing `Context` and performs the main execution logic.
-`Run` is exposed separately so that integration tests can inject a pre-configured
-`Context` without repeating argument parsing.
+The unit exposes a private entry point `Main`, which is called by the .NET runtime,
+and a public method `Run`, which accepts an existing `Context` and performs the main
+execution logic. `Run` is exposed separately so that integration tests can inject a
+pre-configured `Context` without repeating argument parsing.
 
 ## Data Model
 
@@ -27,11 +27,12 @@ first, then falling back to `assembly.GetName().Version`, and finally defaulting
 
 ### `Main(string[] args) → int`
 
-The application entry point. It creates a `Context` from the supplied command-line
-arguments and delegates to `Run`. Any `ArgumentException` or
-`InvalidOperationException` is caught, written to the error output via
-`Context.WriteError`, and results in an exit code of 1. Any other exception is
-re-thrown after logging so the runtime can report an unhandled exception.
+The application entry point (declared `private static`). It creates a `Context` from
+the supplied command-line arguments and delegates to `Run`. Any `ArgumentException`
+or `InvalidOperationException` is caught, written directly to `Console.Error` (no
+`Context` object exists yet at this level), and results in an exit code of 1. Any
+other exception is re-thrown after logging so the runtime can report an unhandled
+exception.
 
 ### `Run(Context context) → void`
 

@@ -26,24 +26,34 @@ public record BuildInformation(
 - `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed
 - `CompleteChangelogLink` (`WebLink?`) — optional link to the full changelog on
   the host
+- `RoutedSections` (`IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>?`) —
+  optional ordered list of custom report sections populated by `RepoConnectorBase.ApplyRules`
+  when routing rules are configured; `null` when no rules are active
 
 ## Methods
 
 ### `ToMarkdown(headingDepth, includeKnownIssues) → string`
 
 Renders the build information as a markdown string. The `headingDepth` parameter
-controls the top-level heading depth (default `2`), allowing the report to be
+controls the top-level heading depth (default `1`), allowing the report to be
 embedded at any level in a larger document. The `includeKnownIssues` flag controls
 whether the Known Issues section is emitted.
+
+When `RoutedSections` is populated, `ToMarkdown` renders each section from the
+`RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
+`Changes`, `Bugs`, and `KnownIssues` lists.
 
 The rendered output contains the following sections:
 
 1. **Version Information** — baseline and current version tags with commit hashes.
-2. **Changes** — list of `ItemInfo` records from `Changes`.
-3. **Bugs Fixed** — list of `ItemInfo` records from `Bugs`.
-4. **Known Issues** *(optional)* — list of `ItemInfo` records from `KnownIssues`,
-   emitted only when `includeKnownIssues` is `true`.
-5. **Full Changelog** *(optional)* — hyperlink from `CompleteChangelogLink`, emitted
+2. **Custom sections from `RoutedSections`** *(when rules are configured)* — one
+   sub-heading per section with the section title and its items.
+   **OR** the following legacy sections *(when no rules are configured)*:
+   - **Changes** — list of `ItemInfo` records from `Changes`.
+   - **Bugs Fixed** — list of `ItemInfo` records from `Bugs`.
+   - **Known Issues** *(optional)* — list of `ItemInfo` records from `KnownIssues`,
+     emitted only when `includeKnownIssues` is `true`.
+3. **Full Changelog** *(optional)* — hyperlink from `CompleteChangelogLink`, emitted
    only when the link is non-null.
 
 ## Interactions

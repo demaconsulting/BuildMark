@@ -47,11 +47,13 @@ self-test.
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                                   |
-|-----------------------|------------------------------------------------------------------------|
-| `Program`             | Creates a connector via `RepoConnectorFactory` and calls it            |
-| `Program`             | Passes `GitHubConnectorConfig` (from `result.Config.Connector.GitHub`) |
-|                       | to `GitHubRepoConnector` for owner, repo, and base-URL settings        |
-| `Validation`          | Uses `MockRepoConnector` directly for self-tests                       |
-| `ItemControlsParser`  | Called by `GitHubRepoConnector` on each description body               |
-| `BuildInformation`    | The data record returned by connectors                                 |
+| Unit / Subsystem             | Role                                                                   |
+|------------------------------|------------------------------------------------------------------------|
+| `Program`                    | Creates a connector via `RepoConnectorFactory` and calls it            |
+| `Program`                    | Passes `ConnectorConfig` (from `result.Config.Connector`) to           |
+|                              | `RepoConnectorFactory`, which forwards platform-specific config to     |
+|                              | the appropriate connector implementation                               |
+| `Validation`                 | Uses `MockRepoConnector` directly for self-tests                       |
+| `ItemControlsParser`         | Called by `GitHubRepoConnector` and `AzureDevOpsRepoConnector`         |
+|                              | on each description body                                               |
+| `BuildInformation`           | The data record returned by connectors                                 |
