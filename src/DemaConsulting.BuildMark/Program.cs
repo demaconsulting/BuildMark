@@ -177,16 +177,19 @@ internal static class Program
             return;
         }
 
+        // Use the default configuration when no file was found (absence of errors means file is simply missing)
+        var effectiveConfig = loadResult.Config ?? BuildMarkConfig.CreateDefault();
+
         // Create repository connector using factory if provided, otherwise use the configured connector.
-        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(loadResult.Config?.Connector);
+        var connector = context.ConnectorFactory?.Invoke() ?? RepoConnectorFactory.Create(effectiveConfig.Connector);
 
         // Configure routing rules on the connector when not using a test factory
         if (context.ConnectorFactory == null && connector is RepoConnectorBase configurableConnector)
         {
             // Pass rules and sections from configuration to the connector
             configurableConnector.Configure(
-                loadResult.Config?.Rules ?? [],
-                loadResult.Config?.Sections ?? []);
+                effectiveConfig.Rules,
+                effectiveConfig.Sections);
         }
 
         // Parse build version if provided

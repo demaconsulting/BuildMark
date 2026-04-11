@@ -358,6 +358,31 @@ public class ConfigurationTests
         // Assert
         Assert.AreEqual(1, context.ExitCode);
     }
+
+    /// <summary>
+    ///     Test that the default configuration contains the expected sections and routing rules.
+    /// </summary>
+    [TestMethod]
+    public void BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection()
+    {
+        // Act
+        var config = BuildMarkConfig.CreateDefault();
+
+        // Assert - verify sections
+        Assert.HasCount(3, config.Sections);
+        Assert.AreEqual("changes", config.Sections[0].Id);
+        Assert.AreEqual("bugs-fixed", config.Sections[1].Id);
+        Assert.AreEqual("dependency-updates", config.Sections[2].Id);
+
+        // Assert - verify rules
+        Assert.HasCount(6, config.Rules);
+        Assert.AreEqual("dependency-updates", config.Rules[0].Route);
+        Assert.AreEqual("bugs-fixed", config.Rules[1].Route);
+        Assert.AreEqual("bugs-fixed", config.Rules[2].Route);
+        Assert.AreEqual("suppressed", config.Rules[3].Route);
+        Assert.AreEqual("suppressed", config.Rules[4].Route);
+        Assert.AreEqual("changes", config.Rules[5].Route);
+    }
 }
 
 
