@@ -44,7 +44,7 @@ public static class BuildMarkConfigReader
 
         // Read the file content and parse with YamlDotNet.
         var text = await File.ReadAllTextAsync(filePath).ConfigureAwait(false);
-        List<ConfigurationIssue> issues = new();
+        List<ConfigurationIssue> issues = [];
 
         YamlDocument document;
         try
