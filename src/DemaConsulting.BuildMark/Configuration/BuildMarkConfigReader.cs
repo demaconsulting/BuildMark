@@ -478,14 +478,9 @@ public static class BuildMarkConfigReader
             return;
         }
 
-        foreach (var item in sequence.Children)
-        {
-            var section = ParseSectionItem(filePath, item, issues);
-            if (!string.IsNullOrEmpty(section.Id) && !string.IsNullOrEmpty(section.Title))
-            {
-                sections.Add(section);
-            }
-        }
+        sections.AddRange(sequence.Children
+            .Select(item => ParseSectionItem(filePath, item, issues))
+            .Where(section => !string.IsNullOrEmpty(section.Id) && !string.IsNullOrEmpty(section.Title)));
     }
 
     /// <summary>

@@ -266,13 +266,11 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         }
 
         // Find the latest tag that points to the current commit
-        foreach (var tagVersion in lookupData.TagVersions)
+        var matchingTagVersion = lookupData.TagVersions.FirstOrDefault(tv =>
+            lookupData.TagToCommitHash.TryGetValue(tv.Tag, out var tagHash) && tagHash == toHash);
+        if (matchingTagVersion is not null)
         {
-            if (lookupData.TagToCommitHash.TryGetValue(tagVersion.Tag, out var tagHash) &&
-                tagHash == toHash)
-            {
-                return (tagVersion, toHash);
-            }
+            return (matchingTagVersion, toHash);
         }
 
         throw new InvalidOperationException(

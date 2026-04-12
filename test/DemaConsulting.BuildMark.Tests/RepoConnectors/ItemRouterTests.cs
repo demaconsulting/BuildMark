@@ -211,9 +211,9 @@ public class ItemRouterTests
 
         // Assert - item is routed to the new section, which is created dynamically
         Assert.IsEmpty(routedItems["changes"]);
-        Assert.IsTrue(routedItems.ContainsKey("new-section"));
-        Assert.HasCount(1, routedItems["new-section"]);
-        Assert.AreEqual("1", routedItems["new-section"][0].Id);
+        Assert.IsTrue(routedItems.TryGetValue("new-section", out var newSection));
+        Assert.HasCount(1, newSection);
+        Assert.AreEqual("1", newSection[0].Id);
     }
 }
 
