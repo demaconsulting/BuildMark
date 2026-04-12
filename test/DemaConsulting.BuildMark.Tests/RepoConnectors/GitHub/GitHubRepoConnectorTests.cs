@@ -909,6 +909,76 @@ public class GitHubRepoConnectorTests
             buildInfo.KnownIssues.Exists(i => i.Id == "303"),
             "Bug 303 with no affected-versions should be a known issue (open status fallback)");
     }
+
+    /// <summary>
+    ///     Verify that a CLOSED bug with an affected-versions range that contains the build
+    ///     version is reported as a known issue.  This models the LTS back-port gap scenario:
+    ///     a bug may be closed after being fixed in a newer release, yet still affect an older
+    ///     branch from which LTS releases are cut.
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
+    {
+        // Arrange - two closed bugs and one closed non-bug:
+        //   304: CLOSED, AV [1.0.0,2.0.0) - fixed in v2 but v1.5.0 LTS branch never got the fix
+        //   305: CLOSED, AV [3.0.0,) - fixed in v3+; does NOT affect v1.5.0
+        //   306: CLOSED, no AV - closed bug with no AV is NOT a known issue
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.5.0", "2024-06-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse(
+                new MockIssue(
+                    Number: 304,
+                    Title: "Closed bug affecting v1.x",
+                    Url: "https://github.com/test/repo/issues/304",
+                    State: "CLOSED",
+                    Labels: ["bug"],
+                    Body: "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```"),
+                new MockIssue(
+                    Number: 305,
+                    Title: "Closed bug affecting v3+",
+                    Url: "https://github.com/test/repo/issues/305",
+                    State: "CLOSED",
+                    Labels: ["bug"],
+                    Body: "```buildmark\naffected-versions: [3.0.0,)\n```"),
+                new MockIssue(
+                    Number: 306,
+                    Title: "Closed bug with no AV",
+                    Url: "https://github.com/test/repo/issues/306",
+                    State: "CLOSED",
+                    Labels: ["bug"]))
+            .AddTagsResponse(new MockTag("v1.5.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.5.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+
+        // Bug 304 is CLOSED but has AV [1.0.0,2.0.0) which contains v1.5.0 → IS a known issue
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "304"),
+            "Closed bug 304 with AV [1.0.0,2.0.0) should be a known issue for v1.5.0 (LTS back-port gap)");
+
+        // Bug 305 is CLOSED and has AV [3.0.0,) which does NOT contain v1.5.0 → NOT a known issue
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "305"),
+            "Closed bug 305 with AV [3.0.0,) should NOT be a known issue for v1.5.0");
+
+        // Bug 306 is CLOSED with no AV → NOT a known issue (open/closed fallback applies)
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "306"),
+            "Closed bug 306 with no AV should NOT be a known issue (closed, no AV)");
+    }
 }
 
 

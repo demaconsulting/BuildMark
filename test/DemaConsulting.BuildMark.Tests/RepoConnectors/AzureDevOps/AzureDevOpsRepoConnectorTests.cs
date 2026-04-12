@@ -1148,4 +1148,53 @@ public class AzureDevOpsRepoConnectorTests
             buildInfo.KnownIssues.Exists(i => i.Id == "403"),
             "Bug 403 with no Custom.AffectedVersions should be a known issue (open status fallback)");
     }
+
+    /// <summary>
+    ///     Verify that a RESOLVED/CLOSED bug with a Custom.AffectedVersions range that contains
+    ///     the build version is reported as a known issue (LTS back-port gap scenario).
+    /// </summary>
+    [TestMethod]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
+    {
+        // Arrange - two resolved bugs and one resolved non-bug:
+        //   404: Resolved, AV [1.0.0,2.0.0) - fixed in v2, LTS v1.5 branch never got the fix
+        //   405: Resolved, AV [3.0.0,) - does NOT affect v1.5.0
+        //   406: Resolved, no AV - resolved bug with no AV is NOT a known issue
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.5.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse(404, 405, 406)
+            .AddWorkItemsResponse(
+                new MockAdoWorkItem(404, "Closed bug affecting v1.x", "Bug", "Resolved",
+                    CustomAffectedVersions: "[1.0.0,2.0.0)"),
+                new MockAdoWorkItem(405, "Closed bug affecting v3+", "Bug", "Resolved",
+                    CustomAffectedVersions: "[3.0.0,)"),
+                new MockAdoWorkItem(406, "Closed bug with no AV", "Bug", "Resolved"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockConnector(mockHttpClient, "commit1");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.5.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+
+        // Bug 404 is Resolved but AV [1.0.0,2.0.0) contains v1.5.0 → IS a known issue
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "404"),
+            "Resolved bug 404 with AV [1.0.0,2.0.0) should be a known issue for v1.5.0 (LTS back-port gap)");
+
+        // Bug 405 is Resolved and AV [3.0.0,) does NOT contain v1.5.0 → NOT a known issue
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "405"),
+            "Resolved bug 405 with AV [3.0.0,) should NOT be a known issue for v1.5.0");
+
+        // Bug 406 is Resolved with no AV → NOT a known issue (resolved/unresolved fallback)
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "406"),
+            "Resolved bug 406 with no AV should NOT be a known issue (resolved, no AV)");
+    }
 }

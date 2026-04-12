@@ -276,6 +276,41 @@ public class MockRepoConnectorTests
             buildInfo.KnownIssues.Exists(i => i.Id == "6"),
             "Bug 6 with no affected-versions should be a known issue");
     }
+
+    /// <summary>
+    ///     Verify that issue 7 — a CLOSED bug with affected-versions [1.0.0,1.0.0] — is
+    ///     reported as a known issue when building exactly v1.0.0, and is NOT reported for
+    ///     a version outside that range (e.g. v2.0.0).
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector known-issues rule for closed bugs with AV
+    ///     What the assertions prove: LTS back-port gap is modelled correctly — a closed bug
+    ///     with a matching AV is included; the same bug is excluded for an unaffected version
+    /// </remarks>
+    [TestMethod]
+    public async Task MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
+    {
+        // Arrange - issue 7 is closed and has AV [1.0.0,1.0.0] (only matches v1.0.0 exactly)
+        var connector = new MockRepoConnector();
+
+        // Act - build for v1.0.0 (issue 7 should be included)
+        var buildInfoV1 = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert - issue 7 must be a known issue for v1.0.0
+        Assert.IsNotNull(buildInfoV1.KnownIssues);
+        Assert.IsTrue(
+            buildInfoV1.KnownIssues.Exists(i => i.Id == "7"),
+            "Closed bug 7 with AV [1.0.0,1.0.0] should be a known issue for v1.0.0 (LTS back-port gap)");
+
+        // Act - build for v2.0.0 (issue 7 should NOT be included — AV doesn't cover v2)
+        var buildInfoV2 = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert - issue 7 must NOT be a known issue for v2.0.0
+        Assert.IsNotNull(buildInfoV2.KnownIssues);
+        Assert.IsFalse(
+            buildInfoV2.KnownIssues.Exists(i => i.Id == "7"),
+            "Closed bug 7 with AV [1.0.0,1.0.0] should NOT be a known issue for v2.0.0");
+    }
 }
 
 

@@ -123,12 +123,14 @@ Main entry point. Performs the following steps:
 12. Fetch linked work items for each PR via
     `GET /git/repositories/{id}/pullrequests/{prId}/workitems` and batch-fetch
     work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
-13. Collect known issues (open bugs not resolved at the time of the build) via a
-    WIQL query, applying item controls from description bodies and custom fields.
-    For each candidate bug, if `AffectedVersions` is declared on the `ItemInfo`,
-    the bug is included as a known issue only when
-    `AffectedVersions.Contains(toVersion)` is true. When no `AffectedVersions`
-    is declared, the open/closed status is the sole indicator.
+13. Collect known issues from **all** bugs (resolved and unresolved), via a WIQL
+    query, applying item controls from description bodies and custom fields.
+    For each candidate bug:
+    - If `AffectedVersions` is declared, the bug is a known issue if and only if
+      `AffectedVersions.Contains(toVersion)` is true, regardless of resolved
+      state. This covers resolved bugs that were never back-ported to older
+      branches (LTS back-port gap).
+    - If no `AffectedVersions` is declared, only unresolved bugs are included.
 14. If routing rules are configured, call `ApplyRules` (inherited from
     `RepoConnectorBase`) to distribute all collected items into the configured
     report sections and populate `BuildInformation.RoutedSections`. If no rules

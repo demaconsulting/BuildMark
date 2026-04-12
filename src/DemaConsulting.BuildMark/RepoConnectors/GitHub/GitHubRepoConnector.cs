@@ -730,10 +730,13 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Collects known issues (open bugs not fixed in this build).
+    ///     Collects known issues from the full issue list.
+    ///     When a bug declares <c>AffectedVersions</c>, it is a known issue if and only if
+    ///     <c>AffectedVersions.Contains(targetVersion)</c> is true, regardless of its open/closed
+    ///     state. When no <c>AffectedVersions</c> are declared, only open bugs are included.
     /// </summary>
-    /// <param name="issues">All issues from GitHub.</param>
-    /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <param name="issues">All issues from GitHub (open and closed).</param>
+    /// <param name="allChangeIds">Set of all change IDs already processed in this build.</param>
     /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
     private static List<ItemInfo> CollectKnownIssues(
@@ -741,15 +744,36 @@ public class GitHubRepoConnector : RepoConnectorBase
         HashSet<string> allChangeIds,
         VersionTag targetVersion)
     {
-        return issues
-            .Where(i => i.State == "OPEN")
-            .Select(issue => (issue, issueId: issue.Number.ToString(CultureInfo.InvariantCulture)))
-            .Where(tuple => !allChangeIds.Contains(tuple.issueId))
-            .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
-            .OfType<ItemInfo>()
-            .Where(itemInfo => itemInfo.Type == "bug")
-            .Where(itemInfo => itemInfo.AffectedVersions == null || itemInfo.AffectedVersions.Contains(targetVersion))
-            .ToList();
+        List<ItemInfo> knownIssues = [];
+
+        foreach (var issue in issues)
+        {
+            // Skip issues already addressed in this build
+            var issueId = issue.Number.ToString(CultureInfo.InvariantCulture);
+            if (allChangeIds.Contains(issueId))
+            {
+                continue;
+            }
+
+            var itemInfo = CreateItemInfoFromIssue(issue, issue.Number);
+            if (itemInfo == null || itemInfo.Type != "bug")
+            {
+                continue;
+            }
+
+            // With affected-versions: include if version matches, regardless of state.
+            // Without affected-versions: only open bugs are included.
+            var isKnownIssue = itemInfo.AffectedVersions != null
+                ? itemInfo.AffectedVersions.Contains(targetVersion)
+                : issue.State == "OPEN";
+
+            if (isKnownIssue)
+            {
+                knownIssues.Add(itemInfo);
+            }
+        }
+
+        return knownIssues;
     }
 
     /// <summary>
