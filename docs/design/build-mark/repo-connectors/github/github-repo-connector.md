@@ -122,7 +122,11 @@ Main entry point. Performs the following steps:
 9. Collect changes and bugs from pull requests merged in the commit range,
    applying item controls overrides from description bodies.
 10. Collect known issues (open issues not included in this build), applying item
-    controls overrides from description bodies.
+    controls overrides from description bodies. For each candidate bug, if
+    `AffectedVersions` is declared on the `ItemInfo`, the bug is included as a
+    known issue only when `AffectedVersions.Contains(toVersion)` is true. When
+    no `AffectedVersions` is declared, the open/closed status is the sole
+    indicator (the existing behaviour).
 11. Sort all lists chronologically.
 12. If routing rules are configured, call `ApplyRules` (inherited from
     `RepoConnectorBase`) to route all collected items into the configured report

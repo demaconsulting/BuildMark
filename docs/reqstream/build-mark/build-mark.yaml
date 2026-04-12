@@ -316,16 +316,27 @@ sections:
               - BuildMark-Program-Report
 
           - id: BuildMark-Report-KnownIssues
-            title: The tool shall support including known issues in build notes.
+            title: >-
+              The tool shall support including known issues in build notes, using
+              affected-versions metadata when available and falling back to open/closed
+              status when it is not.
             justification: |
               Disclosing known issues in release notes promotes transparency, helps users avoid
-              known pitfalls, and manages expectations about current limitations. This improves
-              user trust and reduces support burden.
+              known pitfalls, and manages expectations about current limitations. When a bug
+              declares its affected versions (via the buildmark block or the Azure DevOps
+              Custom.AffectedVersions field), the tool shall include the bug as a known issue
+              only when the build version falls within the declared range. When no affected
+              versions are declared, the bug's open/closed status is the only indicator used.
+              This improves accuracy of known-issue reporting and reduces noise from bugs that
+              do not affect the version being released.
             tests:
               - IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
+              - BuildMark-RepoConnectors-GitHub
+              - BuildMark-RepoConnectors-AzureDevOps
+              - BuildMark-RepoConnectors-Mock
 
           - id: BuildMark-Report-VersionRange
             title: The tool shall support filtering build notes by version range.

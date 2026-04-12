@@ -125,6 +125,10 @@ Main entry point. Performs the following steps:
     work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
 13. Collect known issues (open bugs not resolved at the time of the build) via a
     WIQL query, applying item controls from description bodies and custom fields.
+    For each candidate bug, if `AffectedVersions` is declared on the `ItemInfo`,
+    the bug is included as a known issue only when
+    `AffectedVersions.Contains(toVersion)` is true. When no `AffectedVersions`
+    is declared, the open/closed status is the sole indicator.
 14. If routing rules are configured, call `ApplyRules` (inherited from
     `RepoConnectorBase`) to distribute all collected items into the configured
     report sections and populate `BuildInformation.RoutedSections`. If no rules
