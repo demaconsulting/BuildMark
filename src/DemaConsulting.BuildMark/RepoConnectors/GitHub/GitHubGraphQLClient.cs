@@ -110,7 +110,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<string> allCommitShas = new();
+            List<string> allCommitShas = [];
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -192,7 +192,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<ReleaseNode> allReleaseNodes = new();
+            List<ReleaseNode> allReleaseNodes = [];
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -265,7 +265,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<int> allIssueNumbers = new();
+            List<int> allIssueNumbers = [];
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -340,7 +340,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<TagNode> allTagNodes = new();
+            List<TagNode> allTagNodes = [];
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -414,7 +414,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<PullRequestNode> allPullRequestNodes = new();
+            List<PullRequestNode> allPullRequestNodes = [];
             string? afterCursor = null;
             bool hasNextPage;
 
@@ -498,7 +498,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
     {
         try
         {
-            List<IssueNode> allIssueNodes = new();
+            List<IssueNode> allIssueNodes = [];
             string? afterCursor = null;
             bool hasNextPage;
 

@@ -65,7 +65,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
     {
         // Walk character by character tracking bracket depth
         // Split on ',' when depth==0 (these separate intervals)
-        List<VersionInterval> intervals = new();
+        List<VersionInterval> intervals = [];
         var depth = 0;
         var pos = 0;
         var tokenStart = 0;

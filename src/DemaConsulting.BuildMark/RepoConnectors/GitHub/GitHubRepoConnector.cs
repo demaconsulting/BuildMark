@@ -609,9 +609,9 @@ public class GitHubRepoConnector : RepoConnectorBase
             string repo)
     {
         // Initialize collections for tracking changes
-        HashSet<string> allChangeIds = new();
-        List<ItemInfo> bugs = new();
-        List<ItemInfo> nonBugChanges = new();
+        HashSet<string> allChangeIds = [];
+        List<ItemInfo> bugs = [];
+        List<ItemInfo> nonBugChanges = [];
 
         // Process each commit that has an associated PR
         foreach (var pr in commitsInRange
@@ -909,7 +909,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     private static List<Commit> GetCommitsInRange(IReadOnlyList<Commit> commits, string? fromHash, string toHash)
     {
         // Initialize collection and state tracking
-        List<Commit> result = new();
+        List<Commit> result = [];
         var foundTo = false;
 
         // Iterate through commits from newest to oldest
