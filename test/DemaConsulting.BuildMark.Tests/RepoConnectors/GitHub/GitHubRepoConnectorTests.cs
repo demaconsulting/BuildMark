@@ -919,10 +919,10 @@ public class GitHubRepoConnectorTests
     [TestMethod]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
     {
-        // Arrange - two closed bugs and one closed non-bug:
+        // Arrange - three closed bugs:
         //   304: CLOSED, AV [1.0.0,2.0.0) - fixed in v2 but v1.5.0 LTS branch never got the fix
         //   305: CLOSED, AV [3.0.0,) - fixed in v3+; does NOT affect v1.5.0
-        //   306: CLOSED, no AV - closed bug with no AV is NOT a known issue
+        //   306: CLOSED, no AV - closed bug with no AV is NOT a known issue (status fallback)
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddCommitsResponse("commit1")
             .AddReleasesResponse(new MockRelease("v1.5.0", "2024-06-01T00:00:00Z"))

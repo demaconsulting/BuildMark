@@ -575,8 +575,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         LookupData lookupData,
         VersionTag targetVersion)
     {
-        // Query all bugs — state filtering is applied in code so that closed bugs
-        // with a declared affected-versions range are still considered.
+        // Query all bugs and issues — state filtering is applied in code so that resolved
+        // bugs with a declared affected-versions range are still considered as known issues.
         const string wiql = "SELECT [System.Id] FROM workitems " +
                             "WHERE [System.WorkItemType] IN ('Bug', 'Issue')";
 

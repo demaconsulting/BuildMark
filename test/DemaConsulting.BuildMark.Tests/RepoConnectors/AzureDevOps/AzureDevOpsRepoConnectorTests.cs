@@ -1156,10 +1156,10 @@ public class AzureDevOpsRepoConnectorTests
     [TestMethod]
     public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
     {
-        // Arrange - two resolved bugs and one resolved non-bug:
+        // Arrange - three resolved bugs:
         //   404: Resolved, AV [1.0.0,2.0.0) - fixed in v2, LTS v1.5 branch never got the fix
         //   405: Resolved, AV [3.0.0,) - does NOT affect v1.5.0
-        //   406: Resolved, no AV - resolved bug with no AV is NOT a known issue
+        //   406: Resolved, no AV - resolved bug with no AV is NOT a known issue (status fallback)
         using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
             .AddTagsResponse(new MockAdoTag("v1.5.0", "commit1"))
             .AddCommitsResponse(new MockAdoCommit("commit1"))

@@ -128,7 +128,8 @@ public class MockRepoConnector : RepoConnectorBase
         // Categorize changes into bugs and non-bug changes
         var (bugs, nonBugChanges, allChangeIds) = CategorizeChanges(changes);
 
-        // Collect known issues (open bugs not fixed in this build)
+        // Collect known issues applying the two-tier rule: version-range check for bugs
+        // with affected-versions, open/closed status fallback for bugs without
         var knownIssues = await CollectKnownIssuesAsync(allChangeIds, toTagInfo);
 
         // Sort all lists by Index to ensure chronological order
