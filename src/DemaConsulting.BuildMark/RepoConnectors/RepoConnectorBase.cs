@@ -71,7 +71,7 @@ public abstract class RepoConnectorBase : IRepoConnector
         var routedDict = ItemRouter.Route(allItems.ToList(), _rules, _sections);
 
         // Build ordered list of sections with their items, using configured section order
-        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> result = new();
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> result = [];
 
         // Process each configured section in order
         foreach (var section in _sections)

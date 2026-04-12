@@ -749,7 +749,7 @@ public class RepoConnectorsTests
 
         // Assert: changes include the work item from the PR
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(buildInfo.Changes.Count > 0, "Changes should include items from merged PRs");
+        Assert.IsNotEmpty(buildInfo.Changes, "Changes should include items from merged PRs");
     }
 
     /// <summary>
@@ -775,7 +775,7 @@ public class RepoConnectorsTests
 
         // Assert: known issues include the open bug
         Assert.IsNotNull(buildInfo);
-        Assert.IsTrue(buildInfo.KnownIssues.Count > 0, "KnownIssues should include open bug work items");
+        Assert.IsNotEmpty(buildInfo.KnownIssues, "KnownIssues should include open bug work items");
     }
 
     /// <summary>

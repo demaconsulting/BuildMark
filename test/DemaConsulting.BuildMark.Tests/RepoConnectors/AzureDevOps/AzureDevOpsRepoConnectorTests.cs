@@ -504,7 +504,7 @@ public class AzureDevOpsRepoConnectorTests
         // Assert
         Assert.IsNotNull(controls);
         Assert.IsNotNull(controls.AffectedVersions);
-        Assert.IsTrue(controls.AffectedVersions.Intervals.Count > 0);
+        Assert.IsNotEmpty(controls.AffectedVersions.Intervals);
     }
 
     /// <summary>
@@ -597,11 +597,12 @@ public class AzureDevOpsRepoConnectorTests
         // Assert
         Assert.IsNotNull(buildInfo);
         Assert.IsNotNull(buildInfo.RoutedSections);
-        Assert.IsTrue(buildInfo.RoutedSections.Count > 0, "Should have routed sections");
+        Assert.IsNotEmpty(buildInfo.RoutedSections, "Should have routed sections");
 
         // Verify bug was routed to bugs section
         var bugsSection = buildInfo.RoutedSections.FirstOrDefault(s => s.SectionId == "bugs");
-        Assert.IsTrue(bugsSection.Items.Count > 0, "Bugs section should contain the routed bug");
+        Assert.AreEqual("bugs", bugsSection.SectionId, "Should contain a bugs routed section");
+        Assert.IsNotEmpty(bugsSection.Items, "Bugs section should contain the routed bug");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -649,7 +650,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(commits);
-        Assert.AreEqual(2, commits.Count);
+        Assert.HasCount(2, commits);
         Assert.AreEqual("abc123", commits[0].CommitId);
         Assert.AreEqual("First commit", commits[0].Comment);
         Assert.AreEqual("def456", commits[1].CommitId);
@@ -674,7 +675,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(prs);
-        Assert.AreEqual(2, prs.Count);
+        Assert.HasCount(2, prs);
         Assert.AreEqual(101, prs[0].PullRequestId);
         Assert.AreEqual("Feature PR", prs[0].Title);
         Assert.AreEqual("completed", prs[0].Status);
@@ -698,7 +699,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(workItemRefs);
-        Assert.AreEqual(2, workItemRefs.Count);
+        Assert.HasCount(2, workItemRefs);
         Assert.AreEqual(200, workItemRefs[0].Id);
         Assert.AreEqual(201, workItemRefs[1].Id);
     }
@@ -722,7 +723,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(workItems);
-        Assert.AreEqual(2, workItems.Count);
+        Assert.HasCount(2, workItems);
         Assert.AreEqual(200, workItems[0].Id);
         Assert.AreEqual(201, workItems[1].Id);
     }
@@ -744,7 +745,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(query);
-        Assert.AreEqual(3, query.WorkItems.Count);
+        Assert.HasCount(3, query.WorkItems);
         Assert.AreEqual(300, query.WorkItems[0].Id);
         Assert.AreEqual(301, query.WorkItems[1].Id);
         Assert.AreEqual(302, query.WorkItems[2].Id);
@@ -769,7 +770,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(workItemRefs);
-        Assert.AreEqual(2, workItemRefs.Count);
+        Assert.HasCount(2, workItemRefs);
         Assert.AreEqual(1234, workItemRefs[0].Id);
         Assert.AreEqual(5678, workItemRefs[1].Id);
     }
@@ -793,7 +794,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Assert
         Assert.IsNotNull(query);
-        Assert.AreEqual(2, query.WorkItems.Count);
+        Assert.HasCount(2, query.WorkItems);
         Assert.AreEqual(300, query.WorkItems[0].Id);
         Assert.AreEqual(301, query.WorkItems[1].Id);
     }

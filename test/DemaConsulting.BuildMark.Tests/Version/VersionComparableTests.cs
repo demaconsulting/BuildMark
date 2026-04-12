@@ -28,6 +28,24 @@ namespace DemaConsulting.BuildMark.Tests.Version;
 [TestClass]
 public class VersionComparableTests
 {
+    private static readonly string[] SemanticVersionOrder =
+    [
+        "1.0.0",
+        "2.0.0",
+        "2.1.0",
+        "2.1.1"
+    ];
+
+    private static readonly string[] PreReleaseSemVerOrder =
+    [
+        "1.0.0-alpha",
+        "1.0.0-alpha.1",
+        "1.0.0-alpha.beta",
+        "1.0.0-beta",
+        "1.0.0-beta.2",
+        "1.0.0-beta.11",
+        "1.0.0-rc.1"
+    ];
     /// <summary>
     ///     Test that VersionComparable creates instances from valid version strings.
     /// </summary>
@@ -136,7 +154,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.2.3 should be less than 2.1.1");
+        Assert.IsLessThan(0, result, "1.2.3 should be less than 2.1.1");
     }
 
     /// <summary>
@@ -153,7 +171,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.2.3 should be less than 1.3.1");
+        Assert.IsLessThan(0, result, "1.2.3 should be less than 1.3.1");
     }
 
     /// <summary>
@@ -170,7 +188,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.2.3 should be less than 1.2.4");
+        Assert.IsLessThan(0, result, "1.2.3 should be less than 1.2.4");
     }
 
     /// <summary>
@@ -187,7 +205,7 @@ public class VersionComparableTests
         var result = preRelease.CompareTo(release);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.2.3-alpha should be less than 1.2.3");
+        Assert.IsLessThan(0, result, "1.2.3-alpha should be less than 1.2.3");
     }
 
     /// <summary>
@@ -204,7 +222,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "alpha should be less than beta lexicographically");
+        Assert.IsLessThan(0, result, "alpha should be less than beta lexicographically");
     }
 
     /// <summary>
@@ -278,13 +296,7 @@ public class VersionComparableTests
     public void VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder()
     {
         // Arrange - Test various semantic version scenarios
-        var versions = new[]
-        {
-            "1.0.0",
-            "2.0.0",
-            "2.1.0",
-            "2.1.1"
-        }.Select(v => VersionComparable.Create(v)).ToArray();
+        var versions = SemanticVersionOrder.Select(v => VersionComparable.Create(v)).ToArray();
 
         // Act & Assert - Test that they are in ascending order
         for (var i = 0; i < versions.Length - 1; i++)
@@ -293,7 +305,7 @@ public class VersionComparableTests
             var next = versions[i + 1];
             var result = current!.CompareTo(next);
 
-            Assert.IsTrue(result < 0, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
+            Assert.IsLessThan(0, result, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
         }
     }
 
@@ -311,7 +323,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.2.3 should be less than 1.11.2");
+        Assert.IsLessThan(0, result, "1.2.3 should be less than 1.11.2");
     }
 
     /// <summary>
@@ -328,7 +340,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result > 0, "1.2.3 should be greater than 1.2.3-beta.1");
+        Assert.IsGreaterThan(0, result, "1.2.3 should be greater than 1.2.3-beta.1");
     }
 
     /// <summary>
@@ -345,7 +357,7 @@ public class VersionComparableTests
         var result = version1.CompareTo(version2);
 
         // Assert
-        Assert.IsTrue(result < 0, "alpha should be less than beta lexicographically");
+        Assert.IsLessThan(0, result, "alpha should be less than beta lexicographically");
     }
 
     /// <summary>
@@ -363,7 +375,7 @@ public class VersionComparableTests
         var result = version5!.CompareTo(version10);
 
         // Assert
-        Assert.IsTrue(result < 0, "1.0.0-alpha.5 should be less than 1.0.0-alpha.10 (numeric comparison)");
+        Assert.IsLessThan(0, result, "1.0.0-alpha.5 should be less than 1.0.0-alpha.10 (numeric comparison)");
     }
 
     /// <summary>
@@ -373,16 +385,7 @@ public class VersionComparableTests
     public void VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering()
     {
         // Test cases from SemVer specification
-        var versions = new[]
-        {
-            "1.0.0-alpha",
-            "1.0.0-alpha.1",
-            "1.0.0-alpha.beta",
-            "1.0.0-beta",
-            "1.0.0-beta.2",
-            "1.0.0-beta.11",
-            "1.0.0-rc.1"
-        }.Select(v => VersionComparable.Create(v)).ToArray();
+        var versions = PreReleaseSemVerOrder.Select(v => VersionComparable.Create(v)).ToArray();
 
         // Test that they are in ascending order
         for (var i = 0; i < versions.Length - 1; i++)
@@ -391,7 +394,7 @@ public class VersionComparableTests
             var next = versions[i + 1];
             var result = current!.CompareTo(next);
 
-            Assert.IsTrue(result < 0, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
+            Assert.IsLessThan(0, result, $"{current.CompareVersion} should be less than {next!.CompareVersion}");
         }
     }
 

@@ -126,14 +126,9 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
         // Convert each part into either numeric or text segment
         for (var i = 0; i < parts.Length; i++)
         {
-            if (int.TryParse(parts[i], out var numericValue))
-            {
-                segments[i] = new PreReleaseSegment(numericValue);
-            }
-            else
-            {
-                segments[i] = new PreReleaseSegment(parts[i]);
-            }
+            segments[i] = int.TryParse(parts[i], out var numericValue)
+                ? new PreReleaseSegment(numericValue)
+                : new PreReleaseSegment(parts[i]);
         }
 
         return segments;

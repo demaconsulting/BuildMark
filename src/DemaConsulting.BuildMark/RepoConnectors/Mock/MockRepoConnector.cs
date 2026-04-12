@@ -343,9 +343,9 @@ public class MockRepoConnector : RepoConnectorBase
         CategorizeChanges(List<ItemInfo> changes)
     {
         // Initialize collections for categorized changes
-        HashSet<string> allChangeIds = new();
-        List<ItemInfo> bugs = new();
-        List<ItemInfo> nonBugChanges = new();
+        HashSet<string> allChangeIds = [];
+        List<ItemInfo> bugs = [];
+        List<ItemInfo> nonBugChanges = [];
 
         // Process and categorize each change
         foreach (var change in changes)
@@ -504,7 +504,7 @@ public class MockRepoConnector : RepoConnectorBase
     private List<ItemInfo> BuildChangesFromPullRequests(List<string> prs)
     {
         // Initialize collection for changes
-        List<ItemInfo> changes = new();
+        List<ItemInfo> changes = [];
 
         // Process each pull request
         foreach (var pr in prs)

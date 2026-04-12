@@ -65,7 +65,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
     {
         // Walk character by character tracking bracket depth
         // Split on ',' when depth==0 (these separate intervals)
-        List<VersionInterval> intervals = new();
+        List<VersionInterval> intervals = [];
         var depth = 0;
         var pos = 0;
         var tokenStart = 0;
@@ -96,11 +96,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
                     }
 
                     // Advance past closing bracket and any trailing comma/whitespace
-                    pos++;
-                    while (pos < text.Length && (text[pos] == ',' || char.IsWhiteSpace(text[pos])))
-                    {
-                        pos++;
-                    }
+                    pos = SkipCommaAndWhitespace(text, pos + 1);
                     tokenStart = pos;
                     continue;
                 }
@@ -111,5 +107,18 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
 
         // Return VersionIntervalSet wrapping the list
         return new VersionIntervalSet(intervals);
+    }
+
+    /// <summary>
+    ///     Advances past any comma and whitespace characters starting at <paramref name="pos"/>.
+    /// </summary>
+    private static int SkipCommaAndWhitespace(string text, int pos)
+    {
+        while (pos < text.Length && (text[pos] == ',' || char.IsWhiteSpace(text[pos])))
+        {
+            pos++;
+        }
+
+        return pos;
     }
 }

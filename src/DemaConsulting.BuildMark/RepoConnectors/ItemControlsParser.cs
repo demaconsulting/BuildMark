@@ -158,9 +158,24 @@ public static partial class ItemControlsParser
         foreach (var rawLine in blockLines)
         {
             var (key, value) = ParseKeyValue(rawLine);
-            if (key != null)
+            switch (key)
             {
-                ApplyBlockLineValue(key, value!, ref visibility, ref type, ref affectedVersions);
+                case "visibility" when value is VisibilityPublic or VisibilityInternal:
+                    visibility = value;
+                    break;
+
+                case "type" when value is TypeBug or TypeFeature:
+                    type = value;
+                    break;
+
+                case "affected-versions" when !string.IsNullOrEmpty(value):
+                    var parsed = VersionIntervalSet.Parse(value!);
+                    if (parsed.Intervals.Count > 0)
+                    {
+                        affectedVersions = parsed;
+                    }
+
+                    break;
             }
         }
 
@@ -193,41 +208,5 @@ public static partial class ItemControlsParser
         }
 
         return (line[..colonIdx].Trim().ToLowerInvariant(), line[(colonIdx + 1)..].Trim());
-    }
-
-    /// <summary>
-    ///     Applies a recognized key-value pair to the appropriate output parameter.
-    /// </summary>
-    /// <param name="key">Lowercased key from the buildmark block line.</param>
-    /// <param name="value">Trimmed value from the buildmark block line.</param>
-    /// <param name="visibility">Current visibility value (updated if key is "visibility").</param>
-    /// <param name="type">Current type value (updated if key is "type").</param>
-    /// <param name="affectedVersions">Current affected versions (updated if key is "affected-versions").</param>
-    private static void ApplyBlockLineValue(
-        string key,
-        string value,
-        ref string? visibility,
-        ref string? type,
-        ref VersionIntervalSet? affectedVersions)
-    {
-        switch (key)
-        {
-            case "visibility" when value is VisibilityPublic or VisibilityInternal:
-                visibility = value;
-                break;
-
-            case "type" when value is TypeBug or TypeFeature:
-                type = value;
-                break;
-
-            case "affected-versions" when !string.IsNullOrEmpty(value):
-                var parsed = VersionIntervalSet.Parse(value);
-                if (parsed.Intervals.Count > 0)
-                {
-                    affectedVersions = parsed;
-                }
-
-                break;
-        }
     }
 }
