@@ -601,6 +601,7 @@ public class AzureDevOpsRepoConnectorTests
 
         // Verify bug was routed to bugs section
         var bugsSection = buildInfo.RoutedSections.FirstOrDefault(s => s.SectionId == "bugs");
+        Assert.IsNotNull(bugsSection, "Should contain a bugs routed section");
         Assert.IsNotEmpty(bugsSection.Items, "Bugs section should contain the routed bug");
     }
 
