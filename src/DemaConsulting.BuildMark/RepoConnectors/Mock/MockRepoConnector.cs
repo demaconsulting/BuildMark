@@ -39,7 +39,8 @@ public class MockRepoConnector : RepoConnectorBase
         { "2", "Fix bug in Y" },
         { "3", "Update documentation" },
         { "4", "Known bug A" },
-        { "5", "Known bug B" }
+        { "5", "Known bug B" },
+        { "6", "Known bug C" }
     };
 
     /// <summary>
@@ -51,7 +52,8 @@ public class MockRepoConnector : RepoConnectorBase
         { "2", "bug" },
         { "3", "documentation" },
         { "4", "bug" },
-        { "5", "bug" }
+        { "5", "bug" },
+        { "6", "bug" }
     };
 
     /// <summary>
@@ -85,7 +87,16 @@ public class MockRepoConnector : RepoConnectorBase
     /// <summary>
     ///     List of open issue IDs for testing.
     /// </summary>
-    private readonly List<string> _openIssues = ["4", "5"];
+    private readonly List<string> _openIssues = ["4", "5", "6"];
+
+    /// <summary>
+    ///     Mapping of issue IDs to their affected-version interval sets for testing.
+    ///     Issues without an entry have no declared affected-versions (fallback to open status).
+    /// </summary>
+    private readonly Dictionary<string, VersionIntervalSet> _issueAffectedVersions = new()
+    {
+        { "5", VersionIntervalSet.Parse("[5.0.0,)") }
+    };
 
     /// <summary>
     ///     Gets build information for a release.
@@ -556,7 +567,8 @@ public class MockRepoConnector : RepoConnectorBase
                 _issueTitles.TryGetValue(issueId, out var title) ? title : $"Issue {issueId}",
                 $"https://github.com/example/repo/issues/{issueId}",
                 _issueTypes.GetValueOrDefault(issueId, "other"),
-                int.Parse(issueId, CultureInfo.InvariantCulture)))
+                int.Parse(issueId, CultureInfo.InvariantCulture),
+                _issueAffectedVersions.GetValueOrDefault(issueId)))
             .ToList();
 
         // Return task with open issues data

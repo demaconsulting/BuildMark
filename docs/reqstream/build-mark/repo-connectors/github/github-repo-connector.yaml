@@ -40,6 +40,7 @@ sections:
           - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
           - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
           - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
+          - GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
 
       - id: BuildMark-GitHub-ItemControls
         title: >-

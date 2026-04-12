@@ -126,7 +126,7 @@ Main entry point. Performs the following steps:
     `AffectedVersions` is declared on the `ItemInfo`, the bug is included as a
     known issue only when `AffectedVersions.Contains(toVersion)` is true. When
     no `AffectedVersions` is declared, the open/closed status is the sole
-    indicator (the existing behaviour).
+    indicator (the existing behavior).
 11. Sort all lists chronologically.
 12. If routing rules are configured, call `ApplyRules` (inherited from
     `RepoConnectorBase`) to route all collected items into the configured report

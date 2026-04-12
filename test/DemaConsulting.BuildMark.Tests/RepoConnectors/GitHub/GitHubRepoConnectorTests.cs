@@ -839,6 +839,76 @@ public class GitHubRepoConnectorTests
         Assert.HasCount(1, bugsSection.Items);
         Assert.AreEqual("Bug PR", bugsSection.Items[0].Title);
     }
+
+    /// <summary>
+    ///     Verify that known issues are filtered by affected-versions when present.
+    ///     A bug whose affected-versions do not contain the build version is excluded;
+    ///     a bug whose affected-versions contain the build version is included;
+    ///     a bug with no affected-versions is included (fallback to open status).
+    /// </summary>
+    [TestMethod]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions()
+    {
+        // Arrange - three open bugs:
+        //   301: affected-versions [1.0.0,2.0.0) => includes v1.5.0, excludes v2.0.0
+        //   302: affected-versions [3.0.0,) => excludes v1.5.0
+        //   303: no affected-versions => always included when open
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit1")
+            .AddReleasesResponse(new MockRelease("v1.5.0", "2024-06-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse(
+                new MockIssue(
+                    Number: 301,
+                    Title: "Bug affecting v1.x",
+                    Url: "https://github.com/test/repo/issues/301",
+                    State: "OPEN",
+                    Labels: ["bug"],
+                    Body: "```buildmark\naffected-versions: [1.0.0,2.0.0)\n```"),
+                new MockIssue(
+                    Number: 302,
+                    Title: "Bug affecting v3+",
+                    Url: "https://github.com/test/repo/issues/302",
+                    State: "OPEN",
+                    Labels: ["bug"],
+                    Body: "```buildmark\naffected-versions: [3.0.0,)\n```"),
+                new MockIssue(
+                    Number: 303,
+                    Title: "Bug with no versions",
+                    Url: "https://github.com/test/repo/issues/303",
+                    State: "OPEN",
+                    Labels: ["bug"]))
+            .AddTagsResponse(new MockTag("v1.5.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.5.0"));
+
+        // Assert
+        Assert.IsNotNull(buildInfo);
+        Assert.IsNotNull(buildInfo.KnownIssues);
+
+        // Bug 301 should be included (v1.5.0 is in [1.0.0,2.0.0))
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "301"),
+            "Bug 301 with affected-versions [1.0.0,2.0.0) should be a known issue for v1.5.0");
+
+        // Bug 302 should be excluded (v1.5.0 is NOT in [3.0.0,))
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "302"),
+            "Bug 302 with affected-versions [3.0.0,) should NOT be a known issue for v1.5.0");
+
+        // Bug 303 should be included (no affected-versions, fallback to open status)
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "303"),
+            "Bug 303 with no affected-versions should be a known issue (open status fallback)");
+    }
 }
 
 

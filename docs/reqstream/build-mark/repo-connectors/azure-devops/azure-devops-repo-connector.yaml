@@ -52,6 +52,7 @@ sections:
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenWorkItems_IdentifiesKnownIssues
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
           - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
 
       - id: BuildMark-AzureDevOps-ItemControls
         title: >-

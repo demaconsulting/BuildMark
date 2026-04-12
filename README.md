@@ -210,8 +210,9 @@ Each test in the report proves:
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
 - **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.
 
-See the [CLI Reference](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md#self-validation) for more details
-on the self-validation tests.
+See the [CLI Reference][cli-ref] for more details on the self-validation tests.
+
+[cli-ref]: https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md#self-validation
 
 On validation failure the tool will exit with a non-zero exit code.
 

@@ -178,10 +178,10 @@ public class BuildInformationTests
         // Verify no bug issues for this version
         Assert.IsEmpty(buildInfo.Bugs);
 
-        // Verify known issues include open bugs
+        // Verify known issues include open bugs (issue 5 excluded by affected-versions [5.0.0,))
         Assert.HasCount(2, buildInfo.KnownIssues);
         Assert.AreEqual("4", buildInfo.KnownIssues[0].Id);
-        Assert.AreEqual("5", buildInfo.KnownIssues[1].Id);
+        Assert.AreEqual("6", buildInfo.KnownIssues[1].Id);
     }
 
     /// <summary>
@@ -287,7 +287,10 @@ public class BuildInformationTests
         // Assert - verify known issues section is included
         Assert.Contains("## Known Issues", markdown);
         Assert.Contains("Known bug A", markdown);
-        Assert.Contains("Known bug B", markdown);
+        Assert.Contains("Known bug C", markdown);
+
+        // Known bug B has affected-versions [5.0.0,) which does not include v2.0.0
+        Assert.DoesNotContain("Known bug B", markdown);
     }
 
     /// <summary>

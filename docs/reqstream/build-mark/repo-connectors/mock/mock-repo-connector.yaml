@@ -24,3 +24,4 @@ sections:
           - MockRepoConnector_Configure_StoresRulesAndSections
           - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
           - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections
+          - MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions

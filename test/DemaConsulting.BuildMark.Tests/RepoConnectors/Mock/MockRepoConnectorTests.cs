@@ -245,6 +245,37 @@ public class MockRepoConnectorTests
         // Assert - RoutedSections should be null (legacy mode)
         Assert.IsNull(buildInfo.RoutedSections, "RoutedSections should be null when no rules are configured");
     }
+
+    /// <summary>
+    ///     Verify that MockRepoConnector filters known issues by affected-versions.
+    ///     Issue 5 has affected-versions [5.0.0,) which excludes v2.0.0 but includes v5.0.0.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector affected-versions filtering of known issues
+    ///     What the assertions prove: Bug with out-of-range affected-versions is excluded;
+    ///     building for an in-range version includes it
+    /// </remarks>
+    [TestMethod]
+    public async Task MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions()
+    {
+        // Arrange - Use version v2.0.0 (issue 5 has [5.0.0,) so it is excluded)
+        var connector = new MockRepoConnector();
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert - issue 4 (no affected-versions) and issue 6 (no affected-versions) are included
+        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "4"),
+            "Bug 4 with no affected-versions should be a known issue");
+        Assert.IsFalse(
+            buildInfo.KnownIssues.Exists(i => i.Id == "5"),
+            "Bug 5 with affected-versions [5.0.0,) should NOT be a known issue for v2.0.0");
+        Assert.IsTrue(
+            buildInfo.KnownIssues.Exists(i => i.Id == "6"),
+            "Bug 6 with no affected-versions should be a known issue");
+    }
 }
 
 
