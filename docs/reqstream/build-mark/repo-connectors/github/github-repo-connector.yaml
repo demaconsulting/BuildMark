@@ -27,6 +27,11 @@ sections:
           from GitHub repository data. It must correctly identify the current version tag,
           the baseline (previous) version tag, and the changes between them, correctly
           handling pre-release tags and version selection edge cases.
+
+          Known-issues collection considers all issues (open and closed). When
+          affected-versions is declared the issue state is ignored; only the version range
+          check determines inclusion. This handles the LTS back-port gap scenario where a
+          bug is closed after being fixed in a newer release but was never back-ported.
         tests:
           - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
           - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
@@ -40,6 +45,8 @@ sections:
           - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
           - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
           - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
+          - GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+          - GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
       - id: BuildMark-GitHub-ItemControls
         title: >-

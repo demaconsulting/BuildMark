@@ -121,8 +121,14 @@ Main entry point. Performs the following steps:
 8. Get all commits between the baseline and target.
 9. Collect changes and bugs from pull requests merged in the commit range,
    applying item controls overrides from description bodies.
-10. Collect known issues (open issues not included in this build), applying item
-    controls overrides from description bodies.
+10. Collect known issues from **all** issues (open and closed) by querying GitHub
+    with `states: [OPEN, CLOSED]` and applying item controls overrides from
+    description bodies. For each candidate bug:
+    - If `AffectedVersions` is declared, the bug is a known issue if and only if
+      `AffectedVersions.Contains(toVersion)` is true, regardless of open/closed
+      state. This covers closed bugs that were fixed in a later release but were
+      never back-ported to older branches (LTS back-port gap).
+    - If no `AffectedVersions` is declared, only open bugs are included.
 11. Sort all lists chronologically.
 12. If routing rules are configured, call `ApplyRules` (inherited from
     `RepoConnectorBase`) to route all collected items into the configured report

@@ -39,7 +39,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "2", "Fix bug in Y" },
         { "3", "Update documentation" },
         { "4", "Known bug A" },
-        { "5", "Known bug B" }
+        { "5", "Known bug B" },
+        { "6", "Known bug C" },
+        { "7", "Known bug D (closed, LTS back-port)" }
     };
 
     /// <summary>
@@ -51,7 +53,9 @@ public class MockRepoConnector : RepoConnectorBase
         { "2", "bug" },
         { "3", "documentation" },
         { "4", "bug" },
-        { "5", "bug" }
+        { "5", "bug" },
+        { "6", "bug" },
+        { "7", "bug" }
     };
 
     /// <summary>
@@ -85,7 +89,20 @@ public class MockRepoConnector : RepoConnectorBase
     /// <summary>
     ///     List of open issue IDs for testing.
     /// </summary>
-    private readonly List<string> _openIssues = ["4", "5"];
+    private readonly List<string> _openIssues = ["4", "5", "6"];
+
+    /// <summary>
+    ///     Mapping of issue IDs to their affected-version interval sets for testing.
+    ///     Issues without an entry have no declared affected-versions (fallback to open status).
+    /// </summary>
+    private readonly Dictionary<string, VersionIntervalSet> _issueAffectedVersions = new()
+    {
+        { "5", VersionIntervalSet.Parse("[5.0.0,)") },
+
+        // Issue 7 is deliberately closed (not in _openIssues) but still affects v1.0.0 exactly,
+        // modelling a bug that was fixed in a later release but never back-ported to the v1.0 branch.
+        { "7", VersionIntervalSet.Parse("[1.0.0,1.0.0]") }
+    };
 
     /// <summary>
     ///     Gets build information for a release.
@@ -111,8 +128,9 @@ public class MockRepoConnector : RepoConnectorBase
         // Categorize changes into bugs and non-bug changes
         var (bugs, nonBugChanges, allChangeIds) = CategorizeChanges(changes);
 
-        // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = await CollectKnownIssuesAsync(allChangeIds);
+        // Collect known issues applying the two-tier rule: version-range check for bugs
+        // with affected-versions, open/closed status fallback for bugs without
+        var knownIssues = await CollectKnownIssuesAsync(allChangeIds, toTagInfo);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -354,34 +372,59 @@ public class MockRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Collects known issues (open bugs not fixed in this build).
+    ///     Collects known issues from all issues in the mock dataset.
+    ///     When a bug declares <c>AffectedVersions</c>, it is a known issue if and only if
+    ///     <c>AffectedVersions.Contains(targetVersion)</c> is true, regardless of its open/closed
+    ///     state. When no <c>AffectedVersions</c> are declared, only open bugs are included.
     /// </summary>
-    /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <param name="allChangeIds">Set of all change IDs already processed in this build.</param>
+    /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
-    private async Task<List<ItemInfo>> CollectKnownIssuesAsync(HashSet<string> allChangeIds)
+    private Task<List<ItemInfo>> CollectKnownIssuesAsync(HashSet<string> allChangeIds, VersionTag targetVersion)
     {
-        // Initialize collection for known issues
-        List<ItemInfo> knownIssues = new();
-        var openIssues = await GetOpenIssuesAsync();
+        List<ItemInfo> knownIssues = [];
 
-        // Process each open issue
-        foreach (var issue in openIssues)
+        // Iterate over every known issue ID, not just open ones — closed bugs with a matching
+        // affected-versions range must also appear as known issues (e.g. LTS back-port gaps).
+        foreach (var issueId in _issueTitles.Keys)
         {
-            // Skip issues already fixed in this build
-            if (allChangeIds.Contains(issue.Id))
+            // Skip issues already addressed in this build
+            if (allChangeIds.Contains(issueId))
             {
                 continue;
             }
 
-            // Only include bugs in known issues list
-            if (issue.Type == "bug")
+            var type = _issueTypes.GetValueOrDefault(issueId, "other");
+            if (type != "bug")
             {
-                knownIssues.Add(issue);
+                continue;
             }
+
+            var affectedVersions = _issueAffectedVersions.GetValueOrDefault(issueId);
+            var isOpen = _openIssues.Contains(issueId);
+
+            // With affected-versions: include if version matches, regardless of state.
+            // Without affected-versions: only open bugs are included.
+            var isKnownIssue = affectedVersions != null
+                ? affectedVersions.Contains(targetVersion)
+                : isOpen;
+
+            if (!isKnownIssue)
+            {
+                continue;
+            }
+
+            var title = _issueTitles.TryGetValue(issueId, out var t) ? t : $"Issue {issueId}";
+            knownIssues.Add(new ItemInfo(
+                issueId,
+                title,
+                $"https://github.com/example/repo/issues/{issueId}",
+                type,
+                int.Parse(issueId, CultureInfo.InvariantCulture),
+                affectedVersions));
         }
 
-        // Return collected known issues
-        return knownIssues;
+        return Task.FromResult(knownIssues);
     }
 
     /// <summary>
@@ -534,26 +577,6 @@ public class MockRepoConnector : RepoConnectorBase
             tag == null
                 ? null
                 : _tagHashes.GetValueOrDefault(tag));
-    }
-
-    /// <summary>
-    ///     Gets the list of open issues with their details.
-    /// </summary>
-    /// <returns>List of open issues with full information.</returns>
-    private Task<List<ItemInfo>> GetOpenIssuesAsync()
-    {
-        // Return predefined list of open issues with full details
-        var openIssuesData = _openIssues
-            .Select(issueId => new ItemInfo(
-                issueId,
-                _issueTitles.TryGetValue(issueId, out var title) ? title : $"Issue {issueId}",
-                $"https://github.com/example/repo/issues/{issueId}",
-                _issueTypes.GetValueOrDefault(issueId, "other"),
-                int.Parse(issueId, CultureInfo.InvariantCulture)))
-            .ToList();
-
-        // Return task with open issues data
-        return Task.FromResult(openIssuesData);
     }
 
     /// <summary>

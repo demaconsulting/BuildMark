@@ -123,7 +123,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             lookupData);
 
         // Collect known issues via WIQL query
-        var knownIssues = await CollectKnownIssuesAsync(restClient, allChangeIds, lookupData);
+        var knownIssues = await CollectKnownIssuesAsync(restClient, allChangeIds, lookupData, toVersion);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -559,21 +559,26 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Collects known issues (open bugs not resolved) via a WIQL query.
+    ///     Collects known issues via a WIQL query.
+    ///     When a bug declares <c>AffectedVersions</c>, it is a known issue if and only if
+    ///     <c>AffectedVersions.Contains(targetVersion)</c> is true, regardless of its state.
+    ///     When no <c>AffectedVersions</c> are declared, only unresolved bugs are included.
     /// </summary>
     /// <param name="restClient">Azure DevOps REST client.</param>
-    /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <param name="allChangeIds">Set of all change IDs already processed in this build.</param>
     /// <param name="lookupData">Lookup data structures.</param>
+    /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
     private static async Task<List<ItemInfo>> CollectKnownIssuesAsync(
         AzureDevOpsRestClient restClient,
         HashSet<string> allChangeIds,
-        LookupData lookupData)
+        LookupData lookupData,
+        VersionTag targetVersion)
     {
-        // Query for open bugs and issues
+        // Query all bugs and issues — state filtering is applied in code so that resolved
+        // bugs with a declared affected-versions range are still considered as known issues.
         const string wiql = "SELECT [System.Id] FROM workitems " +
-                            "WHERE [System.WorkItemType] IN ('Bug', 'Issue') " +
-                            "AND [System.State] NOT IN ('Done', 'Closed', 'Resolved')";
+                            "WHERE [System.WorkItemType] IN ('Bug', 'Issue')";
 
         var queryResult = await restClient.QueryWorkItemsAsync(wiql);
         if (queryResult.WorkItems.Count == 0)
@@ -590,21 +595,26 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         {
             var workItemId = workItem.Id.ToString(CultureInfo.InvariantCulture);
 
-            // Skip items already included as changes
+            // Skip items already included as changes in this build
             if (allChangeIds.Contains(workItemId))
-            {
-                continue;
-            }
-
-            // Skip resolved work items (defense in depth)
-            if (WorkItemMapper.IsWorkItemResolved(workItem))
             {
                 continue;
             }
 
             var workItemUrl = BuildWorkItemUrl(lookupData.OrganizationUrl, lookupData.Project, workItem.Id);
             var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, workItemUrl, workItem.Id);
-            if (itemInfo != null && itemInfo.Type == "bug")
+            if (itemInfo == null || itemInfo.Type != "bug")
+            {
+                continue;
+            }
+
+            // With affected-versions: include if version matches, regardless of state.
+            // Without affected-versions: only unresolved bugs are included.
+            var isKnownIssue = itemInfo.AffectedVersions != null
+                ? itemInfo.AffectedVersions.Contains(targetVersion)
+                : !WorkItemMapper.IsWorkItemResolved(workItem);
+
+            if (isKnownIssue)
             {
                 knownIssues.Add(itemInfo);
             }

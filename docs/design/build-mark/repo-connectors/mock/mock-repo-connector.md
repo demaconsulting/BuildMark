@@ -31,6 +31,13 @@ determines the target and baseline versions, collects changes and known issues,
 and returns a fully populated `BuildInformation` record. The logic mirrors the
 production GitHubRepoConnector flow but operates entirely on in-memory data.
 
+When collecting known issues, **all** issues (open and closed) are considered:
+
+- If `AffectedVersions` is non-null, the bug is included if and only if
+  `AffectedVersions.Contains(targetVersion)` is true, regardless of open/closed
+  state (models a closed bug never back-ported to an older branch).
+- If `AffectedVersions` is null, only open bugs are included.
+
 When routing rules have been configured via `Configure`, `GetBuildInformationAsync`
 collects all items and passes them to `ApplyRules` (inherited from `RepoConnectorBase`)
 to produce the `RoutedSections` list. If no rules are configured, the legacy

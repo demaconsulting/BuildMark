@@ -18,6 +18,7 @@ history and issue-tracking systems. It analyzes commits, pull requests, and issu
 notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
 For detailed documentation, see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+For command-line options, see the [CLI Reference](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md).
 
 ## Features
 
@@ -160,7 +161,7 @@ Changes, Bugs Fixed, and Dependency Updates sections with pre-wired routing rule
 common label and work-item patterns.
 
 For configuration details and examples, see the
-[User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+[Configuration Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/configuration.md).
 
 ### Authentication
 
@@ -173,7 +174,7 @@ from environment variables at runtime.
 `AZURE_DEVOPS_EXT_PAT`, then `SYSTEM_ACCESSTOKEN` (Azure Pipelines), then
 `az account get-access-token` (Azure CLI).
 
-For more detail see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+For more detail see the [Authentication Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md#with-github-token).
 
 ## Self Validation
 
@@ -209,8 +210,9 @@ Each test in the report proves:
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
 - **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.
 
-See the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md) for more details
-on the self-validation tests.
+See the [CLI Reference][cli-ref] for more details on the self-validation tests.
+
+[cli-ref]: https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md#self-validation
 
 On validation failure the tool will exit with a non-zero exit code.
 
@@ -220,7 +222,7 @@ BuildMark supports an optional `buildmark` code block in issue and pull request 
 to control visibility, type classification, and affected-version ranges. Azure DevOps work items
 additionally support native custom fields for the same controls.
 
-For details, see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
+For details, see the [Item Controls Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/item-controls.md).
 
 ## Report Format
 

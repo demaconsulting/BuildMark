@@ -45,6 +45,11 @@ sections:
           The primary purpose of the AzureDevOpsRepoConnector is to assemble BuildInformation
           from Azure DevOps repository data using the REST API, correctly identifying the current
           version tag, the baseline (previous) version tag, and the changes between them.
+
+          Known-issues collection queries all bugs regardless of state. When affected-versions
+          is declared the item state is ignored; only the version range check determines
+          inclusion. This handles the LTS back-port gap scenario where a bug is resolved after
+          being fixed in a newer release but was never back-ported to an older branch.
         tests:
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersion
@@ -52,6 +57,8 @@ sections:
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenWorkItems_IdentifiesKnownIssues
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
           - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
       - id: BuildMark-AzureDevOps-ItemControls
         title: >-

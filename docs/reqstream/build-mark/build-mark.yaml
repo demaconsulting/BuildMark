@@ -316,16 +316,34 @@ sections:
               - BuildMark-Program-Report
 
           - id: BuildMark-Report-KnownIssues
-            title: The tool shall support including known issues in build notes.
+            title: >-
+              The tool shall support including known issues in build notes, using
+              affected-versions metadata when available and falling back to open/closed
+              status when it is not.
             justification: |
               Disclosing known issues in release notes promotes transparency, helps users avoid
-              known pitfalls, and manages expectations about current limitations. This improves
-              user trust and reduces support burden.
+              known pitfalls, and manages expectations about current limitations.
+
+              The following rules determine whether a bug is a known issue for a given build:
+
+              1. A closed bug with no declared affected-versions is NOT a known issue.
+              2. An open bug with no declared affected-versions IS a known issue.
+              3. A bug in any state (open or closed) whose declared affected-versions contain
+                 the build version IS a known issue.
+              4. A bug in any state (open or closed) whose declared affected-versions do NOT
+                 contain the build version is NOT a known issue.
+
+              This matters for LTS branches: a bug may be closed after being fixed in a later
+              release, but an LTS branch that was cut before the fix still needs to report the
+              bug as a known issue. The affected-versions field captures that scenario precisely.
             tests:
               - IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
+              - BuildMark-RepoConnectors-GitHub
+              - BuildMark-RepoConnectors-AzureDevOps
+              - BuildMark-RepoConnectors-Mock
 
           - id: BuildMark-Report-VersionRange
             title: The tool shall support filtering build notes by version range.

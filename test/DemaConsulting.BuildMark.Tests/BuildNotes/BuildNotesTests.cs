@@ -68,7 +68,10 @@ public class BuildNotesTests
         // Assert: known issues section is present and contains expected items
         Assert.Contains("## Known Issues", markdown);
         Assert.Contains("Known bug A", markdown);
-        Assert.Contains("Known bug B", markdown);
+        Assert.Contains("Known bug C", markdown);
+
+        // Known bug B has affected-versions [5.0.0,) which does not include v2.0.0
+        Assert.DoesNotContain("Known bug B", markdown);
     }
 
     /// <summary>

@@ -511,7 +511,7 @@ internal sealed class GitHubGraphQLClient : IDisposable
                     Query = @"
                         query($owner: String!, $repo: String!, $after: String) {
                             repository(owner: $owner, name: $repo) {
-                                issues(first: 100, after: $after) {
+                                issues(first: 100, states: [OPEN, CLOSED], after: $after) {
                                     nodes {
                                         number
                                         title
