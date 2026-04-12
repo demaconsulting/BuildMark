@@ -156,7 +156,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             repo);
 
         // Collect known issues
-        var knownIssues = CollectKnownIssues(gitHubData.Issues, allChangeIds);
+        var knownIssues = CollectKnownIssues(gitHubData.Issues, allChangeIds, toVersion);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -734,8 +734,12 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </summary>
     /// <param name="issues">All issues from GitHub.</param>
     /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
-    private static List<ItemInfo> CollectKnownIssues(IReadOnlyList<IssueInfo> issues, HashSet<string> allChangeIds)
+    private static List<ItemInfo> CollectKnownIssues(
+        IReadOnlyList<IssueInfo> issues,
+        HashSet<string> allChangeIds,
+        VersionTag targetVersion)
     {
         return issues
             .Where(i => i.State == "OPEN")
@@ -744,6 +748,7 @@ public class GitHubRepoConnector : RepoConnectorBase
             .Select(tuple => CreateItemInfoFromIssue(tuple.issue, tuple.issue.Number))
             .OfType<ItemInfo>()
             .Where(itemInfo => itemInfo.Type == "bug")
+            .Where(itemInfo => itemInfo.AffectedVersions == null || itemInfo.AffectedVersions.Contains(targetVersion))
             .ToList();
     }
 

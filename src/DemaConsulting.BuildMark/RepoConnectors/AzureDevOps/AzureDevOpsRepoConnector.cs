@@ -123,7 +123,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             lookupData);
 
         // Collect known issues via WIQL query
-        var knownIssues = await CollectKnownIssuesAsync(restClient, allChangeIds, lookupData);
+        var knownIssues = await CollectKnownIssuesAsync(restClient, allChangeIds, lookupData, toVersion);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -564,11 +564,13 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     /// <param name="restClient">Azure DevOps REST client.</param>
     /// <param name="allChangeIds">Set of all change IDs already processed.</param>
     /// <param name="lookupData">Lookup data structures.</param>
+    /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
     private static async Task<List<ItemInfo>> CollectKnownIssuesAsync(
         AzureDevOpsRestClient restClient,
         HashSet<string> allChangeIds,
-        LookupData lookupData)
+        LookupData lookupData,
+        VersionTag targetVersion)
     {
         // Query for open bugs and issues
         const string wiql = "SELECT [System.Id] FROM workitems " +
@@ -606,6 +608,12 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, workItemUrl, workItem.Id);
             if (itemInfo != null && itemInfo.Type == "bug")
             {
+                // When affected-versions are declared, include only if the target version is affected
+                if (itemInfo.AffectedVersions != null && !itemInfo.AffectedVersions.Contains(targetVersion))
+                {
+                    continue;
+                }
+
                 knownIssues.Add(itemInfo);
             }
         }

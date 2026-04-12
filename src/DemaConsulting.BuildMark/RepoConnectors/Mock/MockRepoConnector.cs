@@ -112,7 +112,7 @@ public class MockRepoConnector : RepoConnectorBase
         var (bugs, nonBugChanges, allChangeIds) = CategorizeChanges(changes);
 
         // Collect known issues (open bugs not fixed in this build)
-        var knownIssues = await CollectKnownIssuesAsync(allChangeIds);
+        var knownIssues = await CollectKnownIssuesAsync(allChangeIds, toTagInfo);
 
         // Sort all lists by Index to ensure chronological order
         nonBugChanges.Sort((a, b) => a.Index.CompareTo(b.Index));
@@ -357,8 +357,9 @@ public class MockRepoConnector : RepoConnectorBase
     ///     Collects known issues (open bugs not fixed in this build).
     /// </summary>
     /// <param name="allChangeIds">Set of all change IDs already processed.</param>
+    /// <param name="targetVersion">The version being built, used for affected-versions filtering.</param>
     /// <returns>List of known issues.</returns>
-    private async Task<List<ItemInfo>> CollectKnownIssuesAsync(HashSet<string> allChangeIds)
+    private async Task<List<ItemInfo>> CollectKnownIssuesAsync(HashSet<string> allChangeIds, VersionTag targetVersion)
     {
         // Initialize collection for known issues
         List<ItemInfo> knownIssues = new();
@@ -376,6 +377,12 @@ public class MockRepoConnector : RepoConnectorBase
             // Only include bugs in known issues list
             if (issue.Type == "bug")
             {
+                // When affected-versions are declared, include only if the target version is affected
+                if (issue.AffectedVersions != null && !issue.AffectedVersions.Contains(targetVersion))
+                {
+                    continue;
+                }
+
                 knownIssues.Add(issue);
             }
         }
