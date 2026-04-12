@@ -61,13 +61,9 @@ public record VersionInterval(
         if (LowerBound != null)
         {
             var lowerBoundVersion = VersionComparable.TryCreate(LowerBound);
-            if (lowerBoundVersion != null)
+            if (lowerBoundVersion != null && IsBelowLowerBound(version.CompareTo(lowerBoundVersion), LowerInclusive))
             {
-                var lowerComparison = version.CompareTo(lowerBoundVersion);
-                if (lowerComparison < 0 || (lowerComparison == 0 && !LowerInclusive))
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -75,13 +71,9 @@ public record VersionInterval(
         if (UpperBound != null)
         {
             var upperBoundVersion = VersionComparable.TryCreate(UpperBound);
-            if (upperBoundVersion != null)
+            if (upperBoundVersion != null && IsAboveUpperBound(version.CompareTo(upperBoundVersion), UpperInclusive))
             {
-                var upperComparison = version.CompareTo(upperBoundVersion);
-                if (upperComparison > 0 || (upperComparison == 0 && !UpperInclusive))
-                {
-                    return false;
-                }
+                return false;
             }
         }
 
@@ -97,6 +89,18 @@ public record VersionInterval(
     {
         return Contains(version.Semantic.Comparable);
     }
+
+    /// <summary>
+    ///     Returns true when a comparison result places a version below the lower bound.
+    /// </summary>
+    private static bool IsBelowLowerBound(int comparison, bool inclusive) =>
+        comparison < 0 || (comparison == 0 && !inclusive);
+
+    /// <summary>
+    ///     Returns true when a comparison result places a version above the upper bound.
+    /// </summary>
+    private static bool IsAboveUpperBound(int comparison, bool inclusive) =>
+        comparison > 0 || (comparison == 0 && !inclusive);
 
     /// <summary>
     ///     Parses a version interval from text.
