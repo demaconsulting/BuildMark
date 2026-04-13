@@ -204,6 +204,19 @@ public class CliTests
     }
 
     /// <summary>
+    ///     Test that the Cli subsystem sets the ResultsFile property when --result (alias) is specified.
+    /// </summary>
+    [TestMethod]
+    public void Cli_ResultFlag_SetsProperty()
+    {
+        // Arrange & Act: create context with --result alias argument
+        using var context = Context.Create(["--result", "results.trx"]);
+
+        // Assert: ResultsFile property is set to the specified value
+        Assert.AreEqual("results.trx", context.ResultsFile);
+    }
+
+    /// <summary>
     ///     Test that the Cli subsystem writes error messages to stderr.
     /// </summary>
     [TestMethod]
