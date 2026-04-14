@@ -298,6 +298,7 @@ internal sealed class Context : IDisposable
                     BuildVersion = GetRequiredStringArgument(arg, args, index, "a version argument");
                     return index + 1;
 
+                case "--result":
                 case "--results":
                     ResultsFile = GetRequiredStringArgument(arg, args, index, "a results filename argument");
                     return index + 1;

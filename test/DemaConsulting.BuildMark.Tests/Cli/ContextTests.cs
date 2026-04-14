@@ -220,6 +220,19 @@ public class ContextTests
     }
 
     /// <summary>
+    ///     Test that Context.Create with --result (alias) argument sets ResultsFile property.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_ResultArgument_SetsResultsFileProperty()
+    {
+        // Create context with --result alias argument
+        using var context = Context.Create(["--result", "results.trx"]);
+
+        // Verify ResultsFile property is set
+        Assert.AreEqual("results.trx", context.ResultsFile);
+    }
+
+    /// <summary>
     ///     Test that Context.Create with --log argument creates log file.
     /// </summary>
     [TestMethod]
@@ -479,6 +492,32 @@ public class ContextTests
         // Verify exception was caught and message is correct
         Assert.IsNotNull(caughtException);
         Assert.Contains("--results requires a results filename argument", caughtException.Message);
+    }
+
+    /// <summary>
+    ///     Test that Context.Create throws ArgumentException when --result (alias) has no value.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_ResultWithoutValue_ThrowsArgumentException()
+    {
+        ArgumentException? caughtException = null;
+
+        try
+        {
+            // Attempt to create context with --result alias but no value
+            _ = Context.Create(["--result"]);
+
+            // Fail test if exception was not thrown
+            Assert.Fail("Expected ArgumentException to be thrown");
+        }
+        catch (ArgumentException ex)
+        {
+            caughtException = ex;
+        }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("--result requires a results filename argument", caughtException.Message);
     }
 
     /// <summary>
