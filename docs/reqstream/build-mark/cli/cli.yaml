@@ -73,7 +73,7 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Report
-        title: The Cli subsystem shall support --report and --report-depth flags to configure report output.
+        title: The Cli subsystem shall support --report and --depth flags to configure report output.
         justification: |
           Enables users to direct build notes output to a specific file and embed it at
           any heading level within a larger markdown document.
