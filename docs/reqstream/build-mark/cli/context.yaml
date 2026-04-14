@@ -44,6 +44,7 @@ sections:
           - Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException
           - Context_Create_DepthWithZeroValue_ThrowsArgumentException
           - Context_Create_DepthWithNegativeValue_ThrowsArgumentException
+          - Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
           - Context_Create_ResultsWithoutValue_ThrowsArgumentException
           - Context_Create_LogWithoutValue_ThrowsArgumentException
           - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException

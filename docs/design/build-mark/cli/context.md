@@ -29,7 +29,7 @@ so that any open log file is properly flushed and closed.
 |--------------------|-------------------------|---------|-----------------------------|
 | `BuildVersion`     | `string?`               | `null`  | `--build-version <version>` |
 | `ReportFile`       | `string?`               | `null`  | `--report <file>`           |
-| `Depth`            | `int`                   | `1`     | `--depth <depth>`           |
+| `Depth`            | `int?`                  | `null`  | `--depth <depth>`           |
 | `ResultsFile`      | `string?`               | `null`  | `--results <file>`          |
 | `ConnectorFactory` | `Func<IRepoConnector>?` | `null`  | Injected via overload       |
 

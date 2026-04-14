@@ -482,6 +482,32 @@ public class ContextTests
     }
 
     /// <summary>
+    ///     Test that Context.Create throws ArgumentOutOfRangeException when --depth exceeds maximum value.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException()
+    {
+        ArgumentOutOfRangeException? caughtException = null;
+
+        try
+        {
+            // Attempt to create context with --depth exceeding maximum of 6
+            _ = Context.Create(["--depth", "7"]);
+
+            // Fail test if exception was not thrown
+            Assert.Fail("Expected ArgumentOutOfRangeException to be thrown");
+        }
+        catch (ArgumentOutOfRangeException ex)
+        {
+            caughtException = ex;
+        }
+
+        // Verify exception was caught and message is correct
+        Assert.IsNotNull(caughtException);
+        Assert.Contains("'--depth' must be between 1 and 6", caughtException.Message);
+    }
+
+    /// <summary>
     ///     Test that Context.Create throws ArgumentException when --results has no value.
     /// </summary>
     [TestMethod]

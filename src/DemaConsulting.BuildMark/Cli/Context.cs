@@ -288,7 +288,13 @@ internal sealed class Context : IDisposable
 
                 case "--depth":
                 case "--report-depth":
-                    Depth = GetRequiredIntArgument(arg, args, index);
+                    var depth = GetRequiredIntArgument(arg, args, index);
+                    if (depth > 6)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(args), $"Argument '{arg}' must be between 1 and 6.");
+                    }
+
+                    Depth = depth;
                     return index + 1;
 
                 case "--include-known-issues":
