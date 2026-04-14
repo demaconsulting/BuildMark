@@ -209,5 +209,5 @@ environment without requiring a live GitHub connection.
 ### Report Generation
 
 `BuildInformation.ToMarkdown` converts the in-memory build data model into a
-markdown string. The heading depth is configurable via `--report-depth`, allowing
+markdown string. The heading depth is configurable via `--depth`, allowing
 the report to be embedded at any level in a larger document.

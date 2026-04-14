@@ -13,7 +13,7 @@
 | `--results <file>` | Write validation results (TRX or JUnit) |
 | `--build-version <ver>` | Specify the build version for report generation |
 | `--report <file>` | Export build notes to a markdown file |
-| `--report-depth <n>` | Set markdown heading depth (default: 1) |
+| `--depth <n>` | Set markdown heading depth (default: 1) |
 | `--include-known-issues` | Include open bugs as known issues |
 
 ## Display Options
@@ -77,13 +77,14 @@ optionally known issues.
 buildmark --build-version v1.2.3 --report build-notes.md
 ```
 
-### `--report-depth <depth>`
+### `--depth <depth>`
 
-Set the markdown header depth for the report. Default is 1. Use this when embedding the report in larger documents.
+Set the markdown header depth for the report and self-validation output. Default is 1. Use this when embedding
+the report in larger documents.
 
 ```bash
 # Use level 2 headers (##) instead of level 1 (#)
-buildmark --build-version v1.2.3 --report build-notes.md --report-depth 2
+buildmark --build-version v1.2.3 --report build-notes.md --depth 2
 ```
 
 ### `--include-known-issues`
