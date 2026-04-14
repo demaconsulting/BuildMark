@@ -90,7 +90,9 @@ internal static class Validation
     /// <param name="context">The context for output.</param>
     private static void PrintValidationHeader(Context context)
     {
-        context.WriteLine("# DEMA Consulting BuildMark Self-validation");
+        var depth = context.Depth ?? 1;
+        var heading = new string('#', depth);
+        context.WriteLine($"{heading} DEMA Consulting BuildMark Self-validation");
         context.WriteLine("");
         context.WriteLine("| Information         | Value                                              |");
         context.WriteLine("| :------------------ | :------------------------------------------------- |");

@@ -159,7 +159,7 @@ internal static class Program
         context.WriteLine("  --log <file>                 Write output to log file");
         context.WriteLine("  --build-version <version>    Specify the build version");
         context.WriteLine("  --report <file>              Specify the report file name");
-        context.WriteLine("  --report-depth <depth>       Specify the report markdown depth (default: 1)");
+        context.WriteLine("  --depth <depth>              Specify the markdown heading depth (default: 1)");
         context.WriteLine("  --include-known-issues       Include known issues in the report");
     }
 
@@ -182,7 +182,7 @@ internal static class Program
 
         // Resolve effective report options: CLI arguments override config file values
         var effectiveReportFile = context.ReportFile ?? effectiveConfig.Report?.File;
-        var effectiveReportDepth = context.ReportDepth ?? effectiveConfig.Report?.Depth ?? 1;
+        var effectiveReportDepth = context.Depth ?? effectiveConfig.Report?.Depth ?? 1;
         var effectiveIncludeKnownIssues = context.IncludeKnownIssues || (effectiveConfig.Report?.IncludeKnownIssues ?? false);
 
         // Create repository connector using factory if provided, otherwise use the configured connector.

@@ -71,9 +71,9 @@ internal sealed class Context : IDisposable
     public string? ReportFile { get; private init; }
 
     /// <summary>
-    ///     Gets the report markdown depth, or null when not specified on the command line.
+    ///     Gets the markdown heading depth, or null when not specified on the command line.
     /// </summary>
-    public int? ReportDepth { get; private init; }
+    public int? Depth { get; private init; }
 
     /// <summary>
     ///     Gets a value indicating whether to include known issues in the report.
@@ -134,7 +134,7 @@ internal sealed class Context : IDisposable
             Lint = parser.Lint,
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
-            ReportDepth = parser.ReportDepth,
+            Depth = parser.ReportDepth,
             IncludeKnownIssues = parser.IncludeKnownIssues,
             ResultsFile = parser.ResultsFile,
             ConnectorFactory = connectorFactory
@@ -211,7 +211,7 @@ internal sealed class Context : IDisposable
         public string? ReportFile { get; private set; }
 
         /// <summary>
-        ///     Gets the report markdown depth, or null when not specified on the command line.
+        ///     Gets the markdown heading depth, or null when not specified on the command line.
         /// </summary>
         public int? ReportDepth { get; private set; }
 
@@ -284,6 +284,10 @@ internal sealed class Context : IDisposable
 
                 case "--report":
                     ReportFile = GetRequiredStringArgument(arg, args, index, "a filename argument");
+                    return index + 1;
+
+                case "--depth":
+                    ReportDepth = GetRequiredIntArgument(arg, args, index);
                     return index + 1;
 
                 case "--report-depth":
