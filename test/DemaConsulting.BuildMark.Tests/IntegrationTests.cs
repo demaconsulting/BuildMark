@@ -198,17 +198,17 @@ public class IntegrationTests
     }
 
     /// <summary>
-    ///     Test that report-depth parameter is accepted.
+    ///     Test that depth parameter is accepted.
     /// </summary>
     [TestMethod]
-    public void IntegrationTest_ReportDepthParameter_IsAccepted()
+    public void IntegrationTest_DepthParameter_IsAccepted()
     {
-        // Run the application with report-depth parameter
+        // Run the application with depth parameter
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
-            "--report-depth", "2",
+            "--depth", "2",
             "--help");
 
         // Verify success
@@ -405,7 +405,7 @@ public class IntegrationTests
         {
             // Create context with mock connector and report depth 2
             using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--report-depth", "2", "--silent"],
+                ["--build-version", "2.0.0", "--report", reportFile, "--depth", "2", "--silent"],
                 () => new MockRepoConnector());
 
             // Act: run the program

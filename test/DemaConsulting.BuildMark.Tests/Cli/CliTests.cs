@@ -44,7 +44,7 @@ public class CliTests
         Assert.IsFalse(context.Validate);
         Assert.IsNull(context.BuildVersion);
         Assert.IsNull(context.ReportFile);
-        Assert.IsNull(context.ReportDepth);
+        Assert.IsNull(context.Depth);
         Assert.IsFalse(context.IncludeKnownIssues);
         Assert.IsNull(context.ResultsFile);
         Assert.AreEqual(0, context.ExitCode);
@@ -131,17 +131,17 @@ public class CliTests
     }
 
     /// <summary>
-    ///     Test that the Cli subsystem sets report properties when --report and --report-depth are specified.
+    ///     Test that the Cli subsystem sets report properties when --report and --depth are specified.
     /// </summary>
     [TestMethod]
     public void Cli_ReportFlags_SetProperties()
     {
-        // Arrange & Act: create context with --report and --report-depth arguments
-        using var context = Context.Create(["--report", "output.md", "--report-depth", "3", "--include-known-issues"]);
+        // Arrange & Act: create context with --report and --depth arguments
+        using var context = Context.Create(["--report", "output.md", "--depth", "3", "--include-known-issues"]);
 
         // Assert: report properties are set to the specified values
         Assert.AreEqual("output.md", context.ReportFile);
-        Assert.AreEqual(3, context.ReportDepth);
+        Assert.AreEqual(3, context.Depth);
         Assert.IsTrue(context.IncludeKnownIssues);
     }
 

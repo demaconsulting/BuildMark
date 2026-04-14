@@ -25,7 +25,7 @@ sections:
           - Context_Create_ValidateFlag_SetsValidateProperty
           - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
           - Context_Create_ReportArgument_SetsReportFileProperty
-          - Context_Create_ReportDepthArgument_SetsReportDepthProperty
+          - Context_Create_DepthArgument_SetsDepthProperty
           - Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
           - Context_Create_ResultsArgument_SetsResultsFileProperty
           - Context_Create_LogArgument_CreatesLogFile
@@ -40,10 +40,11 @@ sections:
           - Context_Create_UnsupportedArgument_ThrowsArgumentException
           - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
           - Context_Create_ReportWithoutValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithoutValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException
-          - Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException
+          - Context_Create_DepthWithoutValue_ThrowsArgumentException
+          - Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException
+          - Context_Create_DepthWithZeroValue_ThrowsArgumentException
+          - Context_Create_DepthWithNegativeValue_ThrowsArgumentException
+          - Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
           - Context_Create_ResultsWithoutValue_ThrowsArgumentException
           - Context_Create_LogWithoutValue_ThrowsArgumentException
           - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException

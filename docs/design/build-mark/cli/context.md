@@ -29,7 +29,7 @@ so that any open log file is properly flushed and closed.
 |--------------------|-------------------------|---------|-----------------------------|
 | `BuildVersion`     | `string?`               | `null`  | `--build-version <version>` |
 | `ReportFile`       | `string?`               | `null`  | `--report <file>`           |
-| `ReportDepth`      | `int`                   | `1`     | `--report-depth <depth>`    |
+| `Depth`            | `int?`                  | `null`  | `--depth <depth>`           |
 | `ResultsFile`      | `string?`               | `null`  | `--results <file>`          |
 | `ConnectorFactory` | `Func<IRepoConnector>?` | `null`  | Injected via overload       |
 
@@ -81,8 +81,9 @@ iterates over the argument array and classifies each token:
 
 - Short flags (`-v`, `-h`, `-?`) and long flags (`--version`, `--help`, etc.)
   are mapped to boolean properties.
-- Value arguments (`--build-version`, `--report`, `--report-depth`, `--results`,
+- Value arguments (`--build-version`, `--report`, `--depth`, `--results`,
   `--log`) expect the next token as their value and throw `ArgumentException` if
   no next token is present.
-- `--report-depth` additionally validates that the value is a positive integer.
+- `--depth` additionally validates that the value is a positive integer.
+- The legacy `--report-depth` argument is also accepted as an undocumented alias for `--depth`.
 - Any unrecognized token causes `ArgumentException` to be thrown.

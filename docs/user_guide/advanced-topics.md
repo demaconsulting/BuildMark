@@ -274,7 +274,7 @@ Examples of recognized version tags:
 ## Report Best Practices
 
 - **Use meaningful filenames**: Include version numbers or timestamps in report filenames
-- **Adjust header depth**: Use `--report-depth` when embedding reports in larger documents
+- **Adjust header depth**: Use `--depth` when embedding reports in larger documents
 - **Include known issues**: Use `--include-known-issues` for comprehensive release documentation
 - **Combine with logging**: Use `--log` to capture detailed execution information
 

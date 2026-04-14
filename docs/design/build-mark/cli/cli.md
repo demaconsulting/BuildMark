@@ -29,7 +29,7 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `Lint`                | Property | Set when `--lint` flag is present                  |
 | `BuildVersion`        | Property | Value of `--build-version` argument                |
 | `ReportFile`          | Property | Value of `--report` argument                       |
-| `ReportDepth`         | Property | Value of `--report-depth` argument (default: 1)    |
+| `Depth`               | Property | Value of `--depth` argument (default: 1)           |
 | `IncludeKnownIssues`  | Property | Set when `--include-known-issues` flag is present  |
 | `ResultsFile`         | Property | Value of `--results` argument                      |
 | `ConnectorFactory`    | Property | Optional factory for dependency injection in tests |

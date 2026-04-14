@@ -71,9 +71,9 @@ internal sealed class Context : IDisposable
     public string? ReportFile { get; private init; }
 
     /// <summary>
-    ///     Gets the report markdown depth, or null when not specified on the command line.
+    ///     Gets the markdown heading depth, or null when not specified on the command line.
     /// </summary>
-    public int? ReportDepth { get; private init; }
+    public int? Depth { get; private init; }
 
     /// <summary>
     ///     Gets a value indicating whether to include known issues in the report.
@@ -134,7 +134,7 @@ internal sealed class Context : IDisposable
             Lint = parser.Lint,
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
-            ReportDepth = parser.ReportDepth,
+            Depth = parser.Depth,
             IncludeKnownIssues = parser.IncludeKnownIssues,
             ResultsFile = parser.ResultsFile,
             ConnectorFactory = connectorFactory
@@ -211,9 +211,9 @@ internal sealed class Context : IDisposable
         public string? ReportFile { get; private set; }
 
         /// <summary>
-        ///     Gets the report markdown depth, or null when not specified on the command line.
+        ///     Gets the markdown heading depth, or null when not specified on the command line.
         /// </summary>
-        public int? ReportDepth { get; private set; }
+        public int? Depth { get; private set; }
 
         /// <summary>
         ///     Gets a value indicating whether to include known issues in the report.
@@ -286,8 +286,15 @@ internal sealed class Context : IDisposable
                     ReportFile = GetRequiredStringArgument(arg, args, index, "a filename argument");
                     return index + 1;
 
+                case "--depth":
                 case "--report-depth":
-                    ReportDepth = GetRequiredIntArgument(arg, args, index);
+                    var depth = GetRequiredIntArgument(arg, args, index);
+                    if (depth > 6)
+                    {
+                        throw new ArgumentOutOfRangeException(nameof(args), $"Argument '{arg}' must be between 1 and 6.");
+                    }
+
+                    Depth = depth;
                     return index + 1;
 
                 case "--include-known-issues":

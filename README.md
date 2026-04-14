@@ -115,7 +115,7 @@ Options:
   --log <file>                 Write output to log file
   --build-version <version>    Specify the build version
   --report <file>              Specify the report file name
-  --report-depth <depth>       Specify the report markdown depth (default: 1)
+  --depth <depth>              Specify the markdown heading depth (default: 1)
   --include-known-issues       Include known issues in the report
 ```
 
@@ -130,7 +130,7 @@ buildmark --build-version v1.2.3 --report build-notes.md
 **Generate build notes with custom markdown depth:**
 
 ```bash
-buildmark --build-version v1.2.3 --report build-notes.md --report-depth 2
+buildmark --build-version v1.2.3 --report build-notes.md --depth 2
 ```
 
 **Include known issues in the report:**
