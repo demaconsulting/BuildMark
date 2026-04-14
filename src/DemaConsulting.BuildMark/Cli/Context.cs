@@ -134,7 +134,7 @@ internal sealed class Context : IDisposable
             Lint = parser.Lint,
             BuildVersion = parser.BuildVersion,
             ReportFile = parser.ReportFile,
-            Depth = parser.ReportDepth,
+            Depth = parser.Depth,
             IncludeKnownIssues = parser.IncludeKnownIssues,
             ResultsFile = parser.ResultsFile,
             ConnectorFactory = connectorFactory
@@ -213,7 +213,7 @@ internal sealed class Context : IDisposable
         /// <summary>
         ///     Gets the markdown heading depth, or null when not specified on the command line.
         /// </summary>
-        public int? ReportDepth { get; private set; }
+        public int? Depth { get; private set; }
 
         /// <summary>
         ///     Gets a value indicating whether to include known issues in the report.
@@ -287,11 +287,8 @@ internal sealed class Context : IDisposable
                     return index + 1;
 
                 case "--depth":
-                    ReportDepth = GetRequiredIntArgument(arg, args, index);
-                    return index + 1;
-
                 case "--report-depth":
-                    ReportDepth = GetRequiredIntArgument(arg, args, index);
+                    Depth = GetRequiredIntArgument(arg, args, index);
                     return index + 1;
 
                 case "--include-known-issues":
