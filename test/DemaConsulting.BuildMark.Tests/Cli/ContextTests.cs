@@ -44,7 +44,7 @@ public class ContextTests
         Assert.IsFalse(context.Validate);
         Assert.IsNull(context.BuildVersion);
         Assert.IsNull(context.ReportFile);
-        Assert.IsNull(context.ReportDepth);
+        Assert.IsNull(context.Depth);
         Assert.IsFalse(context.IncludeKnownIssues);
         Assert.IsNull(context.ResultsFile);
         Assert.AreEqual(0, context.ExitCode);
@@ -181,16 +181,29 @@ public class ContextTests
     }
 
     /// <summary>
-    ///     Test that Context.Create with --report-depth argument sets ReportDepth property.
+    ///     Test that Context.Create with --depth argument sets Depth property.
     /// </summary>
     [TestMethod]
-    public void Context_Create_ReportDepthArgument_SetsReportDepthProperty()
+    public void Context_Create_DepthArgument_SetsDepthProperty()
     {
-        // Create context with --report-depth argument
+        // Create context with --depth argument
+        using var context = Context.Create(["--depth", "3"]);
+
+        // Verify Depth property is set
+        Assert.AreEqual(3, context.Depth);
+    }
+
+    /// <summary>
+    ///     Test that Context.Create with legacy --report-depth argument sets Depth property.
+    /// </summary>
+    [TestMethod]
+    public void Context_Create_LegacyReportDepthArgument_SetsDepthProperty()
+    {
+        // Create context with legacy --report-depth argument
         using var context = Context.Create(["--report-depth", "3"]);
 
-        // Verify ReportDepth property is set
-        Assert.AreEqual(3, context.ReportDepth);
+        // Verify Depth property is set (legacy alias)
+        Assert.AreEqual(3, context.Depth);
     }
 
     /// <summary>
@@ -271,7 +284,7 @@ public class ContextTests
             "--validate",
             "--build-version", "1.2.3",
             "--report", "report.md",
-            "--report-depth", "2",
+            "--depth", "2",
             "--include-known-issues",
             "--results", "results.trx"
         ]);
@@ -281,7 +294,7 @@ public class ContextTests
         Assert.IsTrue(context.Validate);
         Assert.AreEqual("1.2.3", context.BuildVersion);
         Assert.AreEqual("report.md", context.ReportFile);
-        Assert.AreEqual(2, context.ReportDepth);
+        Assert.AreEqual(2, context.Depth);
         Assert.IsTrue(context.IncludeKnownIssues);
         Assert.AreEqual("results.trx", context.ResultsFile);
     }
@@ -365,17 +378,17 @@ public class ContextTests
     }
 
     /// <summary>
-    ///     Test that Context.Create throws ArgumentException when --report-depth has no value.
+    ///     Test that Context.Create throws ArgumentException when --depth has no value.
     /// </summary>
     [TestMethod]
-    public void Context_Create_ReportDepthWithoutValue_ThrowsArgumentException()
+    public void Context_Create_DepthWithoutValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
 
         try
         {
-            // Attempt to create context with --report-depth but no value
-            _ = Context.Create(["--report-depth"]);
+            // Attempt to create context with --depth but no value
+            _ = Context.Create(["--depth"]);
 
             // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");
@@ -387,21 +400,21 @@ public class ContextTests
 
         // Verify exception was caught and message is correct
         Assert.IsNotNull(caughtException);
-        Assert.Contains("--report-depth requires a depth argument", caughtException.Message);
+        Assert.Contains("--depth requires a depth argument", caughtException.Message);
     }
 
     /// <summary>
-    ///     Test that Context.Create throws ArgumentException when --report-depth has non-integer value.
+    ///     Test that Context.Create throws ArgumentException when --depth has non-integer value.
     /// </summary>
     [TestMethod]
-    public void Context_Create_ReportDepthWithNonIntegerValue_ThrowsArgumentException()
+    public void Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
 
         try
         {
-            // Attempt to create context with --report-depth with non-integer value
-            _ = Context.Create(["--report-depth", "abc"]);
+            // Attempt to create context with --depth with non-integer value
+            _ = Context.Create(["--depth", "abc"]);
 
             // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");
@@ -413,21 +426,21 @@ public class ContextTests
 
         // Verify exception was caught and message is correct
         Assert.IsNotNull(caughtException);
-        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
+        Assert.Contains("--depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
-    ///     Test that Context.Create throws ArgumentException when --report-depth has zero value.
+    ///     Test that Context.Create throws ArgumentException when --depth has zero value.
     /// </summary>
     [TestMethod]
-    public void Context_Create_ReportDepthWithZeroValue_ThrowsArgumentException()
+    public void Context_Create_DepthWithZeroValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
 
         try
         {
-            // Attempt to create context with --report-depth with zero value
-            _ = Context.Create(["--report-depth", "0"]);
+            // Attempt to create context with --depth with zero value
+            _ = Context.Create(["--depth", "0"]);
 
             // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");
@@ -439,21 +452,21 @@ public class ContextTests
 
         // Verify exception was caught and message is correct
         Assert.IsNotNull(caughtException);
-        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
+        Assert.Contains("--depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
-    ///     Test that Context.Create throws ArgumentException when --report-depth has negative value.
+    ///     Test that Context.Create throws ArgumentException when --depth has negative value.
     /// </summary>
     [TestMethod]
-    public void Context_Create_ReportDepthWithNegativeValue_ThrowsArgumentException()
+    public void Context_Create_DepthWithNegativeValue_ThrowsArgumentException()
     {
         ArgumentException? caughtException = null;
 
         try
         {
-            // Attempt to create context with --report-depth with negative value
-            _ = Context.Create(["--report-depth", "-1"]);
+            // Attempt to create context with --depth with negative value
+            _ = Context.Create(["--depth", "-1"]);
 
             // Fail test if exception was not thrown
             Assert.Fail("Expected ArgumentException to be thrown");
@@ -465,7 +478,7 @@ public class ContextTests
 
         // Verify exception was caught and message is correct
         Assert.IsNotNull(caughtException);
-        Assert.Contains("--report-depth requires a positive integer", caughtException.Message);
+        Assert.Contains("--depth requires a positive integer", caughtException.Message);
     }
 
     /// <summary>
