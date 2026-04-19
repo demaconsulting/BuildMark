@@ -1,8 +1,8 @@
 ---
 title: BuildMark Review Plan
-subtitle: File Review Plan for BuildMark
+subtitle: File Review Plan for the BuildMark Tool
 author: DEMA Consulting
-description: File Review Plan for BuildMark
+description: File Review Plan for the BuildMark Tool
 lang: en-US
 keywords:
   - BuildMark

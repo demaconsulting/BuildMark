@@ -1,13 +1,14 @@
 ---
 title: BuildMark Trace Matrix
-subtitle: Test Traceability Matrix for the BuildMark Tool
+subtitle: Requirements Traceability Matrix for the BuildMark Tool
 author: DEMA Consulting
-description: Test Traceability Matrix for the BuildMark Tool
+description: Requirements Traceability Matrix for the BuildMark Tool
 lang: en-US
 keywords:
   - BuildMark
   - Trace Matrix
   - Traceability
+  - Requirements
   - Testing
   - .NET
   - Command-Line Tool
