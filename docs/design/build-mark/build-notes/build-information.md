@@ -11,7 +11,7 @@ and passed to `Program`, which calls `ToMarkdown` to render the final file.
 ```csharp
 public record BuildInformation(
     VersionCommitTag? BaselineVersionTag,
-    VersionCommitTag? CurrentVersionTag,
+    VersionCommitTag CurrentVersionTag,
     List<ItemInfo> Changes,
     List<ItemInfo> Bugs,
     List<ItemInfo> KnownIssues,
@@ -20,7 +20,7 @@ public record BuildInformation(
 
 - `BaselineVersionTag` (`VersionCommitTag?`) — the previous version tag, which is the
   lower boundary of the reported range
-- `CurrentVersionTag` (`VersionCommitTag?`) — the version tag being reported
+- `CurrentVersionTag` (`VersionCommitTag`) — the version tag being reported
 - `Changes` (`List<ItemInfo>`) — feature and other non-bug items in this build
 - `Bugs` (`List<ItemInfo>`) — bug-fix items in this build
 - `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed

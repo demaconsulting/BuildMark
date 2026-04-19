@@ -17,3 +17,4 @@ sections:
           paired so range calculations and report rendering stay consistent.
         tests:
           - VersionCommitTag_Constructor_StoresVersionAndHash
+          - VersionCommitTag_Constructor_ValidParameters_CreatesInstance
