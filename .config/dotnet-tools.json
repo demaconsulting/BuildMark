@@ -20,6 +20,12 @@
         "spdx-tool"
       ]
     },
+    "demaconsulting.buildmark": {
+      "version": "1.0.0",
+      "commands": [
+        "buildmark"
+      ]
+    },
     "demaconsulting.pandoctool": {
       "version": "3.9.0.2",
       "commands": [

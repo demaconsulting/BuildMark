@@ -321,15 +321,6 @@ Releases follow this process:
 4. Merge the pull request after review
 5. Create a GitHub release with the new version tag — CI/CD will automatically build and publish the NuGet package
 
-## Pull Request Process
-
-1. **Update Documentation**: Ensure all documentation is updated to reflect your changes
-2. **Add Tests**: Include tests for new functionality
-3. **Update Changelog**: Add a brief description of your changes
-4. **Link Issues**: Reference any related issues in your PR description
-5. **Request Review**: Request review from maintainers
-6. **Address Feedback**: Respond to review comments promptly
-
 ## Getting Help
 
 If you need help or have questions:
