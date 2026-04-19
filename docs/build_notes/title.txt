@@ -2,7 +2,7 @@
 title: BuildMark Tool
 subtitle: Build Notes
 author: DEMA Consulting
-description: Build notes for the BuildMark Tool for generating markdown build notes
+description: Build notes for the BuildMark Tool
 lang: en-US
 keywords:
   - BuildMark

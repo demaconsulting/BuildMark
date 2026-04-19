@@ -10,7 +10,6 @@ input-files:
   - docs/user_guide/cli-reference.md
   - docs/user_guide/item-controls.md
   - docs/user_guide/advanced-topics.md
-
 template: template.html
 
 table-of-contents: true

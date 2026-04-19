@@ -233,7 +233,10 @@ Before submitting a pull request, ensure all quality checks pass:
 ### 1. Build and Test
 
 ```bash
+# Build the project
 dotnet build --configuration Release
+
+# Run unit tests
 dotnet test --configuration Release
 ```
 
@@ -241,20 +244,57 @@ All tests must pass with zero warnings.
 
 ### 2. Linting
 
-```bash
-# Use the lint script which installs dependencies and runs all linters
-./lint.sh           # Linux/macOS (or: bash ./lint.sh)
-cmd /c lint.bat     # Windows (Command Prompt)
-./lint.bat          # Windows (PowerShell)
+```pwsh
+# After making changes: applies dotnet format, markdown, and YAML fixes silently
+pwsh ./fix.ps1
+
+# Before submitting a pull request: all linters must pass
+pwsh ./lint.ps1
 ```
 
 ### 3. Code Coverage
 
-Maintain code coverage above 80%:
+Maintain or improve code coverage. Use the `--collect "XPlat Code Coverage"` option when running tests.
 
-```bash
-dotnet test --collect "XPlat Code Coverage"
-```
+## Commit Messages
+
+Write clear, concise commit messages:
+
+- Use present tense ("Add feature" not "Added feature")
+- Use imperative mood ("Move cursor to..." not "Moves cursor to...")
+- Limit first line to 72 characters
+- Reference issues and pull requests when applicable
+
+Examples:
+
+- `Add support for custom report headers`
+- `Fix crash when results file path is invalid`
+- `Update documentation for --report-depth option`
+- `Refactor argument parsing for better testability`
+
+## Pull Request Process
+
+1. **Update Documentation**: Update relevant documentation for your changes
+2. **Add Tests**: Include tests that cover your changes
+3. **Run Quality Checks**: Ensure all linters, tests, and builds pass
+4. **Submit PR**: Create a pull request with a clear description
+5. **Code Review**: Address feedback from maintainers
+6. **Merge**: Once approved, a maintainer will merge your PR
+
+### Pull Request Template
+
+When creating a pull request, include:
+
+- **Description**: What changes does this PR introduce?
+- **Motivation**: Why are these changes needed?
+- **Related Issues**: Link to any related issues
+- **Testing**: How have you tested these changes?
+- **Checklist**:
+  - [ ] Tests added/updated
+  - [ ] Documentation updated
+  - [ ] All tests pass
+  - [ ] Code follows style guidelines
+  - [ ] No new warnings introduced
 
 ## Requirements Management
 
@@ -281,15 +321,6 @@ Releases follow this process:
 4. Merge the pull request after review
 5. Create a GitHub release with the new version tag — CI/CD will automatically build and publish the NuGet package
 
-## Pull Request Process
-
-1. **Update Documentation**: Ensure all documentation is updated to reflect your changes
-2. **Add Tests**: Include tests for new functionality
-3. **Update Changelog**: Add a brief description of your changes
-4. **Link Issues**: Reference any related issues in your PR description
-5. **Request Review**: Request review from maintainers
-6. **Address Feedback**: Respond to review comments promptly
-
 ## Getting Help
 
 If you need help or have questions:
@@ -298,6 +329,10 @@ If you need help or have questions:
 - **GitHub Discussions**: For general questions and discussions — [start a discussion][discussions]
 - **Pull Request Comments**: For questions about specific code changes
 - **Security Vulnerabilities**: Please review the [Security Policy][security] before reporting
+
+## License
+
+By contributing to BuildMark, you agree that your contributions will be licensed under the MIT License.
 
 Thank you for contributing to BuildMark!
 

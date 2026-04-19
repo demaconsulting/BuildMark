@@ -396,8 +396,8 @@ sections:
               - BuildMark-RepoConnectors-ItemControls
 
           - id: BuildMark-Controls-Visibility
-            title: The tool shall support a visibility field in the buildmark block to override
-              default item visibility in the build notes.
+            title: The tool shall support a visibility field in the buildmark block to override default
+              item visibility in the build notes.
             justification: |
               Developers may need to suppress internal housekeeping items from public release
               notes, or promote items that would otherwise be excluded. A visibility override
@@ -409,8 +409,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-VisibilityPublic
-            title: The tool shall include an item in the build notes when visibility is set to
-              public, overriding any default exclusion rules.
+            title: The tool shall include an item in the build notes when visibility is set to public,
+              overriding any default exclusion rules.
             justification: |
               Some items lack the standard labels that trigger automatic inclusion. The public
               value ensures these items still appear in the generated notes when the developer
@@ -422,8 +422,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-VisibilityInternal
-            title: The tool shall exclude an item from the build notes when visibility is set to
-              internal, overriding any default inclusion rules including standard issue labels.
+            title: The tool shall exclude an item from the build notes when visibility is set to internal,
+              overriding any default inclusion rules including standard issue labels.
             justification: |
               Items such as dependency updates, internal refactoring, or CI configuration changes
               are often irrelevant to end-users. The internal value lets developers suppress such
@@ -435,8 +435,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-Type
-            title: The tool shall support a type field in the buildmark block to override the
-              item classification used in the build notes.
+            title: The tool shall support a type field in the buildmark block to override the item
+              classification used in the build notes.
             justification: |
               GitHub labels do not always map cleanly to the bug/feature distinction used in
               release notes. A type override lets developers correct the classification for any
@@ -448,8 +448,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeBug
-            title: The tool shall classify an item as a bug fix when type is set to bug, placing
-              it in the Bugs Fixed section of the report.
+            title: The tool shall classify an item as a bug fix when type is set to bug, placing it in
+              the Bugs Fixed section of the report.
             justification: |
               Correct classification of bug fixes is important for end-users assessing whether a
               release addresses their reported problems. An explicit override ensures accuracy
@@ -461,8 +461,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeFeature
-            title: The tool shall classify an item as a feature or change when type is set to
-              feature, placing it in the Changes section of the report.
+            title: The tool shall classify an item as a feature or change when type is set to feature,
+              placing it in the Changes section of the report.
             justification: |
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
@@ -473,8 +473,8 @@ sections:
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-AffectedVersions
-            title: The tool shall support an affected-versions field in the buildmark block to
-              record which software versions are affected by the change.
+            title: The tool shall support an affected-versions field in the buildmark block to record
+              which software versions are affected by the change.
             justification: |
               Encoding affected versions directly on the work item improves traceability and
               enables downstream tooling to filter or highlight relevant items for a given
@@ -486,8 +486,8 @@ sections:
               - BuildMark-VersionInterval-Parse
 
           - id: BuildMark-Controls-AffectedVersionsInterval
-            title: The affected-versions field shall use mathematical interval notation with
-              inclusive and exclusive bounds, and shall support multiple comma-separated ranges.
+            title: The affected-versions field shall use mathematical interval notation with inclusive
+              and exclusive bounds, and shall support multiple comma-separated ranges.
             justification: |
               Mathematical interval notation is compact, unambiguous, and familiar to developers.
               Supporting multiple ranges allows expression of disjoint sets of affected versions
@@ -500,8 +500,8 @@ sections:
               - BuildMark-VersionInterval-Parse
 
           - id: BuildMark-Controls-HiddenBlock
-            title: The tool shall recognize a buildmark code block that is wrapped in an HTML
-              comment, allowing developers to hide the block from the GitHub rendered view.
+            title: The tool shall recognize a buildmark code block that is wrapped in an HTML comment,
+              allowing developers to hide the block from the GitHub rendered view.
             justification: |
               Some teams prefer clean issue descriptions without visible metadata blocks. Allowing
               the block to be hidden in an HTML comment satisfies both the need to supply control
