@@ -37,6 +37,8 @@ sections:
           - RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo
         children:
           - BuildMark-RepoConnectorFactory-Create
+          - BuildMark-RepoConnectorFactory-ConnectorConfig
+          - BuildMark-RepoConnectorFactory-AzureDevOpsDetection
 
       - id: BuildMark-RepoConnectors-ItemRouter
         title: >-
@@ -130,6 +132,7 @@ sections:
           - RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
           - RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
+          - BuildMark-AzureDevOps-UrlParsing
           - BuildMark-AzureDevOps-ConnectorConfig
           - BuildMark-AzureDevOps-BuildInformation
           - BuildMark-AzureDevOps-ItemControls

@@ -12,12 +12,11 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 
 ## Units
 
-| Unit                 | File                              | Responsibility                                    |
-|----------------------|-----------------------------------|---------------------------------------------------|
-| `BuildInformation`   | `BuildNotes/BuildInformation.cs`  | Top-level build data model and markdown renderer  |
-| `ItemInfo`           | `BuildNotes/ItemInfo.cs`          | Single issue or pull request in the report        |
-| `VersionCommitTag`   | `Version/VersionCommitTag.cs`     | Pairs version with its commit hash                |
-| `WebLink`            | `BuildNotes/WebLink.cs`           | Hyperlink used for the full-changelog entry       |
+| Unit               | File                             | Responsibility                                   |
+|--------------------|----------------------------------|--------------------------------------------------|
+| `BuildInformation` | `BuildNotes/BuildInformation.cs` | Top-level build data model and markdown renderer |
+| `ItemInfo`         | `BuildNotes/ItemInfo.cs`         | Single issue or pull request in the report       |
+| `WebLink`          | `BuildNotes/WebLink.cs`          | Hyperlink used for the full-changelog entry      |
 
 ## Interactions
 

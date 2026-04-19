@@ -76,8 +76,9 @@ Entry point for the parser. Steps:
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                          |
-|-----------------------|---------------------------------------------------------------|
-| `GitHubRepoConnector` | Calls `Parse` on each issue and PR description body           |
-| `VersionIntervalSet`  | Created by the parser when `affected-versions` key is present |
-| `ItemControlsInfo`    | The record returned by `Parse`                                |
+| Unit / Subsystem      | Role                                                                            |
+|-----------------------|---------------------------------------------------------------------------------|
+| `GitHubRepoConnector` | Calls `Parse` on each issue and PR description body                             |
+| `WorkItemMapper`      | Calls `Parse` on each work item description body (used by `AzureDevOpsRepoConnector`) |
+| `VersionIntervalSet`  | Created by the parser when `affected-versions` key is present                   |
+| `ItemControlsInfo`    | The record returned by `Parse`                                                  |

@@ -7,7 +7,7 @@ a list of `ItemInfo` objects into report sections. It applies a list of `RuleCon
 entries to determine which section each item belongs to, avoiding duplication of
 routing logic across multiple connector implementations.
 
-All connectors (GitHub, future Azure DevOps, etc.) call `ItemRouter` rather than
+All connectors (GitHub, Azure DevOps, Mock) call `ItemRouter` rather than
 each implementing their own routing.
 
 ## Methods
@@ -50,4 +50,4 @@ ad-hoc sections without requiring them to be pre-declared.
 - `RuleConfig` provides routing rules from the Configuration subsystem.
 - `SectionConfig` provides section definitions from the Configuration subsystem.
 - `RepoConnectorBase.ApplyRules` calls `ItemRouter.Route` to assign items to report sections.
-- `GitHubRepoConnector` and `MockRepoConnector` call `ApplyRules` when rules are configured.
+- `GitHubRepoConnector`, `AzureDevOpsRepoConnector`, and `MockRepoConnector` call `ApplyRules` when rules are configured.

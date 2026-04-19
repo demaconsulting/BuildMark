@@ -136,6 +136,30 @@ public class IntegrationTests
     }
 
     /// <summary>
+    ///     Test that the tool handles an invalid report file path gracefully.
+    /// </summary>
+    [TestMethod]
+    public void IntegrationTest_InvalidReportPath_ShowsError()
+    {
+        // Arrange: construct a path whose parent directory does not exist
+        var invalidPath = Path.Combine(
+            Path.GetTempPath(),
+            Guid.NewGuid().ToString(),
+            "nonexistent",
+            "output.md");
+
+        using var context = Context.Create(
+            ["--build-version", "1.0.0", "--report", invalidPath, "--silent"],
+            () => new MockRepoConnector());
+
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: tool reports the error gracefully and exits with error code
+        Assert.AreEqual(1, context.ExitCode);
+    }
+
+    /// <summary>
     ///     Test that validate flag runs self-validation.
     /// </summary>
     [TestMethod]

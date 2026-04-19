@@ -139,9 +139,10 @@ Example validation report:
 ✓ BuildMark_GitIntegration - Passed
 ✓ BuildMark_IssueTracking - Passed
 ✓ BuildMark_KnownIssuesReporting - Passed
+✓ BuildMark_RulesRouting - Passed
 
-Total Tests: 4
-Passed: 4
+Total Tests: 5
+Passed: 5
 Failed: 0
 ```
 
@@ -153,3 +154,4 @@ Each test proves specific functionality works correctly:
 - **`BuildMark_GitIntegration`** - Git repository connector reads version tags and commits.
 - **`BuildMark_IssueTracking`** - GitHub issue and pull request tracking works correctly.
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
+- **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.

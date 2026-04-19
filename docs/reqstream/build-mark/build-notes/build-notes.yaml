@@ -25,6 +25,7 @@ sections:
           - BuildNotes_ReportModel_IncludesFullChangelog
         children:
           - BuildMark-BuildInformation-Markdown
+          - BuildMark-BuildInformation-RoutedSections
           - BuildMark-ItemInfo-Record
           - BuildMark-VersionCommitTag-Record
           - BuildMark-WebLink-Record
