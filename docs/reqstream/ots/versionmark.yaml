@@ -1,8 +1,12 @@
 ---
+# VersionMark OTS Software Requirements
+#
+# Requirements for the VersionMark version tracking tool functionality.
+
 sections:
   - title: OTS Software Requirements
     sections:
-      - title: VersionMark
+      - title: VersionMark Requirements
         requirements:
           - id: BuildMark-OTS-VersionMark
             title: VersionMark shall publish captured tool-version information.
