@@ -2,7 +2,7 @@
 title: BuildMark User Guide
 subtitle: A .NET Command-Line Tool for Build Notes Generation
 author: DEMA Consulting
-description: A .NET Command-Line Tool for generating markdown build notes from Git repositories
+description: A .NET Command-Line Tool for Build Notes Generation from Git repositories
 lang: en-US
 keywords:
   - BuildMark
