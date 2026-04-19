@@ -68,57 +68,49 @@ reviews:
     paths:
       - "docs/reqstream/build-mark/cli/cli.yaml"
       - "docs/design/build-mark/cli/cli.md"
-      - "test/**/Cli/ContextTests.cs"
+      - "test/**/Cli/CliTests.cs"
 
   - id: BuildMark-SelfTest
     title: Review of BuildMark SelfTest subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/self-test/self-test.yaml"
       - "docs/design/build-mark/self-test/self-test.md"
-      - "test/**/SelfTest/ValidationTests.cs"
+      - "test/**/SelfTest/SelfTestTests.cs"
 
   - id: BuildMark-Utilities
     title: Review of BuildMark Utilities subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/utilities/utilities.yaml"
       - "docs/design/build-mark/utilities/utilities.md"
-      - "test/**/Utilities/PathHelpersTests.cs"
-      - "test/**/Utilities/ProcessRunnerTests.cs"
+      - "test/**/Utilities/UtilitiesTests.cs"
 
   - id: BuildMark-Version
     title: Review of BuildMark Version subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/version/version.yaml"
-      - "docs/design/build-mark/version/**/*.md"
+      - "docs/design/build-mark/version/version.md"
       - "test/**/Version/VersionTests.cs"
-      - "test/**/Version/VersionComparableTests.cs"
-      - "test/**/Version/VersionSemanticTests.cs"
-      - "test/**/Version/VersionTagTests.cs"
-      - "test/**/Version/VersionIntervalTests.cs"
-      - "test/**/Version/VersionIntervalSetTests.cs"
 
   - id: BuildMark-RepoConnectors
     title: Review of BuildMark RepoConnectors subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/repo-connectors/repo-connectors.yaml"
       - "docs/design/build-mark/repo-connectors/repo-connectors.md"
-      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
       - "test/**/RepoConnectors/RepoConnectorsTests.cs"
-      - "test/**/RepoConnectors/ItemRouterTests.cs"
 
   - id: BuildMark-BuildNotes
     title: Review of BuildMark BuildNotes subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/build-notes/build-notes.yaml"
       - "docs/design/build-mark/build-notes/build-notes.md"
-      - "test/**/BuildNotes/BuildInformationTests.cs"
+      - "test/**/BuildNotes/BuildNotesTests.cs"
 
   - id: BuildMark-Configuration
     title: Review of BuildMark Configuration subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/configuration/configuration.yaml"
       - "docs/design/build-mark/configuration/configuration.md"
-      - "test/**/Configuration/ConfigurationTests.cs"
+      - "test/**/Configuration/ConfigurationSubsystemTests.cs"
 
   # Top-level unit reviews
   - id: BuildMark-Program
@@ -258,39 +250,28 @@ reviews:
       - "src/**/Configuration/ConnectorConfig.cs"
       - "src/**/Configuration/GitHubConnectorConfig.cs"
       - "src/**/Configuration/AzureDevOpsConnectorConfig.cs"
+      - "src/**/Configuration/ReportConfig.cs"
       - "src/**/Configuration/SectionConfig.cs"
       - "src/**/Configuration/RuleConfig.cs"
       - "test/**/Configuration/ConfigurationTests.cs"
 
-  # Unit reviews - RepoConnectors subsystem
-  - id: BuildMark-RepoConnectors-RepoConnectorBase
-    title: Review of BuildMark RepoConnectors RepoConnectorBase unit implementation
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml"
-      - "docs/design/build-mark/repo-connectors/repo-connector-base.md"
-      - "src/**/RepoConnectors/IRepoConnector.cs"
-      - "src/**/RepoConnectors/RepoConnectorBase.cs"
-
-  - id: BuildMark-RepoConnectors-MockRepoConnector
-    title: Review of BuildMark RepoConnectors MockRepoConnector unit implementation
+  # Sub-subsystem reviews - RepoConnectors subsystem
+  - id: BuildMark-RepoConnectors-Mock
+    title: Review of BuildMark RepoConnectors Mock subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/repo-connectors/mock/mock-repo-connector.yaml"
+      - "docs/design/build-mark/repo-connectors/mock/mock.md"
       - "docs/design/build-mark/repo-connectors/mock/mock-repo-connector.md"
       - "src/**/RepoConnectors/Mock/MockRepoConnector.cs"
       - "test/**/RepoConnectors/Mock/MockRepoConnectorTests.cs"
 
-  - id: BuildMark-RepoConnectors-RepoConnectorFactory
-    title: Review of BuildMark RepoConnectors RepoConnectorFactory unit implementation
-    paths:
-      - "docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml"
-      - "docs/design/build-mark/repo-connectors/repo-connector-factory.md"
-      - "src/**/RepoConnectors/RepoConnectorFactory.cs"
-      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
-
-  - id: BuildMark-RepoConnectors-GitHubRepoConnector
-    title: Review of BuildMark RepoConnectors GitHubRepoConnector unit implementation
+  - id: BuildMark-RepoConnectors-GitHub
+    title: Review of BuildMark RepoConnectors GitHub subsystem architecture and interfaces
     paths:
       - "docs/reqstream/build-mark/repo-connectors/github/github-repo-connector.yaml"
+      - "docs/design/build-mark/repo-connectors/github/github.md"
+      - "docs/design/build-mark/repo-connectors/github/github-graphql-client.md"
+      - "docs/design/build-mark/repo-connectors/github/github-graphql-types.md"
       - "docs/design/build-mark/repo-connectors/github/github-repo-connector.md"
       - "src/**/RepoConnectors/GitHub/GitHubRepoConnector.cs"
       - "src/**/RepoConnectors/GitHub/GitHubGraphQLClient.cs"
@@ -306,10 +287,29 @@ reviews:
       - "test/**/RepoConnectors/GitHub/MockGitHubGraphQLHttpMessageHandlerTests.cs"
       - "test/**/RepoConnectors/GitHub/MockableGitHubRepoConnector.cs"
 
+  # Unit reviews - RepoConnectors subsystem
+  - id: BuildMark-RepoConnectors-RepoConnectorBase
+    title: Review of BuildMark RepoConnectors RepoConnectorBase unit implementation
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml"
+      - "docs/design/build-mark/repo-connectors/repo-connector-base.md"
+      - "src/**/RepoConnectors/IRepoConnector.cs"
+      - "src/**/RepoConnectors/RepoConnectorBase.cs"
+      - "test/**/RepoConnectors/RepoConnectorBaseTests.cs"
+
+  - id: BuildMark-RepoConnectors-RepoConnectorFactory
+    title: Review of BuildMark RepoConnectors RepoConnectorFactory unit implementation
+    paths:
+      - "docs/reqstream/build-mark/repo-connectors/repo-connector-factory.yaml"
+      - "docs/design/build-mark/repo-connectors/repo-connector-factory.md"
+      - "src/**/RepoConnectors/RepoConnectorFactory.cs"
+      - "test/**/RepoConnectors/RepoConnectorFactoryTests.cs"
+
   - id: BuildMark-RepoConnectors-ItemControlsParser
     title: Review of BuildMark RepoConnectors ItemControlsParser unit implementation
     paths:
       - "docs/reqstream/build-mark/repo-connectors/item-controls-parser.yaml"
+      - "docs/design/build-mark/repo-connectors/item-controls-info.md"
       - "docs/design/build-mark/repo-connectors/item-controls-parser.md"
       - "src/**/RepoConnectors/ItemControlsInfo.cs"
       - "src/**/RepoConnectors/ItemControlsParser.cs"
@@ -338,3 +338,5 @@ reviews:
       - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs"
       - "src/**/RepoConnectors/AzureDevOps/WorkItemMapper.cs"
       - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnectorTests.cs"
+      - "test/**/RepoConnectors/AzureDevOps/MockableAzureDevOpsRepoConnector.cs"
+      - "test/**/RepoConnectors/AzureDevOps/MockAzureDevOpsHttpMessageHandler.cs"
