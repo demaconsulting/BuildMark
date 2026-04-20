@@ -21,7 +21,6 @@
 using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
-using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
@@ -49,6 +48,15 @@ public class RepoConnectorBaseTests
         /// <returns>Routed sections.</returns>
         public IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> ExposedApplyRules(
             IEnumerable<ItemInfo> items) => ApplyRules(items);
+
+        /// <summary>
+        ///     Exposes FindVersionIndex for test assertions.
+        /// </summary>
+        /// <param name="versions">Version list to search.</param>
+        /// <param name="targetVersion">Target version to find.</param>
+        /// <returns>Index of the matching version, or -1 if not found.</returns>
+        public static int ExposedFindVersionIndex(List<VersionTag> versions, VersionTag targetVersion) =>
+            FindVersionIndex(versions, targetVersion);
 
         /// <inheritdoc/>
         public override Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
@@ -145,47 +153,51 @@ public class RepoConnectorBaseTests
     }
 
     /// <summary>
-    ///     Test that FindVersionIndex works correctly with different prefixes but same version.
+    ///     Test that FindVersionIndex finds the correct index when tags have different prefixes but the same semantic version.
     /// </summary>
     [TestMethod]
     public void RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex()
     {
         // Arrange - Create version tags with different prefixes but same semantic version
-        List<VersionCommitTag> tags =
+        List<VersionTag> versions =
         [
-            new(VersionTag.Create("v1.0.0")!, "hash1"),
-            new(VersionTag.Create("VER1.2.3")!, "hash2"),
-            new(VersionTag.Create("Release_1.2.3")!, "hash3"),
-            new(VersionTag.Create("v2.0.0")!, "hash4")
+            VersionTag.Create("v1.0.0"),
+            VersionTag.Create("VER1.2.3"),
+            VersionTag.Create("Release_1.2.3"),
+            VersionTag.Create("v2.0.0")
         ];
 
-        // Target version to find (different prefix but same semantic version as index 1 and 2)
-        var targetVersion = VersionComparable.Create("1.2.3");
+        // Target version with a different prefix but the same semantic version as index 1 and 2
+        var targetVersion = VersionTag.Create("v1.2.3");
 
-        // Act - Find version index using protected method through exposed functionality
-        int foundIndex = -1;
-        for (int i = 0; i < tags.Count; i++)
-        {
-            if (tags[i].VersionTag.Semantic.Comparable.CompareTo(targetVersion) == 0)
-            {
-                foundIndex = i;
-                break;
-            }
-        }
+        // Act - Find version index using the protected static method
+        var foundIndex = TestableRepoConnector.ExposedFindVersionIndex(versions, targetVersion);
 
         // Assert - Should find the first matching semantic version (index 1)
         Assert.AreEqual(1, foundIndex, "Should find the first tag with matching semantic version 1.2.3");
+    }
 
-        // Additional verification - verify different prefixes yield same comparable version
-        var tag1 = VersionTag.Create("VER1.2.3");
-        var tag2 = VersionTag.Create("Release_1.2.3");
-        var tag3 = VersionTag.Create("v1.2.3");
+    /// <summary>
+    ///     Test that FindVersionIndex returns -1 when the target version is not in the list.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne()
+    {
+        // Arrange - Create a version list that does not contain the target version
+        List<VersionTag> versions =
+        [
+            VersionTag.Create("v1.0.0"),
+            VersionTag.Create("v2.0.0"),
+            VersionTag.Create("v3.0.0")
+        ];
 
-        Assert.AreEqual(tag1!.Semantic.Comparable, tag2!.Semantic.Comparable, "VER and Release prefixes should yield same comparable");
-        Assert.AreEqual(tag1.Semantic.Comparable, tag3!.Semantic.Comparable, "VER and v prefixes should yield same comparable");
-        Assert.AreEqual(tag2.Semantic.Comparable, tag3.Semantic.Comparable, "Release and v prefixes should yield same comparable");
+        // Target version is absent from the list
+        var targetVersion = VersionTag.Create("v4.0.0");
+
+        // Act - Attempt to find a version that is not present
+        var foundIndex = TestableRepoConnector.ExposedFindVersionIndex(versions, targetVersion);
+
+        // Assert - Should return -1 when version is not found
+        Assert.AreEqual(-1, foundIndex, "Should return -1 when the target version is not in the list");
     }
 }
-
-
-

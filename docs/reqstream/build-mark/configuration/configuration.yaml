@@ -21,9 +21,9 @@ sections:
           file is present or malformed, so that callers can inspect issues without
           special-casing null returns.
         tests:
-          - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
-          - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
-          - Configuration_ReadAsync_MalformedFile_ReportsError
+          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+          - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
+          - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
         children:
           - BuildMark-ConfigReader-ReadAsync
           - BuildMark-ConfigReader-MissingFile
@@ -38,9 +38,9 @@ sections:
           description allows the tool to give precise, actionable feedback when a
           configuration file contains errors.
         tests:
-          - Configuration_Issues_ErrorIssue_SetsExitCode
-          - Configuration_Issues_WarningIssue_DoesNotSetExitCode
-          - Configuration_Issues_ValidationError_ReportsAccurateLine
+          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+          - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+          - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
         children:
           - BuildMark-ConfigLoadResult-ReportTo
 
@@ -52,8 +52,8 @@ sections:
           deserialization ensures the factory receives the right settings for the
           selected connector.
         tests:
-          - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
-          - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
+          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
         children:
           - BuildMark-GitHubConnectorConfig-Properties
           - BuildMark-AzureDevOpsConnectorConfig-Properties

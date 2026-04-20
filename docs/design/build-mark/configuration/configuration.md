@@ -121,6 +121,13 @@ problem with its file path, line number, severity, and description.
 | `Match` | Property | Match conditions (labels, work-item types) for the rule |
 | `Route` | Property | Destination section `Id` for matched items              |
 
+`RuleMatchConfig` carries the following properties:
+
+| Member         | Kind     | Description                                                       |
+|----------------|----------|-------------------------------------------------------------------|
+| `Label`        | Property | List of label values; the rule matches when any label is present  |
+| `WorkItemType` | Property | List of work-item type values; the rule matches when any type matches |
+
 ## Interactions
 
 | Unit / Subsystem           | Role                                                                          |

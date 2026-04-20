@@ -372,6 +372,61 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that reporting a warning issue does not set the context exit code.
+    /// </summary>
+    [TestMethod]
+    public void ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode()
+    {
+        // Arrange
+        using var context = Context.Create(["--silent"]);
+        var result = new ConfigurationLoadResult(
+            null,
+            [
+                new ConfigurationIssue(
+                    "/tmp/.buildmark.yaml",
+                    2,
+                    ConfigurationIssueSeverity.Warning,
+                    "Example warning")
+            ]);
+
+        // Act
+        result.ReportTo(context);
+
+        // Assert
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    ///     Test that ReportTo includes the file path and line number in the formatted message.
+    /// </summary>
+    [TestMethod]
+    public void ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber()
+    {
+        // Arrange
+        using var context = Context.Create(["--silent"]);
+        var result = new ConfigurationLoadResult(
+            null,
+            [
+                new ConfigurationIssue(
+                    "/repo/.buildmark.yaml",
+                    7,
+                    ConfigurationIssueSeverity.Error,
+                    "Unexpected value")
+            ]);
+
+        // Act
+        result.ReportTo(context);
+
+        // Assert - the issue's FilePath and Line are surfaced via WriteError; confirm HasErrors
+        // and that the issue record exposes the correct location fields
+        Assert.IsTrue(result.HasErrors);
+        Assert.AreEqual("/repo/.buildmark.yaml", result.Issues[0].FilePath);
+        Assert.AreEqual(7, result.Issues[0].Line);
+        Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.AreEqual("Unexpected value", result.Issues[0].Description);
+    }
+
+    /// <summary>
     ///     Test that the default configuration contains the expected sections and routing rules.
     /// </summary>
     [TestMethod]

@@ -14,13 +14,14 @@ assembly or external tooling.
 
 The connector holds hard-coded mappings used to build the `BuildInformation` response:
 
-| Field                | Type                               | Description                                  |
-|----------------------|------------------------------------|----------------------------------------------|
-| `_issueTitles`       | `Dictionary<string, string>`       | Issue ID -> title                            |
-| `_issueTypes`        | `Dictionary<string, string>`       | Issue ID -> type (bug/feature/documentation) |
-| `_pullRequestIssues` | `Dictionary<string, List<string>>` | PR ID -> linked issue IDs                    |
-| `_tagHashes`         | `Dictionary<string, string>`       | Tag name -> commit hash                      |
-| `_openIssues`        | `List<string>`                     | IDs of issues that remain open               |
+| Field                    | Type                                      | Description                                  |
+|--------------------------|-------------------------------------------|----------------------------------------------|
+| `_issueTitles`           | `Dictionary<string, string>`              | Issue ID -> title                            |
+| `_issueTypes`            | `Dictionary<string, string>`              | Issue ID -> type (bug/feature/documentation) |
+| `_pullRequestIssues`     | `Dictionary<string, List<string>>`        | PR ID -> linked issue IDs                    |
+| `_tagHashes`             | `Dictionary<string, string>`              | Tag name -> commit hash                      |
+| `_openIssues`            | `List<string>`                            | IDs of issues that remain open               |
+| `_issueAffectedVersions` | `Dictionary<string, VersionIntervalSet>`  | Issue ID -> declared affected-versions range |
 
 ## Methods
 
