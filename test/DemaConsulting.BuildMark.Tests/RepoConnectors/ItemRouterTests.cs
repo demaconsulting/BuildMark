@@ -215,7 +215,63 @@ public class ItemRouterTests
         Assert.HasCount(1, newSection);
         Assert.AreEqual("1", newSection[0].Id);
     }
+
+    /// <summary>
+    ///     Test that label matching is case-insensitive.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem()
+    {
+        // Arrange - item type is "Bug" (capitalized) while rule label is "bug" (lowercase)
+        List<ItemInfo> items =
+        [
+            new("1", "Bug Item", "https://example.com/1", "Bug", 1)
+        ];
+        List<SectionConfig> sections =
+        [
+            new() { Id = "changes", Title = "Changes" },
+            new() { Id = "bugs", Title = "Bugs" }
+        ];
+        List<RuleConfig> rules =
+        [
+            new()
+            {
+                Match = new RuleMatchConfig { Label = { "bug" } },
+                Route = "bugs"
+            }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - "Bug" type matches "bug" label rule due to case-insensitive comparison
+        Assert.IsEmpty(routedItems["changes"]);
+        Assert.HasCount(1, routedItems["bugs"]);
+        Assert.AreEqual("1", routedItems["bugs"][0].Id);
+    }
+
+    /// <summary>
+    ///     Test that the suppressed route value is matched case-insensitively.
+    /// </summary>
+    [TestMethod]
+    public void ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem()
+    {
+        // Arrange - route value is "SUPPRESSED" (uppercase) to verify case-insensitive comparison
+        List<ItemInfo> items = [new("1", "Internal", "https://example.com/1", "internal", 1)];
+        List<SectionConfig> sections = [new() { Id = "changes", Title = "Changes" }];
+        List<RuleConfig> rules =
+        [
+            new()
+            {
+                Match = new RuleMatchConfig { Label = { "internal" } },
+                Route = "SUPPRESSED"
+            }
+        ];
+
+        // Act
+        var routedItems = ItemRouter.Route(items, rules, sections);
+
+        // Assert - item is omitted even when the route value uses uppercase "SUPPRESSED"
+        Assert.IsEmpty(routedItems["changes"]);
+    }
 }
-
-
-

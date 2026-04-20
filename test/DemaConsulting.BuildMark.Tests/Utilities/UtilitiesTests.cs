@@ -20,7 +20,6 @@
 
 using System.Runtime.InteropServices;
 using DemaConsulting.BuildMark.Utilities;
-using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests.Utilities;
 
@@ -137,114 +136,6 @@ public class UtilitiesTests
         Assert.Contains("failed with exit code", exception.Message);
     }
 
-    // ─────────────────────────────────────────────────────────────────────────
-    // BuildMark-Utilities-Version
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    ///     Test that the Utilities subsystem parses a simple version tag correctly.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_Version_SimpleTag_ParsesCorrectly()
-    {
-        // Arrange & Act: parse a simple version tag
-        var version = VersionTag.Create("v1.2.3");
-
-        // Assert: version components are parsed correctly
-        Assert.AreEqual("v1.2.3", version.Tag);
-        Assert.AreEqual("1.2.3", version.Numbers);
-        Assert.IsFalse(version.IsPreRelease);
-    }
-
-    /// <summary>
-    ///     Test that the Utilities subsystem correctly detects pre-release versions.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_Version_PreRelease_DetectsCorrectly()
-    {
-        // Arrange & Act: parse a pre-release version tag
-        var version = VersionTag.Create("v2.0.0-beta.1");
-
-        // Assert: pre-release is detected
-        Assert.IsTrue(version.IsPreRelease);
-        Assert.AreEqual("2.0.0", version.Numbers);
-        Assert.AreEqual("beta.1", version.PreRelease);
-    }
-
-    /// <summary>
-    ///     Test that the Utilities subsystem returns null for an invalid version tag.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_Version_InvalidTag_ReturnsNull()
-    {
-        // Arrange & Act: attempt to parse an invalid tag
-        var version = VersionTag.TryCreate("not-a-version");
-
-        // Assert: null is returned
-        Assert.IsNull(version);
-    }
-
-    // ─────────────────────────────────────────────────────────────────────────
-    // BuildMark-Utilities-VersionInterval
-    // ─────────────────────────────────────────────────────────────────────────
-
-    /// <summary>
-    ///     Test that the Utilities subsystem parses a valid version interval.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_VersionInterval_ValidInterval_Parses()
-    {
-        // Arrange & Act: parse a version interval
-        var interval = VersionInterval.Parse("[1.0.0,2.0.0)");
-
-        // Assert: interval bounds are parsed correctly
-        Assert.IsNotNull(interval);
-        Assert.AreEqual("1.0.0", interval.LowerBound);
-        Assert.IsTrue(interval.LowerInclusive);
-        Assert.AreEqual("2.0.0", interval.UpperBound);
-        Assert.IsFalse(interval.UpperInclusive);
-    }
-
-    /// <summary>
-    ///     Test that the Utilities subsystem returns null for an invalid interval.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_VersionInterval_InvalidInterval_ReturnsNull()
-    {
-        // Arrange & Act: attempt to parse an invalid interval
-        var interval = VersionInterval.Parse("not-an-interval");
-
-        // Assert: null is returned
-        Assert.IsNull(interval);
-    }
-
-    /// <summary>
-    ///     Test that the Utilities subsystem parses multiple intervals in a set.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_VersionIntervalSet_MultipleIntervals_ParsesAll()
-    {
-        // Arrange & Act: parse multiple intervals
-        var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");
-
-        // Assert: both intervals are parsed
-        Assert.HasCount(2, intervalSet.Intervals);
-        Assert.AreEqual("1.0.0", intervalSet.Intervals[0].LowerBound);
-        Assert.AreEqual("3.0.0", intervalSet.Intervals[1].LowerBound);
-    }
-
-    /// <summary>
-    ///     Test that the Utilities subsystem returns an empty set for an empty string.
-    /// </summary>
-    [TestMethod]
-    public void Utilities_VersionIntervalSet_EmptyString_ReturnsEmpty()
-    {
-        // Arrange & Act: parse an empty string
-        var intervalSet = VersionIntervalSet.Parse("");
-
-        // Assert: empty set is returned
-        Assert.IsEmpty(intervalSet.Intervals);
-    }
 }
 
 

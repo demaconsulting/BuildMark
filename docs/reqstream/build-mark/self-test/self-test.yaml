@@ -22,6 +22,7 @@ sections:
         tests:
           - SelfTest_Validation_WithTrxFile_WritesResults
           - SelfTest_Validation_WithXmlFile_WritesResults
+          - SelfTest_Qualification_WithoutResultsFile_Succeeds
         children:
           - BuildMark-Validation-Run
 

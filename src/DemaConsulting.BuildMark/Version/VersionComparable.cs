@@ -94,7 +94,7 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
                 // Both are same type - compare accordingly
                 true => NumericValue.CompareTo(other.NumericValue),
 
-                // Both are non-numeric - compare lexically (case-insensitive per SemVer)
+                // Both are non-numeric - compare lexically (case-insensitive by design)
                 _ => string.Compare(TextValue, other.TextValue, StringComparison.OrdinalIgnoreCase)
             };
         }
@@ -133,6 +133,7 @@ public partial record VersionComparable(int Major, int Minor, int Patch, string?
 
         return segments;
     }
+
     /// <summary>
     ///     The core semantic numbers (major.minor.patch).
     /// </summary>

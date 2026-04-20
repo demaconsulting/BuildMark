@@ -44,3 +44,17 @@ sections:
           - MockRepoConnector_Configure_StoresRulesAndSections
           - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
           - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections
+
+      - id: BuildMark-RepoConnectorBase-FindVersionIndex
+        title: >-
+          The RepoConnectorBase class shall provide a static utility method to locate
+          a version tag by semantic equality within a version list, returning its
+          zero-based index or -1 if not found.
+        justification: |
+          Matching version tags by semantic equality rather than raw tag string allows
+          connectors to handle different tagging conventions (e.g., 'v1.2.3',
+          'VER1.2.3', 'Release-1.2.3') without failing to find a corresponding entry.
+          Centralizing this in the base class avoids duplication across connectors.
+        tests:
+          - RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex
+          - RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne

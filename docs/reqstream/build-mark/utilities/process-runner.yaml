@@ -19,5 +19,7 @@ sections:
           - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
           - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
           - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+          - ProcessRunner_TryRunAsync_WithException_ReturnsNull
           - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
           - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+          - ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException

@@ -155,5 +155,5 @@ Throughout this document:
 - [BuildMark User Guide][user-guide]
 - [BuildMark Repository][repo]
 
-[user-guide]: ../guide/guide.md
+[user-guide]: ../user_guide/introduction.md
 [repo]: https://github.com/demaconsulting/BuildMark

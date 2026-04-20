@@ -37,6 +37,7 @@ sections:
           troubleshooting and compatibility verification.
         tests:
           - Cli_VersionFlag_SetsProperty
+          - Cli_VersionShortFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -47,6 +48,7 @@ sections:
           external resources.
         tests:
           - Cli_HelpFlag_SetsProperty
+          - Cli_HelpShortFlags_SetProperty
         children:
           - BuildMark-Context-ArgumentParsing
 
@@ -73,10 +75,12 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Report
-        title: The Cli subsystem shall support --report and --depth flags to configure report output.
+        title: The Cli subsystem shall support --report, --depth, and --include-known-issues flags to configure
+          report output.
         justification: |
-          Enables users to direct build notes output to a specific file and embed it at
-          any heading level within a larger markdown document.
+          Enables users to direct build notes output to a specific file, embed it at
+          any heading level within a larger markdown document, and control whether
+          known issues are included in the report.
         tests:
           - Cli_ReportFlags_SetProperties
         children:
@@ -102,13 +106,25 @@ sections:
         children:
           - BuildMark-Context-ArgumentParsing
 
+      - id: BuildMark-Cli-Lint
+        title: The Cli subsystem shall support --lint flag to signal configuration linting.
+        justification: |
+          Allows users to validate the .buildmark.yaml configuration file without running
+          a full build, providing early feedback on configuration errors.
+        tests:
+          - Cli_LintFlag_SetsProperty
+        children:
+          - BuildMark-Context-ArgumentParsing
+
       - id: BuildMark-Cli-Results
-        title: The Cli subsystem shall support --results flag to specify a test results output file.
+        title: The Cli subsystem shall support --results (and --result alias) flag to specify a test results output
+          file.
         justification: |
           Enables integration with CI/CD systems that expect standard test result formats
           (TRX or JUnit XML).
         tests:
           - Cli_ResultsFlag_SetsProperty
+          - Cli_ResultFlag_SetsProperty
         children:
           - BuildMark-Context-ArgumentParsing
 

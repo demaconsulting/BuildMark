@@ -53,7 +53,7 @@ public record VersionIntervalSet(IReadOnlyList<VersionInterval> Intervals)
     /// <returns>True when the version is within any interval; otherwise false.</returns>
     public bool Contains(VersionTag version)
     {
-        return Contains(version.Numbers);
+        return Contains(version.Semantic.Comparable);
     }
 
     /// <summary>

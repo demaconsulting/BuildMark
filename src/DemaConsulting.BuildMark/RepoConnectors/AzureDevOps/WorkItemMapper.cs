@@ -43,7 +43,8 @@ internal static class WorkItemMapper
     private static readonly HashSet<string> FeatureTypes = new(StringComparer.OrdinalIgnoreCase)
     {
         "User Story",
-        "Feature"
+        "Feature",
+        "Epic"
     };
 
     /// <summary>

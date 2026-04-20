@@ -11,7 +11,7 @@ and passed to `Program`, which calls `ToMarkdown` to render the final file.
 ```csharp
 public record BuildInformation(
     VersionCommitTag? BaselineVersionTag,
-    VersionCommitTag? CurrentVersionTag,
+    VersionCommitTag CurrentVersionTag,
     List<ItemInfo> Changes,
     List<ItemInfo> Bugs,
     List<ItemInfo> KnownIssues,
@@ -20,7 +20,7 @@ public record BuildInformation(
 
 - `BaselineVersionTag` (`VersionCommitTag?`) — the previous version tag, which is the
   lower boundary of the reported range
-- `CurrentVersionTag` (`VersionCommitTag?`) — the version tag being reported
+- `CurrentVersionTag` (`VersionCommitTag`) — the version tag being reported
 - `Changes` (`List<ItemInfo>`) — feature and other non-bug items in this build
 - `Bugs` (`List<ItemInfo>`) — bug-fix items in this build
 - `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed
@@ -39,9 +39,10 @@ controls the top-level heading depth (default `1`), allowing the report to be
 embedded at any level in a larger document. The `includeKnownIssues` flag controls
 whether the Known Issues section is emitted.
 
-When `RoutedSections` is populated, `ToMarkdown` renders each section from the
-`RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
-`Changes`, `Bugs`, and `KnownIssues` lists.
+When `RoutedSections` is non-null and non-empty, `ToMarkdown` renders each section
+from the `RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
+`Changes`, `Bugs`, and `KnownIssues` lists. When `RoutedSections` is `null` or
+empty, `ToMarkdown` falls back to the legacy sections.
 
 The rendered output contains the following sections:
 
@@ -58,14 +59,10 @@ The rendered output contains the following sections:
 
 ## Interactions
 
-+--------------------+-------------------------------------------------------------------+
 | Unit / Subsystem   | Role                                                              |
-+====================+===================================================================+
-| `VersionCommitTag` | Carries version and commit hash for baseline and current entries |
-+--------------------+-------------------------------------------------------------------+
-| `ItemInfo`         | Each item in `Changes`, `Bugs`, and `KnownIssues`                |
-+--------------------+-------------------------------------------------------------------+
-| `WebLink`          | Optional complete-changelog hyperlink                            |
-+--------------------+-------------------------------------------------------------------+
-| `RepoConnectors`    | Connectors assemble and return a `BuildInformation` record        |
-| `Program`           | Calls `ToMarkdown` to produce the final report file               |
+| :----------------- | :---------------------------------------------------------------- |
+| `VersionCommitTag` | Carries version and commit hash for baseline and current entries  |
+| `ItemInfo`         | Each item in `Changes`, `Bugs`, and `KnownIssues`                 |
+| `WebLink`          | Optional complete-changelog hyperlink                             |
+| `RepoConnectors`   | Connectors assemble and return a `BuildInformation` record        |
+| `Program`          | Calls `ToMarkdown` to produce the final report file               |

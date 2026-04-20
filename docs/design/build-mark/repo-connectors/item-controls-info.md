@@ -28,5 +28,7 @@ public record ItemControlsInfo(
   block contains one or more recognized keys.
 - `GitHubRepoConnector` consumes the parsed values to override item visibility,
   item type, and affected-version metadata.
+- `WorkItemMapper` (used by `AzureDevOpsRepoConnector`) consumes the parsed values
+  to override item visibility, item type, and affected-version metadata.
 - `VersionIntervalSet` carries the parsed interval representation for the
   `affected-versions` field.

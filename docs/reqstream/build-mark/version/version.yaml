@@ -21,6 +21,7 @@ sections:
           information generation.
         tests:
           - Version_Subsystem_CreateAllVersionTypes_WorksCorrectly
+          - Version_Subsystem_TagToComparableIntegration_WorksCorrectly
         children:
           - BuildMark-VersionComparable-Comparison
           - BuildMark-VersionComparable-PreReleaseComparison

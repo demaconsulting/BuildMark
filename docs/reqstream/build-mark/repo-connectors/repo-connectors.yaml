@@ -21,6 +21,11 @@ sections:
         tests:
           - RepoConnectors_ConnectorBase_MockConnector_ImplementsInterface
           - RepoConnectors_ConnectorBase_GitHubConnector_ImplementsInterface
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
+          - RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+          - RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
+          - RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
         children:
           - BuildMark-RepoConnectorBase-Interface
           - BuildMark-RepoConnectorBase-CommandExecution
@@ -37,6 +42,8 @@ sections:
           - RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo
         children:
           - BuildMark-RepoConnectorFactory-Create
+          - BuildMark-RepoConnectorFactory-ConnectorConfig
+          - BuildMark-RepoConnectorFactory-AzureDevOpsDetection
 
       - id: BuildMark-RepoConnectors-ItemRouter
         title: >-
@@ -130,6 +137,7 @@ sections:
           - RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
           - RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
+          - BuildMark-AzureDevOps-UrlParsing
           - BuildMark-AzureDevOps-ConnectorConfig
           - BuildMark-AzureDevOps-BuildInformation
           - BuildMark-AzureDevOps-ItemControls

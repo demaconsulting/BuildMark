@@ -25,13 +25,13 @@ so that any open log file is properly flushed and closed.
 
 ### Parsed Arguments
 
-| Property           | Type                    | Default | Source                      |
-|--------------------|-------------------------|---------|-----------------------------|
-| `BuildVersion`     | `string?`               | `null`  | `--build-version <version>` |
-| `ReportFile`       | `string?`               | `null`  | `--report <file>`           |
-| `Depth`            | `int?`                  | `null`  | `--depth <depth>`           |
-| `ResultsFile`      | `string?`               | `null`  | `--results <file>`          |
-| `ConnectorFactory` | `Func<IRepoConnector>?` | `null`  | Injected via overload       |
+| Property           | Type                    | Default | Source                                 |
+|--------------------|-------------------------|---------|----------------------------------------|
+| `BuildVersion`     | `string?`               | `null`  | `--build-version <version>`            |
+| `ReportFile`       | `string?`               | `null`  | `--report <file>`                      |
+| `Depth`            | `int?`                  | `null`  | `--depth <depth>`                      |
+| `ResultsFile`      | `string?`               | `null`  | `--result <file>` / `--results <file>` |
+| `ConnectorFactory` | `Func<IRepoConnector>?` | `null`  | Injected via overload                  |
 
 ### Derived State
 

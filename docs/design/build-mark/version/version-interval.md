@@ -139,8 +139,8 @@ Tests whether a `VersionComparable` instance falls within any interval in the se
 ### `VersionIntervalSet.Contains(VersionTag version) → bool`
 
 Convenience overload for callers that already hold a parsed BuildMark
-`VersionTag`. This overload delegates to `Contains(string)` using
-`version.Numbers`.
+`VersionTag`. This overload delegates to `Contains(VersionComparable)` using
+`version.Semantic.Comparable`.
 
 ## Parsing Examples
 

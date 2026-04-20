@@ -58,6 +58,22 @@ via `RepoConnectorFactory.Create(result.Config?.Connector)`, fetches
 `BuildInformation`, writes a summary to the console, and optionally writes the
 markdown report to `context.ReportFile`.
 
+### `PrintBanner(Context context)`
+
+Writes the application name, version, and copyright notice to the context output.
+Called unconditionally after the version-flag check in `Run`.
+
+### `PrintHelp(Context context)`
+
+Writes the full usage message (command syntax, options list) to the context output.
+Called when any of the `-?`, `-h`, or `--help` flags is set.
+
+### `LoadConfiguration() → ConfigurationLoadResult`
+
+Synchronously invokes `BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory)`.
+Called from both the lint branch of `Run` and from `ProcessBuildNotes` to keep the
+async-to-sync bridging in one place.
+
 ## Interactions
 
 | Unit / Subsystem         | Role                                                                            |

@@ -72,12 +72,14 @@ Entry point for the parser. Steps:
 4. Return `null` if no fence is found.
 5. Split the block body into lines.
 6. Parse each line as a key-value pair.
-7. Build and return an `ItemControlsInfo` from the recognized keys.
+7. Build and return an `ItemControlsInfo` from the recognized keys, or `null` if no
+   recognized keys were found.
 
 ## Interactions
 
-| Unit / Subsystem      | Role                                                          |
-|-----------------------|---------------------------------------------------------------|
-| `GitHubRepoConnector` | Calls `Parse` on each issue and PR description body           |
-| `VersionIntervalSet`  | Created by the parser when `affected-versions` key is present |
-| `ItemControlsInfo`    | The record returned by `Parse`                                |
+| Unit / Subsystem      | Role                                                                            |
+|-----------------------|---------------------------------------------------------------------------------|
+| `GitHubRepoConnector` | Calls `Parse` on each issue and PR description body                             |
+| `WorkItemMapper`      | Calls `Parse` on each work item description body (`AzureDevOpsRepoConnector`)   |
+| `VersionIntervalSet`  | Created by the parser when `affected-versions` key is present                   |
+| `ItemControlsInfo`    | The record returned by `Parse`                                                  |

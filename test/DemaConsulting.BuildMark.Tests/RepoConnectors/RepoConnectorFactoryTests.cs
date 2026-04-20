@@ -169,21 +169,60 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
-    ///     Test that Create returns AzureDevOpsRepoConnector for Azure DevOps remote URLs.
-    ///     This test verifies the explicit type config path since environment-level remote URL
-    ///     detection cannot be isolated in a test without modifying the real git remote.
+    ///     Test that CreateFromRemoteUrl returns AzureDevOpsRepoConnector for dev.azure.com remote URLs.
     /// </summary>
     [TestMethod]
     public void RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector()
     {
-        // Arrange - use explicit config to verify Azure DevOps connector creation
-        // since we cannot modify the actual git remote URL during tests
-        var config = new ConnectorConfig { Type = "azure-devops" };
-
-        // Act
-        var connector = RepoConnectorFactory.Create(config);
+        // Act - supply a fake Azure DevOps remote URL directly
+        var connector = RepoConnectorFactory.CreateFromRemoteUrl(
+            null,
+            "https://dev.azure.com/myorg/myproject/_git/myrepo");
 
         // Assert
         Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that CreateFromRemoteUrl returns AzureDevOpsRepoConnector for visualstudio.com remote URLs.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithVisualStudioRemoteUrl_ReturnsAzureDevOpsConnector()
+    {
+        // Act - supply a fake visualstudio.com remote URL directly
+        var connector = RepoConnectorFactory.CreateFromRemoteUrl(
+            null,
+            "https://myorg.visualstudio.com/myproject/_git/myrepo");
+
+        // Assert
+        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that CreateFromRemoteUrl returns GitHubRepoConnector for github.com remote URLs.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithGitHubRemoteUrl_ReturnsGitHubConnector()
+    {
+        // Act - supply a fake GitHub remote URL directly
+        var connector = RepoConnectorFactory.CreateFromRemoteUrl(
+            null,
+            "https://github.com/example-owner/example-repo.git");
+
+        // Assert
+        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+    }
+
+    /// <summary>
+    ///     Test that CreateFromRemoteUrl defaults to GitHubRepoConnector when the remote URL is null.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithNullRemoteUrl_DefaultsToGitHubConnector()
+    {
+        // Act - supply null to represent an unavailable git remote
+        var connector = RepoConnectorFactory.CreateFromRemoteUrl(null, null);
+
+        // Assert
+        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
     }
 }

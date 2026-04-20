@@ -304,22 +304,77 @@ public class CliTests
     }
 
     /// <summary>
-    ///     Test that the Cli subsystem sets ExitCode to one after WriteError is called.
+    ///     Test that the Cli subsystem sets ExitCode to 1 when WriteError is called.
     /// </summary>
     [TestMethod]
     public void Cli_WriteError_SetsExitCodeToOne()
     {
-        // Arrange: create a silent context to avoid console output
-        using var context = Context.Create(["--silent"]);
-        Assert.AreEqual(0, context.ExitCode);
+        // Arrange: create context with no arguments
+        using var context = Context.Create([]);
 
-        // Act: write an error
-        context.WriteError("Error occurred");
+        // Capture console error output to avoid displaying error during test
+        using var errorOutput = new StringWriter();
+        var originalError = Console.Error;
 
-        // Assert: exit code is now 1
-        Assert.AreEqual(1, context.ExitCode);
+        try
+        {
+            Console.SetError(errorOutput);
+
+            // Act: write an error through the context
+            context.WriteError("Subsystem exit code test");
+
+            // Assert: exit code is set to 1
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            // Restore console error output
+            Console.SetError(originalError);
+        }
+    }
+
+    /// <summary>
+    ///     Test that the Cli subsystem sets the Version property when -v (short form) is specified.
+    /// </summary>
+    [TestMethod]
+    public void Cli_VersionShortFlag_SetsProperty()
+    {
+        // Arrange & Act: create context with -v short flag
+        using var context = Context.Create(["-v"]);
+
+        // Assert: Version property is set
+        Assert.IsTrue(context.Version);
+    }
+
+    /// <summary>
+    ///     Test that the Cli subsystem sets the Help property when short-form help flags are specified.
+    /// </summary>
+    [TestMethod]
+    public void Cli_HelpShortFlags_SetProperty()
+    {
+        // Arrange & Act: create context with -h short flag
+        using var contextH = Context.Create(["-h"]);
+
+        // Assert: Help property is set for -h
+        Assert.IsTrue(contextH.Help);
+
+        // Arrange & Act: create context with -? flag
+        using var contextQuestion = Context.Create(["-?"]);
+
+        // Assert: Help property is set for -?
+        Assert.IsTrue(contextQuestion.Help);
+    }
+
+    /// <summary>
+    ///     Test that the Cli subsystem sets the Lint property when --lint is specified.
+    /// </summary>
+    [TestMethod]
+    public void Cli_LintFlag_SetsProperty()
+    {
+        // Arrange & Act: create context with --lint flag
+        using var context = Context.Create(["--lint"]);
+
+        // Assert: Lint property is set
+        Assert.IsTrue(context.Lint);
     }
 }
-
-
-

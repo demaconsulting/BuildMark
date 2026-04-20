@@ -50,3 +50,4 @@ sections:
         tests:
           - VersionComparable_Create_ValidVersion_ReturnsInstance
           - VersionComparable_TryCreate_InvalidVersion_ReturnsNull
+          - VersionComparable_Create_InvalidVersion_ThrowsArgumentException

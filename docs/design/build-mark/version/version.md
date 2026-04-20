@@ -8,12 +8,13 @@ range operations, ensuring consistent semantic versioning behavior across all Bu
 
 ## Architecture
 
-The Version subsystem is composed of five units:
+The Version subsystem is composed of six units:
 
 - `VersionComparable` (Unit) — core semantic version comparison and ordering engine
 - `VersionSemantic` (Unit) — semantic version parsing and validation
 - `VersionTag` (Unit) — repository version tag processing and extraction
 - `VersionInterval` (Unit) — version range representation and operations
+- `VersionIntervalSet` (Unit) — ordered collection of version intervals for range queries
 - `VersionCommitTag` (Unit) — version-to-commit association for build information
 
 ## Version Type Hierarchy
@@ -83,9 +84,10 @@ Supports version range specifications in configuration files through VersionInte
 
 ## Error Handling
 
-Version processing follows fail-fast principles:
+Version processing provides two parsing patterns:
 
-- Invalid semantic versions return null rather than throwing exceptions
+- `TryCreate()` factory methods return null for invalid input, enabling safe parsing without exceptions
+- `Create()` factory methods throw `ArgumentException` for invalid input, enabling fail-fast behavior
 - Malformed version ranges are rejected during parsing
 - Version comparison operations are guaranteed to be consistent and transitive
 

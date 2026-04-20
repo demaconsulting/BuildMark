@@ -46,6 +46,7 @@ public class VersionComparableTests
         "1.0.0-beta.11",
         "1.0.0-rc.1"
     ];
+
     /// <summary>
     ///     Test that VersionComparable creates instances from valid version strings.
     /// </summary>

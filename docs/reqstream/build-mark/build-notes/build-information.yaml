@@ -24,6 +24,9 @@ sections:
           - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
           - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
           - BuildInformation_ToMarkdown_UsesBulletLists
+          - BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
+          - BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
+          - BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
 
       - id: BuildMark-BuildInformation-RoutedSections
         title: >-
@@ -34,7 +37,7 @@ sections:
           custom sections rather than the default Changes/Bugs/KnownIssues
           categorization. ToMarkdown must render those custom sections when
           RoutedSections is populated, and fall back to the default sections
-          when it is null.
+          when it is null or empty.
         tests:
           - BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
           - BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections

@@ -23,3 +23,5 @@ sections:
           - ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
           - ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection
           - ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection
+          - ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem
+          - ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem

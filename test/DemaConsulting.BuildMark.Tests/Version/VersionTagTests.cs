@@ -132,7 +132,7 @@ public class VersionTagTests
         var versionTag = VersionTag.Create(originalTag);
 
         // Act
-        var result = versionTag.Tag;
+        var result = versionTag.ToString();
 
         // Assert
         Assert.AreEqual(originalTag, result);

@@ -170,6 +170,9 @@ public class ValidationTests
                 // Assert - Verify error message in error output (WriteError writes to Console.Error)
                 var output = errorWriter.ToString();
                 Assert.Contains("Unsupported results file format", output);
+
+                // Assert - Verify exit code is 1 when an error is reported
+                Assert.AreEqual(1, context.ExitCode, "ExitCode should be 1 when unsupported results format is used");
             }
             finally
             {
@@ -212,6 +215,9 @@ public class ValidationTests
             // Assert - Verify error message in error output (WriteError writes to Console.Error)
             var output = errorWriter.ToString();
             Assert.Contains("Failed to write results file", output);
+
+            // Assert - Verify exit code is 1 when a write error is reported
+            Assert.AreEqual(1, context.ExitCode, "ExitCode should be 1 when results file write fails");
         }
         finally
         {
@@ -237,6 +243,3 @@ public class ValidationTests
         Assert.AreEqual(0, context.ExitCode, "Validation should succeed with exit code 0");
     }
 }
-
-
-

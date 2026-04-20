@@ -167,7 +167,42 @@ public class SelfTestTests
             }
         }
     }
+
+    /// <summary>
+    ///     Test that the SelfTest subsystem completes self-validation without error when no --results file is specified.
+    /// </summary>
+    [TestMethod]
+    public void SelfTest_Qualification_WithoutResultsFile_Succeeds()
+    {
+        // Arrange: create a temporary directory and define a log file path (no results file)
+        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
+        Directory.CreateDirectory(tempDir);
+
+        try
+        {
+            var logFile = Path.Combine(tempDir, "validation.log");
+            var args = new[] { "--validate", "--log", logFile, "--silent" };
+
+            // Act: run the validation subsystem without specifying --results.
+            // Dispose the context before reading the log file to release the file lock.
+            using (var context = Context.Create(args, () => new MockRepoConnector()))
+            {
+                Validation.Run(context);
+            }
+
+            // Assert: validation ran and produced log output; no results file was created
+            Assert.IsTrue(File.Exists(logFile), "Log file should be created");
+            var logContent = File.ReadAllText(logFile);
+            Assert.Contains("BuildMark Self-validation", logContent);
+            Assert.Contains("Total Tests:", logContent);
+        }
+        finally
+        {
+            // Cleanup temporary directory
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, true);
+            }
+        }
+    }
 }
-
-
-
