@@ -183,9 +183,12 @@ public class SelfTestTests
             var logFile = Path.Combine(tempDir, "validation.log");
             var args = new[] { "--validate", "--log", logFile, "--silent" };
 
-            // Act: run the validation subsystem without specifying --results
-            using var context = Context.Create(args, () => new MockRepoConnector());
-            Validation.Run(context);
+            // Act: run the validation subsystem without specifying --results.
+            // Dispose the context before reading the log file to release the file lock.
+            using (var context = Context.Create(args, () => new MockRepoConnector()))
+            {
+                Validation.Run(context);
+            }
 
             // Assert: validation ran and produced log output; no results file was created
             Assert.IsTrue(File.Exists(logFile), "Log file should be created");
