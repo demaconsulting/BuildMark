@@ -45,6 +45,7 @@ sections:
           - VersionInterval_Contains_StringInsideUnboundedInterval_ReturnsTrue
           - VersionInterval_Contains_StringOutsideInterval_ReturnsFalse
           - VersionInterval_Contains_Version_DelegatesToSemanticVersion
+          - VersionInterval_Contains_VersionComparable_HandlesPreRelease
 
       - id: BuildMark-VersionIntervalSet-Parse
         title: >-
@@ -76,4 +77,5 @@ sections:
           - VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue
           - VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse
           - VersionIntervalSet_Contains_EmptySet_ReturnsFalse
-          - VersionIntervalSet_Contains_VersionTag_DelegatesToVersionNumbers
+          - VersionIntervalSet_Contains_VersionTag_DelegatesToSemanticVersion
+          - VersionIntervalSet_Contains_VersionComparable_HandlesPreRelease

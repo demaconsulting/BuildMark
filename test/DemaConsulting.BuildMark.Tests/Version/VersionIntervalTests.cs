@@ -353,10 +353,10 @@ public class VersionIntervalTests
     }
 
     /// <summary>
-    ///     Test that Contains correctly orders pre-release versions lexicographically.
+    ///     Test that Contains correctly orders pre-release versions numerically.
     /// </summary>
     [TestMethod]
-    public void VersionInterval_Contains_PreReleaseOrdering_UsesLexicographicComparison()
+    public void VersionInterval_Contains_PreReleaseOrdering_UsesNumericComparison()
     {
         // Arrange
         var interval = VersionInterval.Parse("[1.0.0-alpha.5,1.0.0-alpha.10]");

@@ -50,7 +50,7 @@ The class implements `IComparable<VersionComparable>` providing analytical compa
 Pre-release versions follow SemVer specification:
 
 1. Numeric identifiers are compared numerically (5 < 10)
-2. Non-numeric identifiers are compared lexicographically (case-insensitive)
+2. Non-numeric identifiers are compared lexicographically (case-insensitive by design; note the SemVer specification uses case-sensitive ASCII sort order)
 3. Numeric identifiers have lower precedence than non-numeric
 4. Shorter pre-release lists have lower precedence than longer ones
 

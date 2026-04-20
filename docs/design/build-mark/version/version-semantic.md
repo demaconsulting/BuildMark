@@ -19,7 +19,9 @@ while preserving comparison functionality.
 For convenience, the following properties delegate to the `Comparable` instance:
 
 - `Major`, `Minor`, `Patch` - Version number components
-- `PreRelease` - Pre-release identifier
+- `Numbers` - Core semantic numbers (major.minor.patch)
+- `PreRelease` - Pre-release identifier (empty string when no pre-release)
+- `IsPreRelease` - Whether this is a pre-release version
 - `CompareVersion` - Comparison string (excludes metadata)
 
 ## Comparison

@@ -192,10 +192,10 @@ public class VersionIntervalSetTests
     }
 
     /// <summary>
-    ///     Test that Contains(VersionTag) delegates to version.Numbers (strips pre-release).
+    ///     Test that Contains(VersionTag) delegates to the semantic version comparable.
     /// </summary>
     [TestMethod]
-    public void VersionIntervalSet_Contains_VersionTag_DelegatesToVersionNumbers()
+    public void VersionIntervalSet_Contains_VersionTag_DelegatesToSemanticVersion()
     {
         // Arrange
         var intervalSet = VersionIntervalSet.Parse("[1.0.0,2.0.0),[3.0.0,4.0.0)");

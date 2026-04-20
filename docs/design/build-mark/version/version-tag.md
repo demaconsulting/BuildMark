@@ -60,6 +60,18 @@ tag naming conventions but identical semantic versions.
 - `Create(string tag)` - Creates instance, throws on invalid tag
 - `TryCreate(string tag)` - Returns null for invalid tag
 
+## Display / ToString
+
+The `ToString()` method is overridden to return the original `Tag` string verbatim.
+This preserves the repository tag format for display and logging purposes while keeping semantic comparison
+available through `Semantic.Comparable`:
+
+```csharp
+var versionTag = VersionTag.Create("release/1.2.3-rc.1");
+Console.WriteLine(versionTag);             // "release/1.2.3-rc.1"
+Console.WriteLine(versionTag.FullVersion); // "1.2.3-rc.1"
+```
+
 ## Example
 
 ```csharp

@@ -157,4 +157,12 @@ public partial record VersionTag(string Tag, VersionSemantic Semantic)
     ///     Gets whether this is a pre-release version.
     /// </summary>
     public bool IsPreRelease => Semantic.IsPreRelease;
+
+    /// <summary>
+    ///     Returns the original repository tag string.
+    ///     Preserves the tag exactly as it appears in the repository, enabling correct display of version tags
+    ///     while the semantic comparison is performed via <see cref="Semantic" />.
+    /// </summary>
+    /// <returns>The original tag string.</returns>
+    public override string ToString() => Tag;
 }
