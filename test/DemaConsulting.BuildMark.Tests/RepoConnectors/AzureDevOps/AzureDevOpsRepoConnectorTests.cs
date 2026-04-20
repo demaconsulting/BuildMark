@@ -535,25 +535,27 @@ public class AzureDevOpsRepoConnectorTests
     ///     Verify that Configure with rules causes HasRules to return true.
     /// </summary>
     [TestMethod]
-    public void AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue()
+    public async Task AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue()
     {
-        // Arrange
-        var connector = new AzureDevOpsRepoConnector();
-        List<RuleConfig> rules =
-        [
-            new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" }
-        ];
-        List<SectionConfig> sections =
-        [
-            new() { Id = "bugs", Title = "Bugs" }
-        ];
+        // Arrange - configure a connector with rules and verify via GetBuildInformationAsync
+        // that RoutedSections is populated (HasRules is protected, verified indirectly)
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = CreateMockConnector(mockHttpClient, "commit1");
+        connector.Configure(
+            [new() { Route = "all" }],
+            [new() { Id = "all", Title = "All Items" }]);
 
         // Act
-        connector.Configure(rules, sections);
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
-        // Assert - HasRules is protected; verify indirectly via GetBuildInformationAsync
-        // by checking that the connector was configured without errors
-        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        // Assert - RoutedSections is only populated when HasRules is true
+        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be populated when rules are configured (HasRules == true)");
     }
 
     /// <summary>
@@ -838,6 +840,25 @@ public class AzureDevOpsRepoConnectorTests
         Assert.IsNotNull(itemInfo);
         Assert.AreEqual("101", itemInfo.Id);
         Assert.AreEqual("A user story", itemInfo.Title);
+        Assert.AreEqual("feature", itemInfo.Type);
+    }
+
+    /// <summary>
+    ///     Verify that Epic work item type maps to a feature ItemInfo.
+    /// </summary>
+    [TestMethod]
+    public void WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem()
+    {
+        // Arrange
+        var workItem = CreateWorkItem(103, "An epic", "Epic", "Active");
+
+        // Act
+        var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/103", 4);
+
+        // Assert
+        Assert.IsNotNull(itemInfo);
+        Assert.AreEqual("103", itemInfo.Id);
+        Assert.AreEqual("An epic", itemInfo.Title);
         Assert.AreEqual("feature", itemInfo.Type);
     }
 

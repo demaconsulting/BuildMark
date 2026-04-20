@@ -127,6 +127,7 @@ sections:
         tests:
           - WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
           - WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem
+          - WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem
           - WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem
           - WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue
           - WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse

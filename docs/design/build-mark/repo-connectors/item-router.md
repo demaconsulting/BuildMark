@@ -43,6 +43,13 @@ ad-hoc sections without requiring them to be pre-declared.
   Both lists are matched case-insensitively against the item's `Type` field.
   All non-empty filter lists must match for the rule to apply.
 
+#### Error Handling
+
+No explicit error handling is performed. Callers are responsible for passing valid, non-null
+arguments. Duplicate section IDs in the `sections` list will cause an `ArgumentException` from
+the internal dictionary initialization. Null inputs will result in a `NullReferenceException`
+propagating to the caller.
+
 ## Interactions
 
 - `ItemInfo` provides the input items to be routed from the BuildNotes

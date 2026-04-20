@@ -72,7 +72,8 @@ Entry point for the parser. Steps:
 4. Return `null` if no fence is found.
 5. Split the block body into lines.
 6. Parse each line as a key-value pair.
-7. Build and return an `ItemControlsInfo` from the recognized keys.
+7. Build and return an `ItemControlsInfo` from the recognized keys, or `null` if no
+   recognized keys were found.
 
 ## Interactions
 

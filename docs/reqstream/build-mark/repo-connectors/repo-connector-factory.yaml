@@ -23,6 +23,8 @@ sections:
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+          - RepoConnectorFactory_Create_WithGitHubRemoteUrl_ReturnsGitHubConnector
+          - RepoConnectorFactory_Create_WithNullRemoteUrl_DefaultsToGitHubConnector
 
       - id: BuildMark-RepoConnectorFactory-ConnectorConfig
         title: >-
@@ -48,4 +50,5 @@ sections:
           - RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector
           - RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector
           - RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector
+          - RepoConnectorFactory_Create_WithVisualStudioRemoteUrl_ReturnsAzureDevOpsConnector
           - RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
