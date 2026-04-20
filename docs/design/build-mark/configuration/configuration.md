@@ -27,6 +27,7 @@ problem with its file path, line number, severity, and description.
 | `ConnectorConfig`           | `Configuration/ConnectorConfig.cs`            | Connector envelope data model          |
 | `GitHubConnectorConfig`     | `Configuration/GitHubConnectorConfig.cs`      | GitHub connector settings data model   |
 | `AzureDevOpsConnectorConfig`| `Configuration/AzureDevOpsConnectorConfig.cs` | Azure DevOps connector settings        |
+| `ReportConfig`              | `Configuration/ReportConfig.cs`               | Report output settings data model      |
 | `SectionConfig`             | `Configuration/SectionConfig.cs`              | Report section definition data model   |
 | `RuleConfig`                | `Configuration/RuleConfig.cs`                 | Item routing rule data model           |
 
@@ -69,6 +70,7 @@ problem with its file path, line number, severity, and description.
 | Member      | Kind     | Description                                           |
 |-------------|----------|-------------------------------------------------------|
 | `Connector` | Property | Optional `ConnectorConfig`; `null` when not specified |
+| `Report`    | Property | Optional `ReportConfig`; `null` when not specified    |
 | `Sections`  | Property | Ordered list of `SectionConfig` objects               |
 | `Rules`     | Property | List of `RuleConfig` objects                          |
 
@@ -96,6 +98,14 @@ problem with its file path, line number, severity, and description.
 | `Organization`    | Property | Optional organization name override; `null` when not specified                |
 | `Project`         | Property | Azure DevOps project name                                                     |
 | `Repository`      | Property | Repository name within the project                                            |
+
+`ReportConfig` carries the following properties:
+
+| Member               | Kind     | Description                                                                       |
+|----------------------|----------|-----------------------------------------------------------------------------------|
+| `File`               | Property | Optional output file path override; `null` uses the default report path           |
+| `Depth`              | Property | Optional heading depth for report sections; `null` uses the default depth         |
+| `IncludeKnownIssues` | Property | Optional flag to include known issues in the report; `null` uses the default      |
 
 `SectionConfig` carries the following properties:
 

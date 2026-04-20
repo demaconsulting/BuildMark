@@ -416,6 +416,7 @@ public class ConfigurationTests
         Assert.AreEqual("changes", config.Rules[5].Route);
         Assert.IsNull(config.Rules[5].Match);
     }
+
     /// <summary>
     ///     Test that a valid report section is parsed into the report configuration model.
     /// </summary>
@@ -489,6 +490,3 @@ public class ConfigurationTests
         }
     }
 }
-
-
-

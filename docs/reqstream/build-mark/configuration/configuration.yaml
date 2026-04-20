@@ -127,3 +127,17 @@ sections:
           repository name explicitly in the configuration file.
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+
+  - title: ReportConfig Unit Requirements
+    requirements:
+      - id: BuildMark-ReportConfig-Properties
+        title: >-
+          ReportConfig shall expose File, Depth, and IncludeKnownIssues properties
+          that override the corresponding default report output settings.
+        justification: |
+          Teams that want to control the report output file path, heading depth, or
+          inclusion of known issues need a way to specify these settings explicitly
+          in the configuration file via the report: key.
+        tests:
+          - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
+          - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue

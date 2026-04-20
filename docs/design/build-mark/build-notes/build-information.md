@@ -39,9 +39,10 @@ controls the top-level heading depth (default `1`), allowing the report to be
 embedded at any level in a larger document. The `includeKnownIssues` flag controls
 whether the Known Issues section is emitted.
 
-When `RoutedSections` is populated, `ToMarkdown` renders each section from the
-`RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
-`Changes`, `Bugs`, and `KnownIssues` lists.
+When `RoutedSections` is non-null and non-empty, `ToMarkdown` renders each section
+from the `RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
+`Changes`, `Bugs`, and `KnownIssues` lists. When `RoutedSections` is `null` or
+empty, `ToMarkdown` falls back to the legacy sections.
 
 The rendered output contains the following sections:
 
@@ -58,14 +59,10 @@ The rendered output contains the following sections:
 
 ## Interactions
 
-+--------------------+-------------------------------------------------------------------+
 | Unit / Subsystem   | Role                                                              |
-+====================+===================================================================+
-| `VersionCommitTag` | Carries version and commit hash for baseline and current entries |
-+--------------------+-------------------------------------------------------------------+
-| `ItemInfo`         | Each item in `Changes`, `Bugs`, and `KnownIssues`                |
-+--------------------+-------------------------------------------------------------------+
-| `WebLink`          | Optional complete-changelog hyperlink                            |
-+--------------------+-------------------------------------------------------------------+
-| `RepoConnectors`    | Connectors assemble and return a `BuildInformation` record        |
-| `Program`           | Calls `ToMarkdown` to produce the final report file               |
+| :----------------- | :---------------------------------------------------------------- |
+| `VersionCommitTag` | Carries version and commit hash for baseline and current entries  |
+| `ItemInfo`         | Each item in `Changes`, `Bugs`, and `KnownIssues`                 |
+| `WebLink`          | Optional complete-changelog hyperlink                             |
+| `RepoConnectors`   | Connectors assemble and return a `BuildInformation` record        |
+| `Program`          | Calls `ToMarkdown` to produce the final report file               |

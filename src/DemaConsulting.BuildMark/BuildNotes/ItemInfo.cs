@@ -25,9 +25,9 @@ namespace DemaConsulting.BuildMark.BuildNotes;
 /// <summary>
 ///     Represents an item in the build notes (change, bug, or known issue).
 /// </summary>
-/// <param name="Id">Item ID.</param>
-/// <param name="Title">Item title.</param>
-/// <param name="Url">Item URL.</param>
+/// <param name="Id">Human-readable identifier for the item (e.g., <c>#42</c>).</param>
+/// <param name="Title">Issue or pull request title.</param>
+/// <param name="Url">URL link to the issue or pull request on the host.</param>
 /// <param name="Type">Item type (bug, feature, etc.).</param>
 /// <param name="Index">Numeric index for sorting (PR number for PRs, issue number for issues).</param>
 /// <param name="AffectedVersions">Optional set of version intervals that this item affects.</param>

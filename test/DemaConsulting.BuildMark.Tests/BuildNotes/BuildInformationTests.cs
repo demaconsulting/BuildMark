@@ -483,11 +483,11 @@ public class BuildInformationTests
         var hash = "abc123def456";
 
         // Act
-        var VersionCommitTag = new VersionCommitTag(version, hash);
+        var versionCommitTag = new VersionCommitTag(version, hash);
 
         // Assert
-        Assert.AreEqual(version, VersionCommitTag.VersionTag);
-        Assert.AreEqual(hash, VersionCommitTag.CommitHash);
+        Assert.AreEqual(version, versionCommitTag.VersionTag);
+        Assert.AreEqual(hash, versionCommitTag.CommitHash);
     }
 
     /// <summary>
@@ -519,7 +519,7 @@ public class BuildInformationTests
     public void BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections()
     {
         // Arrange - Build information with routed sections
-        var VersionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
+        var versionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
         var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
         var bugItem = new ItemInfo("2", "Fix bug Y", "https://example.com/2", "bug", 2);
         List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> routedSections =
@@ -527,7 +527,7 @@ public class BuildInformationTests
             ("features", "Features", new List<ItemInfo> { featureItem }),
             ("bugs", "Bugs", new List<ItemInfo> { bugItem })
         ];
-        var buildInfo = new BuildInformation(null, VersionCommitTag, [], [], [], null)
+        var buildInfo = new BuildInformation(null, versionCommitTag, [], [], [], null)
         {
             RoutedSections = routedSections
         };
@@ -557,8 +557,8 @@ public class BuildInformationTests
     public void BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections()
     {
         // Arrange - Build information without routed sections (legacy mode)
-        var VersionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
-        var buildInfo = new BuildInformation(null, VersionCommitTag, [], [], [], null);
+        var versionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
+        var buildInfo = new BuildInformation(null, versionCommitTag, [], [], [], null);
 
         // Act - Generate markdown
         var markdown = buildInfo.ToMarkdown();
