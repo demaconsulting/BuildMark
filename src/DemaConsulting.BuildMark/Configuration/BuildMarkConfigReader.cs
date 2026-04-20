@@ -64,9 +64,8 @@ public static class BuildMarkConfigReader
         catch (YamlException ex)
         {
             // Convert YamlDotNet parse errors into ConfigurationIssue records.
-            // ex.Start reports the beginning of the construct being parsed; +1 approximates
-            // the line of the actual invalid character within that construct.
-            var line = (int)(ex.Start.Line + 1);
+            // YamlDotNet 17+ reports 1-based line numbers; use ex.Start.Line directly.
+            var line = (int)ex.Start.Line;
             AddError(issues, filePath, line > 0 ? line : 1, ex.InnerException?.Message ?? ex.Message);
             return new ConfigurationLoadResult(null, issues);
         }

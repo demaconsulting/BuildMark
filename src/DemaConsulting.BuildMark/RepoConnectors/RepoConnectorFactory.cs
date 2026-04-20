@@ -58,8 +58,8 @@ public static class RepoConnectorFactory
         }
 
         // Get git remote URL once for inspection.
-        // Note: Using .GetAwaiter().GetResult() is safe in console applications as there is no synchronization context
-        // that could cause deadlocks. Console apps run on the ThreadPool which doesn't have a synchronization context.
+        // Note: Using .GetAwaiter().GetResult() is acceptable in this tool-oriented entry point
+        // as console applications have no synchronization context that could cause deadlocks.
         var remoteUrl = ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult();
         return CreateFromRemoteUrl(config, remoteUrl);
     }

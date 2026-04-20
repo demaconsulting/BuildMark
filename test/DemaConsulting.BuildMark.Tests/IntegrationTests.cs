@@ -149,14 +149,27 @@ public class IntegrationTests
             "output.md");
 
         using var context = Context.Create(
-            ["--build-version", "1.0.0", "--report", invalidPath, "--silent"],
+            ["--build-version", "1.0.0", "--report", invalidPath],
             () => new MockRepoConnector());
 
-        // Act: run the program
-        Program.Run(context);
+        // Capture Console.Error to verify the error message
+        using var errorOutput = new StringWriter();
+        var originalError = Console.Error;
+        try
+        {
+            Console.SetError(errorOutput);
 
-        // Assert: tool reports the error gracefully and exits with error code
+            // Act: run the program
+            Program.Run(context);
+        }
+        finally
+        {
+            Console.SetError(originalError);
+        }
+
+        // Assert: tool reports an error message and exits with error code
         Assert.AreEqual(1, context.ExitCode);
+        Assert.Contains("Error:", errorOutput.ToString());
     }
 
     /// <summary>
