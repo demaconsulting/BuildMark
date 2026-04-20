@@ -75,7 +75,8 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Report
-        title: The Cli subsystem shall support --report, --depth, and --include-known-issues flags to configure report output.
+        title: The Cli subsystem shall support --report, --depth, and --include-known-issues flags to configure
+          report output.
         justification: |
           Enables users to direct build notes output to a specific file, embed it at
           any heading level within a larger markdown document, and control whether
@@ -116,7 +117,8 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Results
-        title: The Cli subsystem shall support --results (and --result alias) flag to specify a test results output file.
+        title: The Cli subsystem shall support --results (and --result alias) flag to specify a test results output
+          file.
         justification: |
           Enables integration with CI/CD systems that expect standard test result formats
           (TRX or JUnit XML).

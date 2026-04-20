@@ -29,9 +29,9 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 | `Lint`                | Property | Set when `--lint` flag is present                  |
 | `BuildVersion`        | Property | Value of `--build-version` argument                |
 | `ReportFile`          | Property | Value of `--report` argument                       |
-| `Depth`               | Property | Value of `--depth` / `--report-depth` argument (null when not specified; valid range: 1–6) |
+| `Depth`               | Property | Value of `--depth`/`--report-depth`; range 1–6     |
 | `IncludeKnownIssues`  | Property | Set when `--include-known-issues` flag is present  |
-| `ResultsFile`         | Property | Value of `--results` / `--result` argument                      |
+| `ResultsFile`         | Property | Value of `--results` / `--result` argument         |
 | `ConnectorFactory`    | Property | Optional factory for dependency injection in tests |
 | `ExitCode`            | Property | Returns 0 unless `WriteError` has been called      |
 | `WriteLine(message)`  | Method   | Writes a line to console (if not silent) and log   |

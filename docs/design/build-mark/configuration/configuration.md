@@ -126,7 +126,7 @@ problem with its file path, line number, severity, and description.
 | Member         | Kind     | Description                                                       |
 |----------------|----------|-------------------------------------------------------------------|
 | `Label`        | Property | List of label values; the rule matches when any label is present  |
-| `WorkItemType` | Property | List of work-item type values; the rule matches when any type matches |
+| `WorkItemType` | Property | List of work-item type values; rule matches when any type matches |
 
 ## Interactions
 
