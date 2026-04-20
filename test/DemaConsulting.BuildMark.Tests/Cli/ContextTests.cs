@@ -42,6 +42,7 @@ public class ContextTests
         Assert.IsFalse(context.Help);
         Assert.IsFalse(context.Silent);
         Assert.IsFalse(context.Validate);
+        Assert.IsFalse(context.Lint);
         Assert.IsNull(context.BuildVersion);
         Assert.IsNull(context.ReportFile);
         Assert.IsNull(context.Depth);
@@ -282,6 +283,7 @@ public class ContextTests
         [
             "--silent",
             "--validate",
+            "--lint",
             "--build-version", "1.2.3",
             "--report", "report.md",
             "--depth", "2",
@@ -292,6 +294,7 @@ public class ContextTests
         // Verify all properties are set correctly
         Assert.IsTrue(context.Silent);
         Assert.IsTrue(context.Validate);
+        Assert.IsTrue(context.Lint);
         Assert.AreEqual("1.2.3", context.BuildVersion);
         Assert.AreEqual("report.md", context.ReportFile);
         Assert.AreEqual(2, context.Depth);
@@ -801,12 +804,12 @@ public class ContextTests
         // Verify initial exit code is 0
         Assert.AreEqual(0, context.ExitCode);
 
-        // Capture console output to avoid displaying error
+        // Capture console error output to avoid displaying error during test
         using var output = new StringWriter();
-        var originalOut = Console.Out;
+        var originalError = Console.Error;
         try
         {
-            Console.SetOut(output);
+            Console.SetError(output);
 
             // Write an error
             context.WriteError("Error message");
@@ -816,8 +819,8 @@ public class ContextTests
         }
         finally
         {
-            // Restore console output
-            Console.SetOut(originalOut);
+            // Restore console error output
+            Console.SetError(originalError);
         }
     }
 

@@ -28,6 +28,7 @@ sections:
         tests:
           - Validation_Run_WithTrxResultsFile_WritesTrxFile
           - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+          - Validation_Run_WithInvalidResultsFilePath_ShowsError
 
       - id: BuildMark-Validation-JUnitOutput
         title: The Validation class shall write JUnit XML format test results when an .xml results file is specified.
@@ -38,4 +39,3 @@ sections:
         tests:
           - Validation_Run_WithXmlResultsFile_WritesJUnitFile
           - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
-          - Validation_Run_WithInvalidResultsFilePath_ShowsError

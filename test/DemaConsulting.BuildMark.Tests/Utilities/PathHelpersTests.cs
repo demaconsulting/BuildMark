@@ -124,6 +124,23 @@ public class PathHelpersTests
             Assert.Contains("Invalid path component", windowsException.Message);
         }
     }
+
+    /// <summary>
+    ///     Test that SafePathCombine correctly combines valid paths whose names start with dots (e.g. "..data").
+    /// </summary>
+    [TestMethod]
+    public void PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly()
+    {
+        // Arrange - "..data" is a valid directory name and must not be rejected as traversal
+        var basePath = "/home/user/project";
+        var relativePath = "..data/file.txt";
+
+        // Act
+        var result = PathHelpers.SafePathCombine(basePath, relativePath);
+
+        // Assert
+        Assert.AreEqual(Path.Combine(basePath, relativePath), result);
+    }
 }
 
 

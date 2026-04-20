@@ -24,6 +24,8 @@ sections:
           external resources.
         tests:
           - Program_Run_HelpFlag_OutputsHelpMessage
+          - Program_Run_QuestionMarkFlag_OutputsHelpMessage
+          - Program_Run_LongHelpFlag_OutputsHelpMessage
 
       - id: BuildMark-Program-Validate
         title: The Program class shall support --validate flag to invoke the self-validation framework.

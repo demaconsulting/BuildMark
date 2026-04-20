@@ -176,6 +176,69 @@ public class ConfigurationSubsystemTests
         Assert.AreEqual(1, context.ExitCode);
     }
 
+    /// <summary>
+    ///     Test that the Configuration subsystem does not set the context exit code when only a warning issue is reported.
+    /// </summary>
+    [TestMethod]
+    public void Configuration_Issues_WarningIssue_DoesNotSetExitCode()
+    {
+        // Arrange: create a context and a result with a warning-only issue
+        using var context = Context.Create(["--silent"]);
+        var result = new ConfigurationLoadResult(
+            null,
+            [
+                new ConfigurationIssue(
+                    "/tmp/.buildmark.yaml",
+                    2,
+                    ConfigurationIssueSeverity.Warning,
+                    "Subsystem test warning")
+            ]);
+
+        // Act: report the issues to the context
+        result.ReportTo(context);
+
+        // Assert: exit code remains 0 for warning-only issues
+        Assert.AreEqual(0, context.ExitCode);
+    }
+
+    /// <summary>
+    ///     Test that the Configuration subsystem reports accurate 1-based line numbers for validation errors.
+    /// </summary>
+    [TestMethod]
+    public async Task Configuration_Issues_ValidationError_ReportsAccurateLine()
+    {
+        // Arrange: create a YAML file where the unsupported key is on a known line number
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: github
+              unsupported-key: value
+            """,
+            TestContext.CancellationToken);
+
+        try
+        {
+            // Act: read the configuration
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert: the error is reported with the correct line number (3)
+            Assert.IsNotNull(result.Issues);
+            Assert.IsTrue(result.HasErrors);
+            var issue = result.Issues[0];
+            Assert.AreEqual(3, issue.Line,
+                $"Expected line 3 for 'unsupported-key' but got {issue.Line}");
+        }
+        finally
+        {
+            // Cleanup temporary directory
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-Configuration-ConnectorConfig
     // ─────────────────────────────────────────────────────────────────────────

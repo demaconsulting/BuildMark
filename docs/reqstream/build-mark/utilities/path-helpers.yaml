@@ -21,3 +21,4 @@ sections:
           - PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException
           - PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException
           - PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException
+          - PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly

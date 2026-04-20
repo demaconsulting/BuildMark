@@ -93,7 +93,7 @@ problem with its file path, line number, severity, and description.
 | Member            | Kind     | Description                                                                   |
 |-------------------|----------|-------------------------------------------------------------------------------|
 | `OrganizationUrl` | Property | Azure DevOps organization URL (e.g. `https://dev.azure.com/myorg`)            |
-| `Organization`    | Property | Organization name (derived from `OrganizationUrl` when not explicitly set)    |
+| `Organization`    | Property | Optional organization name override; `null` when not specified                |
 | `Project`         | Property | Azure DevOps project name                                                     |
 | `Repository`      | Property | Repository name within the project                                            |
 

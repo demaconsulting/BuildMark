@@ -64,6 +64,8 @@ public static class BuildMarkConfigReader
         catch (YamlException ex)
         {
             // Convert YamlDotNet parse errors into ConfigurationIssue records.
+            // ex.Start reports the beginning of the construct being parsed; +1 approximates
+            // the line of the actual invalid character within that construct.
             var line = (int)(ex.Start.Line + 1);
             AddError(issues, filePath, line > 0 ? line : 1, ex.InnerException?.Message ?? ex.Message);
             return new ConfigurationLoadResult(null, issues);
@@ -686,8 +688,8 @@ public static class BuildMarkConfigReader
     /// <returns>The 1-based line number.</returns>
     private static int GetLine(YamlNode node)
     {
-        // YamlDotNet uses 0-based line numbers; convert to 1-based.
-        return (int)node.Start.Line + 1;
+        // YamlDotNet 17+ uses 1-based line numbers; return directly.
+        return (int)node.Start.Line;
     }
 
     /// <summary>

@@ -78,8 +78,35 @@ public class ProgramTests
     [TestMethod]
     public void Program_Run_HelpFlag_OutputsHelpMessage()
     {
-        // Create context with help flag and silent mode to capture output
-        using var context = Context.Create(["-h"]);
+        AssertHelpFlagOutputsHelpMessage("-h");
+    }
+
+    /// <summary>
+    ///     Test that Run with question-mark help flag outputs help message.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_QuestionMarkFlag_OutputsHelpMessage()
+    {
+        AssertHelpFlagOutputsHelpMessage("-?");
+    }
+
+    /// <summary>
+    ///     Test that Run with long help flag outputs help message.
+    /// </summary>
+    [TestMethod]
+    public void Program_Run_LongHelpFlag_OutputsHelpMessage()
+    {
+        AssertHelpFlagOutputsHelpMessage("--help");
+    }
+
+    /// <summary>
+    ///     Asserts that running the program with the specified help flag outputs the standard help message.
+    /// </summary>
+    /// <param name="helpFlag">The help flag to test (e.g. "-?", "-h", "--help").</param>
+    private static void AssertHelpFlagOutputsHelpMessage(string helpFlag)
+    {
+        // Create context with the specified help flag
+        using var context = Context.Create([helpFlag]);
 
         // Capture console output
         var originalOut = Console.Out;
@@ -103,6 +130,7 @@ public class ProgramTests
             Console.SetOut(originalOut);
         }
     }
+
 
     /// <summary>
     ///     Test that Run with validate flag outputs validation message.
@@ -198,6 +226,3 @@ public class ProgramTests
         Assert.AreEqual(0, context.ExitCode);
     }
 }
-
-
-

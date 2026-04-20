@@ -39,6 +39,8 @@ sections:
           configuration file contains errors.
         tests:
           - Configuration_Issues_ErrorIssue_SetsExitCode
+          - Configuration_Issues_WarningIssue_DoesNotSetExitCode
+          - Configuration_Issues_ValidationError_ReportsAccurateLine
         children:
           - BuildMark-ConfigLoadResult-ReportTo
 

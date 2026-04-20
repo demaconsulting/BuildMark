@@ -23,11 +23,14 @@ sections:
           - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
           - Context_Create_SilentFlag_SetsSilentProperty
           - Context_Create_ValidateFlag_SetsValidateProperty
+          - Context_Create_LintFlag_SetsLintProperty
           - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
           - Context_Create_ReportArgument_SetsReportFileProperty
           - Context_Create_DepthArgument_SetsDepthProperty
+          - Context_Create_LegacyReportDepthArgument_SetsDepthProperty
           - Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
           - Context_Create_ResultsArgument_SetsResultsFileProperty
+          - Context_Create_ResultArgument_SetsResultsFileProperty
           - Context_Create_LogArgument_CreatesLogFile
           - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
 
@@ -46,6 +49,7 @@ sections:
           - Context_Create_DepthWithNegativeValue_ThrowsArgumentException
           - Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
           - Context_Create_ResultsWithoutValue_ThrowsArgumentException
+          - Context_Create_ResultWithoutValue_ThrowsArgumentException
           - Context_Create_LogWithoutValue_ThrowsArgumentException
           - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
 
