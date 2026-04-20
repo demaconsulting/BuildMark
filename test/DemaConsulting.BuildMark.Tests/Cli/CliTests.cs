@@ -304,6 +304,36 @@ public class CliTests
     }
 
     /// <summary>
+    ///     Test that the Cli subsystem sets ExitCode to 1 when WriteError is called.
+    /// </summary>
+    [TestMethod]
+    public void Cli_WriteError_SetsExitCodeToOne()
+    {
+        // Arrange: create context with no arguments
+        using var context = Context.Create([]);
+
+        // Capture console error output to avoid displaying error during test
+        using var errorOutput = new StringWriter();
+        var originalError = Console.Error;
+
+        try
+        {
+            Console.SetError(errorOutput);
+
+            // Act: write an error through the context
+            context.WriteError("Subsystem exit code test");
+
+            // Assert: exit code is set to 1
+            Assert.AreEqual(1, context.ExitCode);
+        }
+        finally
+        {
+            // Restore console error output
+            Console.SetError(originalError);
+        }
+    }
+
+    /// <summary>
     ///     Test that the Cli subsystem sets the Version property when -v (short form) is specified.
     /// </summary>
     [TestMethod]
