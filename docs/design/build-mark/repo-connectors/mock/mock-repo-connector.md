@@ -44,6 +44,19 @@ collects all items and passes them to `ApplyRules` (inherited from `RepoConnecto
 to produce the `RoutedSections` list. If no rules are configured, the legacy
 categorization into `Changes` and `Bugs` is used.
 
+## Error Conditions
+
+`GetBuildInformationAsync` throws `InvalidOperationException` in the following scenarios:
+
+1. **No version tags exist in data and no version argument provided** — throws with message:
+   `"No tags found in repository and no version specified. Please provide a version parameter."`
+2. **Current commit does not match any tag and no version argument provided** — throws with message:
+   `"Target version not specified and current commit does not match any tag. Please provide a version parameter."`
+
+These conditions mirror the equivalent error paths in the production `GitHubRepoConnector`
+and `AzureDevOpsRepoConnector`, making the mock suitable for testing error-handling code
+paths as well as the happy path.
+
 ## Interactions
 
 | Unit / Subsystem         | Role                                                                              |

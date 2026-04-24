@@ -11,6 +11,7 @@ resource-path:
   - docs/design/build-mark/repo-connectors
   - docs/design/build-mark/repo-connectors/github
   - docs/design/build-mark/repo-connectors/mock
+  - docs/design/build-mark/repo-connectors/azure-devops
   - docs/template
 
 input-files:
@@ -21,7 +22,6 @@ input-files:
   - docs/design/build-mark/build-notes/build-notes.md
   - docs/design/build-mark/build-notes/build-information.md
   - docs/design/build-mark/build-notes/item-info.md
-  - docs/design/build-mark/version/version-tag.md
   - docs/design/build-mark/build-notes/web-link.md
   - docs/design/build-mark/cli/cli.md
   - docs/design/build-mark/cli/context.md
@@ -36,6 +36,7 @@ input-files:
   - docs/design/build-mark/version/version-semantic.md
   - docs/design/build-mark/version/version-tag.md
   - docs/design/build-mark/version/version-interval.md
+  - docs/design/build-mark/version/version-interval-set.md
   - docs/design/build-mark/version/version-commit-tag.md
   - docs/design/build-mark/repo-connectors/repo-connectors.md
   - docs/design/build-mark/repo-connectors/repo-connector-base.md
@@ -49,6 +50,11 @@ input-files:
   - docs/design/build-mark/repo-connectors/github/github-graphql-types.md
   - docs/design/build-mark/repo-connectors/mock/mock.md
   - docs/design/build-mark/repo-connectors/mock/mock-repo-connector.md
+  - docs/design/build-mark/repo-connectors/azure-devops/azure-devops.md
+  - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md
+  - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md
+  - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md
+  - docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md
 template: template.html
 table-of-contents: true
 number-sections: true

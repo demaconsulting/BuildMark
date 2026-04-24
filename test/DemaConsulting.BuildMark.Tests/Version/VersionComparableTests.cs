@@ -112,13 +112,39 @@ public class VersionComparableTests
     }
 
     /// <summary>
+    ///     Test that TryCreate returns null for null input.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_TryCreate_NullInput_ReturnsNull()
+    {
+        // Arrange & Act
+        var version = VersionComparable.TryCreate(null!);
+
+        // Assert
+        Assert.IsNull(version);
+    }
+
+    /// <summary>
+    ///     Test that TryCreate returns null for empty input.
+    /// </summary>
+    [TestMethod]
+    public void VersionComparable_TryCreate_EmptyInput_ReturnsNull()
+    {
+        // Arrange & Act
+        var version = VersionComparable.TryCreate(string.Empty);
+
+        // Assert
+        Assert.IsNull(version);
+    }
+
+    /// <summary>
     ///     Test that Create throws ArgumentException for invalid version.
     /// </summary>
     [TestMethod]
     public void VersionComparable_Create_InvalidVersion_ThrowsArgumentException()
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => VersionComparable.Create("not-a-version"));
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => VersionComparable.Create("not-a-version"));
 
         // Assert
         Assert.Contains("does not match comparable version format", exception.Message);

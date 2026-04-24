@@ -21,11 +21,13 @@ sections:
           file is present or malformed, so that callers can inspect issues without
           special-casing null returns.
         tests:
-          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
-          - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
-          - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
+          - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
+          - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
+          - Configuration_ReadAsync_MalformedFile_ReportsError
         children:
           - BuildMark-ConfigReader-ReadAsync
+          - BuildMark-ConfigReader-MissingFile
+          - BuildMark-ConfigReader-MalformedFile
           - BuildMark-ConfigReader-MissingFile
           - BuildMark-ConfigReader-MalformedFile
 
@@ -38,9 +40,9 @@ sections:
           description allows the tool to give precise, actionable feedback when a
           configuration file contains errors.
         tests:
-          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
-          - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
-          - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+          - Configuration_Issues_ErrorIssue_SetsExitCode
+          - Configuration_Issues_WarningIssue_DoesNotSetExitCode
+          - Configuration_Issues_ValidationError_ReportsAccurateLine
         children:
           - BuildMark-ConfigLoadResult-ReportTo
 
@@ -52,8 +54,8 @@ sections:
           deserialization ensures the factory receives the right settings for the
           selected connector.
         tests:
-          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
-          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+          - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
+          - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
         children:
           - BuildMark-GitHubConnectorConfig-Properties
           - BuildMark-AzureDevOpsConnectorConfig-Properties
@@ -121,13 +123,13 @@ sections:
     requirements:
       - id: BuildMark-AzureDevOpsConnectorConfig-Properties
         title: >-
-          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Project, and
+          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization, Project, and
           Repository properties that override the corresponding auto-detected
           values in AzureDevOpsRepoConnector.
         justification: |
           Teams using Azure DevOps where auto-detection from the Git remote URL is
-          unreliable need a way to specify the organization URL, project, and
-          repository name explicitly in the configuration file.
+          unreliable need a way to specify the organization URL, optional organization
+          name, project, and repository name explicitly in the configuration file.
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
@@ -144,3 +146,58 @@ sections:
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
           - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
+
+  - title: ConnectorConfig Unit Requirements
+    requirements:
+      - id: BuildMark-ConnectorConfig-Properties
+        title: >-
+          ConnectorConfig shall expose Type, GitHub, and AzureDevOps properties
+          that select and configure the active repository connector.
+        justification: |
+          The ConnectorConfig envelope carries a type discriminator and per-connector
+          settings so the factory can instantiate and configure the correct connector
+          without inspecting multiple top-level keys.
+        tests:
+          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+
+  - title: ConfigurationIssue Unit Requirements
+    requirements:
+      - id: BuildMark-ConfigurationIssue-Record
+        title: >-
+          ConfigurationIssue shall record the file path, line number, severity,
+          and description of a single configuration parse or validation problem.
+        justification: |
+          Structured issue records allow the tool to report precise, actionable
+          feedback about configuration problems without losing location context
+          when multiple issues are present in the same file.
+        tests:
+          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+          - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+          - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+
+  - title: SectionConfig Unit Requirements
+    requirements:
+      - id: BuildMark-SectionConfig-Properties
+        title: >-
+          SectionConfig shall expose Id and Title properties that define one
+          named report section for item routing.
+        justification: |
+          Report sections must have a stable machine-readable identifier (Id) for
+          routing rules to reference and a human-readable display title for the
+          generated markdown output.
+        tests:
+          - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+
+  - title: RuleConfig Unit Requirements
+    requirements:
+      - id: BuildMark-RuleConfig-Properties
+        title: >-
+          RuleConfig shall expose Match and Route properties that define one
+          item-routing rule for the ItemRouter.
+        justification: |
+          Routing rules must specify match conditions (label or work-item type)
+          and a destination section identifier so that ItemRouter can correctly
+          categorize items without embedding routing logic in connector code.
+        tests:
+          - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

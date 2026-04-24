@@ -58,6 +58,7 @@ BuildMark (System)
 │   ├── ConnectorConfig (Unit)
 │   ├── GitHubConnectorConfig (Unit)
 │   ├── AzureDevOpsConnectorConfig (Unit)
+│   ├── ReportConfig (Unit)
 │   ├── SectionConfig (Unit)
 │   └── RuleConfig (Unit)
 └── RepoConnectors (Subsystem)
@@ -116,6 +117,7 @@ src/DemaConsulting.BuildMark/
 │   ├── ConnectorConfig.cs                   — connector envelope data model
 │   ├── GitHubConnectorConfig.cs             — GitHub connector settings data model
 │   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings data model
+│   ├── ReportConfig.cs                      — report output settings data model
 │   ├── SectionConfig.cs                     — report section definition data model
 │   └── RuleConfig.cs                        — routing rule data model
 └── RepoConnectors/

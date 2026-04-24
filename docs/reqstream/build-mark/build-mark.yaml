@@ -23,6 +23,7 @@ sections:
               - BuildMark-Cli-Report
               - BuildMark-Cli-Log
               - BuildMark-Cli-Validate
+              - BuildMark-Cli-Lint
               - BuildMark-Cli-Results
               - BuildMark-Cli-ErrorOutput
               - BuildMark-Cli-InvalidArgs
@@ -104,6 +105,8 @@ sections:
               - IntegrationTest_InvalidReportPath_ShowsError
             children:
               - BuildMark-Cli-InvalidArgs
+              - BuildMark-Utilities-SafePaths
+              - BuildMark-Utilities-ProcessRunner
 
           - id: BuildMark-Command-ExitCode
             title: The tool shall return appropriate exit codes.
@@ -151,6 +154,7 @@ sections:
               - IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease
             children:
               - BuildMark-RepoConnectors-GitHub
+              - BuildMark-Version-Subsystem
 
       - title: Azure DevOps Integration
         requirements:
@@ -202,6 +206,7 @@ sections:
             children:
               - BuildMark-Configuration-Read
               - BuildMark-Program-Lint
+              - BuildMark-ReportConfig-Properties
 
           - id: BuildMark-Config-Connector
             title: The tool shall read repository connector settings from the `.buildmark.yaml` file.

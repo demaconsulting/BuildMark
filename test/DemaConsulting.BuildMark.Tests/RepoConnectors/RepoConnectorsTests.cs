@@ -736,7 +736,7 @@ public class RepoConnectorsTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Add feature", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Feature work item", "User Story"))
             .AddWiqlResponse();

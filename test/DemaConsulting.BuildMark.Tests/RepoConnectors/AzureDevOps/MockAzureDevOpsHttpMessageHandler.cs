@@ -184,16 +184,18 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
     /// <summary>
     ///     Adds a mock response for the pull request work items endpoint.
     /// </summary>
+    /// <param name="repositoryName">Repository name to match in the URL.</param>
     /// <param name="pullRequestId">Pull request ID to match.</param>
     /// <param name="workItemIds">Work item IDs to return as linked.</param>
     /// <returns>This instance for method chaining.</returns>
     public MockAzureDevOpsHttpMessageHandler AddPullRequestWorkItemsResponse(
+        string repositoryName,
         int pullRequestId,
         params int[] workItemIds)
     {
         var refs = workItemIds.Select(id => new { id = id.ToString(), url = $"https://dev.azure.com/org/project/_apis/wit/workitems/{id}" });
         var json = JsonSerializer.Serialize(new { count = workItemIds.Length, value = refs });
-        return AddResponse($"pullrequests/{pullRequestId}/workitems", json);
+        return AddResponse($"repositories/{repositoryName}/pullrequests/{pullRequestId}/workitems", json);
     }
 
     /// <summary>

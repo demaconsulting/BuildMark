@@ -32,4 +32,3 @@ sections:
           would incorrectly treat these as different versions.
         tests:
           - VersionComparable_Equals_DifferentPrefixesSameVersion_ReturnsTrue
-          - RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex

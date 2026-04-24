@@ -95,7 +95,21 @@ The `AzureDevOpsRestClient` returns the following record types:
 
 ## Methods
 
-### `GetBuildInformationAsync(Version? version) → BuildInformation`
+### `ParseAzureDevOpsUrl(url) → (organizationUrl, project, repository)`
+
+Internal utility that parses a Git remote URL into organization URL, project
+name, and repository name. Supports the following URL formats:
+
+| Format                                                   | Example                           |
+|----------------------------------------------------------|-----------------------------------|
+| `https://dev.azure.com/{org}/{project}/_git/{repo}`      | Azure DevOps Services             |
+| `https://{org}.visualstudio.com/{project}/_git/{repo}`   | Legacy VisualStudio.com           |
+| `https://{server}/{org}/{project}/_git/{repo}`           | Azure DevOps Server (on-premises) |
+| `git@ssh.dev.azure.com:v3/{org}/{project}/{repo}`        | SSH (dev.azure.com)               |
+
+Throws `ArgumentException` when the URL does not match any supported format.
+
+### `GetBuildInformationAsync(VersionTag? version) → BuildInformation`
 
 Main entry point. Performs the following steps:
 
@@ -121,8 +135,9 @@ Main entry point. Performs the following steps:
     controls from description bodies and custom fields (`Custom.Visibility`,
     `Custom.AffectedVersions`).
 12. Fetch linked work items for each PR via
-    `GET /git/repositories/{id}/pullrequests/{prId}/workitems` and batch-fetch
-    work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
+    `GET /git/repositories/{repositoryName}/pullrequests/{prId}/workitems` (where
+    `{repositoryName}` is the repository name, **not** the project name) and
+    batch-fetch work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
 13. Collect known issues from **all** bugs (resolved and unresolved), via a WIQL
     query, applying item controls from description bodies and custom fields.
     For each candidate bug:

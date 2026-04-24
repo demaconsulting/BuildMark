@@ -105,7 +105,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         var adoData = await FetchAzureDevOpsDataAsync(restClient, repository);
 
         // Build lookup dictionaries and mappings
-        var lookupData = BuildLookupData(adoData, project, organizationUrl);
+        var lookupData = BuildLookupData(adoData, project, organizationUrl, repository);
 
         // Determine the target version and hash
         var (toVersion, toHash) = DetermineTargetVersion(version, currentCommitHash.Trim(), lookupData);
@@ -173,7 +173,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         List<VersionTag> TagVersions,
         Dictionary<string, string> TagToCommitHash,
         string Project,
-        string OrganizationUrl);
+        string OrganizationUrl,
+        string Repository);
 
     /// <summary>
     ///     Fetches all required data from Azure DevOps API in parallel.
@@ -204,8 +205,9 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     /// <param name="data">Azure DevOps data.</param>
     /// <param name="project">Azure DevOps project name.</param>
     /// <param name="organizationUrl">Azure DevOps organization URL.</param>
+    /// <param name="repository">Azure DevOps repository name.</param>
     /// <returns>Container with all lookup data structures.</returns>
-    private static LookupData BuildLookupData(AzureDevOpsData data, string project, string organizationUrl)
+    private static LookupData BuildLookupData(AzureDevOpsData data, string project, string organizationUrl, string repository)
     {
         // Build a set of commit hashes in the current branch
         var branchCommitHashes = data.Commits.Select(c => c.CommitId).ToHashSet(StringComparer.Ordinal);
@@ -234,7 +236,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             .GroupBy(p => p.MergeCommitId!)
             .ToDictionary(g => g.Key, g => g.First());
 
-        return new LookupData(commitHashToPr, tagVersions, tagToCommitHash, project, organizationUrl);
+        return new LookupData(commitHashToPr, tagVersions, tagToCommitHash, project, organizationUrl, repository);
     }
 
     /// <summary>
@@ -442,7 +444,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         {
             // Get work items linked to this PR
             var workItemRefs = await restClient.GetPullRequestWorkItemsAsync(
-                lookupData.Project, pr.PullRequestId);
+                lookupData.Repository, pr.PullRequestId);
 
             if (workItemRefs.Count > 0)
             {

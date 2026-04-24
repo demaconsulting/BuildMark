@@ -27,12 +27,17 @@ sections:
       - id: BuildMark-VersionComparable-PreReleaseComparison
         title: >-
           VersionComparable shall correctly order pre-release versions according
-          to Semantic Versioning specification.
+          to Semantic Versioning specification, with the intentional deviation that
+          text identifiers are compared case-insensitively.
         justification: |
           Pre-release versions must be ordered correctly per SemVer specification
           to ensure proper dependency resolution and version range operations.
           This includes handling complex pre-release identifiers with mixed
-          numeric and text components.
+          numeric and text components. Text identifiers are compared
+          case-insensitively as a deliberate design choice; SemVer 2.0.0
+          specifies case-sensitive ASCII sort order, but case-insensitive
+          comparison is more practical for typical repository tag naming
+          conventions.
         tests:
           - VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
           - VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering

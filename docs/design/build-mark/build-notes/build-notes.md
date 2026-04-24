@@ -23,7 +23,7 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 +---------------------+-------------------------------------------------------------------+
 | Unit / Subsystem    | Role                                                              |
 +=====================+===================================================================+
-| `Utilities`         | Supplies the version types used by `VersionCommitTag`            |
+| `Version`           | Supplies the version types used by `VersionCommitTag`            |
 +---------------------+-------------------------------------------------------------------+
 | `RepoConnectors`    | Connectors construct and populate `BuildInformation` records     |
 +---------------------+-------------------------------------------------------------------+
