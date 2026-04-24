@@ -215,7 +215,7 @@ All files are spell-checked using cspell. Add project-specific terms to `.cspell
 
 ```yaml
 words:
-  - myterm
+  - buildmark
 ```
 
 **Never** add a misspelled word to the `.cspell.yaml` word list to silence a spell-checking failure.

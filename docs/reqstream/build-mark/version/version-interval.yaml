@@ -12,11 +12,12 @@ sections:
       - id: BuildMark-VersionInterval-Parse
         title: >-
           The VersionInterval class shall parse a single interval token using standard
-          mathematical interval notation, returning null for unrecognized input.
+          mathematical interval notation, tolerating unrecognized input without failing
+          the parse of the enclosing interval set.
         justification: |
-          Returning null for invalid tokens allows VersionIntervalSet to silently discard
-          malformed ranges rather than failing the entire parse, making the feature
-          tolerant of minor user errors in the buildmark block.
+          Tolerating malformed interval tokens allows the enclosing interval set to
+          silently discard them rather than failing the entire parse, making the feature
+          resilient to minor user errors in the buildmark block.
         tests:
           - VersionInterval_Parse_InclusiveLower_IsInclusive
           - VersionInterval_Parse_ExclusiveLower_IsExclusive
@@ -30,13 +31,13 @@ sections:
       - id: BuildMark-VersionInterval-Contains
         title: >-
           The VersionInterval class shall determine whether a candidate version falls
-          inside the interval, with overloads for string, VersionComparable, and VersionTag input.
+          inside the interval.
         justification: |
           Callers need to evaluate whether a release version is included by an
-          affected-version interval. Providing string, VersionComparable, and VersionTag
-          overloads makes the utility reusable across parsing and reporting flows.
-          The VersionComparable overload provides direct access to analytical comparison,
-          while the VersionTag overload accepts parsed repository tags directly.
+          affected-version interval. The class must accept version values in the
+          forms used throughout the tool — raw strings, parsed comparable versions,
+          and repository tag objects — so that callers are not forced to convert
+          before querying.
         tests:
           - VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue
           - VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse
@@ -66,12 +67,13 @@ sections:
       - id: BuildMark-VersionIntervalSet-Contains
         title: >-
           The VersionIntervalSet class shall determine whether a candidate version falls
-          inside any interval in the set, with overloads for string, VersionComparable, and VersionTag input.
+          inside any interval in the set.
         justification: |
-          Affected-version metadata can contain multiple disjoint ranges. The utility
-          must allow callers to determine whether a version is covered by any one of
-          those ranges without re-implementing interval iteration logic. VersionComparable
-          provides analytical comparison while VersionTag accepts parsed repository tags.
+          Affected-version metadata can contain multiple disjoint ranges. The class must
+          allow callers to determine whether a version is covered by any one of those
+          ranges without re-implementing interval iteration logic, and must accept version
+          values in the forms used throughout the tool so callers are not forced to convert
+          before querying.
         tests:
           - VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue
           - VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue

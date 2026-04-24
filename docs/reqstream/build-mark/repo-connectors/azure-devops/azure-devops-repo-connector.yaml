@@ -102,11 +102,15 @@ sections:
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
       - id: BuildMark-AzureDevOps-RestClient
-        title: The AzureDevOpsRepoConnector class shall use a REST client for Azure DevOps API interactions.
+        title: >-
+          The AzureDevOpsRestClient shall retrieve repository details, commits, tags,
+          pull requests, and work items from the Azure DevOps API, including support
+          for paginated responses.
         justification: |
-          The Azure DevOps REST API provides efficient access to repository data including
-          commits, tags, pull requests, and work items. The REST client handles pagination,
-          authentication, and response parsing to provide reliable data retrieval.
+          The Azure DevOps REST API returns large result sets in pages. The client must
+          transparently follow pagination to retrieve complete repository data so that
+          build information reflects the full history. Authentication and response
+          parsing must be handled reliably to support consistent data retrieval.
         tests:
           - AzureDevOpsRestClient_GetRepositoryAsync_ValidResponse_ReturnsRepository
           - AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits

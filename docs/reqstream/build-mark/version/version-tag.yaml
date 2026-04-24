@@ -23,12 +23,11 @@ sections:
 
       - id: BuildMark-VersionTag-Equality
         title: >-
-          VersionTag equality shall be determined by VersionComparable semantic
-          comparison, not by tag string comparison, enabling different prefixes
-          with identical versions to be treated as equal.
+          Tags that represent the same semantic version but differ only in string
+          formatting shall compare as equal.
         justification: |
           Repository connectors must recognize that "v1.2.3", "VER1.2.3", and
-          "Release_1.2.3" represent the same semantic version for version matching,
+          "Release_1.2.3" represent the same release for version matching,
           baseline determination, and range operations. String-based comparison
           would incorrectly treat these as different versions.
         tests:

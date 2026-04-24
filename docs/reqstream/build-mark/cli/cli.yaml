@@ -10,12 +10,12 @@ sections:
   - title: Cli Subsystem Requirements
     requirements:
       - id: BuildMark-Cli-Context
-        title: The Cli subsystem shall implement a Context class for command-line argument handling.
+        title: The Cli subsystem shall parse command-line arguments and manage program I/O state for the tool.
         justification: |
           Provides a standardized approach to command-line argument parsing and output
-          handling across all DEMA Consulting DotNet Tools. The Context class encapsulates
-          all parsed flags and output channels so that the rest of the tool has a single,
-          consistent entry point for CLI interaction.
+          handling across all DEMA Consulting DotNet Tools. All parsed flags and output
+          channels must be accessible through a single, consistent entry point so that
+          the rest of the tool can read user intent without re-parsing.
         tests:
           - Cli_Context_EmptyArguments_CreatesValidContext
           - Cli_VersionFlag_SetsProperty
@@ -75,8 +75,9 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Report
-        title: The Cli subsystem shall support --report, --depth, and --include-known-issues flags to configure
-          report output.
+        title: >-
+          The Cli subsystem shall support --report, --depth, and --include-known-issues
+          flags to configure report output.
         justification: |
           Enables users to direct build notes output to a specific file, embed it at
           any heading level within a larger markdown document, and control whether
@@ -117,8 +118,9 @@ sections:
           - BuildMark-Context-ArgumentParsing
 
       - id: BuildMark-Cli-Results
-        title: The Cli subsystem shall support --results (and --result alias) flag to specify a test results output
-          file.
+        title: >-
+          The Cli subsystem shall support --results (and --result alias) flag to
+          specify a test results output file.
         justification: |
           Enables integration with CI/CD systems that expect standard test result formats
           (TRX or JUnit XML).

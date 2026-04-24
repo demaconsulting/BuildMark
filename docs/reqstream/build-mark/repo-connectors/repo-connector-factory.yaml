@@ -3,9 +3,7 @@
 #
 # RepoConnectorFactory creates the appropriate IRepoConnector implementation
 # based on the runtime environment (GitHub Actions environment variables and
-# git remote URL inspection using sync-over-async pattern). BuildMark is
-# distributed as a .NET tool and is not intended for consumption as a library
-# by external callers, so this design reflects the tool-oriented execution model.
+# git remote URL inspection).
 
 sections:
   - title: RepoConnectorFactory Unit Requirements
@@ -15,11 +13,10 @@ sections:
           The RepoConnectorFactory class shall create the appropriate repository
           connector based on environment variables and git remote URL inspection.
         justification: |
-          The factory method encapsulates connector selection logic, auto-detecting
+          The factory encapsulates connector selection logic, auto-detecting
           the environment using GitHub Actions environment variables and git remote
-          URL inspection. Uses sync-over-async pattern; BuildMark is distributed as
-          a .NET tool and is not intended for consumption as a library by external
-          callers, so this reflects the tool-oriented execution model.
+          URL inspection, so that the program does not need to contain environment
+          detection logic itself.
         tests:
           - RepoConnectorFactory_Create_ReturnsConnector
           - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo

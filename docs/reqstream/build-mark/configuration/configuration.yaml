@@ -61,7 +61,9 @@ sections:
   - title: BuildMarkConfigReader Unit Requirements
     requirements:
       - id: BuildMark-ConfigReader-ReadAsync
-        title: BuildMarkConfigReader.ReadAsync shall return a ConfigurationLoadResult for any input path.
+        title: >-
+          BuildMarkConfigReader shall always return a configuration load result regardless
+          of whether the file is present or contains parse errors.
         justification: |
           Callers must always receive a result object rather than null or an exception
           so that subsequent steps (issue reporting, connector creation) are uniform
@@ -71,8 +73,8 @@ sections:
 
       - id: BuildMark-ConfigReader-MissingFile
         title: >-
-          BuildMarkConfigReader.ReadAsync shall return an empty-issues result with null
-          Config when the file is absent.
+          BuildMarkConfigReader shall return an empty configuration result when
+          the .buildmark.yaml file is absent.
         justification: |
           An absent configuration file is the normal case for repositories that have
           not yet adopted .buildmark.yaml. The tool must continue working with defaults.
@@ -81,8 +83,8 @@ sections:
 
       - id: BuildMark-ConfigReader-MalformedFile
         title: >-
-          BuildMarkConfigReader.ReadAsync shall return a ConfigurationLoadResult with one or more
-          error issues and null Config when the file cannot be parsed.
+          BuildMarkConfigReader shall return an error result with actionable messages
+          when the configuration file cannot be parsed.
         justification: |
           A malformed configuration file should produce actionable error messages rather
           than a silent failure or an unhandled exception.
@@ -93,11 +95,12 @@ sections:
     requirements:
       - id: BuildMark-ConfigLoadResult-ReportTo
         title: >-
-          ConfigurationLoadResult.ReportTo shall write all issues to Context and set
-          the exit code to 1 when any issue is an error.
+          ConfigurationLoadResult shall report all configuration issues to the user
+          and signal an error exit code when any issue has error severity.
         justification: |
-          Centralizing issue reporting in a helper method ensures consistent formatting
-          and exit-code behavior across both the --lint path and the normal build path.
+          Centralizing issue reporting in the result object ensures consistent
+          formatting and exit-code behavior across both the --lint path and the
+          normal build path.
         tests:
           - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 

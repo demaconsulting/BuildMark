@@ -15,92 +15,26 @@ language: en
 # Project-specific technical terms and tool names
 words:
   - ACCESSTOKEN
-  - Anson
-  - hostnames
+  - buildmark
+  - demaconsulting
+  - Dema
+  - fileassert
+  - mstest
   - myorg
   - myproject
   - myrepo
+  - Pandoc
   - pullrequest
   - pullrequests
-  - wiql
-  - WIQL
-  - workitems
-  - Blockquotes
-  - buildmark
-  - BuildMark
-  - build_notes
-  - camelcase
-  - Checkmarx
-  - codeql
-  - CodeQL
-  - copilot
-  - creatordate
-  - cspell
-  - csproj
-  - dbproj
-  - dcterms
-  - Dema
-  - demaconsulting
-  - DEMACONSULTINGNUGETKEY
-  - Dependabot
-  - dependabot
-  - doctitle
-  - dotnet
-  - editorconfig
-  - filepart
-  - fsproj
-  - Gidget
-  - gitattributes
-  - ibiqlik
-  - LINQ
-  - maintainer
-  - markdownlint
-  - mermaid
-  - mstest
-  - myterm
-  - ncipollo
-  - nuget
-  - nupkg
-  - oneline
-  - opencover
-  - pandoc
-  - pagetitle
-  - Pylint
-  - Qube
   - reqstream
-  - ReqStream
-  - code_quality
-  - code_review_plan
-  - code_review_report
-  - requirements_doc
-  - requirements_report
   - reviewmark
-  - ReviewMark
+  - sarifmark
   - Sarif
-  - SarifMark
-  - SBOM
-  - sbom
-  - Semgrep
-  - semver
-  - slnx
-  - snupkg
   - sonarmark
-  - SonarMark
-  - SonarQube
-  - spdx
-  - streetsidesoftware
-  - TMPL
-  - trace_matrix
-  - triaging
-  - Trivy
-  - trx
-  - vbproj
-  - vcxproj
   - versionmark
-  - fileassert
-  - FileAssert
   - Weasyprint
-  - yamllint
+  - wiql
+  - workitems
   - yamlfix
 
 # Exclude common build artifacts, dependencies, and vendored third-party code

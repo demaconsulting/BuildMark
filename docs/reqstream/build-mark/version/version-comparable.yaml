@@ -42,11 +42,13 @@ sections:
 
       - id: BuildMark-VersionComparable-Creation
         title: >-
-          VersionComparable shall provide factory methods for creating instances
-          from version strings with integer parsing.
+          VersionComparable shall be constructible from a version string and shall
+          reject inputs that do not represent a valid semantic version.
         justification: |
-          Factory methods provide a clean API for creating VersionComparable
-          instances while isolating parsing logic and handling invalid inputs.
+          Callers must be able to create VersionComparable instances from repository tag
+          strings and user-supplied version values, and must receive a clear error or a
+          null result when the input is not a valid version, so that invalid version data
+          does not propagate silently through version comparisons.
         tests:
           - VersionComparable_Create_ValidVersion_ReturnsInstance
           - VersionComparable_TryCreate_InvalidVersion_ReturnsNull
