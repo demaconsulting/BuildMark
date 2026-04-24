@@ -28,8 +28,6 @@ sections:
           - BuildMark-ConfigReader-ReadAsync
           - BuildMark-ConfigReader-MissingFile
           - BuildMark-ConfigReader-MalformedFile
-          - BuildMark-ConfigReader-MissingFile
-          - BuildMark-ConfigReader-MalformedFile
 
       - id: BuildMark-Configuration-Issues
         title: >-
