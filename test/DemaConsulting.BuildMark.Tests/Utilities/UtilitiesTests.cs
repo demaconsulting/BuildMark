@@ -60,7 +60,7 @@ public class UtilitiesTests
         var basePath = Path.Combine(Path.GetTempPath(), "safe");
 
         // Act & Assert: path traversal is rejected
-        Assert.Throws<ArgumentException>(
+        Assert.ThrowsExactly<ArgumentException>(
             () => PathHelpers.SafePathCombine(basePath, "../../etc/passwd"));
     }
 
@@ -77,7 +77,7 @@ public class UtilitiesTests
             : "/etc/passwd";
 
         // Act & Assert: absolute path is rejected
-        Assert.Throws<ArgumentException>(
+        Assert.ThrowsExactly<ArgumentException>(
             () => PathHelpers.SafePathCombine(basePath, absolutePath));
     }
 

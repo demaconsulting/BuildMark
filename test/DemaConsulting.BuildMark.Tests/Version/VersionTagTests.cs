@@ -196,7 +196,7 @@ public class VersionTagTests
     public void VersionTag_Create_InvalidTag_ThrowsArgumentException()
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => VersionTag.Create("not-a-version"));
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => VersionTag.Create("not-a-version"));
 
         // Assert
         Assert.Contains("does not match version format", exception.Message);

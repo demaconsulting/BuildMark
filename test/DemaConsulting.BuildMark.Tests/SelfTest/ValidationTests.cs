@@ -28,6 +28,7 @@ namespace DemaConsulting.BuildMark.Tests.SelfTest;
 ///     Tests for the Validation class.
 /// </summary>
 [TestClass]
+[DoNotParallelize]
 public class ValidationTests
 {
     /// <summary>

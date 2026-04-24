@@ -30,6 +30,7 @@ sections:
           - BuildMark-RepoConnectorBase-Interface
           - BuildMark-RepoConnectorBase-CommandExecution
           - BuildMark-RepoConnectorBase-RulesRouting
+          - BuildMark-RepoConnectorBase-FindVersionIndex
 
       - id: BuildMark-RepoConnectors-Factory
         title: The RepoConnectors subsystem shall provide a factory for creating the appropriate repository connector.

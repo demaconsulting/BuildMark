@@ -13,7 +13,9 @@ proper semantic version ordering rules with optimized performance for pre-releas
 | Major | int | Major version number |
 | Minor | int | Minor version number |
 | Patch | int | Patch version number |
+| Numbers | string | Core version numbers as string (major.minor.patch) |
 | PreRelease | string? | Pre-release identifier (null for release versions) |
+| IsPreRelease | bool | Whether this is a pre-release version |
 | CompareVersion | string | Normalized comparison string (major.minor.patch[-pre-release]) |
 
 ## Performance Optimization

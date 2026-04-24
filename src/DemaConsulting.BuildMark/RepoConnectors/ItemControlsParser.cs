@@ -19,7 +19,6 @@
 // SOFTWARE.
 
 using System.Text.RegularExpressions;
-using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.RepoConnectors;

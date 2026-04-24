@@ -420,6 +420,7 @@ public class ConfigurationTests
         // Assert - the issue's FilePath and Line are surfaced via WriteError; confirm HasErrors
         // and that the issue record exposes the correct location fields
         Assert.IsTrue(result.HasErrors);
+        Assert.AreEqual(1, context.ExitCode, "Error severity should set exit code");
         Assert.AreEqual("/repo/.buildmark.yaml", result.Issues[0].FilePath);
         Assert.AreEqual(7, result.Issues[0].Line);
         Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);

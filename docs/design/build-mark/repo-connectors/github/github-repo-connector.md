@@ -26,11 +26,13 @@ If no token is found, the connector throws `InvalidOperationException`.
 
 GitHub issue and pull request labels are mapped to normalized types:
 
-| GitHub Labels                              | Normalized Type |
-|--------------------------------------------|-----------------|
-| `bug`, `defect`                            | `"bug"`         |
-| `feature`, `enhancement`                   | `"feature"`     |
-| `documentation`, `performance`, `security` | label name      |
+| GitHub Labels                              | Normalized Type  |
+|--------------------------------------------|------------------|
+| `bug`, `defect`                            | `"bug"`          |
+| `feature`, `enhancement`                   | `"feature"`      |
+| `dependencies`, `renovate`, `dependabot`   | `"dependencies"` |
+| `internal`, `chore`                        | `"internal"`     |
+| `documentation`, `performance`, `security` | label name       |
 
 Items labelled as `"bug"` are placed in the `Bugs` list; all others go to `Changes`.
 

@@ -30,6 +30,7 @@ problem with its file path, line number, severity, and description.
 | `ReportConfig`              | `Configuration/ReportConfig.cs`               | Report output settings data model      |
 | `SectionConfig`             | `Configuration/SectionConfig.cs`              | Report section definition data model   |
 | `RuleConfig`                | `Configuration/RuleConfig.cs`                 | Item routing rule data model           |
+| `RuleMatchConfig`           | `Configuration/RuleConfig.cs`                 | Conditions for an item routing rule    |
 
 ## Interfaces
 

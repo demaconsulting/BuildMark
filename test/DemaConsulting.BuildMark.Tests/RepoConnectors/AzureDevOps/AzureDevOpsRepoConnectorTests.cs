@@ -145,8 +145,8 @@ public class AzureDevOpsRepoConnectorTests
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(101, "Add new feature", "completed", "commit3"),
                 new MockAdoPullRequest(100, "Fix critical bug", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(101, 201)
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 101, 201)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(201, "New feature work item", "User Story"),
                 new MockAdoWorkItem(200, "Bug fix work item", "Bug"))
@@ -337,7 +337,7 @@ public class AzureDevOpsRepoConnectorTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Internal fix", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Internal work item", "Bug", "Active", description))
             .AddWiqlResponse();
@@ -371,7 +371,7 @@ public class AzureDevOpsRepoConnectorTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Public feature", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Public work item", "User Story", "Active", description))
             .AddWiqlResponse();
@@ -407,7 +407,7 @@ public class AzureDevOpsRepoConnectorTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Feature that is actually a bug", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Reclassified bug", "User Story", "Active", description))
             .AddWiqlResponse();
@@ -443,7 +443,7 @@ public class AzureDevOpsRepoConnectorTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Bug that is actually a feature", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Reclassified feature", "Bug", "Active", description))
             .AddWiqlResponse();
@@ -574,7 +574,7 @@ public class AzureDevOpsRepoConnectorTests
                 new MockAdoCommit("commit1"))
             .AddPullRequestsResponse(
                 new MockAdoPullRequest(100, "Bug fix PR", "completed", "commit2"))
-            .AddPullRequestWorkItemsResponse(100, 200)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
             .AddWorkItemsResponse(
                 new MockAdoWorkItem(200, "Bug to route", "Bug", "Active"))
             .AddWiqlResponse();
@@ -692,7 +692,7 @@ public class AzureDevOpsRepoConnectorTests
     {
         // Arrange
         using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
-            .AddPullRequestWorkItemsResponse(101, 200, 201);
+            .AddPullRequestWorkItemsResponse("repo-id", 101, 200, 201);
         using var mockHttpClient = new HttpClient(mockHandler);
         using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
 

@@ -9,7 +9,9 @@ sections:
   - title: RepoConnectorBase Unit Requirements
     requirements:
       - id: BuildMark-RepoConnectorBase-Interface
-        title: The IRepoConnector interface shall define the contract for all repository connectors.
+        title: >-
+          Repository connectors shall be interchangeable, allowing the factory and
+          program to use any connector implementation without depending on concrete types.
         justification: |
           A common interface ensures that all repository connectors are interchangeable,
           enabling the factory and program to work with any connector implementation
@@ -19,24 +21,27 @@ sections:
           - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
 
       - id: BuildMark-RepoConnectorBase-CommandExecution
-        title: The RepoConnectorBase class shall provide a virtual command execution method for shell commands.
+        title: >-
+          The RepoConnectorBase class shall allow shell command execution to be
+          substituted for testing purposes without spawning real processes.
         justification: |
-          Abstracting command execution behind a virtual method allows test subclasses
-          to override it with mock implementations, enabling deterministic unit tests
-          that do not spawn real processes.
+          Repository connectors run git and gh CLI commands to retrieve repository
+          information. Tests must be able to substitute controlled responses for those
+          commands to produce deterministic, repeatable results without network or
+          filesystem dependencies.
         tests:
           - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
           - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
 
       - id: BuildMark-RepoConnectorBase-RulesRouting
         title: >-
-          The RepoConnectorBase class shall provide Configure and ApplyRules methods
-          for rules-based section routing.
+          The RepoConnectorBase class shall accept routing rules and section definitions
+          and apply them to distribute items into the appropriate report sections.
         justification: |
-          Centralizing routing configuration in the base class avoids duplicating
-          Configure/ApplyRules logic in every concrete connector and ensures that
-          all connectors honour the same rules and section definitions supplied by
-          the program configuration.
+          Centralizing routing configuration and application in the base class ensures
+          that all connectors honour the same rules and section definitions supplied by
+          the program configuration, without duplicating routing logic in every concrete
+          connector.
         tests:
           - RepoConnectorBase_Configure_StoresRulesAndSections_HasRulesReturnsTrue
           - RepoConnectorBase_Configure_EmptyRules_HasRulesReturnsFalse
@@ -47,9 +52,9 @@ sections:
 
       - id: BuildMark-RepoConnectorBase-FindVersionIndex
         title: >-
-          The RepoConnectorBase class shall provide a static utility method to locate
-          a version tag by semantic equality within a version list, returning its
-          zero-based index or -1 if not found.
+          The RepoConnectorBase class shall locate a version tag within a list by
+          semantic equality, supporting repositories that use different tag string
+          formats for the same version.
         justification: |
           Matching version tags by semantic equality rather than raw tag string allows
           connectors to handle different tagging conventions (e.g., 'v1.2.3',

@@ -201,7 +201,7 @@ public class VersionSemanticTests
     public void VersionSemantic_Create_InvalidVersion_ThrowsArgumentException()
     {
         // Act
-        var exception = Assert.Throws<ArgumentException>(() => VersionSemantic.Create("not-a-version"));
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => VersionSemantic.Create("not-a-version"));
 
         // Assert
         Assert.Contains("does not match semantic version format", exception.Message);

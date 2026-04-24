@@ -4,6 +4,7 @@ includes:
   - version-semantic.yaml
   - version-tag.yaml
   - version-interval.yaml
+  - version-interval-set.yaml
   - version-commit-tag.yaml
 
 sections:

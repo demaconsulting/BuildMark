@@ -169,6 +169,38 @@ public class RepoConnectorFactoryTests
     }
 
     /// <summary>
+    ///     Test that Create returns GitHubRepoConnector when GITHUB_ACTIONS environment variable is set.
+    /// </summary>
+    [TestMethod]
+    public void RepoConnectorFactory_Create_WithGitHubActionsEnv_ReturnsGitHubConnector()
+    {
+        // Arrange - save and set GITHUB_ACTIONS, clear TF_BUILD env var
+        var originalTfBuild = Environment.GetEnvironmentVariable("TF_BUILD");
+        var originalGhActions = Environment.GetEnvironmentVariable("GITHUB_ACTIONS");
+        var originalGhWorkspace = Environment.GetEnvironmentVariable("GITHUB_WORKSPACE");
+
+        try
+        {
+            Environment.SetEnvironmentVariable("TF_BUILD", null);
+            Environment.SetEnvironmentVariable("GITHUB_ACTIONS", "true");
+            Environment.SetEnvironmentVariable("GITHUB_WORKSPACE", null);
+
+            // Act
+            var connector = RepoConnectorFactory.Create();
+
+            // Assert
+            Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        }
+        finally
+        {
+            // Restore original environment
+            Environment.SetEnvironmentVariable("TF_BUILD", originalTfBuild);
+            Environment.SetEnvironmentVariable("GITHUB_ACTIONS", originalGhActions);
+            Environment.SetEnvironmentVariable("GITHUB_WORKSPACE", originalGhWorkspace);
+        }
+    }
+
+    /// <summary>
     ///     Test that CreateFromRemoteUrl returns AzureDevOpsRepoConnector for dev.azure.com remote URLs.
     /// </summary>
     [TestMethod]

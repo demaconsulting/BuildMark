@@ -308,24 +308,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_UnsupportedArgument_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with unsupported argument
-            _ = Context.Create(["--unsupported"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Unsupported argument '--unsupported'", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--unsupported"]));
+        Assert.Contains("Unsupported argument '--unsupported'", exception.Message);
     }
 
     /// <summary>
@@ -334,24 +319,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_BuildVersionWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --build-version but no value
-            _ = Context.Create(["--build-version"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--build-version requires a version argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--build-version"]));
+        Assert.Contains("--build-version requires a version argument", exception.Message);
     }
 
     /// <summary>
@@ -360,24 +330,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ReportWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --report but no value
-            _ = Context.Create(["--report"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--report requires a filename argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--report"]));
+        Assert.Contains("--report requires a filename argument", exception.Message);
     }
 
     /// <summary>
@@ -386,24 +341,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_DepthWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --depth but no value
-            _ = Context.Create(["--depth"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--depth requires a depth argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth"]));
+        Assert.Contains("--depth requires a depth argument", exception.Message);
     }
 
     /// <summary>
@@ -412,24 +352,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --depth with non-integer value
-            _ = Context.Create(["--depth", "abc"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--depth requires a positive integer", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "abc"]));
+        Assert.Contains("--depth requires a positive integer", exception.Message);
     }
 
     /// <summary>
@@ -438,24 +363,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_DepthWithZeroValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --depth with zero value
-            _ = Context.Create(["--depth", "0"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--depth requires a positive integer", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "0"]));
+        Assert.Contains("--depth requires a positive integer", exception.Message);
     }
 
     /// <summary>
@@ -464,24 +374,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_DepthWithNegativeValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --depth with negative value
-            _ = Context.Create(["--depth", "-1"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--depth requires a positive integer", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--depth", "-1"]));
+        Assert.Contains("--depth requires a positive integer", exception.Message);
     }
 
     /// <summary>
@@ -490,24 +385,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException()
     {
-        ArgumentOutOfRangeException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --depth exceeding maximum of 6
-            _ = Context.Create(["--depth", "7"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentOutOfRangeException to be thrown");
-        }
-        catch (ArgumentOutOfRangeException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("'--depth' must be between 1 and 6", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentOutOfRangeException>(() => Context.Create(["--depth", "7"]));
+        Assert.Contains("'--depth' must be between 1 and 6", exception.Message);
     }
 
     /// <summary>
@@ -516,24 +396,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ResultsWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --results but no value
-            _ = Context.Create(["--results"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--results requires a results filename argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--results"]));
+        Assert.Contains("--results requires a results filename argument", exception.Message);
     }
 
     /// <summary>
@@ -542,24 +407,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_ResultWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --result alias but no value
-            _ = Context.Create(["--result"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--result requires a results filename argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--result"]));
+        Assert.Contains("--result requires a results filename argument", exception.Message);
     }
 
     /// <summary>
@@ -568,24 +418,9 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_LogWithoutValue_ThrowsArgumentException()
     {
-        ArgumentException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with --log but no value
-            _ = Context.Create(["--log"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected ArgumentException to be thrown");
-        }
-        catch (ArgumentException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("--log requires a filename argument", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<ArgumentException>(() => Context.Create(["--log"]));
+        Assert.Contains("--log requires a filename argument", exception.Message);
     }
 
     /// <summary>
@@ -594,24 +429,10 @@ public class ContextTests
     [TestMethod]
     public void Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException()
     {
-        InvalidOperationException? caughtException = null;
-
-        try
-        {
-            // Attempt to create context with invalid log file path
-            _ = Context.Create(["--log", "/invalid/path/to/log.txt"]);
-
-            // Fail test if exception was not thrown
-            Assert.Fail("Expected InvalidOperationException to be thrown");
-        }
-        catch (InvalidOperationException ex)
-        {
-            caughtException = ex;
-        }
-
-        // Verify exception was caught and message is correct
-        Assert.IsNotNull(caughtException);
-        Assert.Contains("Failed to open log file", caughtException.Message);
+        // Act & Assert
+        var exception = Assert.ThrowsExactly<InvalidOperationException>(
+            () => Context.Create(["--log", "/invalid/path/to/log.txt"]));
+        Assert.Contains("Failed to open log file", exception.Message);
     }
 
     /// <summary>

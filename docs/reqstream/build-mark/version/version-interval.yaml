@@ -1,10 +1,8 @@
 ---
-# Software Unit Requirements for the VersionInterval and VersionIntervalSet Classes
+# Software Unit Requirements for the VersionInterval Class
 #
 # VersionInterval represents a single mathematical version interval with inclusive
 # or exclusive bounds (either of which may be null for an unbounded range).
-# VersionIntervalSet is an ordered collection of VersionInterval instances parsed
-# from the comma-separated affected-versions field.
 
 sections:
   - title: VersionInterval Unit Requirements
@@ -12,11 +10,12 @@ sections:
       - id: BuildMark-VersionInterval-Parse
         title: >-
           The VersionInterval class shall parse a single interval token using standard
-          mathematical interval notation, returning null for unrecognized input.
+          mathematical interval notation, tolerating unrecognized input without failing
+          the parse of the enclosing interval set.
         justification: |
-          Returning null for invalid tokens allows VersionIntervalSet to silently discard
-          malformed ranges rather than failing the entire parse, making the feature
-          tolerant of minor user errors in the buildmark block.
+          Tolerating malformed interval tokens allows the enclosing interval set to
+          silently discard them rather than failing the entire parse, making the feature
+          resilient to minor user errors in the buildmark block.
         tests:
           - VersionInterval_Parse_InclusiveLower_IsInclusive
           - VersionInterval_Parse_ExclusiveLower_IsExclusive
@@ -30,13 +29,13 @@ sections:
       - id: BuildMark-VersionInterval-Contains
         title: >-
           The VersionInterval class shall determine whether a candidate version falls
-          inside the interval, with overloads for string, VersionComparable, and VersionTag input.
+          inside the interval.
         justification: |
           Callers need to evaluate whether a release version is included by an
-          affected-version interval. Providing string, VersionComparable, and VersionTag
-          overloads makes the utility reusable across parsing and reporting flows.
-          The VersionComparable overload provides direct access to analytical comparison,
-          while the VersionTag overload accepts parsed repository tags directly.
+          affected-version interval. The class must accept version values in the
+          forms used throughout the tool — raw strings, parsed comparable versions,
+          and repository tag objects — so that callers are not forced to convert
+          before querying.
         tests:
           - VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue
           - VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse
@@ -46,36 +45,3 @@ sections:
           - VersionInterval_Contains_StringOutsideInterval_ReturnsFalse
           - VersionInterval_Contains_Version_DelegatesToSemanticVersion
           - VersionInterval_Contains_VersionComparable_HandlesPreRelease
-
-      - id: BuildMark-VersionIntervalSet-Parse
-        title: >-
-          The VersionIntervalSet class shall parse a comma-separated string of interval
-          tokens into an ordered collection of VersionInterval instances.
-        justification: |
-          The comma that separates multiple intervals also appears inside individual
-          intervals (between lower and upper bounds). The parser must distinguish
-          between the two by tracking bracket depth, ensuring disjoint version ranges
-          can be expressed correctly in a single affected-versions field.
-        tests:
-          - VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
-          - VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals
-          - VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly
-          - VersionIntervalSet_Parse_EmptyString_ReturnsEmptySet
-          - VersionIntervalSet_Parse_InvalidToken_DiscardedSilently
-
-      - id: BuildMark-VersionIntervalSet-Contains
-        title: >-
-          The VersionIntervalSet class shall determine whether a candidate version falls
-          inside any interval in the set, with overloads for string, VersionComparable, and VersionTag input.
-        justification: |
-          Affected-version metadata can contain multiple disjoint ranges. The utility
-          must allow callers to determine whether a version is covered by any one of
-          those ranges without re-implementing interval iteration logic. VersionComparable
-          provides analytical comparison while VersionTag accepts parsed repository tags.
-        tests:
-          - VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue
-          - VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue
-          - VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse
-          - VersionIntervalSet_Contains_EmptySet_ReturnsFalse
-          - VersionIntervalSet_Contains_VersionTag_DelegatesToSemanticVersion
-          - VersionIntervalSet_Contains_VersionComparable_HandlesPreRelease
