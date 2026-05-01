@@ -1,0 +1,29 @@
+---
+# Software Unit Requirements for the AzureDevOpsRestClient Class
+#
+# AzureDevOpsRestClient handles paginated HTTPS communication with the Azure
+# DevOps REST API endpoint. It supports both cloud (dev.azure.com) and
+# on-premises Azure DevOps Server instances.
+
+sections:
+  - title: AzureDevOpsRestClient Unit Requirements
+    requirements:
+      - id: BuildMark-AzureDevOps-RestClient
+        title: >-
+          The AzureDevOpsRestClient shall retrieve repository details, commits, tags,
+          pull requests, and work items from the Azure DevOps API, including support
+          for paginated responses.
+        justification: |
+          The Azure DevOps REST API returns large result sets in pages. The client must
+          transparently follow pagination to retrieve complete repository data so that
+          build information reflects the full history. Authentication and response
+          parsing must be handled reliably to support consistent data retrieval.
+        tests:
+          - AzureDevOpsRestClient_GetRepositoryAsync_ValidResponse_ReturnsRepository
+          - AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits
+          - AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_ValidResponse_ReturnsWorkItemRefs
+          - AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems
+          - AzureDevOpsRestClient_QueryWorkItemsAsync_ValidWiql_ReturnsWorkItemIds
+          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_StringValuedIds_DeserializesCorrectly
+          - AzureDevOpsRestClient_QueryWorkItemsAsync_StringValuedIds_DeserializesCorrectly

@@ -1,0 +1,28 @@
+---
+# Mock Sub-Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the BuildMark Mock sub-subsystem
+# - The Mock sub-subsystem provides a deterministic in-memory connector used
+#   by the built-in --validate self-test and development unit tests
+# - Sub-subsystem requirements describe the externally visible contract
+#   satisfied by the units beneath this sub-subsystem
+
+sections:
+  - title: Mock Sub-Subsystem Requirements
+    requirements:
+      - id: BuildMark-Mock-SubSystem
+        title: >-
+          The Mock sub-subsystem shall provide a deterministic repository connector
+          for self-test and development.
+        justification: |
+          A deterministic mock connector enables the built-in --validate self-test and
+          unit testing of build information processing logic without requiring an actual
+          repository connection, ensuring tests are fast, repeatable, and independent
+          of external services.
+        tests:
+          - Mock_ImplementsInterface_ReturnsTrue
+          - Mock_GetBuildInformation_ReturnsExpectedVersion
+          - Mock_GetBuildInformation_ReturnsCompleteInformation
+        children:
+          - BuildMark-MockRepoConnector-Deterministic

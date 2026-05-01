@@ -99,12 +99,7 @@ sections:
           - RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
           - RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
-          - BuildMark-GitHub-ConnectorConfig
-          - BuildMark-GitHub-BuildInformation
-          - BuildMark-GitHub-ItemControls
-          - BuildMark-GitHub-DescriptionBody
-          - BuildMark-GitHub-GraphQLClient
-          - BuildMark-GitHub-Rules
+          - BuildMark-GitHub-SubSystem
 
       - id: BuildMark-RepoConnectors-Mock
         title: >-
@@ -121,7 +116,7 @@ sections:
           - RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion
           - RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
         children:
-          - BuildMark-MockRepoConnector-Deterministic
+          - BuildMark-Mock-SubSystem
 
       - id: BuildMark-RepoConnectors-AzureDevOps
         title: >-
@@ -138,11 +133,4 @@ sections:
           - RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
           - RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
         children:
-          - BuildMark-AzureDevOps-UrlParsing
-          - BuildMark-AzureDevOps-ConnectorConfig
-          - BuildMark-AzureDevOps-BuildInformation
-          - BuildMark-AzureDevOps-ItemControls
-          - BuildMark-AzureDevOps-CustomFields
-          - BuildMark-AzureDevOps-Rules
-          - BuildMark-AzureDevOps-RestClient
-          - BuildMark-AzureDevOps-WorkItemMapper
+          - BuildMark-AzureDevOps-SubSystem
