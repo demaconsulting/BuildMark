@@ -27,3 +27,52 @@ sections:
           - AzureDevOpsRestClient_QueryWorkItemsAsync_ValidWiql_ReturnsWorkItemIds
           - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_StringValuedIds_DeserializesCorrectly
           - AzureDevOpsRestClient_QueryWorkItemsAsync_StringValuedIds_DeserializesCorrectly
+        children:
+          - BuildMark-AzureDevOps-GetRepository
+          - BuildMark-AzureDevOps-GetCommits
+          - BuildMark-AzureDevOps-GetTags
+          - BuildMark-AzureDevOps-GetPullRequests
+          - BuildMark-AzureDevOps-GetWorkItems
+
+      - id: BuildMark-AzureDevOps-GetRepository
+        title: The AzureDevOpsRestClient shall retrieve repository details from the Azure DevOps API.
+        justification: |
+          Repository detail retrieval provides the repository identity needed for subsequent
+          API calls and for generating accurate hyperlinks in build notes.
+        tests:
+          - AzureDevOpsRestClient_GetRepositoryAsync_ValidResponse_ReturnsRepository
+
+      - id: BuildMark-AzureDevOps-GetCommits
+        title: The AzureDevOpsRestClient shall retrieve commits from the Azure DevOps API with pagination support.
+        justification: |
+          Commit retrieval is required to determine the set of changes between version tags.
+          Pagination ensures complete history is retrieved regardless of repository size.
+        tests:
+          - AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits
+
+      - id: BuildMark-AzureDevOps-GetTags
+        title: The AzureDevOpsRestClient shall retrieve tags from the Azure DevOps API.
+        justification: |
+          Tag retrieval is required to identify version boundaries for build note generation.
+          All tags must be fetched to correctly determine previous version baselines.
+        tests:
+          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_ValidResponse_ReturnsWorkItemRefs
+
+      - id: BuildMark-AzureDevOps-GetPullRequests
+        title: The AzureDevOpsRestClient shall retrieve pull requests from the Azure DevOps API with pagination support.
+        justification: |
+          Pull request retrieval provides the change entries for build notes. Pagination
+          ensures all pull requests in the version range are included.
+        tests:
+          - AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_StringValuedIds_DeserializesCorrectly
+
+      - id: BuildMark-AzureDevOps-GetWorkItems
+        title: The AzureDevOpsRestClient shall retrieve work items from the Azure DevOps API with pagination support.
+        justification: |
+          Work item retrieval provides the issue and bug entries for build notes. Pagination
+          and WIQL query support ensure complete work item coverage.
+        tests:
+          - AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems
+          - AzureDevOpsRestClient_QueryWorkItemsAsync_ValidWiql_ReturnsWorkItemIds
+          - AzureDevOpsRestClient_QueryWorkItemsAsync_StringValuedIds_DeserializesCorrectly

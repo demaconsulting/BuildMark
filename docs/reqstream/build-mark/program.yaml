@@ -52,3 +52,57 @@ sections:
           and generation of the output markdown report.
         tests:
           - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+
+      - id: BuildMark-Program-Silent
+        title: The Program class shall support --silent flag to suppress console output during execution.
+        justification: |
+          Silent mode enables automated build pipelines to invoke BuildMark without
+          cluttering their output logs when only the exit code or report file is needed.
+        tests:
+          - BuildMark_SilentFlag_SuppressesOutput
+
+      - id: BuildMark-Program-Log
+        title: The Program class shall support --log flag to write execution output to a log file.
+        justification: |
+          Log file support enables persistent capture of BuildMark output for audit trails
+          and post-build analysis in automated environments.
+        tests:
+          - BuildMark_LogParameter_IsAccepted
+
+      - id: BuildMark-Program-Results
+        title: The Program class shall support --results flag to write validation results to a test results file.
+        justification: |
+          Writing results to standard test result formats (TRX or JUnit XML) enables
+          integration with CI/CD platforms that process test result files.
+        tests:
+          - BuildMark_ResultsParameter_IsAccepted
+
+      - id: BuildMark-Program-BuildVersion
+        title: The Program class shall support --build-version flag to specify the version for report generation.
+        justification: |
+          Specifying the build version allows users to override or supplement version information
+          from source control, enabling flexible version management strategies.
+        tests:
+          - BuildMark_BuildVersionParameter_IsAccepted
+
+      - id: BuildMark-Program-Depth
+        title: The Program class shall support --depth flag to configure the markdown heading depth of the report.
+        justification: |
+          Configurable heading depth allows BuildMark reports to be embedded at any level
+          within a larger document without disrupting the document hierarchy.
+        tests:
+          - BuildMark_DepthParameter_IsAccepted
+          - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
+
+      - id: BuildMark-Program-ErrorHandling
+        title: >-
+          The Program class shall report an error and set exit code 1 when an invalid
+          build version is provided or when the repository connector fails during data
+          retrieval.
+        justification: |
+          Clear error reporting on invalid inputs and connector failures allows users and
+          CI/CD pipelines to detect and diagnose problems quickly without inspecting logs
+          for root causes.
+        tests:
+          - Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode
+          - Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode

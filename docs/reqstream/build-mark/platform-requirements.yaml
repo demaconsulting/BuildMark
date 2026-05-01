@@ -11,9 +11,9 @@ sections:
         # Test source pattern "windows@" ensures these tests ran on Windows.
         # This filtering is necessary to prove Windows OS functionality.
         tests:
-          - windows@IntegrationTest_VersionFlag_OutputsVersion
-          - windows@IntegrationTest_HelpFlag_OutputsUsageInformation
-          - windows@IntegrationTest_ReportParameter_IsAccepted
+          - windows@BuildMark_VersionFlag_OutputsVersion
+          - windows@BuildMark_HelpFlag_OutputsUsageInformation
+          - windows@BuildMark_ReportParameter_IsAccepted
           - windows@BuildMark_MarkdownReportGeneration
           - windows@BuildMark_GitIntegration
           - windows@BuildMark_IssueTracking
@@ -28,9 +28,9 @@ sections:
         # Test source pattern "ubuntu@" ensures these tests ran on Linux.
         # This filtering is necessary to prove Linux OS functionality.
         tests:
-          - ubuntu@IntegrationTest_VersionFlag_OutputsVersion
-          - ubuntu@IntegrationTest_HelpFlag_OutputsUsageInformation
-          - ubuntu@IntegrationTest_ReportParameter_IsAccepted
+          - ubuntu@BuildMark_VersionFlag_OutputsVersion
+          - ubuntu@BuildMark_HelpFlag_OutputsUsageInformation
+          - ubuntu@BuildMark_ReportParameter_IsAccepted
           - ubuntu@BuildMark_MarkdownReportGeneration
           - ubuntu@BuildMark_GitIntegration
           - ubuntu@BuildMark_IssueTracking
@@ -45,9 +45,9 @@ sections:
         # Test source pattern "macos@" ensures these tests ran on macOS.
         # This filtering is necessary to prove macOS functionality.
         tests:
-          - macos@IntegrationTest_VersionFlag_OutputsVersion
-          - macos@IntegrationTest_HelpFlag_OutputsUsageInformation
-          - macos@IntegrationTest_ReportParameter_IsAccepted
+          - macos@BuildMark_VersionFlag_OutputsVersion
+          - macos@BuildMark_HelpFlag_OutputsUsageInformation
+          - macos@BuildMark_ReportParameter_IsAccepted
           - macos@BuildMark_MarkdownReportGeneration
           - macos@BuildMark_GitIntegration
           - macos@BuildMark_IssueTracking

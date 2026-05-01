@@ -51,7 +51,7 @@ public class IntegrationTests
     ///     Test that version flag outputs version information.
     /// </summary>
     [Fact]
-    public void IntegrationTest_VersionFlag_OutputsVersion()
+    public void BuildMark_VersionFlag_OutputsVersion()
     {
         // Run the application with --version flag
         var exitCode = Runner.Run(
@@ -72,7 +72,7 @@ public class IntegrationTests
     ///     Test that help flag outputs usage information.
     /// </summary>
     [Fact]
-    public void IntegrationTest_HelpFlag_OutputsUsageInformation()
+    public void BuildMark_HelpFlag_OutputsUsageInformation()
     {
         // Run the application with --help flag
         var exitCode = Runner.Run(
@@ -95,7 +95,7 @@ public class IntegrationTests
     ///     Test that silent flag suppresses output.
     /// </summary>
     [Fact]
-    public void IntegrationTest_SilentFlag_SuppressesOutput()
+    public void BuildMark_SilentFlag_SuppressesOutput()
     {
         // Run the application with --silent and --help flags
         var exitCode = Runner.Run(
@@ -116,7 +116,7 @@ public class IntegrationTests
     ///     Test that invalid argument shows error.
     /// </summary>
     [Fact]
-    public void IntegrationTest_InvalidArgument_ShowsError()
+    public void BuildMark_InvalidArgument_ShowsError()
     {
         // Run the application with invalid argument
         var exitCode = Runner.Run(
@@ -137,7 +137,7 @@ public class IntegrationTests
     ///     Test that the tool handles an invalid report file path gracefully.
     /// </summary>
     [Fact]
-    public void IntegrationTest_InvalidReportPath_ShowsError()
+    public void BuildMark_InvalidReportPath_ShowsError()
     {
         // Arrange: construct a path whose parent directory does not exist
         var invalidPath = Path.Combine(
@@ -174,7 +174,7 @@ public class IntegrationTests
     ///     Test that validate flag runs self-validation.
     /// </summary>
     [Fact]
-    public void IntegrationTest_ValidateFlag_RunsSelfValidation()
+    public void BuildMark_ValidateFlag_RunsSelfValidation()
     {
         // Run the application with --validate flag
         var exitCode = Runner.Run(
@@ -194,7 +194,7 @@ public class IntegrationTests
     ///     Test that log parameter is accepted.
     /// </summary>
     [Fact]
-    public void IntegrationTest_LogParameter_IsAccepted()
+    public void BuildMark_LogParameter_IsAccepted()
     {
         // Run the application with log parameter
         var exitCode = Runner.Run(
@@ -215,7 +215,7 @@ public class IntegrationTests
     ///     Test that report parameter is accepted.
     /// </summary>
     [Fact]
-    public void IntegrationTest_ReportParameter_IsAccepted()
+    public void BuildMark_ReportParameter_IsAccepted()
     {
         // Run the application with report parameter
         var exitCode = Runner.Run(
@@ -236,7 +236,7 @@ public class IntegrationTests
     ///     Test that depth parameter is accepted.
     /// </summary>
     [Fact]
-    public void IntegrationTest_DepthParameter_IsAccepted()
+    public void BuildMark_DepthParameter_IsAccepted()
     {
         // Run the application with depth parameter
         var exitCode = Runner.Run(
@@ -257,7 +257,7 @@ public class IntegrationTests
     ///     Test that build-version parameter is accepted.
     /// </summary>
     [Fact]
-    public void IntegrationTest_BuildVersionParameter_IsAccepted()
+    public void BuildMark_BuildVersionParameter_IsAccepted()
     {
         // Run the application with build-version parameter
         var exitCode = Runner.Run(
@@ -278,7 +278,7 @@ public class IntegrationTests
     ///     Test that results parameter is accepted.
     /// </summary>
     [Fact]
-    public void IntegrationTest_ResultsParameter_IsAccepted()
+    public void BuildMark_ResultsParameter_IsAccepted()
     {
         // Run the application with results parameter
         var exitCode = Runner.Run(
@@ -299,7 +299,7 @@ public class IntegrationTests
     ///     Test that the report generates a markdown file with version information.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_GeneratesMarkdownWithVersionInformation()
+    public void BuildMark_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -333,7 +333,7 @@ public class IntegrationTests
     ///     Test that the report contains changes and bug fixes with hyperlinks.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks()
+    public void BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -367,7 +367,7 @@ public class IntegrationTests
     ///     Test that the report shows the version range from the previous release.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease()
+    public void BuildMark_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -400,7 +400,7 @@ public class IntegrationTests
     ///     Test that the report includes known issues when the flag is set.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet()
+    public void BuildMark_Report_IncludesKnownIssues_WhenFlagIsSet()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -432,7 +432,7 @@ public class IntegrationTests
     ///     Test that report-depth 2 uses level-two headings in the report.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings()
+    public void BuildMark_Report_DepthTwo_UsesLevelTwoHeadings()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -465,7 +465,7 @@ public class IntegrationTests
     ///     Test that the --lint flag is accepted and validates configuration without error.
     /// </summary>
     [Fact]
-    public void IntegrationTest_LintFlag_IsAccepted()
+    public void BuildMark_LintFlag_IsAccepted()
     {
         // Act: run the application with --lint flag
         var exitCode = Runner.Run(
@@ -483,7 +483,7 @@ public class IntegrationTests
     ///     Test that the tool consumes the .buildmark.yaml configuration file during report generation.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration()
+    public void BuildMark_Report_ConsumesConfigurationFileDuringGeneration()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -516,7 +516,7 @@ public class IntegrationTests
     ///     Test that the tool uses the configured repository connector to fetch build data.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_UsesConnectorForBuildData()
+    public void BuildMark_Report_UsesConnectorForBuildData()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -549,7 +549,7 @@ public class IntegrationTests
     ///     Test that the report contains section definitions matching expected structure.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_ContainsSectionDefinitions()
+    public void BuildMark_Report_ContainsSectionDefinitions()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -583,7 +583,7 @@ public class IntegrationTests
     ///     Test that items are routed to the correct report sections by type.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_RoutesItemsToCorrectSections()
+    public void BuildMark_Report_RoutesItemsToCorrectSections()
     {
         // Arrange: create a temporary report file path
         var reportFile = Path.GetTempFileName();
@@ -626,7 +626,7 @@ public class IntegrationTests
     ///     Test that the tool recognizes a buildmark code block in item descriptions.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_RecognizesBuildmarkCodeBlock()
+    public void BuildMark_Report_RecognizesBuildmarkCodeBlock()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -639,7 +639,7 @@ public class IntegrationTests
     ///     Test that the tool supports a visibility field in the buildmark block.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_VisibilityFieldControlsInclusion()
+    public void BuildMark_Report_VisibilityFieldControlsInclusion()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -653,7 +653,7 @@ public class IntegrationTests
     ///     Test that the tool includes an item when visibility is set to public.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_PublicVisibility_IncludesItem()
+    public void BuildMark_Report_PublicVisibility_IncludesItem()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -666,7 +666,7 @@ public class IntegrationTests
     ///     Test that the tool excludes an item when visibility is set to internal.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_InternalVisibility_ExcludesItem()
+    public void BuildMark_Report_InternalVisibility_ExcludesItem()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -679,7 +679,7 @@ public class IntegrationTests
     ///     Test that the tool supports a type field in the buildmark block to override classification.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_TypeFieldOverridesClassification()
+    public void BuildMark_Report_TypeFieldOverridesClassification()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -700,7 +700,7 @@ public class IntegrationTests
     ///     Test that the tool classifies an item as a bug fix when type is set to bug.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed()
+    public void BuildMark_Report_TypeBug_PlacesItemInBugsFixed()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -716,7 +716,7 @@ public class IntegrationTests
     ///     Test that the tool classifies an item as a feature when type is set to feature.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_TypeFeature_PlacesItemInChanges()
+    public void BuildMark_Report_TypeFeature_PlacesItemInChanges()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -734,7 +734,7 @@ public class IntegrationTests
     ///     Test that the tool supports an affected-versions field in the buildmark block.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully()
+    public void BuildMark_Report_AffectedVersionsField_ProcessesSuccessfully()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -748,7 +748,7 @@ public class IntegrationTests
     ///     Test that the affected-versions field uses interval notation.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation()
+    public void BuildMark_Report_AffectedVersionsInterval_ParsesNotation()
     {
         // Arrange: generate a report using the controls mock connector
         // (the connector creates an item with interval notation "[1.0.0, 2.0.0)")
@@ -765,7 +765,7 @@ public class IntegrationTests
     ///     Test that the tool recognizes a buildmark block wrapped in an HTML comment.
     /// </summary>
     [Fact]
-    public void IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized()
+    public void BuildMark_Report_HiddenBuildmarkBlock_IsRecognized()
     {
         // Arrange: generate a report using the controls mock connector
         var content = GenerateControlsMockReport();
@@ -789,7 +789,8 @@ public class IntegrationTests
     ///     implementation is available.
     /// </summary>
     [Fact]
-    public void IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
+    [Trait("Category", "Pending")]
+    public void BuildMark_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that running BuildMark against a mocked Azure DevOps
@@ -804,7 +805,8 @@ public class IntegrationTests
     ///     implementation is available.
     /// </summary>
     [Fact]
-    public void IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
+    [Trait("Category", "Pending")]
+    public void BuildMark_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that the generated report contains hyperlinked work items
@@ -819,7 +821,8 @@ public class IntegrationTests
     ///     implementation is available.
     /// </summary>
     [Fact]
-    public void IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
+    [Trait("Category", "Pending")]
+    public void BuildMark_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that the previous version tag is correctly identified

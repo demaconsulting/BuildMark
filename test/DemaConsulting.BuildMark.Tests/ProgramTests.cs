@@ -18,7 +18,11 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests;
 
@@ -172,7 +176,9 @@ public class ProgramTests
         try
         {
             // Create context with report and include-known-issues flags
-            using var context = Context.Create(["--report", reportFile, "--include-known-issues"]);
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
+                () => new MockRepoConnector());
 
             // Verify IncludeKnownIssues property is set
             Assert.True(context.IncludeKnownIssues);
@@ -223,5 +229,89 @@ public class ProgramTests
 
         // Assert
         Assert.Equal(0, context.ExitCode);
+    }
+
+    /// <summary>
+    ///     Test that Run with an invalid build version format writes an error and exits with code 1.
+    /// </summary>
+    [Fact]
+    public void Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode()
+    {
+        // Arrange
+        using var context = Context.Create(
+            ["--build-version", "not-a-version"],
+            () => new MockRepoConnector());
+
+        // Capture Console.Error and Console.Out
+        using var errorOutput = new StringWriter();
+        using var stdOutput = new StringWriter();
+        var originalError = Console.Error;
+        var originalOut = Console.Out;
+        try
+        {
+            Console.SetError(errorOutput);
+            Console.SetOut(stdOutput);
+
+            // Act
+            Program.Run(context);
+        }
+        finally
+        {
+            Console.SetError(originalError);
+            Console.SetOut(originalOut);
+        }
+
+        // Assert
+        Assert.Equal(1, context.ExitCode);
+        Assert.Contains("Error", errorOutput.ToString());
+    }
+
+    /// <summary>
+    ///     Test that Run when the connector throws InvalidOperationException during data retrieval
+    ///     writes an error and exits with code 1.
+    /// </summary>
+    [Fact]
+    public void Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode()
+    {
+        // Arrange: inject a connector whose GetBuildInformationAsync throws
+        using var context = Context.Create(
+            ["--build-version", "2.0.0"],
+            () => new ThrowingConnector());
+
+        // Capture Console.Error and Console.Out
+        using var errorOutput = new StringWriter();
+        using var stdOutput = new StringWriter();
+        var originalError = Console.Error;
+        var originalOut = Console.Out;
+        try
+        {
+            Console.SetError(errorOutput);
+            Console.SetOut(stdOutput);
+
+            // Act
+            Program.Run(context);
+        }
+        finally
+        {
+            Console.SetError(originalError);
+            Console.SetOut(originalOut);
+        }
+
+        // Assert
+        Assert.Equal(1, context.ExitCode);
+        Assert.Contains("Error", errorOutput.ToString());
+    }
+
+    /// <summary>
+    ///     Stub connector that throws <see cref="InvalidOperationException"/> on
+    ///     <see cref="GetBuildInformationAsync"/> to simulate a connector failure.
+    /// </summary>
+    private sealed class ThrowingConnector : IRepoConnector
+    {
+        /// <inheritdoc/>
+        public Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
+        {
+            throw new InvalidOperationException("Simulated connector failure");
+        }
     }
 }

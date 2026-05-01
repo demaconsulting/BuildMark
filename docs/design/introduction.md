@@ -61,6 +61,7 @@ BuildMark (System)
 │   ├── ReportConfig (Unit)
 │   ├── SectionConfig (Unit)
 │   └── RuleConfig (Unit)
+│   └── RuleMatchConfig (Unit)
 └── RepoConnectors (Subsystem)
     ├── IRepoConnector (Unit)
     ├── RepoConnectorBase (Unit)
@@ -119,7 +120,7 @@ src/DemaConsulting.BuildMark/
 │   ├── AzureDevOpsConnectorConfig.cs        — Azure DevOps connector settings data model
 │   ├── ReportConfig.cs                      — report output settings data model
 │   ├── SectionConfig.cs                     — report section definition data model
-│   └── RuleConfig.cs                        — routing rule data model
+│   └── RuleConfig.cs                        — routing rule and rule-match condition data models
 └── RepoConnectors/
     ├── IRepoConnector.cs                    — repository connector interface
     ├── RepoConnectorBase.cs                 — repository connector base class
@@ -154,8 +155,7 @@ Throughout this document:
 
 ## References
 
-- [BuildMark User Guide][user-guide]
+- See the BuildMark User Guide for user-facing documentation.
 - [BuildMark Repository][repo]
 
-[user-guide]: ../user_guide/introduction.md
 [repo]: https://github.com/demaconsulting/BuildMark

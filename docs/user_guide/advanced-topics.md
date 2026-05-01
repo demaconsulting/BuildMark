@@ -17,7 +17,7 @@ Integrate BuildMark into your CI/CD pipeline to automatically generate build not
       --report docs/build-notes.md
 
 - name: Upload Build Notes
-  uses: actions/upload-artifact@v6
+  uses: actions/upload-artifact@v4
   with:
     name: build-notes
     path: docs/build-notes.md

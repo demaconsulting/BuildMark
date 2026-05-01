@@ -25,16 +25,16 @@ BuildMark is composed of seven subsystems and a top-level entry point:
 
 ## External Interfaces
 
-| Interface            | Direction | Protocol / Format                                        |
-|----------------------|-----------|----------------------------------------------------------|
-| Command line         | Input     | POSIX-style flags parsed by `Context`                    |
-| `.buildmark.yaml`    | Input     | YAML file read from the repository root                  |
-| GitHub GraphQL       | Output    | HTTPS POST to `https://api.github.com/graphql`           |
-| Azure DevOps REST    | Output    | HTTPS GET/POST to Azure DevOps `_apis` endpoints v6.0    |
-| Markdown report      | Output    | File written to `--report` path, UTF-8 markdown          |
-| Log file             | Output    | Optional file written to `--log` path, plain text        |
-| Test results         | Output    | TRX or JUnit XML written to `--results` path             |
-| Exit code            | Output    | 0 = success, 1 = error                                   |
+| Interface            | Direction     | Protocol / Format                                        |
+|----------------------|---------------|----------------------------------------------------------|
+| Command line         | Input         | POSIX-style flags parsed by `Context`                    |
+| `.buildmark.yaml`    | Input         | YAML file read from the repository root                  |
+| GitHub GraphQL       | Bidirectional | HTTPS POST to `https://api.github.com/graphql`           |
+| Azure DevOps REST    | Bidirectional | HTTPS GET/POST to Azure DevOps `_apis` endpoints v6.0    |
+| Markdown report      | Output        | File written to `--report` path, UTF-8 markdown          |
+| Log file             | Output        | Optional file written to `--log` path, plain text        |
+| Test results         | Output        | TRX or JUnit XML written to `--results` path             |
+| Exit code            | Output        | 0 = success, 1 = error                                   |
 
 ## Data Flow
 

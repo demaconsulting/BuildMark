@@ -18,19 +18,13 @@ shared utilities used by concrete connectors.
 
 `RepoConnectorBase` provides:
 
-+------------------------------------------+-------------------+-------------------------------------------------------+
 | Member                                   | Kind              | Description                                           |
-+==========================================+===================+=======================================================+
-| `Configure(rules, sections)`            | Public method     | Stores routing rules and section definitions         |
-+------------------------------------------+-------------------+-------------------------------------------------------+
-| `HasRules`                               | Protected bool    | True when at least one rule has been configured      |
-+------------------------------------------+-------------------+-------------------------------------------------------+
-| `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules    |
-+------------------------------------------+-------------------+-------------------------------------------------------+
-| `RunCommandAsync(command, args)`         | Protected virtual | Delegates shell commands to ProcessRunner            |
-+------------------------------------------+-------------------+-------------------------------------------------------+
-| `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality              |
-+------------------------------------------+-------------------+-------------------------------------------------------+
+|------------------------------------------|-------------------|-------------------------------------------------------|
+| `Configure(rules, sections)`             | Public method     | Stores routing rules and section definitions          |
+| `HasRules`                               | Protected bool    | True when at least one rule has been configured       |
+| `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules     |
+| `RunCommandAsync(command, args)`         | Protected virtual | Delegates shell commands to ProcessRunner             |
+| `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality               |
 
 ### `Configure(rules, sections)`
 

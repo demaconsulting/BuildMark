@@ -50,18 +50,7 @@ Unrecognized values for a known key are silently ignored (the field remains
 
 ## Data Model — ItemControlsInfo
 
-```csharp
-public record ItemControlsInfo(
-    string? Visibility,
-    string? Type,
-    VersionIntervalSet? AffectedVersions);
-```
-
-| Property           | Type                  | Description                                   |
-|--------------------|-----------------------|-----------------------------------------------|
-| `Visibility`       | `string?`             | `"public"`, `"internal"`, or `null`           |
-| `Type`             | `string?`             | `"bug"`, `"feature"`, or `null`               |
-| `AffectedVersions` | `VersionIntervalSet?` | Parsed interval set, or `null` if not present |
+See `item-controls-info.md` for the `ItemControlsInfo` data model definition.
 
 ## Methods
 

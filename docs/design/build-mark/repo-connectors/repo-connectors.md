@@ -28,8 +28,6 @@ self-test.
   buildmark blocks from item description bodies
 - `ItemControlsInfo` — `RepoConnectors/ItemControlsInfo.cs` — data record holding
   visibility, type, and version-set values
-- `ProcessRunner` — `Utilities/ProcessRunner.cs` — executes external processes
-  and captures output; used by `RepoConnectorBase` for shell command delegation
 
 ## Subsystems
 

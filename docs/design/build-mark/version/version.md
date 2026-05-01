@@ -55,17 +55,12 @@ Each version type serves a specific purpose with clear boundaries:
 
 ## External Interfaces
 
-+------------------+-----------+-------------------------------------------+
-| Interface        | Direction | Protocol / Format                         |
-+==================+===========+===========================================+
-| Repository Tags  | Input     | String tags from GitHub/Git repositories |
-+------------------+-----------+-------------------------------------------+
-| Version Parsing  | Processing| SemVer 2.0.0 compliant parsing           |
-+------------------+-----------+-------------------------------------------+
-| Version Compare  | Processing| IComparable<T> standard interface        |
-+------------------+-----------+-------------------------------------------+
-| Build Info       | Output    | VersionCommitTag records for build notes |
-+------------------+-----------+-------------------------------------------+
+| Interface        | Direction  | Protocol / Format                         |
+|------------------|------------|-------------------------------------------|
+| Repository Tags  | Input      | String tags from GitHub/Git repositories  |
+| Version Parsing  | Processing | SemVer 2.0.0 compliant parsing            |
+| Version Compare  | Processing | IComparable<T> standard interface         |
+| Build Info       | Output     | VersionCommitTag records for build notes  |
 
 ## Integration Points
 

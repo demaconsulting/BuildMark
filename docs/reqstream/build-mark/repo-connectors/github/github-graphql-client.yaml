@@ -31,6 +31,12 @@ sections:
           - GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues
           - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
           - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues
+        children:
+          - BuildMark-GitHub-GetCommits
+          - BuildMark-GitHub-GetReleases
+          - BuildMark-GitHub-GetTags
+          - BuildMark-GitHub-GetPullRequests
+          - BuildMark-GitHub-GetIssues
 
       - id: BuildMark-GitHub-DescriptionBody
         title: >-
@@ -44,3 +50,52 @@ sections:
         tests:
           - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
           - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
+
+      - id: BuildMark-GitHub-GetCommits
+        title: The GitHubGraphQLClient shall retrieve commits from the GitHub repository with pagination support.
+        justification: |
+          Commit retrieval is required to determine the set of changes between version tags.
+          Pagination ensures complete history is retrieved regardless of repository size.
+        tests:
+          - GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
+          - GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits
+
+      - id: BuildMark-GitHub-GetReleases
+        title: The GitHubGraphQLClient shall retrieve releases from the GitHub repository with pagination support.
+        justification: |
+          Release retrieval provides known-issues data based on published releases.
+          Pagination ensures all releases are fetched for complete known-issue analysis.
+        tests:
+          - GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames
+          - GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases
+
+      - id: BuildMark-GitHub-GetTags
+        title: The GitHubGraphQLClient shall retrieve all tags from the GitHub repository with pagination support.
+        justification: |
+          Tag retrieval is required to identify version boundaries for build note generation.
+          All tags must be fetched to correctly determine previous version baselines.
+        tests:
+          - GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
+          - GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags
+
+      - id: BuildMark-GitHub-GetPullRequests
+        title: The GitHubGraphQLClient shall retrieve pull requests from the GitHub repository with pagination support.
+        justification: |
+          Pull request retrieval provides the change entries for build notes. Pagination
+          ensures all pull requests in the version range are included.
+        tests:
+          - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+          - GitHubGraphQLClient_GetPullRequestsAsync_WithPagination_ReturnsAllPullRequests
+          - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
+
+      - id: BuildMark-GitHub-GetIssues
+        title: The GitHubGraphQLClient shall retrieve issues from the GitHub repository with pagination support.
+        justification: |
+          Issue retrieval provides bug fix entries and known-issue data. Pagination
+          ensures all issues associated with the version range are included.
+        tests:
+          - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssues
+          - GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues
+          - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues

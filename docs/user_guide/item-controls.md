@@ -72,7 +72,11 @@ into the report.
 | `bug` | **Bugs Fixed** section |
 | `feature` | **Changes** section |
 
-When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels.
+The `type` field sets the item classification. Routing rules (configured in `.buildmark.yaml`) govern which
+report section each classified item is placed in. The section names in the table above reflect the default
+configuration only.
+
+When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels or from the Azure DevOps work-item type.
 
 ### Type Example
 
