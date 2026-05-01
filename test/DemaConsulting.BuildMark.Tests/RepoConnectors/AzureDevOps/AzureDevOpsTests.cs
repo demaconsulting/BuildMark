@@ -29,7 +29,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 ///     These tests verify the contract exposed by the AzureDevOps sub-subsystem as a whole,
 ///     exercising the connector through its public IRepoConnector interface.
 /// </summary>
-[TestClass]
 public class AzureDevOpsTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -39,14 +38,14 @@ public class AzureDevOpsTests
     /// <summary>
     ///     Test that the AzureDevOps sub-subsystem provides a connector that implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void AzureDevOps_ImplementsInterface_ReturnsTrue()
     {
         // Arrange: create an AzureDevOpsRepoConnector instance from the AzureDevOps sub-subsystem
         var connector = new AzureDevOpsRepoConnector();
 
         // Assert: the sub-subsystem connector satisfies the shared IRepoConnector interface
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
@@ -56,7 +55,7 @@ public class AzureDevOpsTests
     ///     What is being tested: AzureDevOps sub-subsystem end-to-end build information retrieval
     ///     What the assertions prove: Build information is complete and accurate for a single tag
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
     {
         // Arrange: set up a mocked REST handler with a single tag and commit
@@ -73,12 +72,12 @@ public class AzureDevOpsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("abc123", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("abc123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
@@ -88,7 +87,7 @@ public class AzureDevOpsTests
     ///     What is being tested: AzureDevOps sub-subsystem PR-based change gathering
     ///     What the assertions prove: Merged PR work items appear in the Changes collection
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges()
     {
         // Arrange: set up two versions with a PR merged between them
@@ -113,8 +112,8 @@ public class AzureDevOpsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert: changes include the work item from the PR
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotEmpty(buildInfo.Changes, "Changes should include items from merged PRs");
+        Assert.NotNull(buildInfo);
+        Assert.NotEmpty(buildInfo.Changes);
     }
 
     /// <summary>
@@ -124,7 +123,7 @@ public class AzureDevOpsTests
     ///     What is being tested: AzureDevOps sub-subsystem known-issues identification
     ///     What the assertions prove: Open bug work items from WIQL queries appear in KnownIssues
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues()
     {
         // Arrange: set up a version with an open bug from WIQL query
@@ -143,8 +142,8 @@ public class AzureDevOpsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: known issues include the open bug
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotEmpty(buildInfo.KnownIssues, "KnownIssues should include open bug work items");
+        Assert.NotNull(buildInfo);
+        Assert.NotEmpty(buildInfo.KnownIssues);
     }
 
     /// <summary>
@@ -154,7 +153,7 @@ public class AzureDevOpsTests
     ///     What is being tested: AzureDevOps sub-subsystem pre-release tag handling
     ///     What the assertions prove: A release version uses only prior release tags as its baseline
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
     {
         // Arrange: a release version with a pre-release between it and the previous release
@@ -177,9 +176,9 @@ public class AzureDevOpsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: baseline should be v1.0.0, skipping the pre-release v2.0.0-rc.1
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.NotNull(buildInfo);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
     }
 
     /// <summary>

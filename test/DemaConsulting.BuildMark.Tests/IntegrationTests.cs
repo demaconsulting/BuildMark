@@ -30,29 +30,27 @@ namespace DemaConsulting.BuildMark.Tests;
 /// <summary>
 ///     Integration tests that run the BuildMark application through dotnet.
 /// </summary>
-[TestClass]
 public class IntegrationTests
 {
-    private string _dllPath = string.Empty;
+    private readonly string _dllPath;
 
     /// <summary>
     ///     Initialize test by locating the BuildMark DLL.
     /// </summary>
-    [TestInitialize]
-    public void TestInitialize()
+    public IntegrationTests()
     {
         // The DLL should be in the same directory as the test assembly
         // because the test project references the main project
         var baseDir = AppContext.BaseDirectory;
         _dllPath = PathHelpers.SafePathCombine(baseDir, "DemaConsulting.BuildMark.dll");
 
-        Assert.IsTrue(File.Exists(_dllPath), $"Could not find BuildMark DLL at {_dllPath}");
+        Assert.True(File.Exists(_dllPath), $"Could not find BuildMark DLL at {_dllPath}");
     }
 
     /// <summary>
     ///     Test that version flag outputs version information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_VersionFlag_OutputsVersion()
     {
         // Run the application with --version flag
@@ -63,17 +61,17 @@ public class IntegrationTests
             "--version");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify version is output
-        Assert.IsFalse(string.IsNullOrWhiteSpace(output));
+        Assert.False(string.IsNullOrWhiteSpace(output));
         Assert.DoesNotContain("Error", output);
     }
 
     /// <summary>
     ///     Test that help flag outputs usage information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_HelpFlag_OutputsUsageInformation()
     {
         // Run the application with --help flag
@@ -84,7 +82,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify usage information
         Assert.Contains("Usage: buildmark", output);
@@ -96,7 +94,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that silent flag suppresses output.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_SilentFlag_SuppressesOutput()
     {
         // Run the application with --silent and --help flags
@@ -108,7 +106,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify no banner in output
         Assert.DoesNotContain("BuildMark version", output);
@@ -117,7 +115,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that invalid argument shows error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_InvalidArgument_ShowsError()
     {
         // Run the application with invalid argument
@@ -128,7 +126,7 @@ public class IntegrationTests
             "--invalid-argument");
 
         // Verify error exit code
-        Assert.AreEqual(1, exitCode);
+        Assert.Equal(1, exitCode);
 
         // Verify error message
         Assert.Contains("Error:", output);
@@ -138,7 +136,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool handles an invalid report file path gracefully.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_InvalidReportPath_ShowsError()
     {
         // Arrange: construct a path whose parent directory does not exist
@@ -168,14 +166,14 @@ public class IntegrationTests
         }
 
         // Assert: tool reports an error message and exits with error code
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.Equal(1, context.ExitCode);
         Assert.Contains("Error:", errorOutput.ToString());
     }
 
     /// <summary>
     ///     Test that validate flag runs self-validation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_ValidateFlag_RunsSelfValidation()
     {
         // Run the application with --validate flag
@@ -186,16 +184,16 @@ public class IntegrationTests
             "--validate");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify validation runs
-        Assert.IsFalse(string.IsNullOrWhiteSpace(output));
+        Assert.False(string.IsNullOrWhiteSpace(output));
     }
 
     /// <summary>
     ///     Test that log parameter is accepted.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_LogParameter_IsAccepted()
     {
         // Run the application with log parameter
@@ -207,7 +205,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
@@ -216,7 +214,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that report parameter is accepted.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_ReportParameter_IsAccepted()
     {
         // Run the application with report parameter
@@ -228,7 +226,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
@@ -237,7 +235,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that depth parameter is accepted.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_DepthParameter_IsAccepted()
     {
         // Run the application with depth parameter
@@ -249,7 +247,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
@@ -258,7 +256,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that build-version parameter is accepted.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_BuildVersionParameter_IsAccepted()
     {
         // Run the application with build-version parameter
@@ -270,7 +268,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
@@ -279,7 +277,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that results parameter is accepted.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_ResultsParameter_IsAccepted()
     {
         // Run the application with results parameter
@@ -291,7 +289,7 @@ public class IntegrationTests
             "--help");
 
         // Verify success
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
 
         // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
@@ -300,7 +298,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the report generates a markdown file with version information.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Arrange: create a temporary report file path
@@ -316,7 +314,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report file contains markdown title and version information
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("# Build Report", content);
             Assert.Contains("## Version Information", content);
@@ -334,7 +332,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the report contains changes and bug fixes with hyperlinks.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Arrange: create a temporary report file path
@@ -350,7 +348,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report contains changes and bug fixes sections with linked items
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("## Changes", content);
             Assert.Contains("## Bugs Fixed", content);
@@ -368,7 +366,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the report shows the version range from the previous release.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Arrange: create a temporary report file path
@@ -384,7 +382,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report identifies the previous version as the baseline of the version range
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("Previous Version", content);
             Assert.Contains("ver-1.1.0", content);
@@ -401,7 +399,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the report includes known issues when the flag is set.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet()
     {
         // Arrange: create a temporary report file path
@@ -417,7 +415,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report includes a known issues section
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("## Known Issues", content);
         }
@@ -433,7 +431,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that report-depth 2 uses level-two headings in the report.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings()
     {
         // Arrange: create a temporary report file path
@@ -449,7 +447,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report uses level-two heading for the title and level-three for sections
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("## Build Report", content);
             Assert.Contains("### Version Information", content);
@@ -466,7 +464,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the --lint flag is accepted and validates configuration without error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_LintFlag_IsAccepted()
     {
         // Act: run the application with --lint flag
@@ -477,14 +475,14 @@ public class IntegrationTests
             "--lint");
 
         // Assert: tool completes successfully
-        Assert.AreEqual(0, exitCode);
+        Assert.Equal(0, exitCode);
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
     /// <summary>
     ///     Test that the tool consumes the .buildmark.yaml configuration file during report generation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration()
     {
         // Arrange: create a temporary report file path
@@ -500,9 +498,9 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: tool succeeds and produces a report (configuration was loaded without error)
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
-            Assert.IsFalse(string.IsNullOrWhiteSpace(content));
+            Assert.False(string.IsNullOrWhiteSpace(content));
             Assert.Contains("# Build Report", content);
         }
         finally
@@ -517,7 +515,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool uses the configured repository connector to fetch build data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_UsesConnectorForBuildData()
     {
         // Arrange: create a temporary report file path
@@ -533,7 +531,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report contains data sourced from the mock connector
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("Update documentation", content);
             Assert.Contains("Fix bug in Y", content);
@@ -550,7 +548,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the report contains section definitions matching expected structure.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_ContainsSectionDefinitions()
     {
         // Arrange: create a temporary report file path
@@ -566,7 +564,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: report contains the expected section headings
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             Assert.Contains("## Version Information", content);
             Assert.Contains("## Changes", content);
@@ -584,7 +582,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that items are routed to the correct report sections by type.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_RoutesItemsToCorrectSections()
     {
         // Arrange: create a temporary report file path
@@ -600,12 +598,12 @@ public class IntegrationTests
             Program.Run(context);
 
             // Assert: bug items appear in Bugs Fixed section; non-bug items appear in Changes section
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             var content = File.ReadAllText(reportFile);
             var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
             var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-            Assert.IsGreaterThanOrEqualTo(0, changesStart, "Report must contain Changes section");
-            Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
+            Assert.True(changesStart >= 0, "Report must contain Changes section");
+            Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
 
             // Bug-typed item "Fix bug in Y" should be in Bugs Fixed section
             var bugsSection = content[bugsStart..];
@@ -627,7 +625,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool recognizes a buildmark code block in item descriptions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_RecognizesBuildmarkCodeBlock()
     {
         // Arrange: generate a report using the controls mock connector
@@ -640,7 +638,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool supports a visibility field in the buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_VisibilityFieldControlsInclusion()
     {
         // Arrange: generate a report using the controls mock connector
@@ -654,7 +652,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool includes an item when visibility is set to public.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_PublicVisibility_IncludesItem()
     {
         // Arrange: generate a report using the controls mock connector
@@ -667,7 +665,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool excludes an item when visibility is set to internal.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_InternalVisibility_ExcludesItem()
     {
         // Arrange: generate a report using the controls mock connector
@@ -680,7 +678,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool supports a type field in the buildmark block to override classification.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_TypeFieldOverridesClassification()
     {
         // Arrange: generate a report using the controls mock connector
@@ -688,7 +686,7 @@ public class IntegrationTests
 
         // Assert: item originally typed as feature was reclassified to bug (appears in Bugs Fixed)
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
+        Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Reclassified as bug", bugsSection);
 
@@ -701,7 +699,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool classifies an item as a bug fix when type is set to bug.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed()
     {
         // Arrange: generate a report using the controls mock connector
@@ -709,7 +707,7 @@ public class IntegrationTests
 
         // Assert: item with type: bug override appears in the Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
+        Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Reclassified as bug", bugsSection);
     }
@@ -717,7 +715,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool classifies an item as a feature when type is set to feature.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_TypeFeature_PlacesItemInChanges()
     {
         // Arrange: generate a report using the controls mock connector
@@ -726,8 +724,8 @@ public class IntegrationTests
         // Assert: item with type: feature override appears in the Changes section
         var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsGreaterThanOrEqualTo(0, changesStart, "Report must contain Changes section");
-        Assert.IsGreaterThan(changesStart, bugsStart, "Bugs Fixed section must follow Changes section");
+        Assert.True(changesStart >= 0, "Report must contain Changes section");
+        Assert.True(bugsStart > changesStart, "Bugs Fixed section must follow Changes section");
         var changesSection = content[changesStart..bugsStart];
         Assert.Contains("Reclassified as feature", changesSection);
     }
@@ -735,7 +733,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool supports an affected-versions field in the buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully()
     {
         // Arrange: generate a report using the controls mock connector
@@ -749,7 +747,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the affected-versions field uses interval notation.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation()
     {
         // Arrange: generate a report using the controls mock connector
@@ -758,7 +756,7 @@ public class IntegrationTests
 
         // Assert: the item with interval notation was parsed and routed to Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
+        Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Bug with affected versions", bugsSection);
     }
@@ -766,7 +764,7 @@ public class IntegrationTests
     /// <summary>
     ///     Test that the tool recognizes a buildmark block wrapped in an HTML comment.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized()
     {
         // Arrange: generate a report using the controls mock connector
@@ -775,7 +773,7 @@ public class IntegrationTests
         // Assert: item with HTML-comment-wrapped buildmark block is recognized and processed
         // The hidden block specifies type: bug, so the item should appear in Bugs Fixed section
         var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-        Assert.IsGreaterThanOrEqualTo(0, bugsStart, "Report must contain Bugs Fixed section");
+        Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
         var bugsSection = content[bugsStart..];
         Assert.Contains("Hidden block item", bugsSection);
     }
@@ -790,13 +788,13 @@ public class IntegrationTests
     ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
     ///     implementation is available.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that running BuildMark against a mocked Azure DevOps
         // repository produces a markdown report containing correct version information.
-        Assert.IsTrue(File.Exists(_dllPath));
+        Assert.True(File.Exists(_dllPath));
     }
 
     /// <summary>
@@ -805,13 +803,13 @@ public class IntegrationTests
     ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
     ///     implementation is available.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that the generated report contains hyperlinked work items
         // and pull requests from Azure DevOps.
-        Assert.IsTrue(File.Exists(_dllPath));
+        Assert.True(File.Exists(_dllPath));
     }
 
     /// <summary>
@@ -820,13 +818,13 @@ public class IntegrationTests
     ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
     ///     implementation is available.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
         // This test will verify that the previous version tag is correctly identified
         // and the change range is accurately reported from an Azure DevOps repository.
-        Assert.IsTrue(File.Exists(_dllPath));
+        Assert.True(File.Exists(_dllPath));
     }
 
     /// <summary>
@@ -847,7 +845,7 @@ public class IntegrationTests
             Program.Run(context);
 
             // Verify success and return content
-            Assert.AreEqual(0, context.ExitCode);
+            Assert.Equal(0, context.ExitCode);
             return File.ReadAllText(reportFile);
         }
         finally

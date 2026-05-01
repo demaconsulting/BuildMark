@@ -26,7 +26,6 @@ namespace DemaConsulting.BuildMark.Tests.Utilities;
 /// <summary>
 ///     Subsystem-level tests for the Utilities subsystem.
 /// </summary>
-[TestClass]
 public class UtilitiesTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -36,7 +35,7 @@ public class UtilitiesTests
     /// <summary>
     ///     Test that the Utilities subsystem correctly combines valid relative paths.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Utilities_SafePaths_ValidPaths_CombinesCorrectly()
     {
         // Arrange: define a base path and relative path
@@ -47,27 +46,27 @@ public class UtilitiesTests
         var result = PathHelpers.SafePathCombine(basePath, relativePath);
 
         // Assert: combined path ends with the relative portion
-        Assert.IsTrue(result.EndsWith("subdir", StringComparison.Ordinal));
+        Assert.EndsWith("subdir", result);
     }
 
     /// <summary>
     ///     Test that the Utilities subsystem rejects path traversal sequences.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Utilities_SafePaths_TraversalPath_ThrowsException()
     {
         // Arrange: define a base path and a traversal relative path
         var basePath = Path.Combine(Path.GetTempPath(), "safe");
 
         // Act & Assert: path traversal is rejected
-        Assert.ThrowsExactly<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => PathHelpers.SafePathCombine(basePath, "../../etc/passwd"));
     }
 
     /// <summary>
     ///     Test that the Utilities subsystem rejects absolute paths as relative components.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Utilities_SafePaths_AbsolutePath_ThrowsException()
     {
         // Arrange: define a base path and an absolute relative path
@@ -77,7 +76,7 @@ public class UtilitiesTests
             : "/etc/passwd";
 
         // Act & Assert: absolute path is rejected
-        Assert.ThrowsExactly<ArgumentException>(
+        Assert.Throws<ArgumentException>(
             () => PathHelpers.SafePathCombine(basePath, absolutePath));
     }
 
@@ -88,7 +87,7 @@ public class UtilitiesTests
     /// <summary>
     ///     Test that the Utilities subsystem runs a valid command and returns output.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Utilities_ProcessRunner_ValidCommand_ReturnsOutput()
     {
         // Arrange: choose a portable echo command
@@ -101,27 +100,27 @@ public class UtilitiesTests
         var result = await ProcessRunner.RunAsync(command, arguments);
 
         // Assert: output contains the expected text
-        Assert.IsNotNull(result);
-        Assert.IsTrue(result.Contains("subsystem_test", StringComparison.OrdinalIgnoreCase));
+        Assert.NotNull(result);
+        Assert.True(result.Contains("subsystem_test", StringComparison.OrdinalIgnoreCase));
     }
 
     /// <summary>
     ///     Test that the Utilities subsystem returns null for an invalid command.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Utilities_ProcessRunner_InvalidCommand_ReturnsNull()
     {
         // Arrange & Act: run a non-existent command
         var result = await ProcessRunner.TryRunAsync("nonexistent_utility_test_12345");
 
         // Assert: null is returned
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that the Utilities subsystem throws an exception for a failing command.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Utilities_ProcessRunner_FailingCommand_ThrowsException()
     {
         // Arrange: a command that exits with code 1

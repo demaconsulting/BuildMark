@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient GetAllTagsAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientGetAllTagsTests
 {
     /// <summary>
     ///     Test that GetAllTagsAsync returns expected tag names and SHAs with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes()
     {
         // Arrange
@@ -62,20 +61,20 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.HasCount(3, tagNodes);
-        Assert.AreEqual("v1.0.0", tagNodes[0].Name);
-        Assert.AreEqual("abc123", tagNodes[0].Target?.Oid);
-        Assert.AreEqual("v0.9.0", tagNodes[1].Name);
-        Assert.AreEqual("def456", tagNodes[1].Target?.Oid);
-        Assert.AreEqual("v0.8.5", tagNodes[2].Name);
-        Assert.AreEqual("ghi789", tagNodes[2].Target?.Oid);
+        Assert.NotNull(tagNodes);
+        Assert.Equal(3, tagNodes.Count);
+        Assert.Equal("v1.0.0", tagNodes[0].Name);
+        Assert.Equal("abc123", tagNodes[0].Target?.Oid);
+        Assert.Equal("v0.9.0", tagNodes[1].Name);
+        Assert.Equal("def456", tagNodes[1].Target?.Oid);
+        Assert.Equal("v0.8.5", tagNodes[2].Name);
+        Assert.Equal("ghi789", tagNodes[2].Target?.Oid);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync returns empty list when no tags are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_NoTags_ReturnsEmptyList()
     {
         // Arrange
@@ -100,14 +99,14 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.IsEmpty(tagNodes);
+        Assert.NotNull(tagNodes);
+        Assert.Empty(tagNodes);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -124,14 +123,14 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.IsEmpty(tagNodes);
+        Assert.NotNull(tagNodes);
+        Assert.Empty(tagNodes);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync returns empty list on HTTP error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_HttpError_ReturnsEmptyList()
     {
         // Arrange
@@ -144,14 +143,14 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.IsEmpty(tagNodes);
+        Assert.NotNull(tagNodes);
+        Assert.Empty(tagNodes);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync returns empty list on invalid JSON.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_InvalidJson_ReturnsEmptyList()
     {
         // Arrange
@@ -164,14 +163,14 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.IsEmpty(tagNodes);
+        Assert.NotNull(tagNodes);
+        Assert.Empty(tagNodes);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync returns single tag correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_SingleTag_ReturnsOneTagNode()
     {
         // Arrange
@@ -198,16 +197,16 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.HasCount(1, tagNodes);
-        Assert.AreEqual("v2.0.0-beta1", tagNodes[0].Name);
-        Assert.AreEqual("xyz999", tagNodes[0].Target?.Oid);
+        Assert.NotNull(tagNodes);
+        Assert.Single(tagNodes);
+        Assert.Equal("v2.0.0-beta1", tagNodes[0].Name);
+        Assert.Equal("xyz999", tagNodes[0].Target?.Oid);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync handles nodes with missing name property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_MissingNameProperty_SkipsInvalidNodes()
     {
         // Arrange
@@ -236,18 +235,18 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.HasCount(2, tagNodes);
-        Assert.AreEqual("v1.0.0", tagNodes[0].Name);
-        Assert.AreEqual("abc123", tagNodes[0].Target?.Oid);
-        Assert.AreEqual("v0.9.0", tagNodes[1].Name);
-        Assert.AreEqual("def456", tagNodes[1].Target?.Oid);
+        Assert.NotNull(tagNodes);
+        Assert.Equal(2, tagNodes.Count);
+        Assert.Equal("v1.0.0", tagNodes[0].Name);
+        Assert.Equal("abc123", tagNodes[0].Target?.Oid);
+        Assert.Equal("v0.9.0", tagNodes[1].Name);
+        Assert.Equal("def456", tagNodes[1].Target?.Oid);
     }
 
     /// <summary>
     ///     Test that GetAllTagsAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -259,14 +258,14 @@ public class GitHubGraphQLClientGetAllTagsTests
         var tagNodes = await client.GetAllTagsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(tagNodes);
-        Assert.HasCount(3, tagNodes);
-        Assert.AreEqual("v3.0.0", tagNodes[0].Name);
-        Assert.AreEqual("sha3", tagNodes[0].Target?.Oid);
-        Assert.AreEqual("v2.0.0", tagNodes[1].Name);
-        Assert.AreEqual("sha2", tagNodes[1].Target?.Oid);
-        Assert.AreEqual("v1.0.0", tagNodes[2].Name);
-        Assert.AreEqual("sha1", tagNodes[2].Target?.Oid);
+        Assert.NotNull(tagNodes);
+        Assert.Equal(3, tagNodes.Count);
+        Assert.Equal("v3.0.0", tagNodes[0].Name);
+        Assert.Equal("sha3", tagNodes[0].Target?.Oid);
+        Assert.Equal("v2.0.0", tagNodes[1].Name);
+        Assert.Equal("sha2", tagNodes[1].Target?.Oid);
+        Assert.Equal("v1.0.0", tagNodes[2].Name);
+        Assert.Equal("sha1", tagNodes[2].Target?.Oid);
     }
 
     /// <summary>

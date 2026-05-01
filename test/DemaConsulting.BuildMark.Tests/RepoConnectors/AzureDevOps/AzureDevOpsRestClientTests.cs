@@ -25,7 +25,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 /// <summary>
 ///     Unit tests for the AzureDevOpsRestClient class.
 /// </summary>
-[TestClass]
 public class AzureDevOpsRestClientTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -35,7 +34,7 @@ public class AzureDevOpsRestClientTests
     /// <summary>
     ///     Verify that GetRepositoryAsync returns a repository record from a valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetRepositoryAsync_ValidResponse_ReturnsRepository()
     {
         // Arrange
@@ -48,16 +47,16 @@ public class AzureDevOpsRestClientTests
         var repo = await client.GetRepositoryAsync("MyRepo");
 
         // Assert
-        Assert.IsNotNull(repo);
-        Assert.AreEqual("repo-123", repo.Id);
-        Assert.AreEqual("MyRepo", repo.Name);
-        Assert.AreEqual("https://dev.azure.com/org/project/_git/MyRepo", repo.RemoteUrl);
+        Assert.NotNull(repo);
+        Assert.Equal("repo-123", repo.Id);
+        Assert.Equal("MyRepo", repo.Name);
+        Assert.Equal("https://dev.azure.com/org/project/_git/MyRepo", repo.RemoteUrl);
     }
 
     /// <summary>
     ///     Verify that GetCommitsAsync returns commits from a valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits()
     {
         // Arrange
@@ -72,17 +71,17 @@ public class AzureDevOpsRestClientTests
         var commits = await client.GetCommitsAsync("repo-id");
 
         // Assert
-        Assert.IsNotNull(commits);
-        Assert.HasCount(2, commits);
-        Assert.AreEqual("abc123", commits[0].CommitId);
-        Assert.AreEqual("First commit", commits[0].Comment);
-        Assert.AreEqual("def456", commits[1].CommitId);
+        Assert.NotNull(commits);
+        Assert.Equal(2, commits.Count);
+        Assert.Equal("abc123", commits[0].CommitId);
+        Assert.Equal("First commit", commits[0].Comment);
+        Assert.Equal("def456", commits[1].CommitId);
     }
 
     /// <summary>
     ///     Verify that GetPullRequestsAsync returns pull requests from a valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests()
     {
         // Arrange
@@ -97,18 +96,18 @@ public class AzureDevOpsRestClientTests
         var prs = await client.GetPullRequestsAsync("repo-id");
 
         // Assert
-        Assert.IsNotNull(prs);
-        Assert.HasCount(2, prs);
-        Assert.AreEqual(101, prs[0].PullRequestId);
-        Assert.AreEqual("Feature PR", prs[0].Title);
-        Assert.AreEqual("completed", prs[0].Status);
-        Assert.AreEqual("merge-commit-1", prs[0].MergeCommitId);
+        Assert.NotNull(prs);
+        Assert.Equal(2, prs.Count);
+        Assert.Equal(101, prs[0].PullRequestId);
+        Assert.Equal("Feature PR", prs[0].Title);
+        Assert.Equal("completed", prs[0].Status);
+        Assert.Equal("merge-commit-1", prs[0].MergeCommitId);
     }
 
     /// <summary>
     ///     Verify that GetPullRequestWorkItemsAsync returns work item references from a valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_ValidResponse_ReturnsWorkItemRefs()
     {
         // Arrange
@@ -121,16 +120,16 @@ public class AzureDevOpsRestClientTests
         var workItemRefs = await client.GetPullRequestWorkItemsAsync("repo-id", 101);
 
         // Assert
-        Assert.IsNotNull(workItemRefs);
-        Assert.HasCount(2, workItemRefs);
-        Assert.AreEqual(200, workItemRefs[0].Id);
-        Assert.AreEqual(201, workItemRefs[1].Id);
+        Assert.NotNull(workItemRefs);
+        Assert.Equal(2, workItemRefs.Count);
+        Assert.Equal(200, workItemRefs[0].Id);
+        Assert.Equal(201, workItemRefs[1].Id);
     }
 
     /// <summary>
     ///     Verify that GetWorkItemsAsync returns work item details from a valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems()
     {
         // Arrange
@@ -145,16 +144,16 @@ public class AzureDevOpsRestClientTests
         var workItems = await client.GetWorkItemsAsync([200, 201]);
 
         // Assert
-        Assert.IsNotNull(workItems);
-        Assert.HasCount(2, workItems);
-        Assert.AreEqual(200, workItems[0].Id);
-        Assert.AreEqual(201, workItems[1].Id);
+        Assert.NotNull(workItems);
+        Assert.Equal(2, workItems.Count);
+        Assert.Equal(200, workItems[0].Id);
+        Assert.Equal(201, workItems[1].Id);
     }
 
     /// <summary>
     ///     Verify that QueryWorkItemsAsync returns work item ids for a valid WIQL query.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_QueryWorkItemsAsync_ValidWiql_ReturnsWorkItemIds()
     {
         // Arrange
@@ -167,18 +166,18 @@ public class AzureDevOpsRestClientTests
         var query = await client.QueryWorkItemsAsync("SELECT [System.Id] FROM workitems WHERE [System.WorkItemType] = 'Bug'");
 
         // Assert
-        Assert.IsNotNull(query);
-        Assert.HasCount(3, query.WorkItems);
-        Assert.AreEqual(300, query.WorkItems[0].Id);
-        Assert.AreEqual(301, query.WorkItems[1].Id);
-        Assert.AreEqual(302, query.WorkItems[2].Id);
+        Assert.NotNull(query);
+        Assert.Equal(3, query.WorkItems.Count);
+        Assert.Equal(300, query.WorkItems[0].Id);
+        Assert.Equal(301, query.WorkItems[1].Id);
+        Assert.Equal(302, query.WorkItems[2].Id);
     }
 
     /// <summary>
     ///     Verify that GetPullRequestWorkItemsAsync deserializes string-valued ids
     ///     as returned by the Azure DevOps PR work items endpoint.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_StringValuedIds_DeserializesCorrectly()
     {
         // Arrange - raw JSON matching the real Azure DevOps response format where id is a string
@@ -192,17 +191,17 @@ public class AzureDevOpsRestClientTests
         var workItemRefs = await client.GetPullRequestWorkItemsAsync("repo-id", 101);
 
         // Assert
-        Assert.IsNotNull(workItemRefs);
-        Assert.HasCount(2, workItemRefs);
-        Assert.AreEqual(1234, workItemRefs[0].Id);
-        Assert.AreEqual(5678, workItemRefs[1].Id);
+        Assert.NotNull(workItemRefs);
+        Assert.Equal(2, workItemRefs.Count);
+        Assert.Equal(1234, workItemRefs[0].Id);
+        Assert.Equal(5678, workItemRefs[1].Id);
     }
 
     /// <summary>
     ///     Verify that QueryWorkItemsAsync deserializes string-valued ids
     ///     when the WIQL endpoint returns them as strings.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task AzureDevOpsRestClient_QueryWorkItemsAsync_StringValuedIds_DeserializesCorrectly()
     {
         // Arrange - raw JSON with string-valued ids
@@ -216,9 +215,9 @@ public class AzureDevOpsRestClientTests
         var query = await client.QueryWorkItemsAsync("SELECT [System.Id] FROM workitems WHERE [System.WorkItemType] = 'Bug'");
 
         // Assert
-        Assert.IsNotNull(query);
-        Assert.HasCount(2, query.WorkItems);
-        Assert.AreEqual(300, query.WorkItems[0].Id);
-        Assert.AreEqual(301, query.WorkItems[1].Id);
+        Assert.NotNull(query);
+        Assert.Equal(2, query.WorkItems.Count);
+        Assert.Equal(300, query.WorkItems[0].Id);
+        Assert.Equal(301, query.WorkItems[1].Id);
     }
 }

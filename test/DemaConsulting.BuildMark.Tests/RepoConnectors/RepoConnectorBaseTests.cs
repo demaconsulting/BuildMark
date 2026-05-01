@@ -28,7 +28,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 /// <summary>
 ///     Tests for the RepoConnectorBase class.
 /// </summary>
-[TestClass]
 public class RepoConnectorBaseTests
 {
     /// <summary>
@@ -71,7 +70,7 @@ public class RepoConnectorBaseTests
     /// <summary>
     ///     Test that Configure with rules sets HasRules to true.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorBase_Configure_StoresRulesAndSections_HasRulesReturnsTrue()
     {
         // Arrange - Create testable connector and define rules
@@ -89,13 +88,13 @@ public class RepoConnectorBaseTests
         connector.Configure(rules, sections);
 
         // Assert - HasRules is true after configuration
-        Assert.IsTrue(connector.ExposedHasRules, "HasRules should be true when rules are configured");
+        Assert.True(connector.ExposedHasRules, "HasRules should be true when rules are configured");
     }
 
     /// <summary>
     ///     Test that Configure with empty rules sets HasRules to false.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorBase_Configure_EmptyRules_HasRulesReturnsFalse()
     {
         // Arrange - Create testable connector
@@ -105,13 +104,13 @@ public class RepoConnectorBaseTests
         connector.Configure([], []);
 
         // Assert - HasRules is false when no rules provided
-        Assert.IsFalse(connector.ExposedHasRules, "HasRules should be false when no rules are configured");
+        Assert.False(connector.ExposedHasRules, "HasRules should be false when no rules are configured");
     }
 
     /// <summary>
     ///     Test that ApplyRules routes items into configured sections.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections()
     {
         // Arrange - Create testable connector with rules that route bugs to bugs and everything else to features
@@ -137,25 +136,25 @@ public class RepoConnectorBaseTests
         var sections = connector.ExposedApplyRules(items);
 
         // Assert - Two sections returned
-        Assert.HasCount(2, sections, "Should have two sections");
+        Assert.Equal(2, sections.Count);
 
         // Assert - Feature item routed to features section
         var featuresSection = sections.FirstOrDefault(s => s.SectionId == "features");
-        Assert.IsNotNull(featuresSection.SectionTitle, "Features section should be present");
-        Assert.HasCount(1, featuresSection.Items, "Features section should have one item");
-        Assert.AreEqual("1", featuresSection.Items[0].Id, "Feature item should be in features section");
+        Assert.True(featuresSection.SectionTitle != null, "Features section should be present");
+        Assert.Single(featuresSection.Items);
+        Assert.True(featuresSection.Items[0].Id == "1", "Feature item should be in features section");
 
         // Assert - Bug item routed to bugs section
         var bugsSection = sections.FirstOrDefault(s => s.SectionId == "bugs");
-        Assert.IsNotNull(bugsSection.SectionTitle, "Bugs section should be present");
-        Assert.HasCount(1, bugsSection.Items, "Bugs section should have one item");
-        Assert.AreEqual("2", bugsSection.Items[0].Id, "Bug item should be in bugs section");
+        Assert.True(bugsSection.SectionTitle != null, "Bugs section should be present");
+        Assert.Single(bugsSection.Items);
+        Assert.True(bugsSection.Items[0].Id == "2", "Bug item should be in bugs section");
     }
 
     /// <summary>
     ///     Test that FindVersionIndex finds the correct index when tags have different prefixes but the same semantic version.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex()
     {
         // Arrange - Create version tags with different prefixes but same semantic version
@@ -174,13 +173,13 @@ public class RepoConnectorBaseTests
         var foundIndex = TestableRepoConnector.ExposedFindVersionIndex(versions, targetVersion);
 
         // Assert - Should find the first matching semantic version (index 1)
-        Assert.AreEqual(1, foundIndex, "Should find the first tag with matching semantic version 1.2.3");
+        Assert.True(foundIndex == 1, "Should find the first tag with matching semantic version 1.2.3");
     }
 
     /// <summary>
     ///     Test that FindVersionIndex returns -1 when the target version is not in the list.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne()
     {
         // Arrange - Create a version list that does not contain the target version
@@ -198,6 +197,6 @@ public class RepoConnectorBaseTests
         var foundIndex = TestableRepoConnector.ExposedFindVersionIndex(versions, targetVersion);
 
         // Assert - Should return -1 when version is not found
-        Assert.AreEqual(-1, foundIndex, "Should return -1 when the target version is not in the list");
+        Assert.True(foundIndex == -1, "Should return -1 when the target version is not in the list");
     }
 }

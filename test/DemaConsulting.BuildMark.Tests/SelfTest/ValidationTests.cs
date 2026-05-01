@@ -27,14 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.SelfTest;
 /// <summary>
 ///     Tests for the Validation class.
 /// </summary>
-[TestClass]
-[DoNotParallelize]
 public class ValidationTests
 {
     /// <summary>
     ///     Test that Validation.Run writes TRX results file when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange
@@ -62,7 +60,7 @@ public class ValidationTests
                 Validation.Run(context);
 
                 // Assert - Verify TRX file was created
-                Assert.IsTrue(File.Exists(trxFile), "TRX file should be created");
+                Assert.True(File.Exists(trxFile), "TRX file should be created");
 
                 // Verify TRX file contains expected content
                 var trxContent = File.ReadAllText(trxFile);
@@ -89,7 +87,7 @@ public class ValidationTests
     /// <summary>
     ///     Test that Validation.Run writes JUnit XML results file when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithXmlResultsFile_WritesJUnitFile()
     {
         // Arrange
@@ -117,7 +115,7 @@ public class ValidationTests
                 Validation.Run(context);
 
                 // Assert - Verify XML file was created
-                Assert.IsTrue(File.Exists(xmlFile), "XML file should be created");
+                Assert.True(File.Exists(xmlFile), "XML file should be created");
 
                 // Verify XML file contains expected content
                 var xmlContent = File.ReadAllText(xmlFile);
@@ -144,7 +142,7 @@ public class ValidationTests
     /// <summary>
     ///     Test that Validation.Run handles unsupported results file extension.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithUnsupportedResultsFileExtension_ShowsError()
     {
         // Arrange
@@ -173,7 +171,7 @@ public class ValidationTests
                 Assert.Contains("Unsupported results file format", output);
 
                 // Assert - Verify exit code is 1 when an error is reported
-                Assert.AreEqual(1, context.ExitCode, "ExitCode should be 1 when unsupported results format is used");
+                Assert.True(context.ExitCode == 1);
             }
             finally
             {
@@ -194,7 +192,7 @@ public class ValidationTests
     /// <summary>
     ///     Test that Validation.Run handles write failure for results file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithInvalidResultsFilePath_ShowsError()
     {
         // Arrange
@@ -218,7 +216,7 @@ public class ValidationTests
             Assert.Contains("Failed to write results file", output);
 
             // Assert - Verify exit code is 1 when a write error is reported
-            Assert.AreEqual(1, context.ExitCode, "ExitCode should be 1 when results file write fails");
+            Assert.True(context.ExitCode == 1);
         }
         finally
         {
@@ -230,7 +228,7 @@ public class ValidationTests
     /// <summary>
     ///     Test that Validation.Run completes successfully when no results file is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Validation_Run_WithoutResultsFile_CompletesSuccessfully()
     {
         // Arrange - no --results argument
@@ -241,6 +239,6 @@ public class ValidationTests
         Validation.Run(context);
 
         // Assert - validation should complete without error
-        Assert.AreEqual(0, context.ExitCode, "Validation should succeed with exit code 0");
+        Assert.True(context.ExitCode == 0, "Validation should succeed with exit code 0");
     }
 }

@@ -25,13 +25,12 @@ namespace DemaConsulting.BuildMark.Tests.ItemControls;
 /// <summary>
 ///     Unit tests for ItemControlsParser.Parse method.
 /// </summary>
-[TestClass]
 public class ItemControlsParserTests
 {
     /// <summary>
     ///     Test that Parse returns null for null description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithNullDescription_ReturnsNull()
     {
         // Arrange - null input
@@ -40,13 +39,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(null);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns null for empty description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithEmptyDescription_ReturnsNull()
     {
         // Arrange
@@ -56,13 +55,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns null when there is no buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithNoBlock_ReturnsNull()
     {
         // Arrange
@@ -72,13 +71,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns "public" visibility when visibility is set to public.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility()
     {
         // Arrange
@@ -88,14 +87,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("public", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("public", result.Visibility);
     }
 
     /// <summary>
     ///     Test that Parse returns "internal" visibility when visibility is set to internal.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithVisibilityInternal_ReturnsInternalVisibility()
     {
         // Arrange
@@ -105,14 +104,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("internal", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("internal", result.Visibility);
     }
 
     /// <summary>
     ///     Test that Parse returns "bug" type when type is set to bug.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithTypeBug_ReturnsBugType()
     {
         // Arrange
@@ -122,14 +121,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("bug", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("bug", result.Type);
     }
 
     /// <summary>
     ///     Test that Parse returns "feature" type when type is set to feature.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithTypeFeature_ReturnsFeatureType()
     {
         // Arrange
@@ -139,14 +138,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("feature", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("feature", result.Type);
     }
 
     /// <summary>
     ///     Test that Parse returns correct interval set for affected-versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet()
     {
         // Arrange
@@ -156,17 +155,17 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
-        Assert.AreEqual("1.0.0", result.AffectedVersions.Intervals[0].LowerBound);
-        Assert.AreEqual("2.0.0", result.AffectedVersions.Intervals[0].UpperBound);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Equal("1.0.0", result.AffectedVersions.Intervals[0].LowerBound);
+        Assert.Equal("2.0.0", result.AffectedVersions.Intervals[0].UpperBound);
     }
 
     /// <summary>
     ///     Test that Parse recognizes a buildmark block hidden inside an HTML comment.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls()
     {
         // Arrange - buildmark block wrapped in an HTML comment to hide from GitHub rendered view
@@ -176,14 +175,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - HTML comment delimiters are stripped, exposing the block
-        Assert.IsNotNull(result);
-        Assert.AreEqual("public", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("public", result.Visibility);
     }
 
     /// <summary>
     ///     Test that Parse recognizes internal visibility from a block hidden inside an HTML comment.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithHiddenBlockVisibilityInternal_ReturnsInternalVisibility()
     {
         // Arrange - internal visibility block wrapped in HTML comment
@@ -193,14 +192,14 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - hidden block is parsed and returns internal visibility
-        Assert.IsNotNull(result);
-        Assert.AreEqual("internal", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("internal", result.Visibility);
     }
 
     /// <summary>
     ///     Test that Parse ignores unknown keys and returns null when no recognized keys are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithUnknownKey_IgnoresKey()
     {
         // Arrange - block with only unknown keys, which are silently ignored
@@ -210,13 +209,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - no recognized keys, so null is returned
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse ignores an unrecognized visibility value and treats the field as absent.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithUnrecognizedVisibilityValue_IgnoresValue()
     {
         // Arrange - visibility value is not "public" or "internal"
@@ -226,13 +225,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - unrecognized value is ignored; no valid fields → null result
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse ignores an unrecognized type value and treats the field as absent.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithUnrecognizedTypeValue_IgnoresValue()
     {
         // Arrange - type value is not "bug" or "feature"
@@ -242,13 +241,13 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - unrecognized value is ignored; no valid fields → null result
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns complete info when all fields are present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_AllFields_ReturnsCompleteInfo()
     {
         // Arrange
@@ -258,17 +257,17 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("public", result.Visibility);
-        Assert.AreEqual("bug", result.Type);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.NotNull(result);
+        Assert.Equal("public", result.Visibility);
+        Assert.Equal("bug", result.Type);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
     }
 
     /// <summary>
     ///     Test that Parse ignores an unrecognized affected-versions value and treats the field as absent.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControlsParser_Parse_WithUnrecognizedAffectedVersionsValue_IgnoresValue()
     {
         // Arrange - affected-versions value is not a valid version interval
@@ -278,7 +277,7 @@ public class ItemControlsParserTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - unrecognized value is ignored; no valid fields → null result
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 }
 

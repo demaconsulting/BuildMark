@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.SelfTest;
 /// <summary>
 ///     Subsystem-level tests for the SelfTest subsystem.
 /// </summary>
-[TestClass]
 public class SelfTestTests
 {
     /// <summary>
     ///     Test that the SelfTest subsystem writes TRX results when --validate and --results are specified with a .trx file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_Validation_WithTrxFile_WritesResults()
     {
         // Arrange: create a temporary directory and define a TRX results file path
@@ -50,7 +49,7 @@ public class SelfTestTests
             Validation.Run(context);
 
             // Assert: TRX file was created and contains expected content
-            Assert.IsTrue(File.Exists(trxFile), "TRX file should be created");
+            Assert.True(File.Exists(trxFile), "TRX file should be created");
             var trxContent = File.ReadAllText(trxFile);
             Assert.Contains("TestRun", trxContent);
             Assert.Contains("BuildMark Self-Validation", trxContent);
@@ -68,7 +67,7 @@ public class SelfTestTests
     /// <summary>
     ///     Test that the SelfTest subsystem writes JUnit XML results when --validate and --results are specified with an .xml file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_Validation_WithXmlFile_WritesResults()
     {
         // Arrange: create a temporary directory and define an XML results file path
@@ -85,7 +84,7 @@ public class SelfTestTests
             Validation.Run(context);
 
             // Assert: XML file was created and contains expected content
-            Assert.IsTrue(File.Exists(xmlFile), "XML file should be created");
+            Assert.True(File.Exists(xmlFile), "XML file should be created");
             var xmlContent = File.ReadAllText(xmlFile);
             Assert.Contains("testsuites", xmlContent);
             Assert.Contains("BuildMark Self-Validation", xmlContent);
@@ -103,7 +102,7 @@ public class SelfTestTests
     /// <summary>
     ///     Test that the SelfTest subsystem creates a TRX results output file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_ResultsOutput_WithTrxFile_CreatesFile()
     {
         // Arrange: create a temporary directory and define a TRX results file path
@@ -120,9 +119,9 @@ public class SelfTestTests
             Validation.Run(context);
 
             // Assert: results file exists and has non-zero content
-            Assert.IsTrue(File.Exists(trxFile), "TRX results file should be created");
+            Assert.True(File.Exists(trxFile), "TRX results file should be created");
             var fileInfo = new FileInfo(trxFile);
-            Assert.IsGreaterThan(0, fileInfo.Length, "TRX results file should have content");
+            Assert.True(fileInfo.Length > 0, "TRX results file should have content");
         }
         finally
         {
@@ -137,7 +136,7 @@ public class SelfTestTests
     /// <summary>
     ///     Test that the SelfTest subsystem creates a JUnit XML results output file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_ResultsOutput_WithXmlFile_CreatesFile()
     {
         // Arrange: create a temporary directory and define an XML results file path
@@ -154,9 +153,9 @@ public class SelfTestTests
             Validation.Run(context);
 
             // Assert: results file exists and has non-zero content
-            Assert.IsTrue(File.Exists(xmlFile), "XML results file should be created");
+            Assert.True(File.Exists(xmlFile), "XML results file should be created");
             var fileInfo = new FileInfo(xmlFile);
-            Assert.IsGreaterThan(0, fileInfo.Length, "XML results file should have content");
+            Assert.True(fileInfo.Length > 0, "XML results file should have content");
         }
         finally
         {
@@ -171,7 +170,7 @@ public class SelfTestTests
     /// <summary>
     ///     Test that the SelfTest subsystem completes self-validation without error when no --results file is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void SelfTest_Qualification_WithoutResultsFile_Succeeds()
     {
         // Arrange: create a temporary directory and define a log file path (no results file)
@@ -191,7 +190,7 @@ public class SelfTestTests
             }
 
             // Assert: validation ran and produced log output; no results file was created
-            Assert.IsTrue(File.Exists(logFile), "Log file should be created");
+            Assert.True(File.Exists(logFile), "Log file should be created");
             var logContent = File.ReadAllText(logFile);
             Assert.Contains("BuildMark Self-validation", logContent);
             Assert.Contains("Total Tests:", logContent);

@@ -25,27 +25,26 @@ namespace DemaConsulting.BuildMark.Tests;
 /// <summary>
 ///     Tests for the Program class.
 /// </summary>
-[TestClass]
 public class ProgramTests
 {
     /// <summary>
     ///     Test that the version property returns a valid version string.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Version_ReturnsValidVersion()
     {
         // Retrieve version string from Program
         var version = Program.Version;
 
         // Verify version is not null or empty
-        Assert.IsNotNull(version);
-        Assert.IsFalse(string.IsNullOrWhiteSpace(version));
+        Assert.NotNull(version);
+        Assert.False(string.IsNullOrWhiteSpace(version));
     }
 
     /// <summary>
     ///     Test that Run with version flag outputs version to console.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_VersionFlag_OutputsVersionToConsole()
     {
         // Create context with version flag
@@ -75,7 +74,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with help flag outputs help message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_HelpFlag_OutputsHelpMessage()
     {
         AssertHelpFlagOutputsHelpMessage("-h");
@@ -84,7 +83,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with question-mark help flag outputs help message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_QuestionMarkFlag_OutputsHelpMessage()
     {
         AssertHelpFlagOutputsHelpMessage("-?");
@@ -93,7 +92,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with long help flag outputs help message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_LongHelpFlag_OutputsHelpMessage()
     {
         AssertHelpFlagOutputsHelpMessage("--help");
@@ -135,7 +134,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with validate flag outputs validation message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_ValidateFlag_OutputsValidationMessage()
     {
         // Create context with validate flag
@@ -165,7 +164,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with report and include-known-issues flags generates report with known issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues()
     {
         // Create temporary report file path
@@ -176,7 +175,7 @@ public class ProgramTests
             using var context = Context.Create(["--report", reportFile, "--include-known-issues"]);
 
             // Verify IncludeKnownIssues property is set
-            Assert.IsTrue(context.IncludeKnownIssues);
+            Assert.True(context.IncludeKnownIssues);
 
             // Capture console output
             var originalOut = Console.Out;
@@ -189,10 +188,10 @@ public class ProgramTests
                 Program.Run(context);
 
                 // Verify report file was created
-                Assert.IsTrue(File.Exists(reportFile));
+                Assert.True(File.Exists(reportFile));
 
                 // Verify the context flag was set correctly
-                Assert.IsTrue(context.IncludeKnownIssues);
+                Assert.True(context.IncludeKnownIssues);
             }
             finally
             {
@@ -213,7 +212,7 @@ public class ProgramTests
     /// <summary>
     ///     Test that Run with lint flag succeeds when no configuration file is present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero()
     {
         // Arrange
@@ -223,6 +222,6 @@ public class ProgramTests
         Program.Run(context);
 
         // Assert
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 }

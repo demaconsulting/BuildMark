@@ -29,7 +29,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 ///     These tests verify the contract exposed by the GitHub sub-subsystem as a whole,
 ///     exercising the connector through its public IRepoConnector interface.
 /// </summary>
-[TestClass]
 public class GitHubTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -39,14 +38,14 @@ public class GitHubTests
     /// <summary>
     ///     Test that the GitHub sub-subsystem provides a connector that implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void GitHub_ImplementsInterface_ReturnsTrue()
     {
         // Arrange: create a GitHubRepoConnector instance from the GitHub sub-subsystem
         var connector = new GitHubRepoConnector();
 
         // Assert: the sub-subsystem connector satisfies the shared IRepoConnector interface
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
@@ -56,7 +55,7 @@ public class GitHubTests
     ///     What is being tested: GitHub sub-subsystem end-to-end build information retrieval
     ///     What the assertions prove: Build information is complete and accurate for a single release
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHub_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
     {
         // Arrange: set up a mocked GraphQL handler with a single release and commit
@@ -78,12 +77,12 @@ public class GitHubTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
@@ -93,7 +92,7 @@ public class GitHubTests
     ///     What is being tested: GitHub sub-subsystem baseline version selection
     ///     What the assertions prove: The connector picks the most recent prior release as the baseline
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHub_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline()
     {
         // Arrange: set up three release tags so the connector can pick v1.1.0 as baseline for v2.0.0
@@ -121,10 +120,10 @@ public class GitHubTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: v1.1.0 is selected as baseline
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag, "Previous version should be identified");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.True(buildInfo.BaselineVersionTag != null, "Previous version should be identified");
+        Assert.Equal("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
     }
 
     /// <summary>
@@ -134,7 +133,7 @@ public class GitHubTests
     ///     What is being tested: GitHub sub-subsystem PR classification at the sub-subsystem level
     ///     What the assertions prove: Feature PRs appear in Changes, bug PRs appear in Bugs
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHub_GetBuildInformation_WithPullRequests_GathersChanges()
     {
         // Arrange: two PRs — one labelled "feature", one labelled "bug"
@@ -179,12 +178,12 @@ public class GitHubTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert: feature PR is in Changes, bug PR is in Bugs
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
         var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
-        Assert.IsNotNull(featurePR, "Feature PR should be in Changes");
+        Assert.True(featurePR != null, "Feature PR should be in Changes");
 
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
-        Assert.IsNotNull(bugPR, "Bug PR should be in Bugs");
+        Assert.True(bugPR != null, "Bug PR should be in Bugs");
     }
 
     /// <summary>
@@ -194,7 +193,7 @@ public class GitHubTests
     ///     What is being tested: GitHub sub-subsystem known-issues identification
     ///     What the assertions prove: Open issues with "bug" label appear in KnownIssues
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHub_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues()
     {
         // Arrange: one open issue that is not resolved in this release
@@ -222,11 +221,11 @@ public class GitHubTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: open issue surfaces as a known issue
-        Assert.IsNotNull(buildInfo);
-        Assert.IsGreaterThan(0, buildInfo.KnownIssues.Count, "Should have at least one known issue");
+        Assert.NotNull(buildInfo);
+        Assert.True(buildInfo.KnownIssues.Count > 0, "Should have at least one known issue");
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Index == 201);
-        Assert.IsNotNull(knownIssue, "Open issue 201 should appear in KnownIssues");
-        Assert.AreEqual("Known bug in feature X", knownIssue.Title);
+        Assert.True(knownIssue != null, "Open issue 201 should appear in KnownIssues");
+        Assert.Equal("Known bug in feature X", knownIssue.Title);
     }
 
     /// <summary>
@@ -236,7 +235,7 @@ public class GitHubTests
     ///     What is being tested: GitHub sub-subsystem pre-release handling
     ///     What the assertions prove: A release version uses only prior release tags as its baseline
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHub_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
     {
         // Arrange: mix of release and pre-release tags
@@ -266,10 +265,9 @@ public class GitHubTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: baseline should be v1.1.0, not the pre-release v2.0.0-rc.1
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag, "Baseline version should be set");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion,
-            "Release version should skip pre-releases when selecting baseline");
+        Assert.NotNull(buildInfo);
+        Assert.Equal("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.True(buildInfo.BaselineVersionTag != null, "Baseline version should be set");
+        Assert.True(buildInfo.BaselineVersionTag.VersionTag.FullVersion == "1.1.0", "Release version should skip pre-releases when selecting baseline");
     }
 }

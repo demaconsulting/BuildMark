@@ -24,7 +24,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 
 /// <inheritdoc/>
 /// <inheritdoc/>
-[TestClass]
 public class WorkItemMapperTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -34,7 +33,7 @@ public class WorkItemMapperTests
     /// <summary>
     ///     Verify that Bug work item type maps to a bug ItemInfo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem()
     {
         // Arrange
@@ -44,16 +43,16 @@ public class WorkItemMapperTests
         var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/100", 1);
 
         // Assert
-        Assert.IsNotNull(itemInfo);
-        Assert.AreEqual("100", itemInfo.Id);
-        Assert.AreEqual("A bug", itemInfo.Title);
-        Assert.AreEqual("bug", itemInfo.Type);
+        Assert.NotNull(itemInfo);
+        Assert.Equal("100", itemInfo.Id);
+        Assert.Equal("A bug", itemInfo.Title);
+        Assert.Equal("bug", itemInfo.Type);
     }
 
     /// <summary>
     ///     Verify that User Story work item type maps to a feature ItemInfo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem()
     {
         // Arrange
@@ -63,16 +62,16 @@ public class WorkItemMapperTests
         var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/101", 2);
 
         // Assert
-        Assert.IsNotNull(itemInfo);
-        Assert.AreEqual("101", itemInfo.Id);
-        Assert.AreEqual("A user story", itemInfo.Title);
-        Assert.AreEqual("feature", itemInfo.Type);
+        Assert.NotNull(itemInfo);
+        Assert.Equal("101", itemInfo.Id);
+        Assert.Equal("A user story", itemInfo.Title);
+        Assert.Equal("feature", itemInfo.Type);
     }
 
     /// <summary>
     ///     Verify that Epic work item type maps to a feature ItemInfo.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem()
     {
         // Arrange
@@ -82,16 +81,16 @@ public class WorkItemMapperTests
         var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/103", 4);
 
         // Assert
-        Assert.IsNotNull(itemInfo);
-        Assert.AreEqual("103", itemInfo.Id);
-        Assert.AreEqual("An epic", itemInfo.Title);
-        Assert.AreEqual("feature", itemInfo.Type);
+        Assert.NotNull(itemInfo);
+        Assert.Equal("103", itemInfo.Id);
+        Assert.Equal("An epic", itemInfo.Title);
+        Assert.Equal("feature", itemInfo.Type);
     }
 
     /// <summary>
     ///     Verify that Task work item type maps to an ItemInfo with the raw type name.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem()
     {
         // Arrange
@@ -101,16 +100,16 @@ public class WorkItemMapperTests
         var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/102", 3);
 
         // Assert
-        Assert.IsNotNull(itemInfo);
-        Assert.AreEqual("102", itemInfo.Id);
-        Assert.AreEqual("A task", itemInfo.Title);
-        Assert.AreEqual("Task", itemInfo.Type);
+        Assert.NotNull(itemInfo);
+        Assert.Equal("102", itemInfo.Id);
+        Assert.Equal("A task", itemInfo.Title);
+        Assert.Equal("Task", itemInfo.Type);
     }
 
     /// <summary>
     ///     Verify that IsWorkItemResolved returns true for a resolved work item.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue()
     {
         // Arrange - test all resolved states
@@ -119,15 +118,15 @@ public class WorkItemMapperTests
         var doneItem = CreateWorkItem(102, "Done item", "Bug", "Done");
 
         // Act & Assert
-        Assert.IsTrue(WorkItemMapper.IsWorkItemResolved(resolvedItem), "Resolved state should be resolved");
-        Assert.IsTrue(WorkItemMapper.IsWorkItemResolved(closedItem), "Closed state should be resolved");
-        Assert.IsTrue(WorkItemMapper.IsWorkItemResolved(doneItem), "Done state should be resolved");
+        Assert.True(WorkItemMapper.IsWorkItemResolved(resolvedItem), "Resolved state should be resolved");
+        Assert.True(WorkItemMapper.IsWorkItemResolved(closedItem), "Closed state should be resolved");
+        Assert.True(WorkItemMapper.IsWorkItemResolved(doneItem), "Done state should be resolved");
     }
 
     /// <summary>
     ///     Verify that IsWorkItemResolved returns false for an active work item.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse()
     {
         // Arrange
@@ -135,14 +134,14 @@ public class WorkItemMapperTests
         var newItem = CreateWorkItem(101, "New item", "Bug", "New");
 
         // Act & Assert
-        Assert.IsFalse(WorkItemMapper.IsWorkItemResolved(activeItem), "Active state should not be resolved");
-        Assert.IsFalse(WorkItemMapper.IsWorkItemResolved(newItem), "New state should not be resolved");
+        Assert.False(WorkItemMapper.IsWorkItemResolved(activeItem), "Active state should not be resolved");
+        Assert.False(WorkItemMapper.IsWorkItemResolved(newItem), "New state should not be resolved");
     }
 
     /// <summary>
     ///     Verify that GetWorkItemTypeForRuleMatching returns the raw work item type name.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName()
     {
         // Arrange
@@ -154,8 +153,8 @@ public class WorkItemMapperTests
         var storyType = WorkItemMapper.GetWorkItemTypeForRuleMatching(storyItem);
 
         // Assert
-        Assert.AreEqual("Bug", bugType);
-        Assert.AreEqual("User Story", storyType);
+        Assert.Equal("Bug", bugType);
+        Assert.Equal("User Story", storyType);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -165,7 +164,7 @@ public class WorkItemMapperTests
     /// <summary>
     ///     Verify that Custom.Visibility field returns mapped controls.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls()
     {
         // Arrange - work item with Custom.Visibility field
@@ -176,14 +175,14 @@ public class WorkItemMapperTests
         var controls = WorkItemMapper.ExtractItemControls(workItem);
 
         // Assert
-        Assert.IsNotNull(controls);
-        Assert.AreEqual("internal", controls.Visibility);
+        Assert.NotNull(controls);
+        Assert.Equal("internal", controls.Visibility);
     }
 
     /// <summary>
     ///     Verify that Custom.AffectedVersions field returns mapped version set.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet()
     {
         // Arrange - work item with Custom.AffectedVersions field
@@ -194,15 +193,15 @@ public class WorkItemMapperTests
         var controls = WorkItemMapper.ExtractItemControls(workItem);
 
         // Assert
-        Assert.IsNotNull(controls);
-        Assert.IsNotNull(controls.AffectedVersions);
-        Assert.IsNotEmpty(controls.AffectedVersions.Intervals);
+        Assert.NotNull(controls);
+        Assert.NotNull(controls.AffectedVersions);
+        Assert.NotEmpty(controls.AffectedVersions.Intervals);
     }
 
     /// <summary>
     ///     Verify that custom fields take precedence over buildmark blocks.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock()
     {
         // Arrange - work item with BOTH a buildmark block saying "public" AND a custom field saying "internal"
@@ -215,8 +214,8 @@ public class WorkItemMapperTests
         var controls = WorkItemMapper.ExtractItemControls(workItem);
 
         // Assert - custom field "internal" should take precedence over buildmark block "public"
-        Assert.IsNotNull(controls);
-        Assert.AreEqual("internal", controls.Visibility);
+        Assert.NotNull(controls);
+        Assert.Equal("internal", controls.Visibility);
     }
 
     private static AzureDevOpsWorkItem CreateWorkItem(

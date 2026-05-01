@@ -28,7 +28,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.Mock;
 ///     Sub-subsystem tests for the Mock sub-subsystem.
 ///     These tests verify the contract exposed by the Mock sub-subsystem as a whole.
 /// </summary>
-[TestClass]
 public class MockTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -38,14 +37,14 @@ public class MockTests
     /// <summary>
     ///     Test that the Mock sub-subsystem provides a connector that implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Mock_ImplementsInterface_ReturnsTrue()
     {
         // Arrange: create a MockRepoConnector instance from the Mock sub-subsystem
         var connector = new MockRepoConnector();
 
         // Assert: the sub-subsystem connector satisfies the shared IRepoConnector interface
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
@@ -55,7 +54,7 @@ public class MockTests
     ///     What is being tested: Mock sub-subsystem produces version-correct build information
     ///     What the assertions prove: The connector version tag matches the requested version
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task Mock_GetBuildInformation_ReturnsExpectedVersion()
     {
         // Arrange: create connector and specify a known version
@@ -66,8 +65,8 @@ public class MockTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert: build information contains the correct version tag
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.NotNull(buildInfo);
+        Assert.Equal(version.Tag, buildInfo.CurrentVersionTag.VersionTag.Tag);
     }
 
     /// <summary>
@@ -77,7 +76,7 @@ public class MockTests
     ///     What is being tested: Mock sub-subsystem returns a fully populated BuildInformation
     ///     What the assertions prove: All required collections (Changes, Bugs, KnownIssues) are present
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task Mock_GetBuildInformation_ReturnsCompleteInformation()
     {
         // Arrange: create connector with a version that has associated changes
@@ -88,10 +87,10 @@ public class MockTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert: all required data structures are present
-        Assert.IsNotNull(buildInfo, "BuildInformation should not be null");
-        Assert.IsNotNull(buildInfo.Changes, "Changes list should not be null");
-        Assert.IsNotNull(buildInfo.Bugs, "Bugs list should not be null");
-        Assert.IsNotNull(buildInfo.KnownIssues, "KnownIssues list should not be null");
-        Assert.IsNotNull(buildInfo.CurrentVersionTag, "CurrentVersionTag should not be null");
+        Assert.True(buildInfo != null, "BuildInformation should not be null");
+        Assert.True(buildInfo.Changes != null, "Changes list should not be null");
+        Assert.True(buildInfo.Bugs != null, "Bugs list should not be null");
+        Assert.True(buildInfo.KnownIssues != null, "KnownIssues list should not be null");
+        Assert.True(buildInfo.CurrentVersionTag != null, "CurrentVersionTag should not be null");
     }
 }

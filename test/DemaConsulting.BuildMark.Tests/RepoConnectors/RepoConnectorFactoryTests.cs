@@ -28,40 +28,39 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 /// <summary>
 ///     Tests for the RepoConnectorFactory class.
 /// </summary>
-[TestClass]
 public class RepoConnectorFactoryTests
 {
     /// <summary>
     ///     Test that Create returns a connector instance.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_ReturnsConnector()
     {
         // Create a repository connector
         var connector = RepoConnectorFactory.Create();
 
         // Verify connector is created successfully
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that Create returns GitHubRepoConnector for this repository.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo()
     {
         // Create connector for this repository
         var connector = RepoConnectorFactory.Create();
 
         // Verify GitHub connector is returned
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that Create forwards GitHub connector configuration to the created connector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration()
     {
         // Arrange
@@ -80,18 +79,18 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create(config);
 
         // Assert
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
         var forwardedConfig = ((GitHubRepoConnector)connector).ConfigurationOverrides;
-        Assert.IsNotNull(forwardedConfig);
-        Assert.AreEqual("example-owner", forwardedConfig.Owner);
-        Assert.AreEqual("example-repo", forwardedConfig.Repo);
-        Assert.AreEqual("https://api.github.com", forwardedConfig.BaseUrl);
+        Assert.NotNull(forwardedConfig);
+        Assert.Equal("example-owner", forwardedConfig.Owner);
+        Assert.Equal("example-repo", forwardedConfig.Repo);
+        Assert.Equal("https://api.github.com", forwardedConfig.BaseUrl);
     }
 
     /// <summary>
     ///     Test that Create with azure-devops type creates an AzureDevOpsRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector()
     {
         // Arrange - create config with Azure DevOps connector type
@@ -101,14 +100,14 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create(config);
 
         // Assert
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that Create forwards AzureDevOpsConnectorConfig to the created connector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration()
     {
         // Arrange - create config with Azure DevOps settings
@@ -128,18 +127,18 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create(config);
 
         // Assert
-        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
         var adoConnector = (AzureDevOpsRepoConnector)connector;
-        Assert.IsNotNull(adoConnector.ConfigurationOverrides);
-        Assert.AreEqual("https://dev.azure.com/myorg", adoConnector.ConfigurationOverrides.OrganizationUrl);
-        Assert.AreEqual("myproject", adoConnector.ConfigurationOverrides.Project);
-        Assert.AreEqual("myrepo", adoConnector.ConfigurationOverrides.Repository);
+        Assert.NotNull(adoConnector.ConfigurationOverrides);
+        Assert.Equal("https://dev.azure.com/myorg", adoConnector.ConfigurationOverrides.OrganizationUrl);
+        Assert.Equal("myproject", adoConnector.ConfigurationOverrides.Project);
+        Assert.Equal("myrepo", adoConnector.ConfigurationOverrides.Repository);
     }
 
     /// <summary>
     ///     Test that Create returns AzureDevOpsRepoConnector when TF_BUILD environment variable is set.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector()
     {
         // Arrange - save and set TF_BUILD, clear GitHub env vars
@@ -157,7 +156,7 @@ public class RepoConnectorFactoryTests
             var connector = RepoConnectorFactory.Create();
 
             // Assert
-            Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+            Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
         }
         finally
         {
@@ -171,7 +170,7 @@ public class RepoConnectorFactoryTests
     /// <summary>
     ///     Test that Create returns GitHubRepoConnector when GITHUB_ACTIONS environment variable is set.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithGitHubActionsEnv_ReturnsGitHubConnector()
     {
         // Arrange - save and set GITHUB_ACTIONS, clear TF_BUILD env var
@@ -189,7 +188,7 @@ public class RepoConnectorFactoryTests
             var connector = RepoConnectorFactory.Create();
 
             // Assert
-            Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+            Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
         }
         finally
         {
@@ -203,7 +202,7 @@ public class RepoConnectorFactoryTests
     /// <summary>
     ///     Test that CreateFromRemoteUrl returns AzureDevOpsRepoConnector for dev.azure.com remote URLs.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector()
     {
         // Act - supply a fake Azure DevOps remote URL directly
@@ -212,13 +211,13 @@ public class RepoConnectorFactoryTests
             "https://dev.azure.com/myorg/myproject/_git/myrepo");
 
         // Assert
-        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that CreateFromRemoteUrl returns AzureDevOpsRepoConnector for visualstudio.com remote URLs.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithVisualStudioRemoteUrl_ReturnsAzureDevOpsConnector()
     {
         // Act - supply a fake visualstudio.com remote URL directly
@@ -227,13 +226,13 @@ public class RepoConnectorFactoryTests
             "https://myorg.visualstudio.com/myproject/_git/myrepo");
 
         // Assert
-        Assert.IsInstanceOfType<AzureDevOpsRepoConnector>(connector);
+        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that CreateFromRemoteUrl returns GitHubRepoConnector for github.com remote URLs.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithGitHubRemoteUrl_ReturnsGitHubConnector()
     {
         // Act - supply a fake GitHub remote URL directly
@@ -242,19 +241,19 @@ public class RepoConnectorFactoryTests
             "https://github.com/example-owner/example-repo.git");
 
         // Assert
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that CreateFromRemoteUrl defaults to GitHubRepoConnector when the remote URL is null.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectorFactory_Create_WithNullRemoteUrl_DefaultsToGitHubConnector()
     {
         // Act - supply null to represent an unavailable git remote
         var connector = RepoConnectorFactory.CreateFromRemoteUrl(null, null);
 
         // Assert
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 }

@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient GetCommitsAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientGetCommitsTests
 {
     /// <summary>
     ///     Test that GetCommitsAsync returns expected commit SHAs with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas()
     {
         // Arrange
@@ -66,17 +65,17 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.HasCount(3, commitShas);
-        Assert.AreEqual("abc123", commitShas[0]);
-        Assert.AreEqual("def456", commitShas[1]);
-        Assert.AreEqual("ghi789", commitShas[2]);
+        Assert.NotNull(commitShas);
+        Assert.Equal(3, commitShas.Count);
+        Assert.Equal("abc123", commitShas[0]);
+        Assert.Equal("def456", commitShas[1]);
+        Assert.Equal("ghi789", commitShas[2]);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync returns empty list when no commits are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_NoCommits_ReturnsEmptyList()
     {
         // Arrange
@@ -105,14 +104,14 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.IsEmpty(commitShas);
+        Assert.NotNull(commitShas);
+        Assert.Empty(commitShas);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -129,14 +128,14 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.IsEmpty(commitShas);
+        Assert.NotNull(commitShas);
+        Assert.Empty(commitShas);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync returns empty list on HTTP error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_HttpError_ReturnsEmptyList()
     {
         // Arrange
@@ -149,14 +148,14 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.IsEmpty(commitShas);
+        Assert.NotNull(commitShas);
+        Assert.Empty(commitShas);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync returns empty list on invalid JSON.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_InvalidJson_ReturnsEmptyList()
     {
         // Arrange
@@ -169,14 +168,14 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.IsEmpty(commitShas);
+        Assert.NotNull(commitShas);
+        Assert.Empty(commitShas);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync returns single commit SHA correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_SingleCommit_ReturnsOneCommitSha()
     {
         // Arrange
@@ -207,15 +206,15 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.HasCount(1, commitShas);
-        Assert.AreEqual("abc123def456", commitShas[0]);
+        Assert.NotNull(commitShas);
+        Assert.Single(commitShas);
+        Assert.Equal("abc123def456", commitShas[0]);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync handles nodes with missing oid property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_MissingOidProperty_SkipsInvalidNodes()
     {
         // Arrange
@@ -248,16 +247,16 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.HasCount(2, commitShas);
-        Assert.AreEqual("commit1", commitShas[0]);
-        Assert.AreEqual("commit2", commitShas[1]);
+        Assert.NotNull(commitShas);
+        Assert.Equal(2, commitShas.Count);
+        Assert.Equal("commit1", commitShas[0]);
+        Assert.Equal("commit2", commitShas[1]);
     }
 
     /// <summary>
     ///     Test that GetCommitsAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -269,11 +268,11 @@ public class GitHubGraphQLClientGetCommitsTests
         var commitShas = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.IsNotNull(commitShas);
-        Assert.HasCount(3, commitShas);
-        Assert.AreEqual("page1commit", commitShas[0]);
-        Assert.AreEqual("page2commit", commitShas[1]);
-        Assert.AreEqual("page3commit", commitShas[2]);
+        Assert.NotNull(commitShas);
+        Assert.Equal(3, commitShas.Count);
+        Assert.Equal("page1commit", commitShas[0]);
+        Assert.Equal("page2commit", commitShas[1]);
+        Assert.Equal("page3commit", commitShas[2]);
     }
 
     /// <summary>

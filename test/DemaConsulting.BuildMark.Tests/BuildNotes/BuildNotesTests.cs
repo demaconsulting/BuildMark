@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.BuildNotes;
 /// <summary>
 ///     Subsystem-level tests for the BuildNotes subsystem.
 /// </summary>
-[TestClass]
 public class BuildNotesTests
 {
     /// <summary>
     ///     Test that the BuildNotes subsystem generates correct markdown from a BuildInformation model.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildNotes_ReportModel_GeneratesCorrectMarkdown()
     {
         // Arrange: obtain a BuildInformation model from the mock connector
@@ -55,7 +54,7 @@ public class BuildNotesTests
     /// <summary>
     ///     Test that the BuildNotes subsystem includes known issues in the rendered markdown when requested.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildNotes_ReportModel_IncludesKnownIssues()
     {
         // Arrange: obtain a BuildInformation model that has known issues
@@ -77,7 +76,7 @@ public class BuildNotesTests
     /// <summary>
     ///     Test that the BuildNotes subsystem includes a full changelog link in the rendered markdown.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildNotes_ReportModel_IncludesFullChangelog()
     {
         // Arrange: obtain a BuildInformation model that has a changelog link

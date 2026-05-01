@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 /// <summary>
 ///     Tests for the ItemRouter class.
 /// </summary>
-[TestClass]
 public class ItemRouterTests
 {
     /// <summary>
     ///     Test that matching items are routed to the first configured section.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection()
     {
         // Arrange
@@ -60,16 +59,16 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert
-        Assert.HasCount(1, routedItems["changes"]);
-        Assert.AreEqual("1", routedItems["changes"][0].Id);
-        Assert.HasCount(1, routedItems["bugs"]);
-        Assert.AreEqual("2", routedItems["bugs"][0].Id);
+        Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", routedItems["changes"][0].Id);
+        Assert.Single(routedItems["bugs"]);
+        Assert.Equal("2", routedItems["bugs"][0].Id);
     }
 
     /// <summary>
     ///     Test that suppressed routes exclude matching items.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_SuppressedRouteOmitsMatchingItem()
     {
         // Arrange
@@ -88,13 +87,13 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert
-        Assert.IsEmpty(routedItems["changes"]);
+        Assert.Empty(routedItems["changes"]);
     }
 
     /// <summary>
     ///     Test that a rule with null Match block acts as a catch-all and matches all items.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_WithNullMatchBlock_MatchesAllItems()
     {
         // Arrange
@@ -117,14 +116,14 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - catch-all routes all items to "other", leaving "changes" empty
-        Assert.IsEmpty(routedItems["changes"]);
-        Assert.HasCount(2, routedItems["other"]);
+        Assert.Empty(routedItems["changes"]);
+        Assert.Equal(2, routedItems["other"].Count);
     }
 
     /// <summary>
     ///     Test that WorkItemType matching routes only items with a matching type.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem()
     {
         // Arrange
@@ -151,16 +150,16 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - only the bug item is routed to "bugs"; feature falls through to default
-        Assert.HasCount(1, routedItems["changes"]);
-        Assert.AreEqual("1", routedItems["changes"][0].Id);
-        Assert.HasCount(1, routedItems["bugs"]);
-        Assert.AreEqual("2", routedItems["bugs"][0].Id);
+        Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", routedItems["changes"][0].Id);
+        Assert.Single(routedItems["bugs"]);
+        Assert.Equal("2", routedItems["bugs"][0].Id);
     }
 
     /// <summary>
     ///     Test that items with no matching rule are routed to the default (first) section.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_WithNoMatchingRule_RoutesToDefaultSection()
     {
         // Arrange
@@ -183,15 +182,15 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - unmatched item lands in the first section ("changes")
-        Assert.HasCount(1, routedItems["changes"]);
-        Assert.AreEqual("1", routedItems["changes"][0].Id);
-        Assert.IsEmpty(routedItems["bugs"]);
+        Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", routedItems["changes"][0].Id);
+        Assert.Empty(routedItems["bugs"]);
     }
 
     /// <summary>
     ///     Test that items routed to a section not in the initial list create a new bucket entry.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_ItemNotInConfiguredSections_CreatesNewSection()
     {
         // Arrange
@@ -210,16 +209,16 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - item is routed to the new section, which is created dynamically
-        Assert.IsEmpty(routedItems["changes"]);
-        Assert.IsTrue(routedItems.TryGetValue("new-section", out var newSection));
-        Assert.HasCount(1, newSection);
-        Assert.AreEqual("1", newSection[0].Id);
+        Assert.Empty(routedItems["changes"]);
+        Assert.True(routedItems.TryGetValue("new-section", out var newSection));
+        Assert.Single(newSection);
+        Assert.Equal("1", newSection[0].Id);
     }
 
     /// <summary>
     ///     Test that label matching is case-insensitive.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem()
     {
         // Arrange - item type is "Bug" (capitalized) while rule label is "bug" (lowercase)
@@ -245,15 +244,15 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - "Bug" type matches "bug" label rule due to case-insensitive comparison
-        Assert.IsEmpty(routedItems["changes"]);
-        Assert.HasCount(1, routedItems["bugs"]);
-        Assert.AreEqual("1", routedItems["bugs"][0].Id);
+        Assert.Empty(routedItems["changes"]);
+        Assert.Single(routedItems["bugs"]);
+        Assert.Equal("1", routedItems["bugs"][0].Id);
     }
 
     /// <summary>
     ///     Test that the suppressed route value is matched case-insensitively.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem()
     {
         // Arrange - route value is "SUPPRESSED" (uppercase) to verify case-insensitive comparison
@@ -272,6 +271,6 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - item is omitted even when the route value uses uppercase "SUPPRESSED"
-        Assert.IsEmpty(routedItems["changes"]);
+        Assert.Empty(routedItems["changes"]);
     }
 }

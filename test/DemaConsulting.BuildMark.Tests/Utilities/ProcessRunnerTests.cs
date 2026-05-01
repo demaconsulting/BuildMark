@@ -26,7 +26,6 @@ namespace DemaConsulting.BuildMark.Tests.Utilities;
 /// <summary>
 ///     Tests for the ProcessRunner class.
 /// </summary>
-[TestClass]
 public class ProcessRunnerTests
 {
     /// <summary>
@@ -36,7 +35,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.TryRunAsync with a valid command
     ///     What the assertions prove: The method returns the command output when successful
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput()
     {
         // Arrange - Set up a simple echo command that will succeed
@@ -49,8 +48,8 @@ public class ProcessRunnerTests
         var result = await ProcessRunner.TryRunAsync(command, arguments);
 
         // Assert - Verify output is returned and contains expected text
-        Assert.IsNotNull(result, "TryRunAsync should return output for successful command");
-        Assert.IsTrue(result.Contains("test", StringComparison.OrdinalIgnoreCase),
+        Assert.True(result != null, "TryRunAsync should return output for successful command");
+        Assert.True(result.Contains("test", StringComparison.OrdinalIgnoreCase),
             "Output should contain the echoed text");
     }
 
@@ -61,7 +60,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.TryRunAsync with an invalid command
     ///     What the assertions prove: The method returns null when the command cannot be found
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull()
     {
         // Arrange - Use a command that definitely doesn't exist
@@ -71,7 +70,7 @@ public class ProcessRunnerTests
         var result = await ProcessRunner.TryRunAsync(command);
 
         // Assert - Verify null is returned for invalid command
-        Assert.IsNull(result, "TryRunAsync should return null for non-existent command");
+        Assert.True(result == null, "TryRunAsync should return null for non-existent command");
     }
 
     /// <summary>
@@ -81,7 +80,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.TryRunAsync with a command that fails
     ///     What the assertions prove: The method returns null when exit code is non-zero
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull()
     {
         // Arrange - Set up a command that will fail with non-zero exit code
@@ -96,7 +95,7 @@ public class ProcessRunnerTests
         var result = await ProcessRunner.TryRunAsync(command, arguments);
 
         // Assert - Verify null is returned for failed command
-        Assert.IsNull(result, "TryRunAsync should return null when command exits with non-zero code");
+        Assert.True(result == null, "TryRunAsync should return null when command exits with non-zero code");
     }
 
     /// <summary>
@@ -106,7 +105,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.TryRunAsync exception handling
     ///     What the assertions prove: The method catches exceptions and returns null instead of throwing
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_TryRunAsync_WithException_ReturnsNull()
     {
         // Arrange - Use a command with malformed arguments that may cause issues
@@ -117,7 +116,7 @@ public class ProcessRunnerTests
         var result = await ProcessRunner.TryRunAsync(command);
 
         // Assert - Verify null is returned when exception occurs
-        Assert.IsNull(result, "TryRunAsync should return null when exception occurs");
+        Assert.True(result == null, "TryRunAsync should return null when exception occurs");
     }
 
     /// <summary>
@@ -127,7 +126,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.RunAsync with a valid command
     ///     What the assertions prove: The method returns the command output when successful
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput()
     {
         // Arrange - Set up a simple echo command that will succeed
@@ -140,8 +139,8 @@ public class ProcessRunnerTests
         var result = await ProcessRunner.RunAsync(command, arguments);
 
         // Assert - Verify output is returned and contains expected text
-        Assert.IsNotNull(result, "RunAsync should return output for successful command");
-        Assert.IsTrue(result.Contains("test123", StringComparison.OrdinalIgnoreCase),
+        Assert.True(result != null, "RunAsync should return output for successful command");
+        Assert.True(result.Contains("test123", StringComparison.OrdinalIgnoreCase),
             "Output should contain the echoed text");
     }
 
@@ -152,7 +151,7 @@ public class ProcessRunnerTests
     ///     What is being tested: ProcessRunner.RunAsync error handling
     ///     What the assertions prove: The method throws InvalidOperationException with details when command fails
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_RunAsync_WithFailingCommand_ThrowsException()
     {
         // Arrange - Set up a command that will fail
@@ -177,7 +176,7 @@ public class ProcessRunnerTests
     ///     What the assertions prove: The method wraps the underlying error in an InvalidOperationException
     ///     with a message identifying the missing command
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException()
     {
         // Arrange - Use a command that definitely doesn't exist
@@ -188,7 +187,7 @@ public class ProcessRunnerTests
             async () => await ProcessRunner.RunAsync(command));
 
         // Assert - Verify exception message identifies the missing command
-        Assert.IsTrue(
+        Assert.True(
             exception.Message.Contains(command, StringComparison.Ordinal),
             "Exception message should identify the command that was not found");
     }
