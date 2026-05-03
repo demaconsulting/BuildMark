@@ -1,0 +1,13 @@
+---
+title: BuildMark Verification Design Document
+subtitle: Build Notes Generation Tool
+author: DEMA Consulting
+description: Verification design document for BuildMark
+lang: en-US
+keywords:
+  - BuildMark
+  - .NET
+  - Command-Line Tool
+  - Verification
+  - Verification Design Document
+---

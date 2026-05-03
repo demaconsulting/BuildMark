@@ -33,6 +33,10 @@ words:
   - sonarmark
   - versionmark
   - Weasyprint
+  - mylib
+  - opencover
+  - unconfigured
+  - unparseable
   - wiql
   - workitems
   - yamlfix

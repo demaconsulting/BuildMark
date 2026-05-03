@@ -112,7 +112,7 @@ src/Project2Name/
 
 If the design references external documents (standards, specifications), include
 a `## References` section in `introduction.md`. This is the **only** place in the
-design document collection where a References section should appear — do not add
+design document collection where a References section should appear - do not add
 one to any other design file.
 
 ### Companion Artifact Structure (RECOMMENDED)
@@ -129,6 +129,7 @@ parallel directory trees:
 
 - Requirements: `docs/reqstream/{system}/.../{item}.yaml` (kebab-case)
 - Design docs: `docs/design/{system}/.../{item}.md` (kebab-case)
+- Verification design: `docs/verification/{system}/.../{item}.md` (kebab-case)
 - Source code: `src/{System}/.../{Item}.{ext}` (cased per language - see `software-items.md`)
 - Tests: `test/{System}.Tests/.../{Item}Tests.{ext}` (cased per language - see `software-items.md`)
 - Review-sets: defined in `.reviewmark.yaml`
@@ -176,7 +177,7 @@ implementation specification for formal code review:
 - **Architectural Clarity**: Clearly define component boundaries and interfaces
 - **Traceability**: Link to requirements where applicable using ReqStream patterns
 - **Verbal Cross-References**: Reference other parts of the design by name (e.g.,
-  "See *Parser Design* for more details") — do not use markdown hyperlinks, which
+  "See *Parser Design* for more details") - do not use markdown hyperlinks, which
   break in compiled PDFs
 
 # Mermaid Diagram Integration
