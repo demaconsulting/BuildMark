@@ -55,23 +55,31 @@ Calls `BuildMarkConfigReader.ReadAsync` to load the optional `.buildmark.yaml`
 file, then calls `result.ReportTo(context)` to surface any configuration issues.
 If errors occurred, the method returns early. Otherwise:
 
-1. **Effective option resolution**: derives `effectiveReportFile` from `context.ReportFile` if set,
+1. **Effective configuration**: derives `effectiveConfig` as `loadResult.Config ??
+   BuildMarkConfig.CreateDefault()`. When no `.buildmark.yaml` file is present (i.e.,
+   `loadResult.Config` is `null`), `BuildMarkConfig.CreateDefault()` supplies built-in
+   section and rule definitions so the tool functions without any configuration file.
+2. **Effective option resolution**: derives `effectiveReportFile` from `context.ReportFile` if set,
    or from `effectiveConfig.Report?.File` as fallback; derives `effectiveReportDepth` from
    `context.Depth` if set, or `effectiveConfig.Report?.Depth`, defaulting to 1; derives
    `effectiveIncludeKnownIssues` from `context.IncludeKnownIssues` OR
    `effectiveConfig.Report?.IncludeKnownIssues`.
-2. **ConnectorFactory injection**: if `context.ConnectorFactory` is non-null it is invoked directly
+3. **ConnectorFactory injection**: if `context.ConnectorFactory` is non-null it is invoked directly
    (test injection path); otherwise `RepoConnectorFactory.Create(effectiveConfig.Connector)` is used.
-3. **Configuration step**: when the production factory path is used and the connector implements
+4. **Configuration step**: when the production factory path is used and the connector implements
    `RepoConnectorBase`, calls `configurableConnector.Configure(effectiveConfig.Rules,
    effectiveConfig.Sections)`.
-4. Parses `context.BuildVersion` using `VersionTag.Create`; on `ArgumentException`,
+5. Parses `context.BuildVersion` using `VersionTag.Create`; on `ArgumentException`,
    writes an error and returns early.
-5. Calls `connector.GetBuildInformationAsync(buildVersion)` synchronously; on
+6. Calls `connector.GetBuildInformationAsync(buildVersion)` synchronously; on
    `InvalidOperationException`, writes an error and returns early.
-6. Writes a build summary to the context output.
-7. If `effectiveReportFile` is non-null, renders the markdown and writes it to that path
-   (not to `context.ReportFile` directly).
+7. Writes a build summary to the context output.
+8. If `effectiveReportFile` is non-null, renders the markdown and writes it to that path.
+   Any file-system exception during write is caught, reported via `context.WriteError`, and
+   execution continues - the method does not propagate the exception. This graceful-degradation
+   choice ensures that a report-write failure does not obscure the build summary already written
+   to the console and allows the exit code to reflect only semantic errors rather than I/O
+   failures outside the tool's control.
 
 ### `PrintBanner(Context context)`
 

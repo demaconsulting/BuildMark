@@ -232,6 +232,156 @@ public class ProgramTests
     }
 
     /// <summary>
+    ///     Test that Run with silent flag suppresses banner output.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithSilentFlag_SuppressesOutput()
+    {
+        // Arrange: create context with --silent and --help flags
+        using var context = Context.Create(["--silent", "--help"]);
+
+        // Capture console output
+        var originalOut = Console.Out;
+        using var writer = new StringWriter();
+        Console.SetOut(writer);
+
+        try
+        {
+            // Act: run program
+            Program.Run(context);
+
+            // Assert: banner text is suppressed in output
+            var output = writer.ToString();
+            Assert.DoesNotContain("BuildMark version", output);
+        }
+        finally
+        {
+            Console.SetOut(originalOut);
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with log flag writes output to the specified log file.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithLogFlag_WritesToLogFile()
+    {
+        // Arrange: create a temporary log file path and context with --log flag
+        var logFile = Path.ChangeExtension(Path.GetTempFileName(), ".log");
+        try
+        {
+            // Dispose context before reading file so the log file handle is released
+            using (var context = Context.Create(["--log", logFile, "--help"]))
+            {
+                // Act: run the program (help output is written to log file via context)
+                Program.Run(context);
+            }
+
+            // Assert: log file exists and contains output (checked after context is disposed)
+            Assert.True(File.Exists(logFile), "Log file should have been created");
+            var logContent = File.ReadAllText(logFile);
+            Assert.False(string.IsNullOrWhiteSpace(logContent), "Log file should contain output");
+        }
+        finally
+        {
+            if (File.Exists(logFile))
+            {
+                File.Delete(logFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with results flag writes a results file when --validate is specified.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithResultsFlag_WritesResultsFile()
+    {
+        // Arrange: create a temporary TRX results file path and context with --validate and --results flags
+        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".trx");
+        try
+        {
+            using var context = Context.Create(["--validate", "--results", resultsFile, "--silent"]);
+
+            // Act: run the program in validate mode
+            Program.Run(context);
+
+            // Assert: results file was created by the validation run
+            Assert.Equal(0, context.ExitCode);
+            Assert.True(File.Exists(resultsFile), "Results file should have been created");
+        }
+        finally
+        {
+            if (File.Exists(resultsFile))
+            {
+                File.Delete(resultsFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with build-version flag accepts and processes a valid version string.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithBuildVersionFlag_AcceptsBuildVersion()
+    {
+        // Arrange: create a temporary report file path and context with --build-version flag
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            using var context = Context.Create(
+                ["--build-version", "3.2.1", "--report", reportFile, "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: program succeeds and the build version appears in the report
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("3.2.1", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that Run with depth flag applies the configured heading depth to the generated report.
+    /// </summary>
+    [Fact]
+    public void Program_Run_WithDepthFlag_SetsHeadingDepth()
+    {
+        // Arrange: create a temporary report file path and context with --depth 3 flag
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            using var context = Context.Create(
+                ["--build-version", "1.0.0", "--report", reportFile, "--depth", "3", "--silent"],
+                () => new MockRepoConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report uses level-three heading for the title (depth 3 = ###)
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("### Build Report", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
     ///     Test that Run with an invalid build version format writes an error and exits with code 1.
     /// </summary>
     [Fact]

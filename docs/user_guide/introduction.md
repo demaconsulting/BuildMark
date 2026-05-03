@@ -24,15 +24,15 @@ The following topics are out of scope:
 
 ## Key Features
 
-- **Git Integration** — Analyze Git repository history, tags, and branches
-- **Markdown Reports** — Generate structured build notes from repository data
-- **Issue Tracking** — Extract changes and bug fixes from GitHub and Azure DevOps
-- **Configurable Routing** — Route items into custom report sections by label or work-item type
-- **Customizable Output** — Configure report depth, sections, and known-issue inclusion
-- **CI/CD Ready** — Automate build notes generation in GitHub Actions and Azure Pipelines
-- **Multi-Platform** — Windows, Linux, and macOS with .NET 8, 9, and 10
-- **Self-Validation** — Built-in qualification tests without external tooling
-- **Dependency Updates** — Built-in tracking of dependency changes from Dependabot and Renovate
+- **Git Integration** - Analyze Git repository history, tags, and branches
+- **Markdown Reports** - Generate structured build notes from repository data
+- **Issue Tracking** - Extract changes and bug fixes from GitHub and Azure DevOps
+- **Configurable Routing** - Route items into custom report sections by label or work-item type
+- **Customizable Output** - Configure report depth, sections, and known-issue inclusion
+- **CI/CD Ready** - Automate build notes generation in GitHub Actions and Azure Pipelines
+- **Multi-Platform** - Windows, Linux, and macOS with .NET 8, 9, and 10
+- **Self-Validation** - Built-in qualification tests without external tooling
+- **Dependency Updates** - Built-in tracking of dependency changes from Dependabot and Renovate
 
 # Continuous Compliance
 

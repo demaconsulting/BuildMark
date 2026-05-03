@@ -4,7 +4,7 @@
 
 The Version subsystem is verified through `VersionTests.cs` (subsystem integration
 tests), plus dedicated unit test files for each version class. The subsystem tests
-exercise the interaction between version types — creating `VersionTag` instances,
+exercise the interaction between version types - creating `VersionTag` instances,
 extracting `VersionComparable`, and comparing via `VersionInterval`. The unit tests
 are described in the individual unit chapters.
 

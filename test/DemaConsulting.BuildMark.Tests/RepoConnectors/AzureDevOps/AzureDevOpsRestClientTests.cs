@@ -79,6 +79,36 @@ public class AzureDevOpsRestClientTests
     }
 
     /// <summary>
+    ///     Verify that GetTagsAsync returns tag references from a valid response.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags()
+    {
+        // Arrange: two tags — one lightweight (no peeled object) and one annotated (with peeled object)
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v1.0.0", "abc123"),
+                new MockAdoTag("v2.0.0", "tagobj456", "commit789"));
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act
+        var tags = await client.GetTagsAsync("repo-id");
+
+        // Assert
+        Assert.NotNull(tags);
+        Assert.Equal(2, tags.Count);
+
+        // Lightweight tag: CommitId resolves to ObjectId since PeeledObjectId is null
+        Assert.Equal("refs/tags/v1.0.0", tags[0].Name);
+        Assert.Equal("abc123", tags[0].CommitId);
+
+        // Annotated tag: CommitId resolves to PeeledObjectId (the underlying commit)
+        Assert.Equal("refs/tags/v2.0.0", tags[1].Name);
+        Assert.Equal("commit789", tags[1].CommitId);
+    }
+
+    /// <summary>
     ///     Verify that GetPullRequestsAsync returns pull requests from a valid response.
     /// </summary>
     [Fact]

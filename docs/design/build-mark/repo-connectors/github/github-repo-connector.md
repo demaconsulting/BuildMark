@@ -82,14 +82,14 @@ After the label-derived type is determined, the connector calls
 request. If the parser returns a non-null `ItemControlsInfo`, the following
 overrides are applied:
 
-1. **`visibility: internal`** — The item is excluded from all report sections,
+1. **`visibility: internal`** - The item is excluded from all report sections,
    regardless of its labels or type.
-2. **`visibility: public`** — The item is included in the report even if its
+2. **`visibility: public`** - The item is included in the report even if its
    label-derived type is `"other"`.
-3. **`type: bug`** — The item is placed in the `Bugs` list regardless of labels.
-4. **`type: feature`** — The item is placed in the `Changes` list regardless of
+3. **`type: bug`** - The item is placed in the `Bugs` list regardless of labels.
+4. **`type: feature`** - The item is placed in the `Changes` list regardless of
    labels.
-5. **`affected-versions`** — The parsed `VersionIntervalSet` is stored on the
+5. **`affected-versions`** - The parsed `VersionIntervalSet` is stored on the
    `ItemInfo.AffectedVersions` property.
 
 When no `buildmark` block is present, the existing label-based rules apply
@@ -102,7 +102,7 @@ unchanged.
 Main entry point. Performs the following steps:
 
 1. Get repository metadata (URL, branch, current commit hash) from Git.
-2. Determine the owner and repository name — from `GitHubConnectorConfig.Owner`
+2. Determine the owner and repository name - from `GitHubConnectorConfig.Owner`
    and `GitHubConnectorConfig.Repo` if provided, otherwise parsed from the Git
    remote URL.
 3. Resolve the GitHub authentication token (see Authentication above).

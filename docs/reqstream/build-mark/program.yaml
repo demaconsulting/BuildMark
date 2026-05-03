@@ -60,6 +60,7 @@ sections:
           cluttering their output logs when only the exit code or report file is needed.
         tests:
           - BuildMark_SilentFlag_SuppressesOutput
+          - Program_Run_WithSilentFlag_SuppressesOutput
 
       - id: BuildMark-Program-Log
         title: The Program class shall support --log flag to write execution output to a log file.
@@ -68,6 +69,7 @@ sections:
           and post-build analysis in automated environments.
         tests:
           - BuildMark_LogParameter_IsAccepted
+          - Program_Run_WithLogFlag_WritesToLogFile
 
       - id: BuildMark-Program-Results
         title: The Program class shall support --results flag to write validation results to a test results file.
@@ -76,6 +78,7 @@ sections:
           integration with CI/CD platforms that process test result files.
         tests:
           - BuildMark_ResultsParameter_IsAccepted
+          - Program_Run_WithResultsFlag_WritesResultsFile
 
       - id: BuildMark-Program-BuildVersion
         title: The Program class shall support --build-version flag to specify the version for report generation.
@@ -84,6 +87,7 @@ sections:
           from source control, enabling flexible version management strategies.
         tests:
           - BuildMark_BuildVersionParameter_IsAccepted
+          - Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
 
       - id: BuildMark-Program-Depth
         title: The Program class shall support --depth flag to configure the markdown heading depth of the report.
@@ -93,16 +97,36 @@ sections:
         tests:
           - BuildMark_DepthParameter_IsAccepted
           - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
+          - Program_Run_WithDepthFlag_SetsHeadingDepth
 
-      - id: BuildMark-Program-ErrorHandling
+      - id: BuildMark-Program-IncludeKnownIssues
+        title: >-
+          The Program class shall support --include-known-issues flag to include known
+          issues in the generated build notes report.
+        justification: |
+          Known-issue disclosure in release notes promotes transparency and helps users
+          avoid known pitfalls. The flag enables this optional section without affecting
+          the default report output.
+        tests:
+          - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+
+      - id: BuildMark-Program-ErrorHandling-InvalidBuildVersion
         title: >-
           The Program class shall report an error and set exit code 1 when an invalid
-          build version is provided or when the repository connector fails during data
-          retrieval.
+          build version is provided.
         justification: |
-          Clear error reporting on invalid inputs and connector failures allows users and
-          CI/CD pipelines to detect and diagnose problems quickly without inspecting logs
-          for root causes.
+          Clear error reporting on invalid version inputs allows users and CI/CD pipelines
+          to detect and diagnose problems quickly without inspecting logs for root causes.
         tests:
           - Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode
+
+      - id: BuildMark-Program-ErrorHandling-ConnectorFailure
+        title: >-
+          The Program class shall report an error and set exit code 1 when the repository
+          connector fails during data retrieval.
+        justification: |
+          Clear error reporting on connector failures allows users and CI/CD pipelines to
+          detect and diagnose integration problems quickly without inspecting logs for root
+          causes.
+        tests:
           - Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode

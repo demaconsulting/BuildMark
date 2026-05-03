@@ -28,7 +28,7 @@ Multiple intervals are separated by `,` **between** ranges. The parser
 distinguishes a separating comma from the commas that appear **inside** an
 interval (between the bounds) by tracking bracket depth.
 
-## Data Model — VersionInterval
+## Data Model - VersionInterval
 
 ```csharp
 public record VersionInterval(
@@ -45,7 +45,7 @@ public record VersionInterval(
 | `UpperBound`     | `string?` | Upper version string, or `null` if unbounded   |
 | `UpperInclusive` | `bool`    | `true` if the upper bound is inclusive (`]`)   |
 
-## Data Model — VersionIntervalSet
+## Data Model - VersionIntervalSet
 
 ```csharp
 public record VersionIntervalSet(

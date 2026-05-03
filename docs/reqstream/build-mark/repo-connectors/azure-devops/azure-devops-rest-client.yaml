@@ -56,7 +56,7 @@ sections:
           Tag retrieval is required to identify version boundaries for build note generation.
           All tags must be fetched to correctly determine previous version baselines.
         tests:
-          - AzureDevOpsRestClient_GetPullRequestWorkItemsAsync_ValidResponse_ReturnsWorkItemRefs
+          - AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags
 
       - id: BuildMark-AzureDevOps-GetPullRequests
         title: The AzureDevOpsRestClient shall retrieve pull requests from the Azure DevOps API with pagination support.

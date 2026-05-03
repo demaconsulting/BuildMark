@@ -3,7 +3,7 @@
 ## Verification Approach
 
 `WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 10 unit
-tests. The tests verify mapping of Azure DevOps work items to the BuildMark model —
+tests. The tests verify mapping of Azure DevOps work items to the BuildMark model -
 classification of features and bugs, title and description extraction, change link
 generation, and handling of known issue identification based on work item type and
 state.

@@ -6,7 +6,7 @@
 self-validation and unit testing. It returns a fixed, deterministic dataset
 without making any network or filesystem calls.
 
-`MockRepoConnector` lives in production code — not in the test project — because
+`MockRepoConnector` lives in production code - not in the test project - because
 the `--validate` flag must work in any deployment without requiring a separate test
 assembly or external tooling.
 
@@ -48,9 +48,9 @@ categorization into `Changes` and `Bugs` is used.
 
 `GetBuildInformationAsync` throws `InvalidOperationException` in the following scenarios:
 
-1. **No version tags exist in data and no version argument provided** — throws with message:
+1. **No version tags exist in data and no version argument provided** - throws with message:
    `"No tags found in repository and no version specified. Please provide a version parameter."`
-2. **Current commit does not match any tag and no version argument provided** — throws with message:
+2. **Current commit does not match any tag and no version argument provided** - throws with message:
    `"Target version not specified and current commit does not match any tag. Please provide a version parameter."`
 
 These conditions mirror the equivalent error paths in the production `GitHubRepoConnector`

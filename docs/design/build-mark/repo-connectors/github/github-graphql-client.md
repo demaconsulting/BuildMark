@@ -11,10 +11,10 @@ GitHub API communication to this client.
 
 The class provides two constructors:
 
-- **Public constructor** — accepts a GitHub authentication token and creates an
+- **Public constructor** - accepts a GitHub authentication token and creates an
   owned `HttpClient` configured with the token. Used by `GitHubRepoConnector` in
   production.
-- **Internal constructor** — accepts an existing `HttpClient` directly. Used by
+- **Internal constructor** - accepts an existing `HttpClient` directly. Used by
   tests to inject a mock `HttpClient` without network access.
 
 ## Lifecycle

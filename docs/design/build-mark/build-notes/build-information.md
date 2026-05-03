@@ -18,15 +18,15 @@ public record BuildInformation(
     WebLink? CompleteChangelogLink);
 ```
 
-- `BaselineVersionTag` (`VersionCommitTag?`) — the previous version tag, which is the
+- `BaselineVersionTag` (`VersionCommitTag?`) - the previous version tag, which is the
   lower boundary of the reported range
-- `CurrentVersionTag` (`VersionCommitTag`) — the version tag being reported
-- `Changes` (`List<ItemInfo>`) — feature and other non-bug items in this build
-- `Bugs` (`List<ItemInfo>`) — bug-fix items in this build
-- `KnownIssues` (`List<ItemInfo>`) — open issues not yet fixed
-- `CompleteChangelogLink` (`WebLink?`) — optional link to the full changelog on
+- `CurrentVersionTag` (`VersionCommitTag`) - the version tag being reported
+- `Changes` (`List<ItemInfo>`) - feature and other non-bug items in this build
+- `Bugs` (`List<ItemInfo>`) - bug-fix items in this build
+- `KnownIssues` (`List<ItemInfo>`) - open issues not yet fixed
+- `CompleteChangelogLink` (`WebLink?`) - optional link to the full changelog on
   the host
-- `RoutedSections` (`IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>?`) —
+- `RoutedSections` (`IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>?`) -
   optional ordered list of custom report sections populated by `RepoConnectorBase.ApplyRules`
   when routing rules are configured; `null` when no rules are active
 
@@ -46,15 +46,15 @@ empty, `ToMarkdown` falls back to the legacy sections.
 
 The rendered output contains the following sections:
 
-1. **Version Information** — baseline and current version tags with commit hashes.
-2. **Custom sections from `RoutedSections`** *(when rules are configured)* — one
+1. **Version Information** - baseline and current version tags with commit hashes.
+2. **Custom sections from `RoutedSections`** *(when rules are configured)* - one
    sub-heading per section with the section title and its items.
    **OR** the following legacy sections *(when no rules are configured)*:
-   - **Changes** — list of `ItemInfo` records from `Changes`.
-   - **Bugs Fixed** — list of `ItemInfo` records from `Bugs`.
-   - **Known Issues** *(optional)* — list of `ItemInfo` records from `KnownIssues`,
+   - **Changes** - list of `ItemInfo` records from `Changes`.
+   - **Bugs Fixed** - list of `ItemInfo` records from `Bugs`.
+   - **Known Issues** *(optional)* - list of `ItemInfo` records from `KnownIssues`,
      emitted only when `includeKnownIssues` is `true`.
-3. **Full Changelog** *(optional)* — hyperlink from `CompleteChangelogLink`, emitted
+3. **Full Changelog** *(optional)* - hyperlink from `CompleteChangelogLink`, emitted
    only when the link is non-null.
 
 ## Interactions

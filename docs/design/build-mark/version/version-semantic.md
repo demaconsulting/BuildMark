@@ -3,7 +3,7 @@
 ## Purpose
 
 The `VersionSemantic` record type extends `VersionComparable` with semantic version metadata
-support. As a C# `record`, it provides structural equality by default — two `VersionSemantic`
+support. As a C# `record`, it provides structural equality by default - two `VersionSemantic`
 instances are equal when all their properties compare equal. It provides the full semantic
 version structure including build metadata while preserving comparison functionality.
 

@@ -19,38 +19,38 @@ including all in-house subsystems and units and all Off-The-Shelf (OTS) componen
 
 In-house software items verified in this document:
 
-- **Program** — entry point and execution orchestrator
-- **Cli** subsystem — `Context` unit (command-line argument parser and I/O owner)
-- **BuildNotes** subsystem — `BuildInformation`, `ItemInfo`, and `WebLink` units
-- **SelfTest** subsystem — `Validation` unit
-- **Utilities** subsystem — `PathHelpers` and `ProcessRunner` units
-- **Version** subsystem — `VersionComparable`, `VersionSemantic`, `VersionTag`,
+- **Program** - entry point and execution orchestrator
+- **Cli** subsystem - `Context` unit (command-line argument parser and I/O owner)
+- **BuildNotes** subsystem - `BuildInformation`, `ItemInfo`, and `WebLink` units
+- **SelfTest** subsystem - `Validation` unit
+- **Utilities** subsystem - `PathHelpers` and `ProcessRunner` units
+- **Version** subsystem - `VersionComparable`, `VersionSemantic`, `VersionTag`,
   `VersionInterval`, `VersionIntervalSet`, and `VersionCommitTag` units
-- **Configuration** subsystem — `BuildMarkConfig`, `BuildMarkConfigReader`,
+- **Configuration** subsystem - `BuildMarkConfig`, `BuildMarkConfigReader`,
   `ConfigurationLoadResult`, `ConfigurationIssue`, `ConnectorConfig`,
   `GitHubConnectorConfig`, `AzureDevOpsConnectorConfig`, `ReportConfig`,
   `SectionConfig`, `RuleConfig`, and `RuleMatchConfig` units
-- **RepoConnectors** subsystem — `IRepoConnector`, `RepoConnectorBase`,
+- **RepoConnectors** subsystem - `IRepoConnector`, `RepoConnectorBase`,
   `RepoConnectorFactory`, `ItemRouter`, `ItemControlsInfo`, and `ItemControlsParser`
   units, plus the following sub-subsystems:
-  - **GitHub** sub-subsystem — `GitHubRepoConnector`, `GitHubGraphQLClient`,
+  - **GitHub** sub-subsystem - `GitHubRepoConnector`, `GitHubGraphQLClient`,
     and `GitHubGraphQLTypes` units
-  - **AzureDevOps** sub-subsystem — `AzureDevOpsRepoConnector`,
+  - **AzureDevOps** sub-subsystem - `AzureDevOpsRepoConnector`,
     `AzureDevOpsRestClient`, `AzureDevOpsApiTypes`, and `WorkItemMapper` units
-  - **Mock** sub-subsystem — `MockRepoConnector` unit
+  - **Mock** sub-subsystem - `MockRepoConnector` unit
 
 OTS components verified in this document:
 
-- **BuildMark** — build notes generation tool (self-referential)
-- **FileAssert** — file content assertion tool
-- **Pandoc** — document conversion tool
-- **ReqStream** — requirements traceability tool
-- **ReviewMark** — code review enforcement tool
-- **SarifMark** — SARIF report generation tool
-- **SonarMark** — SonarCloud report generation tool
-- **VersionMark** — tool version capture tool
-- **WeasyPrint** — HTML-to-PDF renderer
-- **xUnit** — unit testing framework
+- **BuildMark** - build notes generation tool (self-referential)
+- **FileAssert** - file content assertion tool
+- **Pandoc** - document conversion tool
+- **ReqStream** - requirements traceability tool
+- **ReviewMark** - code review enforcement tool
+- **SarifMark** - SARIF report generation tool
+- **SonarMark** - SonarCloud report generation tool
+- **VersionMark** - tool version capture tool
+- **WeasyPrint** - HTML-to-PDF renderer
+- **xUnit** - unit testing framework
 
 The following topics are out of scope:
 
@@ -123,12 +123,12 @@ code, and tests. The parallel tree below shows how each artifact type maps to th
 software structure:
 
 ```text
-docs/requirements_doc/   — compiled requirements document (generated)
-docs/reqstream/          — requirements source YAML files
-docs/design/             — software design document source
-docs/verification/       — this document (verification design source)
-src/DemaConsulting.BuildMark/   — implementation source
-test/DemaConsulting.BuildMark.Tests/   — test source
+docs/requirements_doc/   - compiled requirements document (generated)
+docs/reqstream/          - requirements source YAML files
+docs/design/             - software design document source
+docs/verification/       - this document (verification design source)
+src/DemaConsulting.BuildMark/   - implementation source
+test/DemaConsulting.BuildMark.Tests/   - test source
 ```
 
 Each chapter in this verification document corresponds to a unit or subsystem chapter

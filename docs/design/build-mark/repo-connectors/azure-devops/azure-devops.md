@@ -8,13 +8,13 @@ connector used when the repository host is Azure DevOps.
 
 ## Units
 
-- `AzureDevOpsRepoConnector` — `RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs` —
+- `AzureDevOpsRepoConnector` - `RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs` -
   implements `IRepoConnector` for Azure DevOps.
-- `AzureDevOpsRestClient` — `RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs` —
+- `AzureDevOpsRestClient` - `RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs` -
   issues paginated REST API requests.
-- `AzureDevOpsApiTypes` — `RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs` —
+- `AzureDevOpsApiTypes` - `RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs` -
   provides record types for REST API request and response data.
-- `WorkItemMapper` — `RepoConnectors/AzureDevOps/WorkItemMapper.cs` —
+- `WorkItemMapper` - `RepoConnectors/AzureDevOps/WorkItemMapper.cs` -
   maps Azure DevOps work items to `ItemInfo` objects.
 
 ### `AzureDevOpsRepoConnector`

@@ -20,8 +20,11 @@
 
 using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
+using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.BuildMark.Version;
 
@@ -779,55 +782,285 @@ public class IntegrationTests
     }
 
     // ─────────────────────────────────────────────────────────────────────────
-    // Azure DevOps Integration (placeholder tests — Phase 2)
+    // Azure DevOps Integration
     // ─────────────────────────────────────────────────────────────────────────
 
     /// <summary>
-    ///     Placeholder: verify that BuildMark generates markdown with version information
-    ///     from an Azure DevOps repository.
-    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
-    ///     implementation is available.
+    ///     Test that BuildMark generates a markdown report with version information
+    ///     from a mocked Azure DevOps repository.
     /// </summary>
     [Fact]
-    [Trait("Category", "Pending")]
     public void BuildMark_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
     {
-        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
-        // This test will verify that running BuildMark against a mocked Azure DevOps
-        // repository produces a markdown report containing correct version information.
-        Assert.True(File.Exists(_dllPath));
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Set up a mocked REST handler with a single version tag and commit
+            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+                .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
+                .AddCommitsResponse(new MockAdoCommit("abc123"))
+                .AddPullRequestsResponse()
+                .AddWiqlResponse();
+
+            using var mockHttpClient = new HttpClient(mockHandler);
+            var adoConnector = CreateMockAdoConnector(mockHttpClient, "abc123");
+
+            // Create context with Azure DevOps connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
+                () => adoConnector);
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report file contains markdown title and version information
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("# Build Report", content);
+            Assert.Contains("## Version Information", content);
+            Assert.Contains("1.0.0", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
     }
 
     /// <summary>
-    ///     Placeholder: verify that BuildMark generates a report containing changes and bug
-    ///     fixes with hyperlinks from an Azure DevOps repository.
-    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
-    ///     implementation is available.
+    ///     Test that BuildMark generates a report containing changes and bug fixes
+    ///     with hyperlinks from a mocked Azure DevOps repository.
     /// </summary>
     [Fact]
-    [Trait("Category", "Pending")]
     public void BuildMark_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
-        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
-        // This test will verify that the generated report contains hyperlinked work items
-        // and pull requests from Azure DevOps.
-        Assert.True(File.Exists(_dllPath));
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Set up mocked REST data with two versions, two pull requests, and linked work items
+            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+                .AddTagsResponse(
+                    new MockAdoTag("v1.1.0", "commit3"),
+                    new MockAdoTag("v1.0.0", "commit1"))
+                .AddCommitsResponse(
+                    new MockAdoCommit("commit3"),
+                    new MockAdoCommit("commit2"),
+                    new MockAdoCommit("commit1"))
+                .AddPullRequestsResponse(
+                    new MockAdoPullRequest(101, "Add new feature", "completed", "commit3"),
+                    new MockAdoPullRequest(100, "Fix critical bug", "completed", "commit2"))
+                .AddPullRequestWorkItemsResponse("repo", 101, 201)
+                .AddPullRequestWorkItemsResponse("repo", 100, 200)
+                .AddWorkItemsResponse(
+                    new MockAdoWorkItem(201, "New feature work item", "User Story"),
+                    new MockAdoWorkItem(200, "Bug work item", "Bug"))
+                .AddWiqlResponse();
+
+            using var mockHttpClient = new HttpClient(mockHandler);
+            var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
+
+            // Create context with Azure DevOps connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "1.1.0", "--report", reportFile, "--silent"],
+                () => adoConnector);
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report contains changes and bug fixes sections with linked items
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("## Changes", content);
+            Assert.Contains("## Bugs Fixed", content);
+            Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
     }
 
     /// <summary>
-    ///     Placeholder: verify that BuildMark shows the correct version range from the
-    ///     previous release in an Azure DevOps repository.
-    ///     Phase 2: Replace with a real end-to-end test once the AzureDevOps connector
-    ///     implementation is available.
+    ///     Test that BuildMark shows the correct version range from the previous release
+    ///     in a mocked Azure DevOps repository.
     /// </summary>
     [Fact]
-    [Trait("Category", "Pending")]
     public void BuildMark_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
     {
-        // Phase 2: Implement when the AzureDevOpsRepoConnector is available.
-        // This test will verify that the previous version tag is correctly identified
-        // and the change range is accurately reported from an Azure DevOps repository.
-        Assert.True(File.Exists(_dllPath));
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Set up mocked REST data with three version tags so previous version selection is exercised
+            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+                .AddTagsResponse(
+                    new MockAdoTag("v2.0.0", "commit3"),
+                    new MockAdoTag("v1.1.0", "commit2"),
+                    new MockAdoTag("v1.0.0", "commit1"))
+                .AddCommitsResponse(
+                    new MockAdoCommit("commit3"),
+                    new MockAdoCommit("commit2"),
+                    new MockAdoCommit("commit1"))
+                .AddPullRequestsResponse()
+                .AddWiqlResponse();
+
+            using var mockHttpClient = new HttpClient(mockHandler);
+            var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
+
+            // Create context with Azure DevOps connector injected for deterministic output
+            using var context = Context.Create(
+                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+                () => adoConnector);
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report identifies the previous version as the baseline of the version range
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("Previous Version", content);
+            Assert.Contains("v1.1.0", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the --results flag writes a TRX file when --validate is specified.
+    /// </summary>
+    [Fact]
+    public void BuildMark_ResultsParameter_WritesTrxFile()
+    {
+        // Arrange: create a temporary TRX results file path
+        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".trx");
+        try
+        {
+            // Act: run the application with --validate and --results pointing to a TRX file
+            var exitCode = Runner.Run(
+                out _,
+                "dotnet",
+                _dllPath,
+                "--validate",
+                "--results", resultsFile,
+                "--silent");
+
+            // Assert: tool succeeds and writes a TRX file containing the TestRun XML element
+            Assert.Equal(0, exitCode);
+            Assert.True(File.Exists(resultsFile), "TRX results file should have been created");
+            var content = File.ReadAllText(resultsFile);
+            Assert.Contains("<TestRun", content);
+        }
+        finally
+        {
+            if (File.Exists(resultsFile))
+            {
+                File.Delete(resultsFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the --results flag writes a JUnit XML file when --validate is specified.
+    /// </summary>
+    [Fact]
+    public void BuildMark_ResultsParameter_WritesJUnitFile()
+    {
+        // Arrange: create a temporary JUnit XML results file path
+        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".xml");
+        try
+        {
+            // Act: run the application with --validate and --results pointing to an XML file
+            var exitCode = Runner.Run(
+                out _,
+                "dotnet",
+                _dllPath,
+                "--validate",
+                "--results", resultsFile,
+                "--silent");
+
+            // Assert: tool succeeds and writes an XML file containing the testsuites element
+            Assert.Equal(0, exitCode);
+            Assert.True(File.Exists(resultsFile), "JUnit XML results file should have been created");
+            var content = File.ReadAllText(resultsFile);
+            Assert.Contains("<testsuites", content);
+        }
+        finally
+        {
+            if (File.Exists(resultsFile))
+            {
+                File.Delete(resultsFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the tool reads the connector type from the .buildmark.yaml configuration file.
+    /// </summary>
+    [Fact]
+    public async Task BuildMark_Config_ConnectorType_ReadFromConfigFile()
+    {
+        // Arrange: create a temporary directory containing a .buildmark.yaml with an explicit connector type
+        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
+        Directory.CreateDirectory(tempDir);
+        try
+        {
+            // Write a configuration file that explicitly selects the azure-devops connector type
+            var configContent = "connector:\n  type: azure-devops\n";
+            await File.WriteAllTextAsync(
+                Path.Combine(tempDir, ".buildmark.yaml"),
+                configContent,
+                TestContext.Current.CancellationToken);
+
+            // Act: read configuration and create the connector through the factory
+            var loadResult = await BuildMarkConfigReader.ReadAsync(tempDir);
+            var connector = RepoConnectorFactory.Create(loadResult.Config?.Connector);
+
+            // Assert: configuration was parsed without errors and the factory created an Azure DevOps connector
+            Assert.False(loadResult.HasErrors, "Configuration file should load without errors");
+            Assert.NotNull(connector);
+            Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+        }
+        finally
+        {
+            if (Directory.Exists(tempDir))
+            {
+                Directory.Delete(tempDir, recursive: true);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Creates a mock Azure DevOps connector with pre-configured git command responses
+    ///     for use in integration tests.
+    /// </summary>
+    /// <param name="mockHttpClient">Mock HTTP client for REST API calls.</param>
+    /// <param name="currentCommitHash">Current commit hash to return from git rev-parse HEAD.</param>
+    /// <returns>Configured MockableAzureDevOpsRepoConnector ready for use in a connector factory.</returns>
+    private static MockableAzureDevOpsRepoConnector CreateMockAdoConnector(
+        HttpClient mockHttpClient,
+        string currentCommitHash)
+    {
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient);
+        connector.SetCommandResponse(
+            "git remote get-url origin",
+            "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", currentCommitHash);
+        connector.SetCommandResponse(
+            "az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv",
+            "mock-token");
+        return connector;
     }
 
     /// <summary>

@@ -172,7 +172,7 @@ Each rule may contain:
 | `label` | A label name or list of label names. Matches if the item carries any of the listed labels. |
 | `work-item-type` | A work-item type name or list of names (e.g., `Bug`, `Task`, `Epic`). |
 
-Multiple criteria within a single `match` block are combined with AND logic — the item must satisfy
+Multiple criteria within a single `match` block are combined with AND logic - the item must satisfy
 all specified criteria to match that rule.
 
 A rule with no `match` key is a **catch-all** and matches every item that has not already been

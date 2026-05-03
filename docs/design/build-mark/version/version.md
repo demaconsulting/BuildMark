@@ -10,12 +10,12 @@ range operations, ensuring consistent semantic versioning behavior across all Bu
 
 The Version subsystem is composed of six units:
 
-- `VersionComparable` (Unit) — core semantic version comparison and ordering engine
-- `VersionSemantic` (Unit) — semantic version parsing and validation
-- `VersionTag` (Unit) — repository version tag processing and extraction
-- `VersionInterval` (Unit) — version range representation and operations
-- `VersionIntervalSet` (Unit) — ordered collection of version intervals for range queries
-- `VersionCommitTag` (Unit) — version-to-commit association for build information
+- `VersionComparable` (Unit) - core semantic version comparison and ordering engine
+- `VersionSemantic` (Unit) - semantic version parsing and validation
+- `VersionTag` (Unit) - repository version tag processing and extraction
+- `VersionInterval` (Unit) - version range representation and operations
+- `VersionIntervalSet` (Unit) - ordered collection of version intervals for range queries
+- `VersionCommitTag` (Unit) - version-to-commit association for build information
 
 ## Version Type Hierarchy
 

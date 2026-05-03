@@ -217,6 +217,7 @@ sections:
               details across multiple CI pipelines.
             tests:
               - BuildMark_Report_UsesConnectorForBuildData
+              - BuildMark_Config_ConnectorType_ReadFromConfigFile
             children:
               - BuildMark-Configuration-ConnectorConfig
               - BuildMark-RepoConnectors-Factory
@@ -376,15 +377,41 @@ sections:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-RepoConnectors-GitHub
 
-          - id: BuildMark-Report-Structure
+          - id: BuildMark-Report-Structure-Headings
             title: >-
-              The tool shall format build notes using ATX-style headings at the configured depth,
-              bullet lists for change and bug entries, and a version heading as the first section
-              element.
+              The tool shall format build notes using ATX-style headings at the configured
+              heading depth.
             justification: |
-              Proper markdown structure ensures reports render correctly across different
-              markdown processors and documentation platforms. Well-structured documents are
-              more readable, professional, and maintainable.
+              ATX-style headings at a configurable depth allow BuildMark reports to be
+              embedded at any level within a larger document without disrupting the heading
+              hierarchy of the surrounding content.
+            tests:
+              - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
+            children:
+              - BuildMark-BuildNotes-ReportModel
+              - BuildMark-Program-Report
+
+          - id: BuildMark-Report-Structure-Lists
+            title: >-
+              The tool shall format change and bug entries as bullet list items in the
+              generated build notes.
+            justification: |
+              Bullet lists provide a scannable, visually distinct format for change and bug
+              entries that renders correctly across markdown processors and documentation
+              platforms.
+            tests:
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
+            children:
+              - BuildMark-BuildNotes-ReportModel
+              - BuildMark-Program-Report
+
+          - id: BuildMark-Report-Structure-VersionHeading
+            title: >-
+              The tool shall place the version heading as the first section element of the
+              generated build notes.
+            justification: |
+              Leading with the version heading makes the report immediately identifiable and
+              ensures a consistent structure across all generated documents.
             tests:
               - BuildMark_Report_GeneratesMarkdownWithVersionInformation
             children:
@@ -551,6 +578,8 @@ sections:
               to be tracked, analyzed, and reported alongside other test metrics.
             tests:
               - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesTrxFile
+              - BuildMark_ResultsParameter_WritesJUnitFile
             children:
               - BuildMark-SelfTest-ResultsOutput
 
@@ -562,6 +591,7 @@ sections:
               and Azure DevOps pipelines.
             tests:
               - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesTrxFile
             children:
               - BuildMark-SelfTest-ResultsOutput
 
@@ -573,5 +603,6 @@ sections:
               toolchains beyond the Microsoft ecosystem.
             tests:
               - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesJUnitFile
             children:
               - BuildMark-SelfTest-ResultsOutput

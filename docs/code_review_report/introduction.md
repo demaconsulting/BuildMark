@@ -4,7 +4,7 @@ This document contains the review report for the BuildMark project.
 
 ## Purpose
 
-This review report provides evidence that each review-set is current — the review
+This review report provides evidence that each review-set is current - the review
 evidence matches the current file fingerprints. It confirms that all formal reviews
 conducted for BuildMark remain valid for the current state of the
 reviewed files.
