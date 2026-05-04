@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient GetReleasesAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientGetReleasesTests
 {
     /// <summary>
     ///     Test that GetReleasesAsync returns expected release tag names with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames()
     {
         // Arrange
@@ -62,17 +61,17 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.HasCount(3, releaseNodes);
-        Assert.AreEqual("v1.0.0", releaseNodes[0].TagName);
-        Assert.AreEqual("v0.9.0", releaseNodes[1].TagName);
-        Assert.AreEqual("v0.8.5", releaseNodes[2].TagName);
+        Assert.NotNull(releaseNodes);
+        Assert.Equal(3, releaseNodes.Count);
+        Assert.Equal("v1.0.0", releaseNodes[0].TagName);
+        Assert.Equal("v0.9.0", releaseNodes[1].TagName);
+        Assert.Equal("v0.8.5", releaseNodes[2].TagName);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync returns empty list when no releases are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_NoReleases_ReturnsEmptyList()
     {
         // Arrange
@@ -97,14 +96,14 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.IsEmpty(releaseNodes);
+        Assert.NotNull(releaseNodes);
+        Assert.Empty(releaseNodes);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -121,14 +120,14 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.IsEmpty(releaseNodes);
+        Assert.NotNull(releaseNodes);
+        Assert.Empty(releaseNodes);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync returns empty list on HTTP error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList()
     {
         // Arrange
@@ -141,14 +140,14 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.IsEmpty(releaseNodes);
+        Assert.NotNull(releaseNodes);
+        Assert.Empty(releaseNodes);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync returns empty list on invalid JSON.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList()
     {
         // Arrange
@@ -161,14 +160,14 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.IsEmpty(releaseNodes);
+        Assert.NotNull(releaseNodes);
+        Assert.Empty(releaseNodes);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync returns single release tag correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_SingleRelease_ReturnsOneTagName()
     {
         // Arrange
@@ -195,15 +194,15 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.HasCount(1, releaseNodes);
-        Assert.AreEqual("v2.0.0-beta1", releaseNodes[0].TagName);
+        Assert.NotNull(releaseNodes);
+        Assert.Single(releaseNodes);
+        Assert.Equal("v2.0.0-beta1", releaseNodes[0].TagName);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync handles nodes with missing tagName property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_MissingTagNameProperty_SkipsInvalidNodes()
     {
         // Arrange
@@ -232,16 +231,16 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.HasCount(2, releaseNodes);
-        Assert.AreEqual("v1.0.0", releaseNodes[0].TagName);
-        Assert.AreEqual("v0.9.0", releaseNodes[1].TagName);
+        Assert.NotNull(releaseNodes);
+        Assert.Equal(2, releaseNodes.Count);
+        Assert.Equal("v1.0.0", releaseNodes[0].TagName);
+        Assert.Equal("v0.9.0", releaseNodes[1].TagName);
     }
 
     /// <summary>
     ///     Test that GetReleasesAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -253,11 +252,11 @@ public class GitHubGraphQLClientGetReleasesTests
         var releaseNodes = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(releaseNodes);
-        Assert.HasCount(3, releaseNodes);
-        Assert.AreEqual("v3.0.0", releaseNodes[0].TagName);
-        Assert.AreEqual("v2.0.0", releaseNodes[1].TagName);
-        Assert.AreEqual("v1.0.0", releaseNodes[2].TagName);
+        Assert.NotNull(releaseNodes);
+        Assert.Equal(3, releaseNodes.Count);
+        Assert.Equal("v3.0.0", releaseNodes[0].TagName);
+        Assert.Equal("v2.0.0", releaseNodes[1].TagName);
+        Assert.Equal("v1.0.0", releaseNodes[2].TagName);
     }
 
     /// <summary>

@@ -26,6 +26,14 @@ input-files:
   - docs/design/build-mark/cli/cli.md
   - docs/design/build-mark/cli/context.md
   - docs/design/build-mark/configuration/configuration.md
+  - docs/design/build-mark/configuration/build-mark-config.md
+  - docs/design/build-mark/configuration/build-mark-config-reader.md
+  - docs/design/build-mark/configuration/configuration-load-result.md
+  - docs/design/build-mark/configuration/configuration-issue.md
+  - docs/design/build-mark/configuration/connector-config.md
+  - docs/design/build-mark/configuration/report-config.md
+  - docs/design/build-mark/configuration/rule-config.md
+  - docs/design/build-mark/configuration/section-config.md
   - docs/design/build-mark/self-test/self-test.md
   - docs/design/build-mark/self-test/validation.md
   - docs/design/build-mark/utilities/utilities.md

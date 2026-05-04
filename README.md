@@ -22,15 +22,15 @@ For command-line options, see the [CLI Reference](https://github.com/demaconsult
 
 ## Features
 
-- 📄 **Git Integration** — Analyze repository history, tags, and branches
-- 📝 **Markdown Reports** — Generate structured build notes
-- 🐛 **Issue Tracking** — Pull changes and bugs from GitHub and Azure DevOps
-- 🔀 **Configurable Routing** — Route items to sections by label or type
-- 🎯 **Customizable Output** — Control report depth, sections, and content
-- 🚀 **CI/CD Ready** — Integrate with GitHub Actions and Azure Pipelines
-- 🌐 **Multi-Platform** — Windows, Linux, and macOS on .NET 8, 9, and 10
-- ✅ **Self-Validation** — Built-in qualification tests
-- 📊 **Dependency Updates** — Track changes from Dependabot and Renovate
+- 📄 **Git Integration** - Analyze repository history, tags, and branches
+- 📝 **Markdown Reports** - Generate structured build notes
+- 🐛 **Issue Tracking** - Pull changes and bugs from GitHub and Azure DevOps
+- 🔀 **Configurable Routing** - Route items to sections by label or type
+- 🎯 **Customizable Output** - Control report depth, sections, and content
+- 🚀 **CI/CD Ready** - Integrate with GitHub Actions and Azure Pipelines
+- 🌐 **Multi-Platform** - Windows, Linux, and macOS on .NET 8, 9, and 10
+- ✅ **Self-Validation** - Built-in qualification tests
+- 📊 **Dependency Updates** - Track changes from Dependabot and Renovate
 
 ## Installation
 
@@ -228,12 +228,13 @@ For details, see the [Item Controls Guide](https://github.com/demaconsulting/Bui
 
 The generated markdown report includes:
 
-1. **Build Report** — title heading
-2. **Version Information** — current version, baseline version, and commit hashes
-3. **Routed Sections** — items distributed by routing rules (e.g., Changes, Bugs Fixed,
+1. **Build Report** - title heading
+2. **Version Information** - current version, baseline version, and commit hashes
+3. **Routed Sections** - items distributed by routing rules (e.g., Changes, Bugs Fixed,
    Dependency Updates), or legacy Changes/Bugs Fixed sections when no rules are configured
-4. **Known Issues** — open bugs (when `--include-known-issues` is specified)
-5. **Full Changelog** — link to the platform compare view between versions (when available)
+4. **Known Issues** - open bugs, plus any bugs (open or closed) whose `affected-versions`
+   field includes the current build version (when `--include-known-issues` is specified)
+5. **Full Changelog** - link to the platform compare view between versions (when available)
 
 Sections with no items are omitted. When routing rules are active, the section order and titles
 are determined by the configuration.

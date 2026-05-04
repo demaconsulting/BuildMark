@@ -31,13 +31,12 @@ namespace DemaConsulting.BuildMark.Tests.BuildNotes;
 /// <summary>
 ///     Tests for the BuildInformation class.
 /// </summary>
-[TestClass]
 public class BuildInformationTests
 {
     /// <summary>
     ///     Test that GetBuildInformationAsync throws when no version specified and no tags found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags()
     {
         // Create mock connector that throws for no tags
@@ -58,7 +57,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that GetBuildInformationAsync throws when no version specified and current commit doesn't match tag.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag()
     {
         // Create mock connector that throws for commit mismatch
@@ -79,7 +78,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that GetBuildInformationAsync works with explicit version parameter.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion()
     {
         // Create build information with explicit version
@@ -87,16 +86,16 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.1.0"));
 
         // Verify version and hashes are set correctly
-        Assert.AreEqual("v2.1.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // New version preserves input tag
-        Assert.AreEqual("current123hash456", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.AreEqual("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
-        Assert.AreEqual("mno345pqr678", buildInfo.BaselineVersionTag?.CommitHash);
+        Assert.Equal("v2.1.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // New version preserves input tag
+        Assert.Equal("current123hash456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.Equal("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
+        Assert.Equal("mno345pqr678", buildInfo.BaselineVersionTag?.CommitHash);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync works when current commit matches latest tag.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag()
     {
         // Create mock connector that returns data for matching tag
@@ -114,15 +113,15 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync();
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
-        Assert.AreEqual("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
+        Assert.Equal("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.Equal("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.Equal("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync correctly identifies pre-release and uses previous tag.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag()
     {
         // Arrange
@@ -135,14 +134,14 @@ public class BuildInformationTests
         // Assert
         // Since "v2.0.0-beta.1" doesn't match any existing repository tag semantically,
         // it should create a new version using the provided tag
-        Assert.AreEqual("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionTag.Tag);
-        Assert.AreEqual("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
+        Assert.Equal("v2.0.0-beta.1", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.Equal("v2.0.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync correctly identifies release and skips pre-releases.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases()
     {
         // Arrange
@@ -152,14 +151,14 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert
-        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
-        Assert.AreEqual("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
+        Assert.Equal("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.Equal("ver-1.1.0", buildInfo.BaselineVersionTag?.VersionTag.Tag);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync collects issues correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly()
     {
         // Create build information for version with issues
@@ -167,27 +166,27 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"));
 
         // Verify change issues are collected (including PR without issues)
-        Assert.HasCount(2, buildInfo.Changes);
-        Assert.AreEqual("1", buildInfo.Changes[0].Id);
-        Assert.AreEqual("Add feature X", buildInfo.Changes[0].Title);
-        Assert.AreEqual("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
+        Assert.Equal(2, buildInfo.Changes.Count);
+        Assert.Equal("1", buildInfo.Changes[0].Id);
+        Assert.Equal("Add feature X", buildInfo.Changes[0].Title);
+        Assert.Equal("https://github.com/example/repo/issues/1", buildInfo.Changes[0].Url);
 
         // Second change should be PR #13 (without issues)
-        Assert.AreEqual("#13", buildInfo.Changes[1].Id);
+        Assert.Equal("#13", buildInfo.Changes[1].Id);
 
         // Verify no bug issues for this version
-        Assert.IsEmpty(buildInfo.Bugs);
+        Assert.Empty(buildInfo.Bugs);
 
         // Verify known issues include open bugs (issue 5 excluded by affected-versions [5.0.0,))
-        Assert.HasCount(2, buildInfo.KnownIssues);
-        Assert.AreEqual("4", buildInfo.KnownIssues[0].Id);
-        Assert.AreEqual("6", buildInfo.KnownIssues[1].Id);
+        Assert.Equal(2, buildInfo.KnownIssues.Count);
+        Assert.Equal("4", buildInfo.KnownIssues[0].Id);
+        Assert.Equal("6", buildInfo.KnownIssues[1].Id);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync orders changes by Index (PR number).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex()
     {
         // Create build information for version with issues
@@ -196,26 +195,24 @@ public class BuildInformationTests
 
         // Verify changes are ordered by Index (PR number)
         // Issue #1 from PR #10 should come before PR #13
-        Assert.HasCount(2, buildInfo.Changes);
-        Assert.AreEqual("1", buildInfo.Changes[0].Id);
-        Assert.AreEqual(10, buildInfo.Changes[0].Index);
-        Assert.AreEqual("#13", buildInfo.Changes[1].Id);
-        Assert.AreEqual(13, buildInfo.Changes[1].Index);
+        Assert.Equal(2, buildInfo.Changes.Count);
+        Assert.Equal("1", buildInfo.Changes[0].Id);
+        Assert.Equal(10, buildInfo.Changes[0].Index);
+        Assert.Equal("#13", buildInfo.Changes[1].Id);
+        Assert.Equal(13, buildInfo.Changes[1].Index);
 
         // Verify Index values are in ascending order
         for (var i = 0; i < buildInfo.Changes.Count - 1; i++)
         {
-            Assert.IsLessThanOrEqualTo(
-                buildInfo.Changes[i + 1].Index,
-                buildInfo.Changes[i].Index,
-                $"Changes should be ordered by Index. Found {buildInfo.Changes[i].Index} before {buildInfo.Changes[i + 1].Index}");
+            Assert.True(buildInfo.Changes[i].Index <=
+                buildInfo.Changes[i + 1].Index, $"Changes should be ordered by Index. Found {buildInfo.Changes[i].Index} before {buildInfo.Changes[i + 1].Index}");
         }
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync separates bug and change issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues()
     {
         // Arrange
@@ -225,16 +222,16 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert - verify bugs and changes are properly separated
-        Assert.HasCount(1, buildInfo.Changes);
-        Assert.HasCount(1, buildInfo.Bugs);
-        Assert.AreEqual("2", buildInfo.Bugs[0].Id);
-        Assert.AreEqual("Fix bug in Y", buildInfo.Bugs[0].Title);
+        Assert.Single(buildInfo.Changes);
+        Assert.Single(buildInfo.Bugs);
+        Assert.Equal("2", buildInfo.Bugs[0].Id);
+        Assert.Equal("Fix bug in Y", buildInfo.Bugs[0].Title);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync handles first release correctly (no from version).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly()
     {
         // Arrange
@@ -244,14 +241,14 @@ public class BuildInformationTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - verify first release has no previous version
-        Assert.IsNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.Null(buildInfo.BaselineVersionTag);
+        Assert.Equal("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
     }
 
     /// <summary>
     ///     Test that ToMarkdown generates correct markdown with default parameters.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults()
     {
         // Arrange
@@ -274,7 +271,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown includes known issues when requested.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested()
     {
         // Arrange
@@ -296,7 +293,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown respects custom heading depth.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_RespectsCustomHeadingDepth()
     {
         // Arrange
@@ -316,7 +313,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown displays N/A for empty changes table.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges()
     {
         // Arrange - Create build info with no change issues
@@ -341,7 +338,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown displays N/A for empty bugs table.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs()
     {
         // Arrange - Create build info with no bug issues
@@ -365,7 +362,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown includes issue links in bullet lists.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_IncludesIssueLinks()
     {
         // Arrange
@@ -383,7 +380,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown handles first release with N/A for previous version.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA()
     {
         // Arrange
@@ -404,7 +401,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown includes Full Changelog section when link is present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent()
     {
         // Arrange
@@ -424,7 +421,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown excludes Full Changelog section when no baseline version.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline()
     {
         // Arrange
@@ -441,7 +438,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that ToMarkdown uses bullet lists for changes, bugs, and known issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildInformation_ToMarkdown_UsesBulletLists()
     {
         // Arrange
@@ -475,7 +472,7 @@ public class BuildInformationTests
     /// <summary>
     ///     Test that VersionCommitTag correctly stores version and hash.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionCommitTag_Constructor_StoresVersionAndHash()
     {
         // Arrange
@@ -486,14 +483,14 @@ public class BuildInformationTests
         var versionCommitTag = new VersionCommitTag(version, hash);
 
         // Assert
-        Assert.AreEqual(version, versionCommitTag.VersionTag);
-        Assert.AreEqual(hash, versionCommitTag.CommitHash);
+        Assert.Equal(version, versionCommitTag.VersionTag);
+        Assert.Equal(hash, versionCommitTag.CommitHash);
     }
 
     /// <summary>
     ///     Test that WebLink correctly stores text and URL.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void WebLink_Constructor_StoresTextAndUrl()
     {
         // Arrange
@@ -504,8 +501,8 @@ public class BuildInformationTests
         var webLink = new WebLink(text, url);
 
         // Assert
-        Assert.AreEqual(text, webLink.LinkText);
-        Assert.AreEqual(url, webLink.TargetUrl);
+        Assert.Equal(text, webLink.LinkText);
+        Assert.Equal(url, webLink.TargetUrl);
     }
 
     /// <summary>
@@ -515,7 +512,7 @@ public class BuildInformationTests
     ///     What is being tested: BuildInformation.ToMarkdown with RoutedSections
     ///     What the assertions prove: Custom section headings appear and legacy sections do not
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public void BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections()
     {
         // Arrange - Build information with routed sections
@@ -536,14 +533,14 @@ public class BuildInformationTests
         var markdown = buildInfo.ToMarkdown();
 
         // Assert - Custom section headings are present
-        Assert.Contains("## Features", markdown, "Features heading should be present");
-        Assert.Contains("## Bugs", markdown, "Bugs heading should be present");
-        Assert.Contains("Add feature X", markdown, "Feature item should be present");
-        Assert.Contains("Fix bug Y", markdown, "Bug item should be present");
+        Assert.Contains("## Features", markdown);
+        Assert.Contains("## Bugs", markdown);
+        Assert.Contains("Add feature X", markdown);
+        Assert.Contains("Fix bug Y", markdown);
 
         // Assert - Legacy sections are not present
-        Assert.DoesNotContain("## Changes", markdown, "Legacy Changes heading should not be present");
-        Assert.DoesNotContain("## Bugs Fixed", markdown, "Legacy Bugs Fixed heading should not be present");
+        Assert.DoesNotContain("## Changes", markdown);
+        Assert.DoesNotContain("## Bugs Fixed", markdown);
     }
 
     /// <summary>
@@ -553,7 +550,7 @@ public class BuildInformationTests
     ///     What is being tested: BuildInformation.ToMarkdown without RoutedSections
     ///     What the assertions prove: Legacy Changes/Bugs Fixed sections are present
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public void BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections()
     {
         // Arrange - Build information without routed sections (legacy mode)
@@ -564,8 +561,8 @@ public class BuildInformationTests
         var markdown = buildInfo.ToMarkdown();
 
         // Assert - Legacy section headings are present
-        Assert.Contains("## Changes", markdown, "Legacy Changes heading should be present");
-        Assert.Contains("## Bugs Fixed", markdown, "Legacy Bugs Fixed heading should be present");
+        Assert.Contains("## Changes", markdown);
+        Assert.Contains("## Bugs Fixed", markdown);
     }
 }
 

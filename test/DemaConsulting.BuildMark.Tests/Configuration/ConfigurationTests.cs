@@ -26,18 +26,12 @@ namespace DemaConsulting.BuildMark.Tests.Configuration;
 /// <summary>
 ///     Tests for configuration loading and reporting.
 /// </summary>
-[TestClass]
 public class ConfigurationTests
 {
     /// <summary>
-    ///     Gets or sets the test context for the current test run.
-    /// </summary>
-    public TestContext TestContext { get; set; } = null!;
-
-    /// <summary>
     ///     Test that missing configuration files return an empty result.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult()
     {
         // Arrange
@@ -50,9 +44,9 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.IsEmpty(result.Issues);
+            Assert.Null(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Empty(result.Issues);
         }
         finally
         {
@@ -63,7 +57,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that valid configuration files are parsed into the configuration model.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration()
     {
         // Arrange
@@ -87,7 +81,7 @@ public class ConfigurationTests
                   label: [feature]
                 route: changes
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -95,17 +89,17 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("github", result.Config.Connector?.Type);
-            Assert.AreEqual("example-owner", result.Config.Connector?.GitHub?.Owner);
-            Assert.AreEqual("hello-world", result.Config.Connector?.GitHub?.Repo);
-            Assert.AreEqual("https://api.github.com", result.Config.Connector?.GitHub?.BaseUrl);
-            Assert.HasCount(1, result.Config.Sections);
-            Assert.AreEqual("changes", result.Config.Sections[0].Id);
-            Assert.HasCount(1, result.Config.Rules);
-            Assert.AreEqual("changes", result.Config.Rules[0].Route);
-            Assert.AreEqual("feature", result.Config.Rules[0].Match?.Label[0]);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("github", result.Config.Connector?.Type);
+            Assert.Equal("example-owner", result.Config.Connector?.GitHub?.Owner);
+            Assert.Equal("hello-world", result.Config.Connector?.GitHub?.Repo);
+            Assert.Equal("https://api.github.com", result.Config.Connector?.GitHub?.BaseUrl);
+            Assert.Single(result.Config.Sections);
+            Assert.Equal("changes", result.Config.Sections[0].Id);
+            Assert.Single(result.Config.Rules);
+            Assert.Equal("changes", result.Config.Rules[0].Route);
+            Assert.Equal("feature", result.Config.Rules[0].Match?.Label[0]);
         }
         finally
         {
@@ -116,7 +110,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that malformed configuration files surface an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_InvalidRepositoryValue_ReturnsErrorIssue()
     {
         // Arrange
@@ -131,7 +125,7 @@ public class ConfigurationTests
               github:
                 repository: invalid
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -139,9 +133,9 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
-            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
             Assert.Contains("owner/repo", result.Issues[0].Description);
         }
         finally
@@ -153,7 +147,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that malformed configuration files surface an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue()
     {
         // Arrange
@@ -163,7 +157,7 @@ public class ConfigurationTests
         await File.WriteAllTextAsync(
             filePath,
             "connector:\n\ttype: github\n",
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -171,9 +165,9 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
-            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
             Assert.Contains("tab", result.Issues[0].Description, StringComparison.OrdinalIgnoreCase);
         }
         finally
@@ -185,7 +179,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that a valid Azure DevOps connector block is parsed into the configuration model.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration()
     {
         // Arrange
@@ -206,7 +200,7 @@ public class ConfigurationTests
               - id: changes
                 title: Changes
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -214,13 +208,13 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("azure-devops", result.Config.Connector?.Type);
-            Assert.AreEqual("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.AreEqual("myorg", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.AreEqual("myproject", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.AreEqual("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("azure-devops", result.Config.Connector?.Type);
+            Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
         }
         finally
         {
@@ -231,7 +225,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that Azure DevOps connector block with alternate key aliases is parsed correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration()
     {
         // Arrange
@@ -252,7 +246,7 @@ public class ConfigurationTests
               - id: changes
                 title: Changes
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -260,12 +254,12 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.AreEqual("myorg", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.AreEqual("myproject", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.AreEqual("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
         }
         finally
         {
@@ -276,7 +270,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that an unsupported key inside the Azure DevOps connector block produces an error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsUnsupportedKey_ReturnsErrorIssue()
     {
         // Arrange
@@ -291,7 +285,7 @@ public class ConfigurationTests
               azure-devops:
                 unknown-key: some-value
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -299,9 +293,9 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
-            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
             Assert.Contains("Unsupported Azure DevOps connector key", result.Issues[0].Description);
         }
         finally
@@ -313,7 +307,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that a non-mapping Azure DevOps connector node produces an error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsNonMapping_ReturnsErrorIssue()
     {
         // Arrange
@@ -327,7 +321,7 @@ public class ConfigurationTests
               type: azure-devops
               azure-devops: not-a-mapping
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -335,9 +329,9 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
-            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
             Assert.Contains("YAML mapping", result.Issues[0].Description);
         }
         finally
@@ -349,7 +343,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that reporting an error issue sets the context exit code.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode()
     {
         // Arrange
@@ -368,13 +362,13 @@ public class ConfigurationTests
         result.ReportTo(context);
 
         // Assert
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.Equal(1, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that reporting a warning issue does not set the context exit code.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode()
     {
         // Arrange
@@ -393,13 +387,13 @@ public class ConfigurationTests
         result.ReportTo(context);
 
         // Assert
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that ReportTo includes the file path and line number in the formatted message.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber()
     {
         // Arrange
@@ -419,64 +413,64 @@ public class ConfigurationTests
 
         // Assert - the issue's FilePath and Line are surfaced via WriteError; confirm HasErrors
         // and that the issue record exposes the correct location fields
-        Assert.IsTrue(result.HasErrors);
-        Assert.AreEqual(1, context.ExitCode, "Error severity should set exit code");
-        Assert.AreEqual("/repo/.buildmark.yaml", result.Issues[0].FilePath);
-        Assert.AreEqual(7, result.Issues[0].Line);
-        Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-        Assert.AreEqual("Unexpected value", result.Issues[0].Description);
+        Assert.True(result.HasErrors);
+        Assert.True(context.ExitCode == 1, "Error severity should set exit code");
+        Assert.Equal("/repo/.buildmark.yaml", result.Issues[0].FilePath);
+        Assert.Equal(7, result.Issues[0].Line);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Equal("Unexpected value", result.Issues[0].Description);
     }
 
     /// <summary>
     ///     Test that the default configuration contains the expected sections and routing rules.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection()
     {
         // Act
         var config = BuildMarkConfig.CreateDefault();
 
         // Assert - verify sections have correct IDs and titles
-        Assert.HasCount(3, config.Sections);
-        Assert.AreEqual("changes", config.Sections[0].Id);
-        Assert.AreEqual("Changes", config.Sections[0].Title);
-        Assert.AreEqual("bugs-fixed", config.Sections[1].Id);
-        Assert.AreEqual("Bugs Fixed", config.Sections[1].Title);
-        Assert.AreEqual("dependency-updates", config.Sections[2].Id);
-        Assert.AreEqual("Dependency Updates", config.Sections[2].Title);
+        Assert.Equal(3, config.Sections.Count);
+        Assert.Equal("changes", config.Sections[0].Id);
+        Assert.Equal("Changes", config.Sections[0].Title);
+        Assert.Equal("bugs-fixed", config.Sections[1].Id);
+        Assert.Equal("Bugs Fixed", config.Sections[1].Title);
+        Assert.Equal("dependency-updates", config.Sections[2].Id);
+        Assert.Equal("Dependency Updates", config.Sections[2].Title);
 
         // Assert - verify rules have correct routes and match conditions
-        Assert.HasCount(6, config.Rules);
+        Assert.Equal(6, config.Rules.Count);
 
-        Assert.AreEqual("dependency-updates", config.Rules[0].Route);
+        Assert.Equal("dependency-updates", config.Rules[0].Route);
         Assert.Contains("dependencies", config.Rules[0].Match!.Label);
         Assert.Contains("renovate", config.Rules[0].Match!.Label);
         Assert.Contains("dependabot", config.Rules[0].Match!.Label);
 
-        Assert.AreEqual("bugs-fixed", config.Rules[1].Route);
+        Assert.Equal("bugs-fixed", config.Rules[1].Route);
         Assert.Contains("Bug", config.Rules[1].Match!.WorkItemType);
 
-        Assert.AreEqual("bugs-fixed", config.Rules[2].Route);
+        Assert.Equal("bugs-fixed", config.Rules[2].Route);
         Assert.Contains("bug", config.Rules[2].Match!.Label);
         Assert.Contains("defect", config.Rules[2].Match!.Label);
         Assert.Contains("regression", config.Rules[2].Match!.Label);
 
-        Assert.AreEqual("suppressed", config.Rules[3].Route);
+        Assert.Equal("suppressed", config.Rules[3].Route);
         Assert.Contains("internal", config.Rules[3].Match!.Label);
         Assert.Contains("chore", config.Rules[3].Match!.Label);
 
-        Assert.AreEqual("suppressed", config.Rules[4].Route);
+        Assert.Equal("suppressed", config.Rules[4].Route);
         Assert.Contains("Task", config.Rules[4].Match!.WorkItemType);
         Assert.Contains("Epic", config.Rules[4].Match!.WorkItemType);
 
-        Assert.AreEqual("changes", config.Rules[5].Route);
-        Assert.IsNull(config.Rules[5].Match);
+        Assert.Equal("changes", config.Rules[5].Route);
+        Assert.Null(config.Rules[5].Match);
     }
 
     /// <summary>
     ///     Test that a valid report section is parsed into the report configuration model.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig()
     {
         // Arrange
@@ -491,7 +485,7 @@ public class ConfigurationTests
               depth: 2
               include-known-issues: true
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -499,12 +493,12 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.IsNotNull(result.Config.Report);
-            Assert.AreEqual("build-notes.md", result.Config.Report.File);
-            Assert.AreEqual(2, result.Config.Report.Depth);
-            Assert.IsTrue(result.Config.Report.IncludeKnownIssues);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.NotNull(result.Config.Report);
+            Assert.Equal("build-notes.md", result.Config.Report.File);
+            Assert.Equal(2, result.Config.Report.Depth);
+            Assert.True(result.Config.Report.IncludeKnownIssues);
         }
         finally
         {
@@ -515,7 +509,7 @@ public class ConfigurationTests
     /// <summary>
     ///     Test that an invalid report depth produces an error issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue()
     {
         // Arrange
@@ -528,7 +522,7 @@ public class ConfigurationTests
             report:
               depth: -1
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -536,8 +530,8 @@ public class ConfigurationTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
             Assert.Contains("positive integer", result.Issues[0].Description);
         }
         finally

@@ -16,28 +16,26 @@ self-test.
 
 ## Units
 
-- `IRepoConnector` — `RepoConnectors/IRepoConnector.cs` — interface for all
+- `IRepoConnector` - `RepoConnectors/IRepoConnector.cs` - interface for all
   repository connectors
-- `RepoConnectorBase` — `RepoConnectors/RepoConnectorBase.cs` — base class with
+- `RepoConnectorBase` - `RepoConnectors/RepoConnectorBase.cs` - base class with
   common connector logic
-- `RepoConnectorFactory` — `RepoConnectors/RepoConnectorFactory.cs` — creates
+- `RepoConnectorFactory` - `RepoConnectors/RepoConnectorFactory.cs` - creates
   the appropriate connector
-- `ItemRouter` — `RepoConnectors/ItemRouter.cs` — shared item-routing logic for
+- `ItemRouter` - `RepoConnectors/ItemRouter.cs` - shared item-routing logic for
   all connectors
-- `ItemControlsParser` — `RepoConnectors/ItemControlsParser.cs` — parses
+- `ItemControlsParser` - `RepoConnectors/ItemControlsParser.cs` - parses
   buildmark blocks from item description bodies
-- `ItemControlsInfo` — `RepoConnectors/ItemControlsInfo.cs` — data record holding
+- `ItemControlsInfo` - `RepoConnectors/ItemControlsInfo.cs` - data record holding
   visibility, type, and version-set values
-- `ProcessRunner` — `Utilities/ProcessRunner.cs` — executes external processes
-  and captures output; used by `RepoConnectorBase` for shell command delegation
 
 ## Subsystems
 
-- **`GitHub`** — `RepoConnectors/GitHub/` — `GitHubRepoConnector`, `GitHubGraphQLClient`,
+- **`GitHub`** - `RepoConnectors/GitHub/` - `GitHubRepoConnector`, `GitHubGraphQLClient`,
   `GitHubGraphQLTypes`
-- **`AzureDevOps`** — `RepoConnectors/AzureDevOps/` — `AzureDevOpsRepoConnector`,
+- **`AzureDevOps`** - `RepoConnectors/AzureDevOps/` - `AzureDevOpsRepoConnector`,
   `AzureDevOpsRestClient`, `AzureDevOpsApiTypes`, `WorkItemMapper`
-- **`Mock`** — `RepoConnectors/Mock/` — `MockRepoConnector` (used by `--validate` self-test)
+- **`Mock`** - `RepoConnectors/Mock/` - `MockRepoConnector` (used by `--validate` self-test)
 
 ## Interfaces
 

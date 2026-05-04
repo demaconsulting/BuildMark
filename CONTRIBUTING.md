@@ -319,14 +319,14 @@ Releases follow this process:
 2. Update version references as needed
 3. Create a pull request with the release changes
 4. Merge the pull request after review
-5. Create a GitHub release with the new version tag — CI/CD will automatically build and publish the NuGet package
+5. Create a GitHub release with the new version tag - CI/CD will automatically build and publish the NuGet package
 
 ## Getting Help
 
 If you need help or have questions:
 
-- **GitHub Issues**: For bug reports and feature requests — [open an issue][issues]
-- **GitHub Discussions**: For general questions and discussions — [start a discussion][discussions]
+- **GitHub Issues**: For bug reports and feature requests - [open an issue][issues]
+- **GitHub Discussions**: For general questions and discussions - [start a discussion][discussions]
 - **Pull Request Comments**: For questions about specific code changes
 - **Security Vulnerabilities**: Please review the [Security Policy][security] before reporting
 

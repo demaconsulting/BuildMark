@@ -39,7 +39,8 @@ sections:
       - id: BuildMark-Version-SemanticVersioning
         title: >-
           Version subsystem shall comply with Semantic Versioning 2.0.0 specification
-          for all version processing operations.
+          for all version processing operations, except that text pre-release identifiers
+          are compared case-insensitively as documented in BuildMark-VersionComparable-PreReleaseComparison.
         justification: |
           Compliance with SemVer 2.0.0 ensures consistent and predictable version
           comparison behavior that aligns with industry standards and developer

@@ -91,7 +91,7 @@ Git reference (tag or branch) returned by the Azure DevOps refs endpoint.
 Fields: `name`, `objectId`, `peeledObjectId`
 
 The `objectId` field contains the SHA of the object this reference points to
-directly — for lightweight tags this is the commit SHA, and for annotated tags
+directly - for lightweight tags this is the commit SHA, and for annotated tags
 this is the tag object SHA. The `peeledObjectId` field contains the commit SHA
 for annotated tags (resolved through the tag object), or `null` for lightweight
 tags. The type exposes a computed `CommitId` property that returns

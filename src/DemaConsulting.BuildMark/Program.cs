@@ -55,6 +55,13 @@ internal static class Program
     /// </summary>
     /// <param name="args">Command-line arguments.</param>
     /// <returns>Exit code: 0 for success, non-zero for failure.</returns>
+    /// <remarks>
+    ///     Catches <see cref="ArgumentException"/> and <see cref="InvalidOperationException"/>
+    ///     as expected failure modes, writing the message to <see cref="Console.Error"/> and
+    ///     returning exit code 1. Any other exception type is re-thrown after logging so that
+    ///     the runtime can generate event logs for unexpected failures.
+    ///     The method itself runs on the main thread; no async execution occurs at this level.
+    /// </remarks>
     private static int Main(string[] args)
     {
         try
@@ -167,6 +174,16 @@ internal static class Program
     ///     Processes build notes and generates markdown output.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
+    /// <remarks>
+    ///     This method is called on the UI thread and blocks until the connector completes.
+    ///     Side effects include: writing build summary lines to the context output, writing
+    ///     the markdown report file to <c>effectiveReportFile</c>, and setting
+    ///     <see cref="Context.ExitCode"/> to 1 on any error.
+    ///     When <see cref="Context.ConnectorFactory"/> is non-null, configuration-based
+    ///     routing is not applied (test isolation path). When it is null, the connector
+    ///     is configured via
+    ///     <see cref="RepoConnectorBase.Configure"/> before use.
+    /// </remarks>
     private static void ProcessBuildNotes(Context context)
     {
         // Load the optional configuration before attempting report generation.
@@ -260,6 +277,12 @@ internal static class Program
     ///     Loads the optional repository configuration.
     /// </summary>
     /// <returns>The configuration load result.</returns>
+    /// <remarks>
+    ///     Uses a sync-over-async pattern (<c>GetAwaiter().GetResult()</c>) to call the
+    ///     async <see cref="BuildMarkConfigReader.ReadAsync"/> method. This is safe because
+    ///     the method is always called from the UI/main thread, which does not hold a
+    ///     synchronization context that could cause a deadlock.
+    /// </remarks>
     private static ConfigurationLoadResult LoadConfiguration()
     {
         return BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory).GetAwaiter().GetResult();

@@ -36,11 +36,11 @@ unresolved and included in known-issues reporting.
 
 Item controls are extracted from two sources and merged:
 
-1. **Buildmark blocks** — `ItemControlsParser.Parse(description)` is called on the
+1. **Buildmark blocks** - `ItemControlsParser.Parse(description)` is called on the
    `System.Description` field of the work item. The resulting `ItemControlsInfo`
    provides `Visibility`, `Type`, and `AffectedVersions` overrides from embedded
    YAML blocks in the description body.
-2. **Custom fields** — The `Custom.Visibility` and `Custom.AffectedVersions` fields
+2. **Custom fields** - The `Custom.Visibility` and `Custom.AffectedVersions` fields
    in the work item's fields dictionary are read directly.
 
 **Precedence**: custom fields take priority over buildmark blocks when both are

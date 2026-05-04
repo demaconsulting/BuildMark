@@ -29,27 +29,26 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubRepoConnector class.
 /// </summary>
-[TestClass]
 public class GitHubRepoConnectorTests
 {
     /// <summary>
     ///     Test that GitHubRepoConnector can be instantiated.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void GitHubRepoConnector_Constructor_CreatesInstance()
     {
         // Create connector
         var connector = new GitHubRepoConnector();
 
         // Verify instance
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that GitHubRepoConnector stores the provided configuration overrides.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides()
     {
         // Arrange
@@ -64,23 +63,23 @@ public class GitHubRepoConnectorTests
         var connector = new GitHubRepoConnector(config);
 
         // Assert
-        Assert.IsNotNull(connector.ConfigurationOverrides);
-        Assert.AreEqual("example-owner", connector.ConfigurationOverrides.Owner);
-        Assert.AreEqual("example-repo", connector.ConfigurationOverrides.Repo);
-        Assert.AreEqual("https://api.github.com", connector.ConfigurationOverrides.BaseUrl);
+        Assert.NotNull(connector.ConfigurationOverrides);
+        Assert.Equal("example-owner", connector.ConfigurationOverrides.Owner);
+        Assert.Equal("example-repo", connector.ConfigurationOverrides.Repo);
+        Assert.Equal("https://api.github.com", connector.ConfigurationOverrides.BaseUrl);
     }
 
     /// <summary>
     ///     Test that GitHubRepoConnector implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void GitHubRepoConnector_ImplementsInterface_ReturnsTrue()
     {
         // Create connector
         var connector = new GitHubRepoConnector();
 
         // Verify interface implementation
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
 
@@ -88,7 +87,7 @@ public class GitHubRepoConnectorTests
     /// <summary>
     ///     Test that GetBuildInformationAsync works with mocked data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation()
     {
         // Arrange - Create mock responses using helper methods
@@ -112,18 +111,18 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync correctly selects previous version and generates changelog link.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink()
     {
         // Arrange - Create mock responses with multiple versions
@@ -153,24 +152,24 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("commit3", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("commit3", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have selected v1.1.0 as baseline (previous non-prerelease)
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.Equal("commit2", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link
-        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
         Assert.Contains("v1.1.0...v2.0.0", buildInfo.CompleteChangelogLink.TargetUrl);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync correctly gathers changes from PRs with labels.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly()
     {
         // Arrange - Create mock responses with PRs containing different label types
@@ -217,29 +216,29 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.1.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
 
         // PRs without linked issues are treated based on their labels
         // PR 100 with "bug" label should be in bugs
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Bugs.Count, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.True(buildInfo.Bugs.Count >= 1, $"Expected at least 1 bug, got {buildInfo.Bugs.Count}");
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
-        Assert.IsNotNull(bugPR, "PR 100 should be categorized as a bug");
-        Assert.AreEqual("Fix critical bug", bugPR.Title);
+        Assert.True(bugPR != null, "PR 100 should be categorized as a bug");
+        Assert.Equal("Fix critical bug", bugPR.Title);
 
         // PR 101 with "feature" label should be in changes
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsGreaterThanOrEqualTo(1, buildInfo.Changes.Count, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
+        Assert.NotNull(buildInfo.Changes);
+        Assert.True(buildInfo.Changes.Count >= 1, $"Expected at least 1 change, got {buildInfo.Changes.Count}");
         var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
-        Assert.IsNotNull(featurePR, "PR 101 should be categorized as a change");
-        Assert.AreEqual("Add new feature", featurePR.Title);
+        Assert.True(featurePR != null, "PR 101 should be categorized as a change");
+        Assert.Equal("Add new feature", featurePR.Title);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync correctly identifies known issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues()
     {
         // Arrange - Create mock responses with open and closed issues
@@ -281,17 +280,17 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
 
         // Known issues are open issues that aren't linked to any changes in this release
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo.KnownIssues);
         // Since we have no PRs, all open issues should be known issues
-        Assert.IsGreaterThanOrEqualTo(1, buildInfo.KnownIssues.Count, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
+        Assert.True(buildInfo.KnownIssues.Count >= 1, $"Expected at least 1 known issue, got {buildInfo.KnownIssues.Count}");
 
         // Verify at least one known issue is present
         var knownIssueTitles = buildInfo.KnownIssues.Select(i => i.Title).ToList();
         var hasExpectedIssue = knownIssueTitles.Exists(t => t.Contains("Known bug") || t.Contains("Feature request"));
-        Assert.IsTrue(hasExpectedIssue, "Should have at least one of the open issues as a known issue");
+        Assert.True(hasExpectedIssue, "Should have at least one of the open issues as a known issue");
     }
 
     /// <summary>
@@ -299,7 +298,7 @@ public class GitHubRepoConnectorTests
     ///     Example: 1.1.2-rc.1 (hash a1b2c3d4) and 1.1.2-beta.2 (hash a1b2c3d4) are re-tags.
     ///     When processing 1.1.2-rc.1, it should skip 1.1.2-beta.2 and use 1.1.2-beta.1 (hash 734713bc).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash()
     {
         // Arrange - Create mock responses with multiple pre-releases on same and different hashes
@@ -331,17 +330,17 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-rc.1"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("a1b2c3d4", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("a1b2c3d4", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have skipped 1.1.2-beta.2 (same hash) and selected 1.1.2-beta.1 (different hash)
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("734713bc", buildInfo.BaselineVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.Equal("734713bc", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link between beta.1 and rc.1
-        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
         Assert.Contains("1.1.2-beta.1...1.1.2-rc.1", buildInfo.CompleteChangelogLink.TargetUrl);
     }
 
@@ -349,7 +348,7 @@ public class GitHubRepoConnectorTests
     ///     Test that release baseline selection skips all pre-release versions.
     ///     Example: 1.1.2 should skip 1.1.2-rc.1, 1.1.2-beta.2, 1.1.2-beta.1 and use 1.1.1.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases()
     {
         // Arrange - Create mock responses with release and multiple pre-releases
@@ -383,17 +382,17 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("commit5", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.1.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("commit5", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have skipped all pre-releases and selected 1.1.1
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("commit1", buildInfo.BaselineVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.1.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.Equal("commit1", buildInfo.BaselineVersionTag.CommitHash);
 
         // Should have changelog link between 1.1.1 and 1.1.2
-        Assert.IsNotNull(buildInfo.CompleteChangelogLink);
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
         Assert.Contains("v1.1.1...1.1.2", buildInfo.CompleteChangelogLink.TargetUrl);
     }
 
@@ -401,7 +400,7 @@ public class GitHubRepoConnectorTests
     ///     Test that pre-release baseline selection works correctly when target is not in release history.
     ///     This happens when generating build notes for a version that hasn't been tagged yet.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash()
     {
         // Arrange - Create mock responses where target version doesn't exist yet
@@ -429,21 +428,21 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-beta.2"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.1.2-beta.2", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("new-hash-123", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should use most recent release with different hash
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("commit2", buildInfo.BaselineVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.1.2-beta.1", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.Equal("commit2", buildInfo.BaselineVersionTag.CommitHash);
     }
 
     /// <summary>
     ///     Test that pre-release baseline selection returns null when all previous versions have the same hash.
     ///     This is an edge case where all previous tags are re-tags of the current commit.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline()
     {
         // Arrange - Create mock responses where all versions are on the same commit
@@ -473,12 +472,12 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("1.1.2-rc.1"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.1.2-rc.1", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("same-hash-123", buildInfo.CurrentVersionTag.CommitHash);
 
         // Should have null baseline since all previous versions are on the same hash
-        Assert.IsNull(buildInfo.BaselineVersionTag);
+        Assert.Null(buildInfo.BaselineVersionTag);
     }
 
     /// <summary>
@@ -486,7 +485,7 @@ public class GitHubRepoConnectorTests
     ///     the same merge commit SHA. This is a regression test for the key collision bug where
     ///     <c>ToDictionary</c> would throw <see cref="ArgumentException"/> on duplicate keys.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow()
     {
         // Arrange - Create mock responses where two merged PRs share the same merge commit SHA.
@@ -528,18 +527,18 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - Build info should be valid and not null
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual(sharedMergeCommitSha, buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal(sharedMergeCommitSha, buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
     ///     Test that a PR with a label whose name contains a known type as a substring is not incorrectly classified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug()
     {
         // Arrange - PR with label "debugging" (contains "bug" as substring but is not "bug")
@@ -571,15 +570,15 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - PR with "debugging" label must NOT be classified as a bug
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
-        Assert.IsNull(bugPR, "PR with 'debugging' label must not be classified as a bug");
+        Assert.True(bugPR == null, "PR with 'debugging' label must not be classified as a bug");
     }
 
     /// <summary>
     ///     Test that an open issue with a label whose name contains a known type as a substring is not a known issue.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue()
     {
         // Arrange - Open issue with label "debugging" (contains "bug" as substring but is not "bug")
@@ -608,15 +607,15 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - Open issue with "debugging" label must NOT be classified as a known issue
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Index == 201);
-        Assert.IsNull(knownIssue, "Issue with 'debugging' label must not be classified as a known issue");
+        Assert.True(knownIssue == null, "Issue with 'debugging' label must not be classified as a known issue");
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync excludes items with visibility:internal in description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem()
     {
         // Arrange
@@ -640,15 +639,15 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.IsEmpty(buildInfo.Changes);
-        Assert.IsEmpty(buildInfo.Bugs);
+        Assert.NotNull(buildInfo);
+        Assert.Empty(buildInfo.Changes);
+        Assert.Empty(buildInfo.Bugs);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync includes items with visibility:public in description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem()
     {
         // Arrange
@@ -672,16 +671,16 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
         // Item should be included in Changes (type "other" which is not bug)
-        Assert.HasCount(1, buildInfo.Changes);
-        Assert.AreEqual("Public PR", buildInfo.Changes[0].Title);
+        Assert.Single(buildInfo.Changes);
+        Assert.Equal("Public PR", buildInfo.Changes[0].Title);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync classifies as bug when type:bug in description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug()
     {
         // Arrange
@@ -705,16 +704,16 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.HasCount(1, buildInfo.Bugs);
-        Assert.AreEqual("Bug PR", buildInfo.Bugs[0].Title);
-        Assert.IsEmpty(buildInfo.Changes);
+        Assert.NotNull(buildInfo);
+        Assert.Single(buildInfo.Bugs);
+        Assert.Equal("Bug PR", buildInfo.Bugs[0].Title);
+        Assert.Empty(buildInfo.Changes);
     }
 
     /// <summary>
     ///     Test that GetBuildInformationAsync classifies as feature when type:feature in description.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature()
     {
         // Arrange
@@ -738,11 +737,11 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.HasCount(1, buildInfo.Changes);
-        Assert.AreEqual("Feature PR", buildInfo.Changes[0].Title);
-        Assert.AreEqual("feature", buildInfo.Changes[0].Type);
-        Assert.IsEmpty(buildInfo.Bugs);
+        Assert.NotNull(buildInfo);
+        Assert.Single(buildInfo.Changes);
+        Assert.Equal("Feature PR", buildInfo.Changes[0].Title);
+        Assert.Equal("feature", buildInfo.Changes[0].Type);
+        Assert.Empty(buildInfo.Bugs);
     }
 
     /// <summary>
@@ -752,7 +751,7 @@ public class GitHubRepoConnectorTests
     ///     What is being tested: GitHubRepoConnector.Configure stores rules
     ///     What the assertions prove: Configure is callable on GitHubRepoConnector (public method inherited from base)
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public void GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue()
     {
         // Arrange - Create connector and define rules
@@ -772,8 +771,8 @@ public class GitHubRepoConnectorTests
         connector.Configure(rules, sections);
 
         // Assert - Connector is still a valid instance after configuration
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     /// <summary>
@@ -784,7 +783,7 @@ public class GitHubRepoConnectorTests
     ///     What the assertions prove: When rules are configured, items are routed into the
     ///     correct sections and RoutedSections is populated on the returned BuildInformation.
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections()
     {
         // Arrange: set up two merged PRs with different labels — one feature, one bug
@@ -822,22 +821,22 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: RoutedSections is populated when rules are configured
-        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be populated when rules are configured");
-        Assert.HasCount(2, buildInfo.RoutedSections);
+        Assert.True(buildInfo.RoutedSections != null, "RoutedSections should be populated when rules are configured");
+        Assert.Equal(2, buildInfo.RoutedSections.Count);
 
         // Verify the feature item was routed to the "features" section (first section)
         var featuresSection = buildInfo.RoutedSections[0];
-        Assert.AreEqual("features", featuresSection.SectionId);
-        Assert.AreEqual("Features", featuresSection.SectionTitle);
-        Assert.HasCount(1, featuresSection.Items);
-        Assert.AreEqual("Feature PR", featuresSection.Items[0].Title);
+        Assert.Equal("features", featuresSection.SectionId);
+        Assert.Equal("Features", featuresSection.SectionTitle);
+        Assert.Single(featuresSection.Items);
+        Assert.Equal("Feature PR", featuresSection.Items[0].Title);
 
         // Verify the bug item was routed to the "bugs" section (second section)
         var bugsSection = buildInfo.RoutedSections[1];
-        Assert.AreEqual("bugs", bugsSection.SectionId);
-        Assert.AreEqual("Bugs Fixed", bugsSection.SectionTitle);
-        Assert.HasCount(1, bugsSection.Items);
-        Assert.AreEqual("Bug PR", bugsSection.Items[0].Title);
+        Assert.Equal("bugs", bugsSection.SectionId);
+        Assert.Equal("Bugs Fixed", bugsSection.SectionTitle);
+        Assert.Single(bugsSection.Items);
+        Assert.Equal("Bug PR", bugsSection.Items[0].Title);
     }
 
     /// <summary>
@@ -846,7 +845,7 @@ public class GitHubRepoConnectorTests
     ///     a bug whose affected-versions contain the build version is included;
     ///     a bug with no affected-versions is included (fallback to open status).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions()
     {
         // Arrange - three open bugs:
@@ -891,21 +890,21 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.5.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.NotNull(buildInfo.KnownIssues);
 
         // Bug 301 should be included (v1.5.0 is in [1.0.0,2.0.0))
-        Assert.IsTrue(
+        Assert.True(
             buildInfo.KnownIssues.Exists(i => i.Id == "301"),
             "Bug 301 with affected-versions [1.0.0,2.0.0) should be a known issue for v1.5.0");
 
         // Bug 302 should be excluded (v1.5.0 is NOT in [3.0.0,))
-        Assert.IsFalse(
+        Assert.False(
             buildInfo.KnownIssues.Exists(i => i.Id == "302"),
             "Bug 302 with affected-versions [3.0.0,) should NOT be a known issue for v1.5.0");
 
         // Bug 303 should be included (no affected-versions, fallback to open status)
-        Assert.IsTrue(
+        Assert.True(
             buildInfo.KnownIssues.Exists(i => i.Id == "303"),
             "Bug 303 with no affected-versions should be a known issue (open status fallback)");
     }
@@ -916,7 +915,7 @@ public class GitHubRepoConnectorTests
     ///     a bug may be closed after being fixed in a newer release, yet still affect an older
     ///     branch from which LTS releases are cut.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
     {
         // Arrange - three closed bugs:
@@ -961,21 +960,21 @@ public class GitHubRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.5.0"));
 
         // Assert
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.NotNull(buildInfo.KnownIssues);
 
         // Bug 304 is CLOSED but has AV [1.0.0,2.0.0) which contains v1.5.0 → IS a known issue
-        Assert.IsTrue(
+        Assert.True(
             buildInfo.KnownIssues.Exists(i => i.Id == "304"),
             "Closed bug 304 with AV [1.0.0,2.0.0) should be a known issue for v1.5.0 (LTS back-port gap)");
 
         // Bug 305 is CLOSED and has AV [3.0.0,) which does NOT contain v1.5.0 → NOT a known issue
-        Assert.IsFalse(
+        Assert.False(
             buildInfo.KnownIssues.Exists(i => i.Id == "305"),
             "Closed bug 305 with AV [3.0.0,) should NOT be a known issue for v1.5.0");
 
         // Bug 306 is CLOSED with no AV → NOT a known issue (open/closed fallback applies)
-        Assert.IsFalse(
+        Assert.False(
             buildInfo.KnownIssues.Exists(i => i.Id == "306"),
             "Closed bug 306 with no AV should NOT be a known issue (closed, no AV)");
     }

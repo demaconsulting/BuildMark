@@ -16,13 +16,13 @@ construct a `BuildInformation` record.
 
 The connector resolves the Azure DevOps token using the following priority order:
 
-1. `AZURE_DEVOPS_PAT` environment variable — authenticated as Basic (PAT)
-2. `AZURE_DEVOPS_TOKEN` environment variable — authenticated as Basic (PAT)
-3. `AZURE_DEVOPS_EXT_PAT` environment variable — authenticated as Basic (PAT)
+1. `AZURE_DEVOPS_PAT` environment variable - authenticated as Basic (PAT)
+2. `AZURE_DEVOPS_TOKEN` environment variable - authenticated as Basic (PAT)
+3. `AZURE_DEVOPS_EXT_PAT` environment variable - authenticated as Basic (PAT)
 4. `SYSTEM_ACCESSTOKEN` environment variable (set automatically by Azure Pipelines)
-   — authenticated as Bearer
+   - authenticated as Bearer
 5. Output of `az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv`
-   — authenticated as Bearer
+   - authenticated as Bearer
 
 If no token is found, the connector throws `InvalidOperationException`.
 
@@ -49,22 +49,22 @@ After the work-item-type-derived categorization is determined, the connector cal
 and pull request. If the parser returns a non-null `ItemControlsInfo`, the following
 overrides are applied:
 
-1. **`visibility: internal`** — The item is excluded from all report sections,
+1. **`visibility: internal`** - The item is excluded from all report sections,
    regardless of its type.
-2. **`visibility: public`** — The item is included in the report even if its
+2. **`visibility: public`** - The item is included in the report even if its
    type-derived category would otherwise suppress it.
-3. **`type: bug`** — The item is placed in the `Bugs` list regardless of work item
+3. **`type: bug`** - The item is placed in the `Bugs` list regardless of work item
    type.
-4. **`type: feature`** — The item is placed in the `Changes` list regardless of
+4. **`type: feature`** - The item is placed in the `Changes` list regardless of
    work item type.
-5. **`affected-versions`** — The parsed `VersionIntervalSet` is stored on the
+5. **`affected-versions`** - The parsed `VersionIntervalSet` is stored on the
    `ItemInfo.AffectedVersions` property.
 
 In addition, the connector reads the following Azure DevOps custom fields from each
 work item:
 
-- `Custom.Visibility` — overrides the `visibility` control when present.
-- `Custom.AffectedVersions` — overrides the `affected-versions` control when present.
+- `Custom.Visibility` - overrides the `visibility` control when present.
+- `Custom.AffectedVersions` - overrides the `affected-versions` control when present.
 
 Custom fields take precedence over buildmark blocks when both are present.
 
@@ -75,22 +75,22 @@ work-item-type-based rules apply unchanged.
 
 The `AzureDevOpsRestClient` returns the following record types:
 
-- **`AzureDevOpsRepository`** — repository metadata including id, name, and remoteUrl.
-- **`AzureDevOpsCommit`** — commit data including commitId and comment.
-- **`AzureDevOpsGitCommitRef`** — minimal commit reference containing only commitId.
-- **`AzureDevOpsPullRequest`** — pull request data including pullRequestId, title,
+- **`AzureDevOpsRepository`** - repository metadata including id, name, and remoteUrl.
+- **`AzureDevOpsCommit`** - commit data including commitId and comment.
+- **`AzureDevOpsGitCommitRef`** - minimal commit reference containing only commitId.
+- **`AzureDevOpsPullRequest`** - pull request data including pullRequestId, title,
   url, status, lastMergeCommit (an `AzureDevOpsGitCommitRef` object representing
   the most recent merge commit), sourceRefName, and description. Exposes a computed
   `MergeCommitId` property that returns `LastMergeCommit?.CommitId`.
-- **`AzureDevOpsWorkItem`** — work item data including id and a fields dictionary
+- **`AzureDevOpsWorkItem`** - work item data including id and a fields dictionary
   containing System.Title, System.WorkItemType, System.State, System.Description,
   Custom.Visibility, and Custom.AffectedVersions.
-- **`AzureDevOpsWorkItemQuery`** — result of a WIQL query, containing a list of
+- **`AzureDevOpsWorkItemQuery`** - result of a WIQL query, containing a list of
   work item id references.
-- **`AzureDevOpsRef`** — git reference including name, objectId, and
+- **`AzureDevOpsRef`** - git reference including name, objectId, and
   peeledObjectId. Exposes a computed `CommitId` property that returns
   `PeeledObjectId ?? ObjectId`, resolving annotated tags to their commit SHA.
-- **`AzureDevOpsCollectionResponse<T>`** — wraps paginated responses with a count
+- **`AzureDevOpsCollectionResponse<T>`** - wraps paginated responses with a count
   and value list.
 
 ## Methods
@@ -114,7 +114,7 @@ Throws `ArgumentException` when the URL does not match any supported format.
 Main entry point. Performs the following steps:
 
 1. Get repository metadata (URL, branch, current commit hash) from Git.
-2. Determine the organization URL, project, and repository name — from
+2. Determine the organization URL, project, and repository name - from
    `AzureDevOpsConnectorConfig` if provided, otherwise parsed from the Git remote
    URL (supports `dev.azure.com`, `visualstudio.com`, and on-premises Azure
    DevOps Server URL formats by locating the `_git` path segment).

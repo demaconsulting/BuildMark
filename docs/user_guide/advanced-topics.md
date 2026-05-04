@@ -17,7 +17,7 @@ Integrate BuildMark into your CI/CD pipeline to automatically generate build not
       --report docs/build-notes.md
 
 - name: Upload Build Notes
-  uses: actions/upload-artifact@v6
+  uses: actions/upload-artifact@v4
   with:
     name: build-notes
     path: docs/build-notes.md
@@ -142,7 +142,8 @@ changes from tools like Dependabot and Renovate are grouped separately:
 
 ## Known Issues
 
-When `--include-known-issues` is specified, lists currently open bugs:
+When `--include-known-issues` is specified, lists open bugs and any bugs (open or closed)
+whose `affected-versions` field includes the current build version:
 
 ```markdown
 ## Known Issues

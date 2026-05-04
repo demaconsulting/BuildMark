@@ -1,0 +1,37 @@
+---
+# GitHub Sub-Subsystem Requirements
+#
+# PURPOSE:
+# - Define requirements for the BuildMark GitHub sub-subsystem
+# - The GitHub sub-subsystem provides the production connector used when
+#   the repository host is GitHub or GitHub Enterprise
+# - Sub-subsystem requirements describe the externally visible contract
+#   satisfied by the units beneath this sub-subsystem
+
+sections:
+  - title: GitHub Sub-Subsystem Requirements
+    requirements:
+      - id: BuildMark-GitHub-SubSystem
+        title: >-
+          The GitHub sub-subsystem shall provide a repository connector that implements
+          the IRepoConnector interface, retrieves build information from GitHub, supports
+          item controls, description body retrieval, and configurable routing rules.
+        justification: |
+          Generating build notes from GitHub repositories requires a dedicated sub-subsystem
+          that can authenticate to the GitHub API, retrieve commits, releases, tags, pull
+          requests, and issues, apply item-controls overrides, and assemble them into
+          structured build information.
+        tests:
+          - GitHub_ImplementsInterface_ReturnsTrue
+          - GitHub_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+          - GitHub_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline
+          - GitHub_GetBuildInformation_WithPullRequests_GathersChanges
+          - GitHub_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues
+          - GitHub_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+        children:
+          - BuildMark-GitHub-ConnectorConfig
+          - BuildMark-GitHub-BuildInformation
+          - BuildMark-GitHub-ItemControls
+          - BuildMark-GitHub-DescriptionBody
+          - BuildMark-GitHub-GraphQLClient
+          - BuildMark-GitHub-Rules

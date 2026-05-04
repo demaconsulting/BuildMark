@@ -11,10 +11,10 @@ all Azure DevOps API communication to this client.
 
 The client authenticates using either:
 
-- **Basic authentication** — the PAT is supplied as the password field of a `Basic`
+- **Basic authentication** - the PAT is supplied as the password field of a `Basic`
   authorization header (with an empty username), which is the standard Azure DevOps
   PAT authentication scheme.
-- **Bearer authentication** — an Entra ID (Azure AD) access token is supplied as a
+- **Bearer authentication** - an Entra ID (Azure AD) access token is supplied as a
   `Bearer` authorization header, used when authenticating via `az account get-access-token`
   or the `SYSTEM_ACCESSTOKEN` Azure Pipelines variable with OAuth scope.
 
@@ -34,7 +34,7 @@ per-property `[JsonPropertyName]` attributes on the response records. The
 `AllowReadingFromString` setting handles numeric fields (such as work item IDs) that
 the API may return as JSON string values rather than JSON numbers.
 
-The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary — its keys are
+The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary - its keys are
 Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
 and are preserved as-is without any naming transformation.
 

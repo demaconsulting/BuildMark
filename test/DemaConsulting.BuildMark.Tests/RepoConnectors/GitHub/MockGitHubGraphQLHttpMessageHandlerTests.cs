@@ -25,13 +25,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the MockGitHubGraphQLHttpMessageHandler class.
 /// </summary>
-[TestClass]
 public class MockGitHubGraphQLHttpMessageHandlerTests
 {
     /// <summary>
     ///     Test that MockGitHubGraphQLHttpMessageHandler can be configured with multiple responses.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MockGitHubGraphQLHttpMessageHandler_MultipleResponses_ReturnsCorrectResponse()
     {
         // Arrange - Use helper methods for standard responses
@@ -44,19 +43,19 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
 
         // Act & Assert - GetCommitsAsync should return commit1
         var commits = await client.GetCommitsAsync("owner", "repo", "main");
-        Assert.HasCount(1, commits);
-        Assert.AreEqual("commit1", commits[0]);
+        Assert.Single(commits);
+        Assert.Equal("commit1", commits[0]);
 
         // Act & Assert - GetReleasesAsync should return different data
         var releases = await client.GetReleasesAsync("owner", "repo");
-        Assert.HasCount(1, releases);
-        Assert.AreEqual("v1.0.0", releases[0].TagName);
+        Assert.Single(releases);
+        Assert.Equal("v1.0.0", releases[0].TagName);
     }
 
     /// <summary>
     ///     Test that MockGitHubGraphQLHttpMessageHandler returns default response when no pattern matches.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MockGitHubGraphQLHttpMessageHandler_NoPatternMatches_ReturnsDefaultResponse()
     {
         // Arrange - Use helper method for empty repository response
@@ -70,14 +69,14 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
         var commits = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert - Should return empty list since repository is null
-        Assert.IsNotNull(commits);
-        Assert.IsEmpty(commits);
+        Assert.NotNull(commits);
+        Assert.Empty(commits);
     }
 
     /// <summary>
     ///     Test that MockGitHubGraphQLHttpMessageHandler supports method chaining.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void MockGitHubGraphQLHttpMessageHandler_MethodChaining_WorksCorrectly()
     {
         // Arrange & Act - Chain multiple AddResponse calls
@@ -87,13 +86,13 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
             .SetDefaultResponse("default");
 
         // Assert - Verify handler was created
-        Assert.IsNotNull(mockHandler);
+        Assert.NotNull(mockHandler);
     }
 
     /// <summary>
     ///     Test that MockGitHubGraphQLHttpMessageHandler can handle multiple commits.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MockGitHubGraphQLHttpMessageHandler_MultipleCommits_ReturnsAllCommits()
     {
         // Arrange
@@ -107,16 +106,16 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
         var commits = await client.GetCommitsAsync("owner", "repo", "main");
 
         // Assert
-        Assert.HasCount(3, commits);
-        Assert.AreEqual("commit1", commits[0]);
-        Assert.AreEqual("commit2", commits[1]);
-        Assert.AreEqual("commit3", commits[2]);
+        Assert.Equal(3, commits.Count);
+        Assert.Equal("commit1", commits[0]);
+        Assert.Equal("commit2", commits[1]);
+        Assert.Equal("commit3", commits[2]);
     }
 
     /// <summary>
     ///     Test that MockGitHubGraphQLHttpMessageHandler can handle multiple releases.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task MockGitHubGraphQLHttpMessageHandler_MultipleReleases_ReturnsAllReleases()
     {
         // Arrange
@@ -133,10 +132,10 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
         var releases = await client.GetReleasesAsync("owner", "repo");
 
         // Assert
-        Assert.HasCount(3, releases);
-        Assert.AreEqual("v1.0.0", releases[0].TagName);
-        Assert.AreEqual("v1.1.0", releases[1].TagName);
-        Assert.AreEqual("v2.0.0", releases[2].TagName);
+        Assert.Equal(3, releases.Count);
+        Assert.Equal("v1.0.0", releases[0].TagName);
+        Assert.Equal("v1.1.0", releases[1].TagName);
+        Assert.Equal("v2.0.0", releases[2].TagName);
     }
 }
 

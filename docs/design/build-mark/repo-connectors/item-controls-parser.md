@@ -32,9 +32,9 @@ Each non-empty line inside the block is treated as a `key: value` pair:
 - The value is the text after the first `:`, trimmed of whitespace.
 - Lines that do not contain `:` are ignored.
 - Unknown keys are silently ignored.
-- Key matching is **case-insensitive** — keys are normalized to lowercase before
+- Key matching is **case-insensitive** - keys are normalized to lowercase before
   comparison.
-- Value matching is **case-sensitive** — only the exact values listed below are
+- Value matching is **case-sensitive** - only the exact values listed below are
   recognized; other values are silently ignored.
 
 Recognized keys:
@@ -48,20 +48,9 @@ Recognized keys:
 Unrecognized values for a known key are silently ignored (the field remains
 `null`).
 
-## Data Model — ItemControlsInfo
+## Data Model - ItemControlsInfo
 
-```csharp
-public record ItemControlsInfo(
-    string? Visibility,
-    string? Type,
-    VersionIntervalSet? AffectedVersions);
-```
-
-| Property           | Type                  | Description                                   |
-|--------------------|-----------------------|-----------------------------------------------|
-| `Visibility`       | `string?`             | `"public"`, `"internal"`, or `null`           |
-| `Type`             | `string?`             | `"bug"`, `"feature"`, or `null`               |
-| `AffectedVersions` | `VersionIntervalSet?` | Parsed interval set, or `null` if not present |
+See `item-controls-info.md` for the `ItemControlsInfo` data model definition.
 
 ## Methods
 

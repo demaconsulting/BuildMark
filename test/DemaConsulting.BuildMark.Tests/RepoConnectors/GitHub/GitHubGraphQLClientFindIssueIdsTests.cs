@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient FindIssueIdsLinkedToPullRequestAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientFindIssueIdsTests
 {
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns expected issue IDs with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds()
     {
         // Arrange
@@ -64,17 +63,17 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 42);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.HasCount(3, issueIds);
-        Assert.AreEqual(123, issueIds[0]);
-        Assert.AreEqual(456, issueIds[1]);
-        Assert.AreEqual(789, issueIds[2]);
+        Assert.NotNull(issueIds);
+        Assert.Equal(3, issueIds.Count);
+        Assert.Equal(123, issueIds[0]);
+        Assert.Equal(456, issueIds[1]);
+        Assert.Equal(789, issueIds[2]);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns empty list when no issues are linked.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_NoIssues_ReturnsEmptyList()
     {
         // Arrange
@@ -101,14 +100,14 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 42);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.IsEmpty(issueIds);
+        Assert.NotNull(issueIds);
+        Assert.Empty(issueIds);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -125,14 +124,14 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 42);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.IsEmpty(issueIds);
+        Assert.NotNull(issueIds);
+        Assert.Empty(issueIds);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns empty list on HTTP error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_HttpError_ReturnsEmptyList()
     {
         // Arrange
@@ -145,14 +144,14 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 42);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.IsEmpty(issueIds);
+        Assert.NotNull(issueIds);
+        Assert.Empty(issueIds);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns empty list on invalid JSON.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_InvalidJson_ReturnsEmptyList()
     {
         // Arrange
@@ -165,14 +164,14 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 42);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.IsEmpty(issueIds);
+        Assert.NotNull(issueIds);
+        Assert.Empty(issueIds);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync returns single issue ID correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_SingleIssue_ReturnsOneIssueId()
     {
         // Arrange
@@ -201,15 +200,15 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 1);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.HasCount(1, issueIds);
-        Assert.AreEqual(999, issueIds[0]);
+        Assert.NotNull(issueIds);
+        Assert.Single(issueIds);
+        Assert.Equal(999, issueIds[0]);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync handles nodes with missing number property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_MissingNumberProperty_SkipsInvalidNodes()
     {
         // Arrange
@@ -240,16 +239,16 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 5);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.HasCount(2, issueIds);
-        Assert.AreEqual(100, issueIds[0]);
-        Assert.AreEqual(200, issueIds[1]);
+        Assert.NotNull(issueIds);
+        Assert.Equal(2, issueIds.Count);
+        Assert.Equal(100, issueIds[0]);
+        Assert.Equal(200, issueIds[1]);
     }
 
     /// <summary>
     ///     Test that FindIssueIdsLinkedToPullRequestAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -261,11 +260,11 @@ public class GitHubGraphQLClientFindIssueIdsTests
         var issueIds = await client.FindIssueIdsLinkedToPullRequestAsync("owner", "repo", 10);
 
         // Assert
-        Assert.IsNotNull(issueIds);
-        Assert.HasCount(3, issueIds);
-        Assert.AreEqual(100, issueIds[0]);
-        Assert.AreEqual(200, issueIds[1]);
-        Assert.AreEqual(300, issueIds[2]);
+        Assert.NotNull(issueIds);
+        Assert.Equal(3, issueIds.Count);
+        Assert.Equal(100, issueIds[0]);
+        Assert.Equal(200, issueIds[1]);
+        Assert.Equal(300, issueIds[2]);
     }
 
     /// <summary>

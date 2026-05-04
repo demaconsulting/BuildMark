@@ -74,14 +74,31 @@ sections:
         children:
           - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Report
-        title: >-
-          The Cli subsystem shall support --report, --depth, and --include-known-issues
-          flags to configure report output.
+      - id: BuildMark-Cli-ReportFile
+        title: The Cli subsystem shall support --report flag to specify the report output file path.
         justification: |
-          Enables users to direct build notes output to a specific file, embed it at
-          any heading level within a larger markdown document, and control whether
-          known issues are included in the report.
+          Enables users to direct build notes output to a specific file, supporting
+          flexible integration into CI/CD pipelines and documentation workflows.
+        tests:
+          - Cli_ReportFlags_SetProperties
+        children:
+          - BuildMark-Context-ArgumentParsing
+
+      - id: BuildMark-Cli-Depth
+        title: The Cli subsystem shall support --depth flag to configure the markdown heading depth.
+        justification: |
+          Allows users to embed the generated report at any heading level within a larger
+          markdown document, ensuring proper document hierarchy in compound documents.
+        tests:
+          - Cli_ReportFlags_SetProperties
+        children:
+          - BuildMark-Context-ArgumentParsing
+
+      - id: BuildMark-Cli-IncludeKnownIssues
+        title: The Cli subsystem shall support --include-known-issues flag to include known issues in the report.
+        justification: |
+          Provides users control over whether known issues are included in generated build
+          notes, enabling comprehensive release documentation when needed.
         tests:
           - Cli_ReportFlags_SetProperties
         children:

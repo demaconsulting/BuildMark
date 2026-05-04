@@ -1,0 +1,83 @@
+---
+resource-path:
+  - docs/verification
+  - docs/verification/build-mark
+  - docs/verification/build-mark/cli
+  - docs/verification/build-mark/build-notes
+  - docs/verification/build-mark/self-test
+  - docs/verification/build-mark/utilities
+  - docs/verification/build-mark/version
+  - docs/verification/build-mark/configuration
+  - docs/verification/build-mark/repo-connectors
+  - docs/verification/build-mark/repo-connectors/github
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops
+  - docs/verification/build-mark/repo-connectors/mock
+  - docs/verification/ots
+  - docs/template
+
+input-files:
+  - docs/verification/title.txt
+  - docs/verification/introduction.md
+  - docs/verification/build-mark/build-mark.md
+  - docs/verification/build-mark/program.md
+  - docs/verification/build-mark/cli/cli.md
+  - docs/verification/build-mark/cli/context.md
+  - docs/verification/build-mark/build-notes/build-notes.md
+  - docs/verification/build-mark/build-notes/build-information.md
+  - docs/verification/build-mark/build-notes/item-info.md
+  - docs/verification/build-mark/build-notes/web-link.md
+  - docs/verification/build-mark/self-test/self-test.md
+  - docs/verification/build-mark/self-test/validation.md
+  - docs/verification/build-mark/utilities/utilities.md
+  - docs/verification/build-mark/utilities/path-helpers.md
+  - docs/verification/build-mark/utilities/process-runner.md
+  - docs/verification/build-mark/version/version.md
+  - docs/verification/build-mark/version/version-comparable.md
+  - docs/verification/build-mark/version/version-semantic.md
+  - docs/verification/build-mark/version/version-tag.md
+  - docs/verification/build-mark/version/version-interval.md
+  - docs/verification/build-mark/version/version-interval-set.md
+  - docs/verification/build-mark/version/version-commit-tag.md
+  - docs/verification/build-mark/configuration/configuration.md
+  - docs/verification/build-mark/configuration/build-mark-config.md
+  - docs/verification/build-mark/configuration/build-mark-config-reader.md
+  - docs/verification/build-mark/configuration/configuration-load-result.md
+  - docs/verification/build-mark/configuration/configuration-issue.md
+  - docs/verification/build-mark/configuration/connector-config.md
+  - docs/verification/build-mark/configuration/git-hub-connector-config.md
+  - docs/verification/build-mark/configuration/azure-dev-ops-connector-config.md
+  - docs/verification/build-mark/configuration/report-config.md
+  - docs/verification/build-mark/configuration/section-config.md
+  - docs/verification/build-mark/configuration/rule-config.md
+  - docs/verification/build-mark/configuration/rule-match-config.md
+  - docs/verification/build-mark/repo-connectors/repo-connectors.md
+  - docs/verification/build-mark/repo-connectors/i-repo-connector.md
+  - docs/verification/build-mark/repo-connectors/repo-connector-base.md
+  - docs/verification/build-mark/repo-connectors/repo-connector-factory.md
+  - docs/verification/build-mark/repo-connectors/item-router.md
+  - docs/verification/build-mark/repo-connectors/item-controls-info.md
+  - docs/verification/build-mark/repo-connectors/item-controls-parser.md
+  - docs/verification/build-mark/repo-connectors/github/github.md
+  - docs/verification/build-mark/repo-connectors/github/git-hub-repo-connector.md
+  - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md
+  - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-types.md
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops.md
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-repo-connector.md
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-rest-client.md
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-api-types.md
+  - docs/verification/build-mark/repo-connectors/azure-dev-ops/work-item-mapper.md
+  - docs/verification/build-mark/repo-connectors/mock/mock.md
+  - docs/verification/build-mark/repo-connectors/mock/mock-repo-connector.md
+  - docs/verification/ots/buildmark.md
+  - docs/verification/ots/fileassert.md
+  - docs/verification/ots/pandoc.md
+  - docs/verification/ots/reqstream.md
+  - docs/verification/ots/reviewmark.md
+  - docs/verification/ots/sarifmark.md
+  - docs/verification/ots/sonarmark.md
+  - docs/verification/ots/versionmark.md
+  - docs/verification/ots/weasyprint.md
+  - docs/verification/ots/xunit.md
+template: template.html
+table-of-contents: true
+number-sections: true

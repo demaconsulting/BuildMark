@@ -25,13 +25,12 @@ namespace DemaConsulting.BuildMark.Tests.Version;
 /// <summary>
 ///     Tests for VersionInterval.Parse method.
 /// </summary>
-[TestClass]
 public class VersionIntervalTests
 {
     /// <summary>
     ///     Test that Parse returns LowerInclusive=true for '[' opening bracket.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_InclusiveLower_IsInclusive()
     {
         // Arrange
@@ -41,15 +40,15 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("1.0.0", result.LowerBound);
-        Assert.IsTrue(result.LowerInclusive);
+        Assert.NotNull(result);
+        Assert.Equal("1.0.0", result.LowerBound);
+        Assert.True(result.LowerInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns LowerInclusive=false for '(' opening bracket.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_ExclusiveLower_IsExclusive()
     {
         // Arrange
@@ -59,15 +58,15 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("1.0.0", result.LowerBound);
-        Assert.IsFalse(result.LowerInclusive);
+        Assert.NotNull(result);
+        Assert.Equal("1.0.0", result.LowerBound);
+        Assert.False(result.LowerInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns UpperInclusive=true for ']' closing bracket.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_InclusiveUpper_IsInclusive()
     {
         // Arrange
@@ -77,15 +76,15 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("2.0.0", result.UpperBound);
-        Assert.IsTrue(result.UpperInclusive);
+        Assert.NotNull(result);
+        Assert.Equal("2.0.0", result.UpperBound);
+        Assert.True(result.UpperInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns UpperInclusive=false for ')' closing bracket.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_ExclusiveUpper_IsExclusive()
     {
         // Arrange
@@ -95,15 +94,15 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("2.0.0", result.UpperBound);
-        Assert.IsFalse(result.UpperInclusive);
+        Assert.NotNull(result);
+        Assert.Equal("2.0.0", result.UpperBound);
+        Assert.False(result.UpperInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns LowerBound=null for empty lower bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_UnboundedLower_HasNullLowerBound()
     {
         // Arrange
@@ -113,17 +112,17 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNull(result.LowerBound);
-        Assert.IsFalse(result.LowerInclusive);
-        Assert.AreEqual("1.0.1", result.UpperBound);
-        Assert.IsTrue(result.UpperInclusive);
+        Assert.NotNull(result);
+        Assert.Null(result.LowerBound);
+        Assert.False(result.LowerInclusive);
+        Assert.Equal("1.0.1", result.UpperBound);
+        Assert.True(result.UpperInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns UpperBound=null for empty upper bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_UnboundedUpper_HasNullUpperBound()
     {
         // Arrange
@@ -133,17 +132,17 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("3.0.0", result.LowerBound);
-        Assert.IsTrue(result.LowerInclusive);
-        Assert.IsNull(result.UpperBound);
-        Assert.IsFalse(result.UpperInclusive);
+        Assert.NotNull(result);
+        Assert.Equal("3.0.0", result.LowerBound);
+        Assert.True(result.LowerInclusive);
+        Assert.Null(result.UpperBound);
+        Assert.False(result.UpperInclusive);
     }
 
     /// <summary>
     ///     Test that Parse returns an interval with both bounds present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_BothBoundsPresent_ReturnsInterval()
     {
         // Arrange
@@ -153,15 +152,15 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("1.0.0", result.LowerBound);
-        Assert.AreEqual("2.0.0", result.UpperBound);
+        Assert.NotNull(result);
+        Assert.Equal("1.0.0", result.LowerBound);
+        Assert.Equal("2.0.0", result.UpperBound);
     }
 
     /// <summary>
     ///     Test that Parse returns null for invalid format (no brackets).
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_InvalidFormat_ReturnsNull()
     {
         // Arrange
@@ -171,13 +170,13 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns null for null input.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_NullInput_ReturnsNull()
     {
         // Arrange - null input
@@ -186,13 +185,13 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(null);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Parse returns null for empty string.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Parse_EmptyString_ReturnsNull()
     {
         // Arrange
@@ -202,13 +201,13 @@ public class VersionIntervalTests
         var result = VersionInterval.Parse(text);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that Contains returns true when the candidate equals the inclusive lower bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue()
     {
         // Arrange
@@ -218,13 +217,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("1.0.0");
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.True(result);
     }
 
     /// <summary>
     ///     Test that Contains returns false when the candidate equals the exclusive lower bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse()
     {
         // Arrange
@@ -234,13 +233,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("1.0.0");
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.False(result);
     }
 
     /// <summary>
     ///     Test that Contains returns true when the candidate equals the inclusive upper bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringEqualToInclusiveUpper_ReturnsTrue()
     {
         // Arrange
@@ -250,13 +249,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("2.0.0");
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.True(result);
     }
 
     /// <summary>
     ///     Test that Contains returns false when the candidate equals the exclusive upper bound.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringEqualToExclusiveUpper_ReturnsFalse()
     {
         // Arrange
@@ -266,13 +265,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("2.0.0");
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.False(result);
     }
 
     /// <summary>
     ///     Test that Contains returns true for a candidate inside an unbounded interval.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringInsideUnboundedInterval_ReturnsTrue()
     {
         // Arrange
@@ -282,13 +281,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("1.0.0");
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.True(result);
     }
 
     /// <summary>
     ///     Test that Contains returns false for a candidate outside the interval.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_StringOutsideInterval_ReturnsFalse()
     {
         // Arrange
@@ -298,13 +297,13 @@ public class VersionIntervalTests
         var result = interval!.Contains("2.1.0");
 
         // Assert
-        Assert.IsFalse(result);
+        Assert.False(result);
     }
 
     /// <summary>
     ///     Test that the VersionInfo overload delegates to the semantic version.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_Version_DelegatesToSemanticVersion()
     {
         // Arrange
@@ -315,64 +314,64 @@ public class VersionIntervalTests
         var result = interval!.Contains(version);
 
         // Assert
-        Assert.IsTrue(result);
+        Assert.True(result);
     }
 
     /// <summary>
     ///     Test that Contains correctly handles pre-release version bounds.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_PreReleaseBounds_HandlesCorrectly()
     {
         // Arrange
         var interval = VersionInterval.Parse("[1.2.0-rc.1,1.2.0]");
 
         // Act & Assert
-        Assert.IsTrue(interval!.Contains("1.2.0-rc.1"));  // Equal to inclusive lower bound
-        Assert.IsTrue(interval!.Contains("1.2.0-rc.2"));  // Between bounds (rc.2 > rc.1)
-        Assert.IsTrue(interval!.Contains("1.2.0"));       // Equal to inclusive upper bound
-        Assert.IsFalse(interval!.Contains("1.2.0-alpha.1")); // Before lower bound (alpha < rc)
-        Assert.IsFalse(interval!.Contains("1.2.1"));     // After upper bound
-        Assert.IsFalse(interval!.Contains("1.1.9"));     // Before lower bound
+        Assert.True(interval!.Contains("1.2.0-rc.1"));  // Equal to inclusive lower bound
+        Assert.True(interval!.Contains("1.2.0-rc.2"));  // Between bounds (rc.2 > rc.1)
+        Assert.True(interval!.Contains("1.2.0"));       // Equal to inclusive upper bound
+        Assert.False(interval!.Contains("1.2.0-alpha.1")); // Before lower bound (alpha < rc)
+        Assert.False(interval!.Contains("1.2.1"));     // After upper bound
+        Assert.False(interval!.Contains("1.1.9"));     // Before lower bound
     }
 
     /// <summary>
     ///     Test that Contains correctly handles pre-release to pre-release intervals.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_PreReleaseToPreRelease_HandlesCorrectly()
     {
         // Arrange
         var interval = VersionInterval.Parse("[1.2.0-alpha.1,1.2.0-rc.1)");
 
         // Act & Assert
-        Assert.IsTrue(interval!.Contains("1.2.0-alpha.1"));  // Equal to inclusive lower bound
-        Assert.IsTrue(interval!.Contains("1.2.0-beta.1"));   // Between bounds
-        Assert.IsFalse(interval!.Contains("1.2.0-rc.1"));   // Equal to exclusive upper bound
-        Assert.IsFalse(interval!.Contains("1.2.0"));        // After upper bound (release > pre-release)
+        Assert.True(interval!.Contains("1.2.0-alpha.1"));  // Equal to inclusive lower bound
+        Assert.True(interval!.Contains("1.2.0-beta.1"));   // Between bounds
+        Assert.False(interval!.Contains("1.2.0-rc.1"));   // Equal to exclusive upper bound
+        Assert.False(interval!.Contains("1.2.0"));        // After upper bound (release > pre-release)
     }
 
     /// <summary>
     ///     Test that Contains correctly orders pre-release versions numerically.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_PreReleaseOrdering_UsesNumericComparison()
     {
         // Arrange
         var interval = VersionInterval.Parse("[1.0.0-alpha.5,1.0.0-alpha.10]");
 
         // Act & Assert
-        Assert.IsTrue(interval!.Contains("1.0.0-alpha.5"));   // Equal to lower bound
-        Assert.IsTrue(interval!.Contains("1.0.0-alpha.6"));   // Between bounds
-        Assert.IsTrue(interval!.Contains("1.0.0-alpha.10"));  // Equal to upper bound
-        Assert.IsFalse(interval!.Contains("1.0.0-alpha.4"));  // Before lower bound
-        Assert.IsFalse(interval!.Contains("1.0.0-alpha.11")); // After upper bound
+        Assert.True(interval!.Contains("1.0.0-alpha.5"));   // Equal to lower bound
+        Assert.True(interval!.Contains("1.0.0-alpha.6"));   // Between bounds
+        Assert.True(interval!.Contains("1.0.0-alpha.10"));  // Equal to upper bound
+        Assert.False(interval!.Contains("1.0.0-alpha.4"));  // Before lower bound
+        Assert.False(interval!.Contains("1.0.0-alpha.11")); // After upper bound
     }
 
     /// <summary>
     ///     Test that VersionComparable overload works with pre-release versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void VersionInterval_Contains_VersionComparable_HandlesPreRelease()
     {
         // Arrange
@@ -381,8 +380,8 @@ public class VersionIntervalTests
         var releaseVersion = VersionComparable.Create("1.2.0");
 
         // Act & Assert
-        Assert.IsTrue(interval!.Contains(preReleaseVersion));
-        Assert.IsTrue(interval!.Contains(releaseVersion));
+        Assert.True(interval!.Contains(preReleaseVersion));
+        Assert.True(interval!.Contains(releaseVersion));
     }
 }
 

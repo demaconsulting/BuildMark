@@ -25,13 +25,12 @@ namespace DemaConsulting.BuildMark.Tests.ItemControls;
 /// <summary>
 ///     Subsystem-level tests for ItemControls parsing.
 /// </summary>
-[TestClass]
 public class ItemControlsTests
 {
     /// <summary>
     ///     Test that the subsystem returns "public" visibility when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility()
     {
         // Arrange
@@ -41,14 +40,14 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("public", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("public", result.Visibility);
     }
 
     /// <summary>
     ///     Test that the subsystem returns "internal" visibility when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithVisibilityInternal_ReturnsInternalVisibility()
     {
         // Arrange
@@ -58,14 +57,14 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("internal", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("internal", result.Visibility);
     }
 
     /// <summary>
     ///     Test that the subsystem returns "bug" type when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithTypeBug_ReturnsBugType()
     {
         // Arrange
@@ -75,14 +74,14 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("bug", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("bug", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem returns "feature" type when specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithTypeFeature_ReturnsFeatureType()
     {
         // Arrange
@@ -92,14 +91,14 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.AreEqual("feature", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("feature", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem parses an affected-versions interval set correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithAffectedVersions_ReturnsIntervalSet()
     {
         // Arrange - multi-range affected-versions field
@@ -109,19 +108,19 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(2, result.AffectedVersions.Intervals);
-        Assert.IsNull(result.AffectedVersions.Intervals[0].LowerBound);
-        Assert.AreEqual("1.0.1", result.AffectedVersions.Intervals[0].UpperBound);
-        Assert.AreEqual("1.1.0", result.AffectedVersions.Intervals[1].LowerBound);
-        Assert.AreEqual("1.2.0", result.AffectedVersions.Intervals[1].UpperBound);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Equal(2, result.AffectedVersions.Intervals.Count);
+        Assert.Null(result.AffectedVersions.Intervals[0].LowerBound);
+        Assert.Equal("1.0.1", result.AffectedVersions.Intervals[0].UpperBound);
+        Assert.Equal("1.1.0", result.AffectedVersions.Intervals[1].LowerBound);
+        Assert.Equal("1.2.0", result.AffectedVersions.Intervals[1].UpperBound);
     }
 
     /// <summary>
     ///     Test that the subsystem recognizes a buildmark block hidden inside an HTML comment.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithHiddenBlock_ReturnsControls()
     {
         // Arrange - buildmark block wrapped in HTML comment to hide from GitHub rendered view
@@ -131,14 +130,14 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert - HTML comment delimiters are stripped, exposing and parsing the block
-        Assert.IsNotNull(result);
-        Assert.AreEqual("feature", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("feature", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem returns null when no buildmark block is present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_Parse_WithNoBlock_ReturnsNull()
     {
         // Arrange - description with no buildmark fenced block
@@ -148,13 +147,13 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     /// <summary>
     ///     Test that a single version interval in affected-versions is returned correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_SingleInterval_ReturnsInterval()
     {
         // Arrange
@@ -164,15 +163,15 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
     }
 
     /// <summary>
     ///     Test that multiple version intervals in affected-versions are returned correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_MultipleIntervals_ReturnsIntervalSet()
     {
         // Arrange
@@ -182,15 +181,15 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(2, result.AffectedVersions.Intervals);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Equal(2, result.AffectedVersions.Intervals.Count);
     }
 
     /// <summary>
     ///     Test that LowerInclusive is true when '[' is used in affected-versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_InclusiveLowerBound_IsInclusive()
     {
         // Arrange
@@ -200,16 +199,16 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
-        Assert.IsTrue(result.AffectedVersions.Intervals[0].LowerInclusive);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
+        Assert.True(result.AffectedVersions.Intervals[0].LowerInclusive);
     }
 
     /// <summary>
     ///     Test that UpperInclusive is false when ')' is used in affected-versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_ExclusiveUpperBound_IsExclusive()
     {
         // Arrange
@@ -219,16 +218,16 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
-        Assert.IsFalse(result.AffectedVersions.Intervals[0].UpperInclusive);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
+        Assert.False(result.AffectedVersions.Intervals[0].UpperInclusive);
     }
 
     /// <summary>
     ///     Test that LowerBound is null when lower bound is empty in affected-versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_UnboundedLower_HasNullLowerBound()
     {
         // Arrange
@@ -238,16 +237,16 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
-        Assert.IsNull(result.AffectedVersions.Intervals[0].LowerBound);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Null(result.AffectedVersions.Intervals[0].LowerBound);
     }
 
     /// <summary>
     ///     Test that UpperBound is null when upper bound is empty in affected-versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void ItemControls_VersionInterval_Parse_UnboundedUpper_HasNullUpperBound()
     {
         // Arrange
@@ -257,10 +256,10 @@ public class ItemControlsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(1, result.AffectedVersions.Intervals);
-        Assert.IsNull(result.AffectedVersions.Intervals[0].UpperBound);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Null(result.AffectedVersions.Intervals[0].UpperBound);
     }
 }
 

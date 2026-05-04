@@ -33,7 +33,6 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors;
 /// <summary>
 ///     Subsystem tests for the RepoConnectors subsystem.
 /// </summary>
-[TestClass]
 public class RepoConnectorsTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -43,20 +42,20 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that the GitHub connector implements the IRepoConnector interface.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue()
     {
         // Arrange: create a GitHubRepoConnector instance
         var connector = new GitHubRepoConnector();
 
         // Assert: it satisfies the public IRepoConnector interface
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that the GitHub connector returns valid build information from mocked API data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
     {
         // Arrange: set up a mocked GraphQL handler with a single release and commit
@@ -78,18 +77,18 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("abc123def456", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
     ///     Test that the GitHub connector selects the correct previous version as baseline.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline()
     {
         // Arrange: set up three release tags so the connector can pick v1.1.0 as baseline for v2.0.0
@@ -117,18 +116,18 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: v1.1.0 is selected as baseline and a changelog link is generated
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag, "Previous version should be identified");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
-        Assert.IsNotNull(buildInfo.CompleteChangelogLink, "Changelog link should be generated");
+        Assert.NotNull(buildInfo);
+        Assert.Equal("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.True(buildInfo.BaselineVersionTag != null, "Previous version should be identified");
+        Assert.Equal("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.True(buildInfo.CompleteChangelogLink != null, "Changelog link should be generated");
         Assert.Contains("v1.1.0...v2.0.0", buildInfo.CompleteChangelogLink.TargetUrl);
     }
 
     /// <summary>
     ///     Test that the GitHub connector correctly categorizes pull requests into changes and bugs.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges()
     {
         // Arrange: two PRs – one labelled "feature", one labelled "bug"
@@ -173,18 +172,18 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert: feature PR is in Changes, bug PR is in Bugs
-        Assert.IsNotNull(buildInfo);
+        Assert.NotNull(buildInfo);
         var featurePR = buildInfo.Changes.FirstOrDefault(c => c.Index == 101);
-        Assert.IsNotNull(featurePR, "Feature PR should be in Changes");
+        Assert.True(featurePR != null, "Feature PR should be in Changes");
 
         var bugPR = buildInfo.Bugs.FirstOrDefault(b => b.Index == 100);
-        Assert.IsNotNull(bugPR, "Bug PR should be in Bugs");
+        Assert.True(bugPR != null, "Bug PR should be in Bugs");
     }
 
     /// <summary>
     ///     Test that the GitHub connector correctly identifies open issues as known issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues()
     {
         // Arrange: one open issue that is not resolved in this release
@@ -212,17 +211,17 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: open issue surfaces as a known issue
-        Assert.IsNotNull(buildInfo);
-        Assert.IsGreaterThan(0, buildInfo.KnownIssues.Count, "Should have at least one known issue");
+        Assert.NotNull(buildInfo);
+        Assert.True(buildInfo.KnownIssues.Count > 0, "Should have at least one known issue");
         var knownIssue = buildInfo.KnownIssues.FirstOrDefault(i => i.Index == 201);
-        Assert.IsNotNull(knownIssue, "Open issue 201 should appear in KnownIssues");
-        Assert.AreEqual("Known bug in feature X", knownIssue.Title);
+        Assert.True(knownIssue != null, "Open issue 201 should appear in KnownIssues");
+        Assert.Equal("Known bug in feature X", knownIssue.Title);
     }
 
     /// <summary>
     ///     Test that the GitHub connector skips pre-releases when building the version baseline.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
     {
         // Arrange: mix of release and pre-release tags; the connector must skip pre-releases
@@ -253,11 +252,10 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: baseline should be v1.1.0 (the last release), not v2.0.0-rc.1 (a pre-release)
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag, "Baseline version should be set");
-        Assert.AreEqual("1.1.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion,
-            "Release version should skip pre-releases when selecting baseline");
+        Assert.NotNull(buildInfo);
+        Assert.Equal("2.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.True(buildInfo.BaselineVersionTag != null, "Baseline version should be set");
+        Assert.True(buildInfo.BaselineVersionTag.VersionTag.FullVersion == "1.1.0", "Release version should skip pre-releases when selecting baseline");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -267,31 +265,31 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that MockRepoConnector satisfies the shared IRepoConnector interface.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ConnectorBase_MockConnector_ImplementsInterface()
     {
         // Arrange: create a MockRepoConnector
         var connector = new MockRepoConnector();
 
         // Assert: MockRepoConnector derives from the base class and satisfies the shared interface
-        Assert.IsInstanceOfType<RepoConnectorBase>(connector);
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
-        Assert.IsInstanceOfType<MockRepoConnector>(connector);
+        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<MockRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that GitHubRepoConnector satisfies the shared IRepoConnector interface.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ConnectorBase_GitHubConnector_ImplementsInterface()
     {
         // Arrange: create a GitHubRepoConnector
         var connector = new GitHubRepoConnector();
 
         // Assert: GitHubRepoConnector derives from the base class and satisfies the shared interface
-        Assert.IsInstanceOfType<RepoConnectorBase>(connector);
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -301,35 +299,35 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that MockRepoConnector can be constructed.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_MockConnector_Constructor_CreatesInstance()
     {
         // Act: create a MockRepoConnector
         var connector = new MockRepoConnector();
 
         // Assert: instance is created and is of the expected type
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<MockRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<MockRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that MockRepoConnector implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue()
     {
         // Act: create a MockRepoConnector
         var connector = new MockRepoConnector();
 
         // Assert: it implements both the base class and the public interface
-        Assert.IsInstanceOfType<RepoConnectorBase>(connector);
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that MockRepoConnector returns build information with the specified version.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion()
     {
         // Arrange: create connector and request a known version
@@ -340,14 +338,14 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert: current version tag matches the requested version
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // Actual repository tag
+        Assert.NotNull(buildInfo);
+        Assert.Equal("v2.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag); // Actual repository tag
     }
 
     /// <summary>
     ///     Test that MockRepoConnector returns a complete BuildInformation structure.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation()
     {
         // Arrange: create connector
@@ -358,11 +356,11 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert: all required collections are present
-        Assert.IsNotNull(buildInfo, "BuildInformation should not be null");
-        Assert.IsNotNull(buildInfo.Changes, "Changes list should not be null");
-        Assert.IsNotNull(buildInfo.Bugs, "Bugs list should not be null");
-        Assert.IsNotNull(buildInfo.KnownIssues, "KnownIssues list should not be null");
-        Assert.IsNotNull(buildInfo.CurrentVersionTag, "CurrentVersionTag should not be null");
+        Assert.True(buildInfo != null, "BuildInformation should not be null");
+        Assert.True(buildInfo.Changes != null, "Changes list should not be null");
+        Assert.True(buildInfo.Bugs != null, "Bugs list should not be null");
+        Assert.True(buildInfo.KnownIssues != null, "KnownIssues list should not be null");
+        Assert.True(buildInfo.CurrentVersionTag != null, "CurrentVersionTag should not be null");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -372,7 +370,7 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that TryRunAsync returns output when the command succeeds.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput()
     {
         // Arrange: choose a portable echo command
@@ -383,28 +381,28 @@ public class RepoConnectorsTests
         var result = await ProcessRunner.TryRunAsync(command, arguments);
 
         // Assert: output is returned and contains the expected text
-        Assert.IsNotNull(result, "TryRunAsync should return output for a successful command");
-        Assert.IsTrue(result.Contains("test", StringComparison.OrdinalIgnoreCase),
+        Assert.True(result != null, "TryRunAsync should return output for a successful command");
+        Assert.True(result.Contains("test", StringComparison.OrdinalIgnoreCase),
             "Output should contain the echoed text");
     }
 
     /// <summary>
     ///     Test that TryRunAsync returns null when the command does not exist.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull()
     {
         // Arrange: a command that definitely does not exist
         var result = await ProcessRunner.TryRunAsync("nonexistent_command_12345678", "");
 
         // Assert: null is returned
-        Assert.IsNull(result, "TryRunAsync should return null for a non-existent command");
+        Assert.True(result == null, "TryRunAsync should return null for a non-existent command");
     }
 
     /// <summary>
     ///     Test that TryRunAsync returns null when the command exits with a non-zero code.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull()
     {
         // Arrange: a command that exits with code 1
@@ -415,13 +413,13 @@ public class RepoConnectorsTests
         var result = await ProcessRunner.TryRunAsync(command, arguments);
 
         // Assert: null is returned for a failed command
-        Assert.IsNull(result, "TryRunAsync should return null when the command exits with a non-zero code");
+        Assert.True(result == null, "TryRunAsync should return null when the command exits with a non-zero code");
     }
 
     /// <summary>
     ///     Test that RunAsync returns output when the command succeeds.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput()
     {
         // Arrange: a portable echo command
@@ -432,15 +430,15 @@ public class RepoConnectorsTests
         var result = await ProcessRunner.RunAsync(command, arguments);
 
         // Assert: output contains the expected text
-        Assert.IsNotNull(result, "RunAsync should return output for a successful command");
-        Assert.IsTrue(result.Contains("test123", StringComparison.OrdinalIgnoreCase),
+        Assert.True(result != null, "RunAsync should return output for a successful command");
+        Assert.True(result.Contains("test123", StringComparison.OrdinalIgnoreCase),
             "Output should contain the echoed text");
     }
 
     /// <summary>
     ///     Test that RunAsync throws InvalidOperationException when the command fails.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException()
     {
         // Arrange: a command that exits with code 1
@@ -460,28 +458,28 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that the factory creates a non-null connector instance.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_Factory_Create_ReturnsConnector()
     {
         // Act: create a connector via the factory
         var connector = RepoConnectorFactory.Create();
 
         // Assert: a valid IRepoConnector instance is returned
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that the factory returns a GitHubRepoConnector for this repository.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_Factory_Create_ReturnsGitHubConnectorForThisRepo()
     {
         // Act: create a connector via the factory
         var connector = RepoConnectorFactory.Create();
 
         // Assert: the factory selects the GitHub connector for this GitHub-hosted repository
-        Assert.IsInstanceOfType<GitHubRepoConnector>(connector);
+        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -491,7 +489,7 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that the subsystem parses "public" visibility from a buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_VisibilityPublic_ReturnsPublicVisibility()
     {
         // Arrange: description with public visibility
@@ -501,14 +499,14 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: visibility is "public"
-        Assert.IsNotNull(result);
-        Assert.AreEqual("public", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("public", result.Visibility);
     }
 
     /// <summary>
     ///     Test that the subsystem parses "internal" visibility from a buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_VisibilityInternal_ReturnsInternalVisibility()
     {
         // Arrange: description with internal visibility
@@ -518,14 +516,14 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: visibility is "internal"
-        Assert.IsNotNull(result);
-        Assert.AreEqual("internal", result.Visibility);
+        Assert.NotNull(result);
+        Assert.Equal("internal", result.Visibility);
     }
 
     /// <summary>
     ///     Test that the subsystem parses "bug" type from a buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_TypeBug_ReturnsBugType()
     {
         // Arrange: description with bug type
@@ -535,14 +533,14 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: type is "bug"
-        Assert.IsNotNull(result);
-        Assert.AreEqual("bug", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("bug", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem parses "feature" type from a buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_TypeFeature_ReturnsFeatureType()
     {
         // Arrange: description with feature type
@@ -552,14 +550,14 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: type is "feature"
-        Assert.IsNotNull(result);
-        Assert.AreEqual("feature", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("feature", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem parses affected-versions from a buildmark block.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_AffectedVersions_ReturnsIntervalSet()
     {
         // Arrange: description with affected-versions field
@@ -569,15 +567,15 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: affected versions interval set is parsed correctly
-        Assert.IsNotNull(result);
-        Assert.IsNotNull(result.AffectedVersions);
-        Assert.HasCount(2, result.AffectedVersions.Intervals);
+        Assert.NotNull(result);
+        Assert.NotNull(result.AffectedVersions);
+        Assert.Equal(2, result.AffectedVersions.Intervals.Count);
     }
 
     /// <summary>
     ///     Test that the subsystem recognizes a buildmark block hidden in an HTML comment.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_HiddenBlock_ReturnsControls()
     {
         // Arrange: buildmark block wrapped in HTML comment delimiters
@@ -587,14 +585,14 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: controls are extracted despite the HTML comment wrapping
-        Assert.IsNotNull(result);
-        Assert.AreEqual("feature", result.Type);
+        Assert.NotNull(result);
+        Assert.Equal("feature", result.Type);
     }
 
     /// <summary>
     ///     Test that the subsystem returns null when no buildmark block is present.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemControls_NoBlock_ReturnsNull()
     {
         // Arrange: description with no buildmark block
@@ -604,7 +602,7 @@ public class RepoConnectorsTests
         var result = ItemControlsParser.Parse(description);
 
         // Assert: null is returned
-        Assert.IsNull(result);
+        Assert.Null(result);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -614,7 +612,7 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that the subsystem routes items to matching sections based on rules.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemRouter_MatchingRule_RoutesToSection()
     {
         // Arrange: define sections and rules, then create items to route
@@ -640,16 +638,16 @@ public class RepoConnectorsTests
         var routed = ItemRouter.Route(items, rules, sections);
 
         // Assert: each item is routed to its matching section
-        Assert.HasCount(1, routed["features"]);
-        Assert.AreEqual("1", routed["features"][0].Id);
-        Assert.HasCount(1, routed["bugs"]);
-        Assert.AreEqual("2", routed["bugs"][0].Id);
+        Assert.Single(routed["features"]);
+        Assert.Equal("1", routed["features"][0].Id);
+        Assert.Single(routed["bugs"]);
+        Assert.Equal("2", routed["bugs"][0].Id);
     }
 
     /// <summary>
     ///     Test that the subsystem suppresses items when the route is "suppressed".
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_ItemRouter_SuppressedRoute_OmitsItem()
     {
         // Arrange: define a section and a suppression rule
@@ -672,7 +670,7 @@ public class RepoConnectorsTests
         var routed = ItemRouter.Route(items, rules, sections);
 
         // Assert: the item is suppressed and does not appear in any section
-        Assert.IsEmpty(routed["changes"]);
+        Assert.Empty(routed["changes"]);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -682,20 +680,20 @@ public class RepoConnectorsTests
     /// <summary>
     ///     Test that the Azure DevOps connector implements the IRepoConnector interface.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue()
     {
         // Arrange: create an AzureDevOpsRepoConnector instance
         var connector = new AzureDevOpsRepoConnector();
 
         // Assert: it satisfies the public IRepoConnector interface
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that the Azure DevOps connector returns valid build information from mocked API data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation()
     {
         // Arrange: set up a mocked REST handler with a single tag and commit
@@ -712,18 +710,18 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: build information is complete and accurate
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
-        Assert.AreEqual("abc123", buildInfo.CurrentVersionTag.CommitHash);
-        Assert.IsNotNull(buildInfo.Changes);
-        Assert.IsNotNull(buildInfo.Bugs);
-        Assert.IsNotNull(buildInfo.KnownIssues);
+        Assert.NotNull(buildInfo);
+        Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        Assert.Equal("abc123", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo.Changes);
+        Assert.NotNull(buildInfo.Bugs);
+        Assert.NotNull(buildInfo.KnownIssues);
     }
 
     /// <summary>
     ///     Test that the Azure DevOps connector gathers changes from pull requests.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges()
     {
         // Arrange: set up two versions with a PR merged between them
@@ -748,14 +746,14 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
 
         // Assert: changes include the work item from the PR
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotEmpty(buildInfo.Changes, "Changes should include items from merged PRs");
+        Assert.NotNull(buildInfo);
+        Assert.NotEmpty(buildInfo.Changes);
     }
 
     /// <summary>
     ///     Test that the Azure DevOps connector identifies open work items as known issues.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues()
     {
         // Arrange: set up a version with an open bug from WIQL query
@@ -774,14 +772,14 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert: known issues include the open bug
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotEmpty(buildInfo.KnownIssues, "KnownIssues should include open bug work items");
+        Assert.NotNull(buildInfo);
+        Assert.NotEmpty(buildInfo.KnownIssues);
     }
 
     /// <summary>
     ///     Test that the Azure DevOps connector skips pre-release tags for release versions.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases()
     {
         // Arrange: set up a release version with a pre-release between it and the previous release
@@ -804,9 +802,9 @@ public class RepoConnectorsTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert: baseline should be v1.0.0, skipping the pre-release v2.0.0-rc.1
-        Assert.IsNotNull(buildInfo);
-        Assert.IsNotNull(buildInfo.BaselineVersionTag);
-        Assert.AreEqual("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
+        Assert.NotNull(buildInfo);
+        Assert.NotNull(buildInfo.BaselineVersionTag);
+        Assert.Equal("1.0.0", buildInfo.BaselineVersionTag.VersionTag.FullVersion);
     }
 
     /// <summary>

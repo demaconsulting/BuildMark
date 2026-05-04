@@ -4,7 +4,7 @@
 
 BuildMark is a .NET command-line tool that generates markdown build notes from
 Git repository metadata hosted on GitHub or Azure DevOps. It queries the
-appropriate platform API — GitHub's GraphQL API or the Azure DevOps REST API — to
+appropriate platform API - GitHub's GraphQL API or the Azure DevOps REST API — to
 retrieve commits, issues or work items, pull requests, and version tags, then
 formats the results as a structured markdown report suitable for embedding in
 release documentation.
@@ -13,28 +13,28 @@ release documentation.
 
 BuildMark is composed of seven subsystems and a top-level entry point:
 
-- `Program` (Unit) — entry point; dispatches to handlers based on CLI flags
-- `Cli` (Subsystem) — command-line argument parsing and output channel control
-- `BuildNotes` (Subsystem) — output data model shared by all connectors and `Program`
-- `Configuration` (Subsystem) — parses the `.buildmark.yaml` configuration file
-- `RepoConnectors` (Subsystem) — repository metadata retrieval, including item-controls
+- `Program` (Unit) - entry point; dispatches to handlers based on CLI flags
+- `Cli` (Subsystem) - command-line argument parsing and output channel control
+- `BuildNotes` (Subsystem) - output data model shared by all connectors and `Program`
+- `Configuration` (Subsystem) - parses the `.buildmark.yaml` configuration file
+- `RepoConnectors` (Subsystem) - repository metadata retrieval, including item-controls
   parsing and concrete connectors
-- `SelfTest` (Subsystem) — built-in self-validation test framework
-- `Utilities` (Subsystem) — shared path combination and process execution helpers
-- `Version` (Subsystem) — semantic version processing and comparison engine
+- `SelfTest` (Subsystem) - built-in self-validation test framework
+- `Utilities` (Subsystem) - shared path combination and process execution helpers
+- `Version` (Subsystem) - semantic version processing and comparison engine
 
 ## External Interfaces
 
-| Interface            | Direction | Protocol / Format                                        |
-|----------------------|-----------|----------------------------------------------------------|
-| Command line         | Input     | POSIX-style flags parsed by `Context`                    |
-| `.buildmark.yaml`    | Input     | YAML file read from the repository root                  |
-| GitHub GraphQL       | Output    | HTTPS POST to `https://api.github.com/graphql`           |
-| Azure DevOps REST    | Output    | HTTPS GET/POST to Azure DevOps `_apis` endpoints v6.0    |
-| Markdown report      | Output    | File written to `--report` path, UTF-8 markdown          |
-| Log file             | Output    | Optional file written to `--log` path, plain text        |
-| Test results         | Output    | TRX or JUnit XML written to `--results` path             |
-| Exit code            | Output    | 0 = success, 1 = error                                   |
+| Interface            | Direction     | Protocol / Format                                        |
+|----------------------|---------------|----------------------------------------------------------|
+| Command line         | Input         | POSIX-style flags parsed by `Context`                    |
+| `.buildmark.yaml`    | Input         | YAML file read from the repository root                  |
+| GitHub GraphQL       | Bidirectional | HTTPS POST to `https://api.github.com/graphql`           |
+| Azure DevOps REST    | Bidirectional | HTTPS GET/POST to Azure DevOps `_apis` endpoints v6.0    |
+| Markdown report      | Output        | File written to `--report` path, UTF-8 markdown          |
+| Log file             | Output        | Optional file written to `--log` path, plain text        |
+| Test results         | Output        | TRX or JUnit XML written to `--results` path             |
+| Exit code            | Output        | 0 = success, 1 = error                                   |
 
 ## Data Flow
 
@@ -127,7 +127,7 @@ allowing operators to validate the configuration file without running a build.
 When a valid `BuildMarkConfig` is available, its properties are consumed as
 follows:
 
-- `BuildMarkConfig.Connector` — optional `ConnectorConfig` carrying the connector
+- `BuildMarkConfig.Connector` - optional `ConnectorConfig` carrying the connector
   `Type` (`"github"` or `"azure-devops"`), a `GitHub` property holding a
   `GitHubConnectorConfig` for GitHub-based operation, and an `AzureDevOps`
   property holding an `AzureDevOpsConnectorConfig` for Azure DevOps-based
@@ -137,10 +137,10 @@ follows:
   supply `OrganizationUrl`, `Project`, and `Repository` overrides. The full
   `ConnectorConfig` is also passed to `RepoConnectorFactory` to select the
   appropriate connector implementation.
-- `BuildMarkConfig.Sections` — ordered list of `SectionConfig` objects (each with
+- `BuildMarkConfig.Sections` - ordered list of `SectionConfig` objects (each with
   an `Id` and `Title`) that define the report sections. Passed to the active
   connector for output structuring.
-- `BuildMarkConfig.Rules` — list of `RuleConfig` objects that map item attributes
+- `BuildMarkConfig.Rules` - list of `RuleConfig` objects that map item attributes
   (labels, work-item types) to report sections. Passed to the active connector for
   item routing.
 
@@ -191,10 +191,10 @@ custom fields take precedence over buildmark blocks when both are present.
 
 The connector applies these overrides as follows:
 
-- `visibility: internal` — the item is excluded from all report sections
-- `visibility: public` — the item is included regardless of its label-derived type
-- `type: bug` or `type: feature` — overrides the label-derived type classification
-- `affected-versions` — stored on the `ItemInfo` record for downstream use
+- `visibility: internal` - the item is excluded from all report sections
+- `visibility: public` - the item is included regardless of its label-derived type
+- `type: bug` or `type: feature` - overrides the label-derived type classification
+- `affected-versions` - stored on the `ItemInfo` record for downstream use
 
 When no `buildmark` block is present, the existing label-based rules apply
 unchanged.

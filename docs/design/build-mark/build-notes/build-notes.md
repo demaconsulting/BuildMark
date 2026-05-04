@@ -20,14 +20,9 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 
 ## Interactions
 
-+---------------------+-------------------------------------------------------------------+
-| Unit / Subsystem    | Role                                                              |
-+=====================+===================================================================+
-| `Version`           | Supplies the version types used by `VersionCommitTag`            |
-+---------------------+-------------------------------------------------------------------+
-| `RepoConnectors`    | Connectors construct and populate `BuildInformation` records     |
-+---------------------+-------------------------------------------------------------------+
-| `Program`           | Calls `BuildInformation.ToMarkdown` to produce the report file   |
-+---------------------+-------------------------------------------------------------------+
-| `SelfTest`          | `Validation` creates `BuildInformation` records during self-tests|
-+---------------------+-------------------------------------------------------------------+
+| Unit / Subsystem    | Role                                                               |
+|---------------------|--------------------------------------------------------------------|
+| `Version`           | Supplies the version types used by `VersionCommitTag`              |
+| `RepoConnectors`    | Connectors construct and populate `BuildInformation` records       |
+| `Program`           | Calls `BuildInformation.ToMarkdown` to produce the report file     |
+| `SelfTest`          | `Validation` creates `BuildInformation` records during self-tests  |

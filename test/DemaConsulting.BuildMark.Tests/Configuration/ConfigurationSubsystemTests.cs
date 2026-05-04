@@ -26,14 +26,8 @@ namespace DemaConsulting.BuildMark.Tests.Configuration;
 /// <summary>
 ///     Subsystem-level tests for the Configuration subsystem.
 /// </summary>
-[TestClass]
 public class ConfigurationSubsystemTests
 {
-    /// <summary>
-    ///     Gets or sets the test context for the current test run.
-    /// </summary>
-    public TestContext TestContext { get; set; } = null!;
-
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-Configuration-Read
     // ─────────────────────────────────────────────────────────────────────────
@@ -41,7 +35,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem reads a valid .buildmark.yaml file and returns a populated result.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_ReadAsync_ValidFile_ReturnsConfiguration()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml file
@@ -64,7 +58,7 @@ public class ConfigurationSubsystemTests
                   label: [feature]
                 route: changes
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -72,13 +66,13 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: configuration is returned with expected structure
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("github", result.Config.Connector?.Type);
-            Assert.AreEqual("test-owner", result.Config.Connector?.GitHub?.Owner);
-            Assert.AreEqual("test-repo", result.Config.Connector?.GitHub?.Repo);
-            Assert.HasCount(1, result.Config.Sections);
-            Assert.HasCount(1, result.Config.Rules);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("github", result.Config.Connector?.Type);
+            Assert.Equal("test-owner", result.Config.Connector?.GitHub?.Owner);
+            Assert.Equal("test-repo", result.Config.Connector?.GitHub?.Repo);
+            Assert.Single(result.Config.Sections);
+            Assert.Single(result.Config.Rules);
         }
         finally
         {
@@ -90,7 +84,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem returns an empty result when the file is missing.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_ReadAsync_MissingFile_ReturnsEmptyResult()
     {
         // Arrange: create a temporary directory with no .buildmark.yaml file
@@ -103,9 +97,9 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: result has null Config and no errors
-            Assert.IsNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.IsEmpty(result.Issues);
+            Assert.Null(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Empty(result.Issues);
         }
         finally
         {
@@ -117,7 +111,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem reports errors for a malformed .buildmark.yaml file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_ReadAsync_MalformedFile_ReportsError()
     {
         // Arrange: create a temporary directory with a malformed .buildmark.yaml file
@@ -127,7 +121,7 @@ public class ConfigurationSubsystemTests
         await File.WriteAllTextAsync(
             filePath,
             "connector:\n\ttype: github\n",
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -135,10 +129,10 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: result contains errors and Config is null
-            Assert.IsNull(result.Config);
-            Assert.IsTrue(result.HasErrors);
-            Assert.IsNotEmpty(result.Issues);
-            Assert.AreEqual(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.NotEmpty(result.Issues);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
         }
         finally
         {
@@ -154,7 +148,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem sets the context exit code when an error issue is reported.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Configuration_Issues_ErrorIssue_SetsExitCode()
     {
         // Arrange: create a context and a result with an error issue
@@ -173,13 +167,13 @@ public class ConfigurationSubsystemTests
         result.ReportTo(context);
 
         // Assert: exit code is set to 1 due to the error issue
-        Assert.AreEqual(1, context.ExitCode);
+        Assert.Equal(1, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that the Configuration subsystem does not set the context exit code when only a warning issue is reported.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Configuration_Issues_WarningIssue_DoesNotSetExitCode()
     {
         // Arrange: create a context and a result with a warning-only issue
@@ -198,13 +192,13 @@ public class ConfigurationSubsystemTests
         result.ReportTo(context);
 
         // Assert: exit code remains 0 for warning-only issues
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that the Configuration subsystem reports accurate 1-based line numbers for validation errors.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_Issues_ValidationError_ReportsAccurateLine()
     {
         // Arrange: create a YAML file where the unsupported key is on a known line number
@@ -218,7 +212,7 @@ public class ConfigurationSubsystemTests
               type: github
               unsupported-key: value
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -226,11 +220,10 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: the error is reported with the correct line number (3)
-            Assert.IsNotNull(result.Issues);
-            Assert.IsTrue(result.HasErrors);
+            Assert.NotNull(result.Issues);
+            Assert.True(result.HasErrors);
             var issue = result.Issues[0];
-            Assert.AreEqual(3, issue.Line,
-                $"Expected line 3 for 'unsupported-key' but got {issue.Line}");
+            Assert.True(issue.Line == 3, $"Expected line 3 for 'unsupported-key' but got {issue.Line}");
         }
         finally
         {
@@ -246,7 +239,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem parses connector-specific settings from a valid file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml containing connector settings
@@ -263,7 +256,7 @@ public class ConfigurationSubsystemTests
                 repo: my-project
                 base-url: https://api.github.example.com
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -271,12 +264,12 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: connector settings are parsed correctly
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("github", result.Config.Connector?.Type);
-            Assert.AreEqual("acme-org", result.Config.Connector?.GitHub?.Owner);
-            Assert.AreEqual("my-project", result.Config.Connector?.GitHub?.Repo);
-            Assert.AreEqual("https://api.github.example.com", result.Config.Connector?.GitHub?.BaseUrl);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("github", result.Config.Connector?.Type);
+            Assert.Equal("acme-org", result.Config.Connector?.GitHub?.Owner);
+            Assert.Equal("my-project", result.Config.Connector?.GitHub?.Repo);
+            Assert.Equal("https://api.github.example.com", result.Config.Connector?.GitHub?.BaseUrl);
         }
         finally
         {
@@ -288,7 +281,7 @@ public class ConfigurationSubsystemTests
     /// <summary>
     ///     Test that the Configuration subsystem parses Azure DevOps connector settings from a valid file.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml containing Azure DevOps settings
@@ -306,7 +299,7 @@ public class ConfigurationSubsystemTests
                 project: my-project
                 repository: my-repo
             """,
-            TestContext.CancellationToken);
+            TestContext.Current.CancellationToken);
 
         try
         {
@@ -314,13 +307,13 @@ public class ConfigurationSubsystemTests
             var result = await BuildMarkConfigReader.ReadAsync(directory);
 
             // Assert: Azure DevOps connector settings are parsed correctly
-            Assert.IsNotNull(result.Config);
-            Assert.IsFalse(result.HasErrors);
-            Assert.AreEqual("azure-devops", result.Config.Connector?.Type);
-            Assert.AreEqual("https://dev.azure.com/acme", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.AreEqual("acme", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.AreEqual("my-project", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.AreEqual("my-repo", result.Config.Connector?.AzureDevOps?.Repository);
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal("azure-devops", result.Config.Connector?.Type);
+            Assert.Equal("https://dev.azure.com/acme", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+            Assert.Equal("acme", result.Config.Connector?.AzureDevOps?.Organization);
+            Assert.Equal("my-project", result.Config.Connector?.AzureDevOps?.Project);
+            Assert.Equal("my-repo", result.Config.Connector?.AzureDevOps?.Repository);
         }
         finally
         {

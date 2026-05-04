@@ -38,7 +38,7 @@ the base directory.
   escaping segment only when it is the entire relative result or is followed by a directory
   separator, avoiding false positives for valid in-base names such as `..data`.
 - **Post-combine canonical-path check**: Resolving paths after combining handles all traversal
-  patterns — `../`, embedded `/../`, absolute-path overrides, and platform edge cases —
+  patterns - `../`, embedded `/../`, absolute-path overrides, and platform edge cases -
   without fragile pre-combine string inspection of `relativePath`.
 - **ArgumentException on invalid input**: Callers receive a specific `ArgumentException`
   identifying `relativePath` as the problematic parameter, making debugging straightforward.

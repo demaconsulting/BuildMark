@@ -25,74 +25,73 @@ namespace DemaConsulting.BuildMark.Tests.Cli;
 /// <summary>
 ///     Subsystem-level tests for the Cli subsystem.
 /// </summary>
-[TestClass]
 public class CliTests
 {
     /// <summary>
     ///     Test that the Cli subsystem creates a valid context from empty arguments.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_Context_EmptyArguments_CreatesValidContext()
     {
         // Arrange & Act: create context with no arguments
         using var context = Context.Create([]);
 
         // Assert: all properties have expected defaults
-        Assert.IsFalse(context.Version);
-        Assert.IsFalse(context.Help);
-        Assert.IsFalse(context.Silent);
-        Assert.IsFalse(context.Validate);
-        Assert.IsNull(context.BuildVersion);
-        Assert.IsNull(context.ReportFile);
-        Assert.IsNull(context.Depth);
-        Assert.IsFalse(context.IncludeKnownIssues);
-        Assert.IsNull(context.ResultsFile);
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.False(context.Version);
+        Assert.False(context.Help);
+        Assert.False(context.Silent);
+        Assert.False(context.Validate);
+        Assert.Null(context.BuildVersion);
+        Assert.Null(context.ReportFile);
+        Assert.Null(context.Depth);
+        Assert.False(context.IncludeKnownIssues);
+        Assert.Null(context.ResultsFile);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the Version property when --version is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_VersionFlag_SetsProperty()
     {
         // Arrange & Act: create context with --version flag
         using var context = Context.Create(["--version"]);
 
         // Assert: Version property is set
-        Assert.IsTrue(context.Version);
+        Assert.True(context.Version);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the Help property when --help is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_HelpFlag_SetsProperty()
     {
         // Arrange & Act: create context with --help flag
         using var context = Context.Create(["--help"]);
 
         // Assert: Help property is set
-        Assert.IsTrue(context.Help);
+        Assert.True(context.Help);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the Silent property when --silent is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_SilentFlag_SetsProperty()
     {
         // Arrange & Act: create context with --silent flag
         using var context = Context.Create(["--silent"]);
 
         // Assert: Silent property is set
-        Assert.IsTrue(context.Silent);
+        Assert.True(context.Silent);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem suppresses console output when --silent is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_SilentFlag_SuppressesConsoleOutput()
     {
         // Arrange: create context with silent flag and capture console output
@@ -108,7 +107,7 @@ public class CliTests
             context.WriteLine("Test message");
 
             // Assert: no output was written to the console
-            Assert.AreEqual(string.Empty, output.ToString());
+            Assert.Equal(string.Empty, output.ToString());
         }
         finally
         {
@@ -120,35 +119,35 @@ public class CliTests
     /// <summary>
     ///     Test that the Cli subsystem sets the BuildVersion property when --build-version is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_BuildVersionFlag_SetsProperty()
     {
         // Arrange & Act: create context with --build-version argument
         using var context = Context.Create(["--build-version", "1.2.3"]);
 
         // Assert: BuildVersion property is set to the specified value
-        Assert.AreEqual("1.2.3", context.BuildVersion);
+        Assert.Equal("1.2.3", context.BuildVersion);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets report properties when --report and --depth are specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ReportFlags_SetProperties()
     {
         // Arrange & Act: create context with --report and --depth arguments
         using var context = Context.Create(["--report", "output.md", "--depth", "3", "--include-known-issues"]);
 
         // Assert: report properties are set to the specified values
-        Assert.AreEqual("output.md", context.ReportFile);
-        Assert.AreEqual(3, context.Depth);
-        Assert.IsTrue(context.IncludeKnownIssues);
+        Assert.Equal("output.md", context.ReportFile);
+        Assert.Equal(3, context.Depth);
+        Assert.True(context.IncludeKnownIssues);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem creates a log file when --log is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_LogFlag_CreatesLogFile()
     {
         // Arrange: create a temporary log file path
@@ -163,7 +162,7 @@ public class CliTests
             }
 
             // Assert: log file exists and contains the written message
-            Assert.IsTrue(File.Exists(logFile));
+            Assert.True(File.Exists(logFile));
             var logContent = File.ReadAllText(logFile);
             Assert.Contains("Subsystem log test", logContent);
         }
@@ -180,46 +179,46 @@ public class CliTests
     /// <summary>
     ///     Test that the Cli subsystem sets the Validate property when --validate is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ValidateFlag_SetsProperty()
     {
         // Arrange & Act: create context with --validate flag
         using var context = Context.Create(["--validate"]);
 
         // Assert: Validate property is set
-        Assert.IsTrue(context.Validate);
+        Assert.True(context.Validate);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the ResultsFile property when --results is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ResultsFlag_SetsProperty()
     {
         // Arrange & Act: create context with --results argument
         using var context = Context.Create(["--results", "results.trx"]);
 
         // Assert: ResultsFile property is set to the specified value
-        Assert.AreEqual("results.trx", context.ResultsFile);
+        Assert.Equal("results.trx", context.ResultsFile);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the ResultsFile property when --result (alias) is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ResultFlag_SetsProperty()
     {
         // Arrange & Act: create context with --result alias argument
         using var context = Context.Create(["--result", "results.trx"]);
 
         // Assert: ResultsFile property is set to the specified value
-        Assert.AreEqual("results.trx", context.ResultsFile);
+        Assert.Equal("results.trx", context.ResultsFile);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem writes error messages to stderr.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ErrorOutput_WritesToStderr()
     {
         // Arrange: create context and capture stderr
@@ -247,7 +246,7 @@ public class CliTests
     /// <summary>
     ///     Test that the Cli subsystem throws an exception for an invalid argument.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_InvalidArgument_ThrowsException()
     {
         // Arrange & Act & Assert: attempt to create context with an unsupported argument
@@ -263,14 +262,14 @@ public class CliTests
             caughtException = ex;
         }
 
-        Assert.IsNotNull(caughtException);
+        Assert.NotNull(caughtException);
         Assert.Contains("Unsupported argument '--unsupported'", caughtException.Message);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem throws an exception when a required argument value is missing.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_MissingArgumentValue_ThrowsException()
     {
         // Arrange & Act & Assert: attempt to create context with --build-version but no value
@@ -286,27 +285,27 @@ public class CliTests
             caughtException = ex;
         }
 
-        Assert.IsNotNull(caughtException);
+        Assert.NotNull(caughtException);
         Assert.Contains("--build-version requires a version argument", caughtException.Message);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem defaults ExitCode to zero.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_ExitCode_DefaultsToZero()
     {
         // Arrange & Act: create context with no arguments
         using var context = Context.Create([]);
 
         // Assert: exit code defaults to zero
-        Assert.AreEqual(0, context.ExitCode);
+        Assert.Equal(0, context.ExitCode);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets ExitCode to 1 when WriteError is called.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_WriteError_SetsExitCodeToOne()
     {
         // Arrange: create context with no arguments
@@ -324,7 +323,7 @@ public class CliTests
             context.WriteError("Subsystem exit code test");
 
             // Assert: exit code is set to 1
-            Assert.AreEqual(1, context.ExitCode);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -336,45 +335,45 @@ public class CliTests
     /// <summary>
     ///     Test that the Cli subsystem sets the Version property when -v (short form) is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_VersionShortFlag_SetsProperty()
     {
         // Arrange & Act: create context with -v short flag
         using var context = Context.Create(["-v"]);
 
         // Assert: Version property is set
-        Assert.IsTrue(context.Version);
+        Assert.True(context.Version);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the Help property when short-form help flags are specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_HelpShortFlags_SetProperty()
     {
         // Arrange & Act: create context with -h short flag
         using var contextH = Context.Create(["-h"]);
 
         // Assert: Help property is set for -h
-        Assert.IsTrue(contextH.Help);
+        Assert.True(contextH.Help);
 
         // Arrange & Act: create context with -? flag
         using var contextQuestion = Context.Create(["-?"]);
 
         // Assert: Help property is set for -?
-        Assert.IsTrue(contextQuestion.Help);
+        Assert.True(contextQuestion.Help);
     }
 
     /// <summary>
     ///     Test that the Cli subsystem sets the Lint property when --lint is specified.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void Cli_LintFlag_SetsProperty()
     {
         // Arrange & Act: create context with --lint flag
         using var context = Context.Create(["--lint"]);
 
         // Assert: Lint property is set
-        Assert.IsTrue(context.Lint);
+        Assert.True(context.Lint);
     }
 }

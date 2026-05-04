@@ -19,8 +19,8 @@ words:
   - demaconsulting
   - Dema
   - fileassert
-  - mstest
   - myorg
+  - xunit
   - myproject
   - myrepo
   - Pandoc
@@ -33,6 +33,11 @@ words:
   - sonarmark
   - versionmark
   - Weasyprint
+  - mylib
+  - opencover
+  - unconfigured
+  - unparseable
+  - tagobj
   - wiql
   - workitems
   - yamlfix
@@ -45,6 +50,7 @@ ignorePaths:
   - "**/thirdparty/**"
   - "**/third-party/**"
   - "**/3rd-party/**"
+  - "**/generated/**"
   - "**/AGENT_REPORT_*.md"
   - "**/.agent-logs/**"
   - "**/bin/**"

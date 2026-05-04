@@ -60,16 +60,7 @@ __pycache__/
 .venv/
 
 # Generated documentation
-docs/**/*.html
-docs/**/*.pdf
-!docs/template/**
-docs/requirements_doc/requirements.md
-docs/requirements_doc/justifications.md
-docs/requirements_report/trace_matrix.md
-docs/code_quality/sonar-quality.md
-docs/code_quality/codeql-quality.md
-docs/build_notes.md
-docs/build_notes/versions.md
+**/generated/
 
 # VersionMark captures (generated during CI/CD)
 versionmark-*.json

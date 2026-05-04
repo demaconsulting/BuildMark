@@ -29,34 +29,33 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.Mock;
 /// <summary>
 ///     Tests for the MockRepoConnector class.
 /// </summary>
-[TestClass]
 public class MockRepoConnectorTests
 {
     /// <summary>
     ///     Test that MockRepoConnector can be instantiated.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void MockRepoConnector_Constructor_CreatesInstance()
     {
         // Create connector
         var connector = new MockRepoConnector();
 
         // Verify instance
-        Assert.IsNotNull(connector);
-        Assert.IsInstanceOfType<MockRepoConnector>(connector);
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<MockRepoConnector>(connector);
     }
 
     /// <summary>
     ///     Test that MockRepoConnector implements IRepoConnector.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public void MockRepoConnector_ImplementsInterface()
     {
         // Create connector
         var connector = new MockRepoConnector();
 
         // Verify interface implementation
-        Assert.IsInstanceOfType<IRepoConnector>(connector);
+        Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
     /// <summary>
@@ -66,7 +65,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector.GetBuildInformationAsync with explicit version
     ///     What the assertions prove: Build information is returned with the correct version tag
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion()
     {
         // Arrange - Create connector and specify a known version
@@ -77,9 +76,9 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert - Verify build information contains expected version
-        Assert.IsNotNull(buildInfo);
-        Assert.AreEqual(version.Tag, buildInfo.CurrentVersionTag.VersionTag.Tag);
-        Assert.AreEqual("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
+        Assert.NotNull(buildInfo);
+        Assert.Equal(version.Tag, buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.Equal("mno345pqr678", buildInfo.CurrentVersionTag.CommitHash);
     }
 
     /// <summary>
@@ -89,7 +88,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector's ability to resolve version information from tags
     ///     What the assertions prove: Build information is correctly generated with version from tag data
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline()
     {
         // Arrange - Create connector without explicit version, relying on tag matching
@@ -100,9 +99,9 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert - Verify build information is returned successfully
-        Assert.IsNotNull(buildInfo, "Build information should be returned for valid version");
-        Assert.AreEqual("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
-        Assert.IsNotNull(buildInfo.CurrentVersionTag.CommitHash, "Commit hash should be set");
+        Assert.True(buildInfo != null, "Build information should be returned for valid version");
+        Assert.Equal("v1.0.0", buildInfo.CurrentVersionTag.VersionTag.Tag);
+        Assert.True(buildInfo.CurrentVersionTag.CommitHash != null, "Commit hash should be set");
     }
 
     /// <summary>
@@ -112,7 +111,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector returns complete BuildInformation structure
     ///     What the assertions prove: All expected components (changes, bugs, known issues) are present
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation()
     {
         // Arrange - Create connector with version that has associated changes
@@ -123,11 +122,11 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(version);
 
         // Assert - Verify all expected data structures are present
-        Assert.IsNotNull(buildInfo, "Build information should not be null");
-        Assert.IsNotNull(buildInfo.Changes, "Changes list should not be null");
-        Assert.IsNotNull(buildInfo.Bugs, "Bugs list should not be null");
-        Assert.IsNotNull(buildInfo.KnownIssues, "Known issues list should not be null");
-        Assert.IsNotNull(buildInfo.CurrentVersionTag, "Current version tag should not be null");
+        Assert.True(buildInfo != null, "Build information should not be null");
+        Assert.True(buildInfo.Changes != null, "Changes list should not be null");
+        Assert.True(buildInfo.Bugs != null, "Bugs list should not be null");
+        Assert.True(buildInfo.KnownIssues != null, "Known issues list should not be null");
+        Assert.True(buildInfo.CurrentVersionTag != null, "Current version tag should not be null");
     }
 
     /// <summary>
@@ -137,7 +136,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector categorization of changes by type
     ///     What the assertions prove: Changes are correctly categorized into bugs and other changes
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly()
     {
         // Arrange - Create connector and request version with known changes
@@ -152,12 +151,12 @@ public class MockRepoConnectorTests
         // - Issue #2 is a bug (type "bug")
         // - Issue #3 is documentation (type "documentation")
         var allItems = buildInfo.Changes.Concat(buildInfo.Bugs).ToList();
-        Assert.IsGreaterThan(0, allItems.Count, "Should have at least one change");
+        Assert.True(allItems.Count > 0, "Should have at least one change");
 
         // Verify bugs only contain items with type "bug"
         foreach (var bug in buildInfo.Bugs)
         {
-            Assert.AreEqual("bug", bug.Type, $"Bug {bug.Id} should have type 'bug'");
+            Assert.True(bug.Type == "bug", $"Bug {bug.Id} should have type 'bug'");
         }
     }
 
@@ -168,7 +167,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector.Configure stores provided rules
     ///     What the assertions prove: After Configure with non-empty rules, GetBuildInformationAsync returns RoutedSections
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_Configure_StoresRulesAndSections()
     {
         // Arrange - Create connector and define rules
@@ -189,7 +188,7 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - Routing was applied (RoutedSections is populated when rules are configured)
-        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should be set when rules are configured");
+        Assert.True(buildInfo.RoutedSections != null, "RoutedSections should be set when rules are configured");
     }
 
     /// <summary>
@@ -199,7 +198,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector routes items when rules are configured
     ///     What the assertions prove: RoutedSections contains expected section titles
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections()
     {
         // Arrange - Create connector with routing rules
@@ -218,12 +217,12 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - RoutedSections is populated with the configured sections
-        Assert.IsNotNull(buildInfo.RoutedSections, "RoutedSections should not be null when rules are configured");
-        Assert.HasCount(2, buildInfo.RoutedSections, "Should have two configured sections");
+        Assert.True(buildInfo.RoutedSections != null, "RoutedSections should not be null when rules are configured");
+        Assert.Equal(2, buildInfo.RoutedSections.Count);
 
         var sectionTitles = buildInfo.RoutedSections.Select(s => s.SectionTitle).ToList();
-        Assert.Contains("Features", sectionTitles, "Features section should be present");
-        Assert.Contains("Bugs", sectionTitles, "Bugs section should be present");
+        Assert.Contains("Features", sectionTitles);
+        Assert.Contains("Bugs", sectionTitles);
     }
 
     /// <summary>
@@ -233,7 +232,7 @@ public class MockRepoConnectorTests
     ///     What is being tested: MockRepoConnector does not route when no rules are configured
     ///     What the assertions prove: RoutedSections is null when no rules are configured
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections()
     {
         // Arrange - Create connector without configuring rules
@@ -243,7 +242,7 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("2.0.0"));
 
         // Assert - RoutedSections should be null (legacy mode)
-        Assert.IsNull(buildInfo.RoutedSections, "RoutedSections should be null when no rules are configured");
+        Assert.True(buildInfo.RoutedSections == null, "RoutedSections should be null when no rules are configured");
     }
 
     /// <summary>
@@ -255,7 +254,7 @@ public class MockRepoConnectorTests
     ///     What the assertions prove: Bug with out-of-range affected-versions is excluded;
     ///     building for an in-range version includes it
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions()
     {
         // Arrange - Use version v2.0.0 (issue 5 has [5.0.0,) so it is excluded)
@@ -265,14 +264,14 @@ public class MockRepoConnectorTests
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert - issue 4 (no affected-versions) and issue 6 (no affected-versions) are included
-        Assert.IsNotNull(buildInfo.KnownIssues);
-        Assert.IsTrue(
+        Assert.NotNull(buildInfo.KnownIssues);
+        Assert.True(
             buildInfo.KnownIssues.Exists(i => i.Id == "4"),
             "Bug 4 with no affected-versions should be a known issue");
-        Assert.IsFalse(
+        Assert.False(
             buildInfo.KnownIssues.Exists(i => i.Id == "5"),
             "Bug 5 with affected-versions [5.0.0,) should NOT be a known issue for v2.0.0");
-        Assert.IsTrue(
+        Assert.True(
             buildInfo.KnownIssues.Exists(i => i.Id == "6"),
             "Bug 6 with no affected-versions should be a known issue");
     }
@@ -287,7 +286,7 @@ public class MockRepoConnectorTests
     ///     What the assertions prove: LTS back-port gap is modelled correctly — a closed bug
     ///     with a matching AV is included; the same bug is excluded for an unaffected version
     /// </remarks>
-    [TestMethod]
+    [Fact]
     public async Task MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue()
     {
         // Arrange - issue 7 is closed and has AV [1.0.0,1.0.0] (only matches v1.0.0 exactly)
@@ -297,8 +296,8 @@ public class MockRepoConnectorTests
         var buildInfoV1 = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
         // Assert - issue 7 must be a known issue for v1.0.0
-        Assert.IsNotNull(buildInfoV1.KnownIssues);
-        Assert.IsTrue(
+        Assert.NotNull(buildInfoV1.KnownIssues);
+        Assert.True(
             buildInfoV1.KnownIssues.Exists(i => i.Id == "7"),
             "Closed bug 7 with AV [1.0.0,1.0.0] should be a known issue for v1.0.0 (LTS back-port gap)");
 
@@ -306,8 +305,8 @@ public class MockRepoConnectorTests
         var buildInfoV2 = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
 
         // Assert - issue 7 must NOT be a known issue for v2.0.0
-        Assert.IsNotNull(buildInfoV2.KnownIssues);
-        Assert.IsFalse(
+        Assert.NotNull(buildInfoV2.KnownIssues);
+        Assert.False(
             buildInfoV2.KnownIssues.Exists(i => i.Id == "7"),
             "Closed bug 7 with AV [1.0.0,1.0.0] should NOT be a known issue for v2.0.0");
     }

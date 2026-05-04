@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient GetAllIssuesAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientGetAllIssuesTests
 {
     /// <summary>
     ///     Test that GetAllIssuesAsync returns expected issues with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssues()
     {
         // Arrange
@@ -82,31 +81,31 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.HasCount(2, issues);
+        Assert.NotNull(issues);
+        Assert.Equal(2, issues.Count);
 
-        Assert.AreEqual(1, issues[0].Number);
-        Assert.AreEqual("Bug: Application crashes on startup", issues[0].Title);
-        Assert.AreEqual("https://github.com/owner/repo/issues/1", issues[0].Url);
-        Assert.AreEqual("OPEN", issues[0].State);
-        Assert.IsNotNull(issues[0].Labels?.Nodes);
-        Assert.HasCount(1, issues[0].Labels!.Nodes!);
-        Assert.AreEqual("bug", issues[0].Labels!.Nodes![0].Name);
+        Assert.Equal(1, issues[0].Number);
+        Assert.Equal("Bug: Application crashes on startup", issues[0].Title);
+        Assert.Equal("https://github.com/owner/repo/issues/1", issues[0].Url);
+        Assert.Equal("OPEN", issues[0].State);
+        Assert.NotNull(issues[0].Labels?.Nodes);
+        Assert.Single(issues[0].Labels!.Nodes!);
+        Assert.Equal("bug", issues[0].Labels!.Nodes![0].Name);
 
-        Assert.AreEqual(2, issues[1].Number);
-        Assert.AreEqual("Feature: Add dark mode", issues[1].Title);
-        Assert.AreEqual("https://github.com/owner/repo/issues/2", issues[1].Url);
-        Assert.AreEqual("CLOSED", issues[1].State);
-        Assert.IsNotNull(issues[1].Labels?.Nodes);
-        Assert.HasCount(2, issues[1].Labels!.Nodes!);
-        Assert.AreEqual("feature", issues[1].Labels!.Nodes![0].Name);
-        Assert.AreEqual("enhancement", issues[1].Labels!.Nodes![1].Name);
+        Assert.Equal(2, issues[1].Number);
+        Assert.Equal("Feature: Add dark mode", issues[1].Title);
+        Assert.Equal("https://github.com/owner/repo/issues/2", issues[1].Url);
+        Assert.Equal("CLOSED", issues[1].State);
+        Assert.NotNull(issues[1].Labels?.Nodes);
+        Assert.Equal(2, issues[1].Labels!.Nodes!.Count);
+        Assert.Equal("feature", issues[1].Labels!.Nodes![0].Name);
+        Assert.Equal("enhancement", issues[1].Labels!.Nodes![1].Name);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync returns empty list when no issues are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_NoIssues_ReturnsEmptyList()
     {
         // Arrange
@@ -131,14 +130,14 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.IsEmpty(issues);
+        Assert.NotNull(issues);
+        Assert.Empty(issues);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -155,14 +154,14 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.IsEmpty(issues);
+        Assert.NotNull(issues);
+        Assert.Empty(issues);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync handles null nodes gracefully.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_NullNodes_ReturnsEmptyList()
     {
         // Arrange
@@ -187,14 +186,14 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.IsEmpty(issues);
+        Assert.NotNull(issues);
+        Assert.Empty(issues);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync filters out issues with missing required fields.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_InvalidIssues_FiltersThemOut()
     {
         // Arrange
@@ -247,16 +246,16 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.HasCount(1, issues);
-        Assert.AreEqual(2, issues[0].Number);
-        Assert.AreEqual("Valid issue", issues[0].Title);
+        Assert.NotNull(issues);
+        Assert.Single(issues);
+        Assert.Equal(2, issues[0].Number);
+        Assert.Equal("Valid issue", issues[0].Title);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -268,20 +267,20 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.HasCount(3, issues);
-        Assert.AreEqual(1, issues[0].Number);
-        Assert.AreEqual("Issue from page 1", issues[0].Title);
-        Assert.AreEqual(2, issues[1].Number);
-        Assert.AreEqual("Issue from page 2", issues[1].Title);
-        Assert.AreEqual(3, issues[2].Number);
-        Assert.AreEqual("Issue from page 3", issues[2].Title);
+        Assert.NotNull(issues);
+        Assert.Equal(3, issues.Count);
+        Assert.Equal(1, issues[0].Number);
+        Assert.Equal("Issue from page 1", issues[0].Title);
+        Assert.Equal(2, issues[1].Number);
+        Assert.Equal("Issue from page 2", issues[1].Title);
+        Assert.Equal(3, issues[2].Number);
+        Assert.Equal("Issue from page 3", issues[2].Title);
     }
 
     /// <summary>
     ///     Test that GetAllIssuesAsync returns empty list on exception.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_Exception_ReturnsEmptyList()
     {
         // Arrange
@@ -292,8 +291,8 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.IsEmpty(issues);
+        Assert.NotNull(issues);
+        Assert.Empty(issues);
     }
 
     /// <summary>
@@ -311,7 +310,7 @@ public class GitHubGraphQLClientGetAllIssuesTests
     /// <summary>
     ///     Test that GetAllIssuesAsync returns issues with body.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody()
     {
         // Arrange
@@ -332,9 +331,9 @@ public class GitHubGraphQLClientGetAllIssuesTests
         var issues = await client.GetAllIssuesAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(issues);
-        Assert.HasCount(1, issues);
-        Assert.AreEqual("This is an issue.\n\n```buildmark\nvisibility: internal\n```", issues[0].Body);
+        Assert.NotNull(issues);
+        Assert.Single(issues);
+        Assert.Equal("This is an issue.\n\n```buildmark\nvisibility: internal\n```", issues[0].Body);
     }
 
     /// <summary>

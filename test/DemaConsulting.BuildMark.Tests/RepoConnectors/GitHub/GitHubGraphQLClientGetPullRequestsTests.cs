@@ -27,13 +27,12 @@ namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
 /// <summary>
 ///     Tests for the GitHubGraphQLClient GetPullRequestsAsync method.
 /// </summary>
-[TestClass]
 public class GitHubGraphQLClientGetPullRequestsTests
 {
     /// <summary>
     ///     Test that GetPullRequestsAsync returns expected pull requests with valid response.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests()
     {
         // Arrange
@@ -87,29 +86,29 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.HasCount(2, pullRequests);
+        Assert.NotNull(pullRequests);
+        Assert.Equal(2, pullRequests.Count);
 
-        Assert.AreEqual(1, pullRequests[0].Number);
-        Assert.AreEqual("Add feature A", pullRequests[0].Title);
-        Assert.AreEqual("https://github.com/owner/repo/pull/1", pullRequests[0].Url);
-        Assert.IsTrue(pullRequests[0].Merged);
-        Assert.AreEqual("abc123", pullRequests[0].MergeCommit?.Oid);
-        Assert.AreEqual("def456", pullRequests[0].HeadRefOid);
-        Assert.IsNotNull(pullRequests[0].Labels?.Nodes);
-        Assert.HasCount(1, pullRequests[0].Labels!.Nodes!);
-        Assert.AreEqual("feature", pullRequests[0].Labels!.Nodes![0].Name);
+        Assert.Equal(1, pullRequests[0].Number);
+        Assert.Equal("Add feature A", pullRequests[0].Title);
+        Assert.Equal("https://github.com/owner/repo/pull/1", pullRequests[0].Url);
+        Assert.True(pullRequests[0].Merged);
+        Assert.Equal("abc123", pullRequests[0].MergeCommit?.Oid);
+        Assert.Equal("def456", pullRequests[0].HeadRefOid);
+        Assert.NotNull(pullRequests[0].Labels?.Nodes);
+        Assert.Single(pullRequests[0].Labels!.Nodes!);
+        Assert.Equal("feature", pullRequests[0].Labels!.Nodes![0].Name);
 
-        Assert.AreEqual(2, pullRequests[1].Number);
-        Assert.AreEqual("Fix bug B", pullRequests[1].Title);
-        Assert.IsFalse(pullRequests[1].Merged);
-        Assert.IsNull(pullRequests[1].MergeCommit);
+        Assert.Equal(2, pullRequests[1].Number);
+        Assert.Equal("Fix bug B", pullRequests[1].Title);
+        Assert.False(pullRequests[1].Merged);
+        Assert.Null(pullRequests[1].MergeCommit);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns empty list when no pull requests are found.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_NoPullRequests_ReturnsEmptyList()
     {
         // Arrange
@@ -134,14 +133,14 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.IsEmpty(pullRequests);
+        Assert.NotNull(pullRequests);
+        Assert.Empty(pullRequests);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns empty list when response has missing data.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_MissingData_ReturnsEmptyList()
     {
         // Arrange
@@ -158,14 +157,14 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.IsEmpty(pullRequests);
+        Assert.NotNull(pullRequests);
+        Assert.Empty(pullRequests);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns empty list on HTTP error.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_HttpError_ReturnsEmptyList()
     {
         // Arrange
@@ -178,14 +177,14 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.IsEmpty(pullRequests);
+        Assert.NotNull(pullRequests);
+        Assert.Empty(pullRequests);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns empty list on invalid JSON.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_InvalidJson_ReturnsEmptyList()
     {
         // Arrange
@@ -198,14 +197,14 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.IsEmpty(pullRequests);
+        Assert.NotNull(pullRequests);
+        Assert.Empty(pullRequests);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns single pull request correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_SinglePullRequest_ReturnsOnePullRequest()
     {
         // Arrange
@@ -244,16 +243,16 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.HasCount(1, pullRequests);
-        Assert.AreEqual(42, pullRequests[0].Number);
-        Assert.AreEqual("Important PR", pullRequests[0].Title);
+        Assert.NotNull(pullRequests);
+        Assert.Single(pullRequests);
+        Assert.Equal(42, pullRequests[0].Number);
+        Assert.Equal("Important PR", pullRequests[0].Title);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync handles nodes with missing number or title property.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_MissingNumberOrTitle_SkipsInvalidNodes()
     {
         // Arrange
@@ -321,18 +320,18 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.HasCount(2, pullRequests);
-        Assert.AreEqual(1, pullRequests[0].Number);
-        Assert.AreEqual("Valid PR", pullRequests[0].Title);
-        Assert.AreEqual(4, pullRequests[1].Number);
-        Assert.AreEqual("Another valid PR", pullRequests[1].Title);
+        Assert.NotNull(pullRequests);
+        Assert.Equal(2, pullRequests.Count);
+        Assert.Equal(1, pullRequests[0].Number);
+        Assert.Equal("Valid PR", pullRequests[0].Title);
+        Assert.Equal(4, pullRequests[1].Number);
+        Assert.Equal("Another valid PR", pullRequests[1].Title);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync handles pagination correctly.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_WithPagination_ReturnsAllPullRequests()
     {
         // Arrange - Create mock handler that returns different responses for different pages
@@ -344,20 +343,20 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.HasCount(3, pullRequests);
-        Assert.AreEqual(1, pullRequests[0].Number);
-        Assert.AreEqual("PR from page 1", pullRequests[0].Title);
-        Assert.AreEqual(2, pullRequests[1].Number);
-        Assert.AreEqual("PR from page 2", pullRequests[1].Title);
-        Assert.AreEqual(3, pullRequests[2].Number);
-        Assert.AreEqual("PR from page 3", pullRequests[2].Title);
+        Assert.NotNull(pullRequests);
+        Assert.Equal(3, pullRequests.Count);
+        Assert.Equal(1, pullRequests[0].Number);
+        Assert.Equal("PR from page 1", pullRequests[0].Title);
+        Assert.Equal(2, pullRequests[1].Number);
+        Assert.Equal("PR from page 2", pullRequests[1].Title);
+        Assert.Equal(3, pullRequests[2].Number);
+        Assert.Equal("PR from page 3", pullRequests[2].Title);
     }
 
     /// <summary>
     ///     Test that GetPullRequestsAsync returns pull requests with body.
     /// </summary>
-    [TestMethod]
+    [Fact]
     public async Task GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody()
     {
         // Arrange
@@ -380,9 +379,9 @@ public class GitHubGraphQLClientGetPullRequestsTests
         var pullRequests = await client.GetPullRequestsAsync("owner", "repo");
 
         // Assert
-        Assert.IsNotNull(pullRequests);
-        Assert.HasCount(1, pullRequests);
-        Assert.AreEqual("This PR fixes a bug.\n\n```buildmark\ntype: bug\n```", pullRequests[0].Body);
+        Assert.NotNull(pullRequests);
+        Assert.Single(pullRequests);
+        Assert.Equal("This PR fixes a bug.\n\n```buildmark\ntype: bug\n```", pullRequests[0].Body);
     }
 
     /// <summary>

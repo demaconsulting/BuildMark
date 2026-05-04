@@ -1,0 +1,41 @@
+---
+# Software Unit Requirements for the WorkItemMapper Class
+#
+# WorkItemMapper maps Azure DevOps work items to ItemInfo objects, applying
+# type normalization, state-based filtering, and custom field extraction for
+# visibility and affected-versions controls.
+
+sections:
+  - title: WorkItemMapper Unit Requirements
+    requirements:
+      - id: BuildMark-AzureDevOps-WorkItemMapper
+        title: >-
+          The WorkItemMapper class shall map Azure DevOps work items to ItemInfo objects,
+          applying type normalization and state-based filtering.
+        justification: |
+          Azure DevOps work items use platform-specific type names and state values that must
+          be normalized to the BuildMark ItemInfo model. The mapper centralizes this translation
+          logic to ensure consistent type classification and state filtering across all connector
+          operations.
+        tests:
+          - WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
+          - WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem
+          - WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem
+          - WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem
+          - WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue
+          - WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse
+          - WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName
+
+      - id: BuildMark-AzureDevOps-CustomFields
+        title: >-
+          The WorkItemMapper class shall read Custom.Visibility and Custom.AffectedVersions
+          custom fields from Azure DevOps work items to control item visibility and version ranges.
+        justification: |
+          Azure DevOps work items support native custom fields for visibility and version range
+          metadata. These fields provide a more natural Azure DevOps-native alternative to
+          buildmark code blocks for teams that prefer not to embed YAML in descriptions.
+          Custom fields take precedence over buildmark blocks when both are present.
+        tests:
+          - WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls
+          - WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet
+          - WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock

@@ -10,13 +10,10 @@ tag strings, enabling version equality across different tag formats.**
 
 ## Structure
 
-+----------+------------------+------------------------------------+
-| Property | Type             | Description                        |
-+==========+==================+====================================+
-| Tag      | string           | Original repository tag            |
-+----------+------------------+------------------------------------+
-| Semantic | VersionSemantic  | Parsed semantic version info       |
-+----------+------------------+------------------------------------+
+| Property | Type            | Description                  |
+|----------|-----------------|------------------------------|
+| Tag      | string          | Original repository tag      |
+| Semantic | VersionSemantic | Parsed semantic version info |
 
 ## Delegated Properties
 

@@ -72,7 +72,11 @@ into the report.
 | `bug` | **Bugs Fixed** section |
 | `feature` | **Changes** section |
 
-When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels.
+The `type` field sets the item classification. Routing rules (configured in `.buildmark.yaml`) govern which
+report section each classified item is placed in. The section names in the table above reflect the default
+configuration only.
+
+When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels or from the Azure DevOps work-item type.
 
 ### Type Example
 
@@ -99,8 +103,8 @@ affected-versions: (,1.0.1],[1.1.0,1.2.0),(1.2.5,2.0.0],[3.0.0,)
 | `(` | Exclusive lower bound |
 | `]` | Inclusive upper bound |
 | `)` | Exclusive upper bound |
-| _(empty)_ lower bound | No minimum — all versions from the beginning |
-| _(empty)_ upper bound | No maximum — all versions from the lower bound onward |
+| _(empty)_ lower bound | No minimum - all versions from the beginning |
+| _(empty)_ upper bound | No maximum - all versions from the lower bound onward |
 
 ### Affected Version Examples
 
@@ -122,7 +126,27 @@ affected-versions: (,1.0.1],[1.1.0,1.2.0)
 This matches all versions up to and including `1.0.1`, and also versions from `1.1.0` up to
 (but not including) `1.2.0`.
 
-## Azure DevOps Custom Fields
+### Known-Issue Inclusion Rules
+
+When `--include-known-issues` is used to generate a report, BuildMark applies the following
+four rules to determine whether each bug qualifies as a known issue for the current build
+version:
+
+1. A **closed** bug with **no declared `affected-versions`** is **not** a known issue.
+2. An **open** bug with **no declared `affected-versions`** **is** a known issue.
+3. A bug in **any state** (open or closed) whose `affected-versions` **contains** the build
+   version **is** a known issue.
+4. A bug in **any state** (open or closed) whose `affected-versions` **does not contain** the
+   build version is **not** a known issue.
+
+Rules 3 and 4 take precedence over the open/closed status whenever `affected-versions` is
+declared. This matters for LTS branches: a bug may be closed in a later release but still
+affects an older LTS branch. Setting `affected-versions` on that bug ensures it is correctly
+reported as a known issue in LTS build notes even after it has been closed.
+
+**Example:** A bug is fixed in v2.0.0 but affects all v1.x releases. Setting
+`affected-versions: (,2.0.0)` ensures it appears in build notes for any v1.x version
+regardless of its open/closed state.
 
 Azure DevOps work items support the same visibility and version controls through native custom
 fields, as an alternative to embedding `buildmark` code blocks in descriptions. When both a custom

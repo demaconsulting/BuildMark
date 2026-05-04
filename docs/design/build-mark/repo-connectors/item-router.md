@@ -18,10 +18,10 @@ Takes a list of `ItemInfo` objects, a list of `RuleConfig` entries, and a list o
 `SectionConfig` entries, and returns a dictionary mapping each section ID to the
 items assigned to that section.
 
-- `items` (`IReadOnlyList<ItemInfo>`) — items to be distributed into sections
-- `rules` (`IReadOnlyList<RuleConfig>`) — routing rules that map item attributes to
+- `items` (`IReadOnlyList<ItemInfo>`) - items to be distributed into sections
+- `rules` (`IReadOnlyList<RuleConfig>`) - routing rules that map item attributes to
   sections
-- `sections` (`IReadOnlyList<SectionConfig>`) — ordered list of report sections
+- `sections` (`IReadOnlyList<SectionConfig>`) - ordered list of report sections
 
 #### Algorithm
 
@@ -38,7 +38,7 @@ ad-hoc sections without requiring them to be pre-declared.
 
 #### Rule matching
 
-- A `null` `Match` block is a **catch-all** — the rule matches every item.
+- A `null` `Match` block is a **catch-all** - the rule matches every item.
 - A non-null `Match` block may specify `Label` and/or `WorkItemType` filter lists.
   Both lists are matched case-insensitively against the item's `Type` field.
   All non-empty filter lists must match for the rule to apply.

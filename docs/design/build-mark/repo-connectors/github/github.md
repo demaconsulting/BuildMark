@@ -8,11 +8,11 @@ production connector used when the repository host is GitHub or GitHub Enterpris
 
 ## Units
 
-- `GitHubRepoConnector` — `RepoConnectors/GitHub/GitHubRepoConnector.cs` —
+- `GitHubRepoConnector` - `RepoConnectors/GitHub/GitHubRepoConnector.cs` -
   implements `IRepoConnector` for GitHub.
-- `GitHubGraphQLClient` — `RepoConnectors/GitHub/GitHubGraphQLClient.cs` —
+- `GitHubGraphQLClient` - `RepoConnectors/GitHub/GitHubGraphQLClient.cs` -
   issues paginated GraphQL queries.
-- `GitHubGraphQLTypes` — `RepoConnectors/GitHub/GitHubGraphQLTypes.cs` —
+- `GitHubGraphQLTypes` - `RepoConnectors/GitHub/GitHubGraphQLTypes.cs` -
   provides record types for GraphQL request and response data.
 
 ### `GitHubRepoConnector`

@@ -12,15 +12,17 @@ sections:
               developers and build systems to invoke the tool programmatically without requiring
               a graphical user interface.
             tests:
-              - IntegrationTest_VersionFlag_OutputsVersion
-              - IntegrationTest_HelpFlag_OutputsUsageInformation
+              - BuildMark_VersionFlag_OutputsVersion
+              - BuildMark_HelpFlag_OutputsUsageInformation
             children:
               - BuildMark-Cli-Context
               - BuildMark-Cli-Version
               - BuildMark-Cli-Help
               - BuildMark-Cli-Silent
               - BuildMark-Cli-BuildVersion
-              - BuildMark-Cli-Report
+              - BuildMark-Cli-ReportFile
+              - BuildMark-Cli-Depth
+              - BuildMark-Cli-IncludeKnownIssues
               - BuildMark-Cli-Log
               - BuildMark-Cli-Validate
               - BuildMark-Cli-Lint
@@ -36,7 +38,7 @@ sections:
               which is critical for debugging issues, ensuring compatibility, and tracking tool
               updates across different environments.
             tests:
-              - IntegrationTest_VersionFlag_OutputsVersion
+              - BuildMark_VersionFlag_OutputsVersion
             children:
               - BuildMark-Cli-Version
 
@@ -47,7 +49,7 @@ sections:
               commands, and parameter descriptions. This improves user experience and reduces the
               learning curve for new users without requiring external documentation.
             tests:
-              - IntegrationTest_HelpFlag_OutputsUsageInformation
+              - BuildMark_HelpFlag_OutputsUsageInformation
             children:
               - BuildMark-Cli-Help
 
@@ -58,7 +60,7 @@ sections:
               output can clutter logs or interfere with parsing build results. This allows users
               to control verbosity based on their specific use case.
             tests:
-              - IntegrationTest_SilentFlag_SuppressesOutput
+              - BuildMark_SilentFlag_SuppressesOutput
             children:
               - BuildMark-Cli-Silent
 
@@ -69,7 +71,7 @@ sections:
               troubleshooting, and post-build analysis. This is particularly valuable in automated
               environments where console output may not be easily accessible.
             tests:
-              - IntegrationTest_LogParameter_IsAccepted
+              - BuildMark_LogParameter_IsAccepted
             children:
               - BuildMark-Cli-Log
 
@@ -80,7 +82,7 @@ sections:
               from source control, enabling flexible version management strategies and supporting
               scenarios where version numbers are determined externally.
             tests:
-              - IntegrationTest_BuildVersionParameter_IsAccepted
+              - BuildMark_BuildVersionParameter_IsAccepted
             children:
               - BuildMark-Cli-BuildVersion
 
@@ -91,7 +93,7 @@ sections:
               when invalid inputs are provided. This improves reliability, helps users identify
               configuration errors early, and prevents unexpected behavior in automated workflows.
             tests:
-              - IntegrationTest_InvalidArgument_ShowsError
+              - BuildMark_InvalidArgument_ShowsError
             children:
               - BuildMark-Cli-InvalidArgs
 
@@ -102,7 +104,7 @@ sections:
               the tool fails safely when given incorrect paths. This improves user experience and
               makes troubleshooting easier in production environments.
             tests:
-              - IntegrationTest_InvalidReportPath_ShowsError
+              - BuildMark_InvalidReportPath_ShowsError
             children:
               - BuildMark-Cli-InvalidArgs
               - BuildMark-Utilities-SafePaths
@@ -115,7 +117,7 @@ sections:
               or failure conditions programmatically. This is fundamental for proper integration
               into CI/CD pipelines and automated workflows.
             tests:
-              - IntegrationTest_InvalidArgument_ShowsError
+              - BuildMark_InvalidArgument_ShowsError
             children:
               - BuildMark-Cli-ExitCode
 
@@ -129,7 +131,7 @@ sections:
               ensures consistency in release documentation by deriving information directly from
               source control history.
             tests:
-              - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
             children:
               - BuildMark-RepoConnectors-GitHub
 
@@ -140,7 +142,7 @@ sections:
               work items, enabling comprehensive release notes that link features, bug fixes, and
               improvements to their corresponding GitHub issues and pull requests.
             tests:
-              - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
+              - BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
               - BuildMark-RepoConnectors-GitHub
 
@@ -151,7 +153,7 @@ sections:
               accurately capture what changed in each version. This is essential for semantic
               versioning workflows and helps users understand the scope of changes between releases.
             tests:
-              - IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease
+              - BuildMark_Report_ShowsVersionRangeFromPreviousRelease
             children:
               - BuildMark-RepoConnectors-GitHub
               - BuildMark-Version-Subsystem
@@ -166,7 +168,7 @@ sections:
               during release processes and ensures consistency in release documentation by deriving
               information directly from source control history and work items.
             tests:
-              - IntegrationTest_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation
+              - BuildMark_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation
             children:
               - BuildMark-RepoConnectors-AzureDevOps
 
@@ -178,7 +180,7 @@ sections:
               bug fixes, and improvements to their corresponding Azure DevOps work items and pull
               requests.
             tests:
-              - IntegrationTest_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks
+              - BuildMark_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
               - BuildMark-RepoConnectors-AzureDevOps
 
@@ -190,7 +192,7 @@ sections:
               essential for semantic versioning workflows and helps users understand the scope of
               changes between releases.
             tests:
-              - IntegrationTest_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease
+              - BuildMark_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease
             children:
               - BuildMark-RepoConnectors-AzureDevOps
 
@@ -202,7 +204,7 @@ sections:
               A dedicated configuration file separates persistent repository settings from runtime
               arguments, simplifying CI invocations and enabling version-controlled configuration.
             tests:
-              - IntegrationTest_Report_ConsumesConfigurationFileDuringGeneration
+              - BuildMark_Report_ConsumesConfigurationFileDuringGeneration
             children:
               - BuildMark-Configuration-Read
               - BuildMark-Program-Lint
@@ -214,7 +216,8 @@ sections:
               Centralizing connector configuration in the repository avoids repeating connection
               details across multiple CI pipelines.
             tests:
-              - IntegrationTest_Report_UsesConnectorForBuildData
+              - BuildMark_Report_UsesConnectorForBuildData
+              - BuildMark_Config_ConnectorType_ReadFromConfigFile
             children:
               - BuildMark-Configuration-ConnectorConfig
               - BuildMark-RepoConnectors-Factory
@@ -226,7 +229,7 @@ sections:
               Configurable sections let teams tailor the structure of generated build notes to
               their conventions without modifying the tool.
             tests:
-              - IntegrationTest_Report_ContainsSectionDefinitions
+              - BuildMark_Report_ContainsSectionDefinitions
             children:
               - BuildMark-Configuration-Read
 
@@ -238,7 +241,7 @@ sections:
               Declarative routing rules allow repository owners to control categorization of items
               without embedding logic in CI scripts.
             tests:
-              - IntegrationTest_Report_RoutesItemsToCorrectSections
+              - BuildMark_Report_RoutesItemsToCorrectSections
             children:
               - BuildMark-Configuration-Read
               - BuildMark-RepoConnectors-ItemRouter
@@ -252,7 +255,7 @@ sections:
               running a full build. Linting with precise issue locations helps teams fix
               configuration errors quickly.
             tests:
-              - IntegrationTest_LintFlag_IsAccepted
+              - BuildMark_LintFlag_IsAccepted
             children:
               - BuildMark-Configuration-Issues
               - BuildMark-Program-Lint
@@ -267,7 +270,7 @@ sections:
               markdown format ensures broad compatibility and easy integration into existing
               documentation workflows.
             tests:
-              - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -279,7 +282,7 @@ sections:
               documentation structures by adjusting heading levels. This flexibility ensures
               reports integrate properly regardless of the document hierarchy.
             tests:
-              - IntegrationTest_Report_DepthTwo_UsesLevelTwoHeadings
+              - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -291,7 +294,7 @@ sections:
               providing essential context for users reviewing changes and enabling proper
               organization of release documentation.
             tests:
-              - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -303,7 +306,7 @@ sections:
               release, helping users understand the evolution of the software and make informed
               decisions about upgrading.
             tests:
-              - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
+              - BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -315,7 +318,7 @@ sections:
               maintenance, and helps users determine if specific problems they encountered have
               been addressed in newer versions.
             tests:
-              - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
+              - BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -342,7 +345,7 @@ sections:
               release, but an LTS branch that was cut before the fix still needs to report the
               bug as a known issue. The affected-versions field captures that scenario precisely.
             tests:
-              - IntegrationTest_Report_IncludesKnownIssues_WhenFlagIsSet
+              - BuildMark_Report_IncludesKnownIssues_WhenFlagIsSet
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -357,7 +360,7 @@ sections:
               multiple versions or focused notes for specific releases. This flexibility supports
               various documentation scenarios and user needs.
             tests:
-              - IntegrationTest_Report_ShowsVersionRangeFromPreviousRelease
+              - BuildMark_Report_ShowsVersionRangeFromPreviousRelease
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -369,19 +372,48 @@ sections:
               enabling users to investigate specific items of interest and maintaining
               traceability between release notes and source repository work items.
             tests:
-              - IntegrationTest_Report_ContainsChangesAndBugFixesWithHyperlinks
+              - BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-RepoConnectors-GitHub
 
-          - id: BuildMark-Report-Structure
-            title: The tool shall format build notes with proper markdown structure.
+          - id: BuildMark-Report-Structure-Headings
+            title: >-
+              The tool shall format build notes using ATX-style headings at the configured
+              heading depth.
             justification: |
-              Proper markdown structure ensures reports render correctly across different
-              markdown processors and documentation platforms. Well-structured documents are
-              more readable, professional, and maintainable.
+              ATX-style headings at a configurable depth allow BuildMark reports to be
+              embedded at any level within a larger document without disrupting the heading
+              hierarchy of the surrounding content.
             tests:
-              - IntegrationTest_Report_GeneratesMarkdownWithVersionInformation
+              - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
+            children:
+              - BuildMark-BuildNotes-ReportModel
+              - BuildMark-Program-Report
+
+          - id: BuildMark-Report-Structure-Lists
+            title: >-
+              The tool shall format change and bug entries as bullet list items in the
+              generated build notes.
+            justification: |
+              Bullet lists provide a scannable, visually distinct format for change and bug
+              entries that renders correctly across markdown processors and documentation
+              platforms.
+            tests:
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
+            children:
+              - BuildMark-BuildNotes-ReportModel
+              - BuildMark-Program-Report
+
+          - id: BuildMark-Report-Structure-VersionHeading
+            title: >-
+              The tool shall place the version heading as the first section element of the
+              generated build notes.
+            justification: |
+              Leading with the version heading makes the report immediately identifiable and
+              ensures a consistent structure across all generated documents.
+            tests:
+              - BuildMark_Report_GeneratesMarkdownWithVersionInformation
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
@@ -396,7 +428,7 @@ sections:
               eliminates the need for custom GitHub labels or external configuration files and
               keeps all item-level controls co-located with the work item itself.
             tests:
-              - IntegrationTest_Report_RecognizesBuildmarkCodeBlock
+              - BuildMark_Report_RecognizesBuildmarkCodeBlock
             children:
               - BuildMark-RepoConnectors-ItemControls
 
@@ -409,7 +441,7 @@ sections:
               notes, or promote items that would otherwise be excluded. A visibility override
               gives fine-grained control without altering GitHub labels.
             tests:
-              - IntegrationTest_Report_VisibilityFieldControlsInclusion
+              - BuildMark_Report_VisibilityFieldControlsInclusion
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -423,7 +455,7 @@ sections:
               value ensures these items still appear in the generated notes when the developer
               explicitly requests it.
             tests:
-              - IntegrationTest_Report_PublicVisibility_IncludesItem
+              - BuildMark_Report_PublicVisibility_IncludesItem
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -437,7 +469,7 @@ sections:
               are often irrelevant to end-users. The internal value lets developers suppress such
               items without removing the labels that are used for other project-management purposes.
             tests:
-              - IntegrationTest_Report_InternalVisibility_ExcludesItem
+              - BuildMark_Report_InternalVisibility_ExcludesItem
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -451,34 +483,34 @@ sections:
               release notes. A type override lets developers correct the classification for any
               individual item without modifying project-wide label conventions.
             tests:
-              - IntegrationTest_Report_TypeFieldOverridesClassification
+              - BuildMark_Report_TypeFieldOverridesClassification
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeBug
             title: >-
-              The tool shall classify an item as a bug fix when type is set to bug,
-              placing it in the Bugs Fixed section of the report.
+              The tool shall classify an item as a bug when type is set to bug and route it to the
+              configured bug-fix section (default: 'Bugs Fixed').
             justification: |
               Correct classification of bug fixes is important for end-users assessing whether a
               release addresses their reported problems. An explicit override ensures accuracy
               even when labels are missing or inconsistent.
             tests:
-              - IntegrationTest_Report_TypeBug_PlacesItemInBugsFixed
+              - BuildMark_Report_TypeBug_PlacesItemInBugsFixed
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
 
           - id: BuildMark-Controls-TypeFeature
             title: >-
-              The tool shall classify an item as a feature or change when type is set to
-              feature, placing it in the Changes section of the report.
+              The tool shall classify an item as a feature when type is set to feature and route it
+              to the configured changes section (default: 'Changes').
             justification: |
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
             tests:
-              - IntegrationTest_Report_TypeFeature_PlacesItemInChanges
+              - BuildMark_Report_TypeFeature_PlacesItemInChanges
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-RepoConnectors-GitHub
@@ -492,7 +524,7 @@ sections:
               enables downstream tooling to filter or highlight relevant items for a given
               release without relying on external spreadsheets or manual documentation.
             tests:
-              - IntegrationTest_Report_AffectedVersionsField_ProcessesSuccessfully
+              - BuildMark_Report_AffectedVersionsField_ProcessesSuccessfully
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-VersionInterval-Parse
@@ -507,7 +539,7 @@ sections:
               in a single field, covering scenarios such as a bug present in two separate
               release branches.
             tests:
-              - IntegrationTest_Report_AffectedVersionsInterval_ParsesNotation
+              - BuildMark_Report_AffectedVersionsInterval_ParsesNotation
             children:
               - BuildMark-RepoConnectors-ItemControls
               - BuildMark-VersionInterval-Parse
@@ -521,7 +553,7 @@ sections:
               the block to be hidden in an HTML comment satisfies both the need to supply control
               data and the desire for a tidy rendered appearance.
             tests:
-              - IntegrationTest_Report_HiddenBuildmarkBlock_IsRecognized
+              - BuildMark_Report_HiddenBuildmarkBlock_IsRecognized
             children:
               - BuildMark-RepoConnectors-ItemControls
 
@@ -534,7 +566,7 @@ sections:
               environment, providing evidence that the user's environment does not introduce
               unexpected behaviors, and giving users evidence they can rely on the tool's output.
             tests:
-              - IntegrationTest_ValidateFlag_RunsSelfValidation
+              - BuildMark_ValidateFlag_RunsSelfValidation
             children:
               - BuildMark-SelfTest-Qualification
 
@@ -545,7 +577,9 @@ sections:
               CI/CD pipelines, and reporting tools. This allows BuildMark's validation results
               to be tracked, analyzed, and reported alongside other test metrics.
             tests:
-              - IntegrationTest_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesTrxFile
+              - BuildMark_ResultsParameter_WritesJUnitFile
             children:
               - BuildMark-SelfTest-ResultsOutput
 
@@ -556,7 +590,8 @@ sections:
               Studio Test Explorer, providing native support for .NET development environments
               and Azure DevOps pipelines.
             tests:
-              - IntegrationTest_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesTrxFile
             children:
               - BuildMark-SelfTest-ResultsOutput
 
@@ -567,6 +602,7 @@ sections:
               testing tools. Supporting this format ensures BuildMark can integrate with diverse
               toolchains beyond the Microsoft ecosystem.
             tests:
-              - IntegrationTest_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_IsAccepted
+              - BuildMark_ResultsParameter_WritesJUnitFile
             children:
               - BuildMark-SelfTest-ResultsOutput

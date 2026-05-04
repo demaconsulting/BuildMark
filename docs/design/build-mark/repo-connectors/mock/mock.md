@@ -5,7 +5,7 @@
 The Mock subsystem groups the in-memory connector used by the built-in
 `--validate` self-test. It sits within the RepoConnectors subsystem.
 
-`MockRepoConnector` lives in production code — not in the test project — because
+`MockRepoConnector` lives in production code - not in the test project - because
 the `--validate` flag must work in any deployment without requiring a separate test
 assembly or external tooling.
 
