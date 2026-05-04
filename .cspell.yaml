@@ -37,6 +37,7 @@ words:
   - opencover
   - unconfigured
   - unparseable
+  - tagobj
   - wiql
   - workitems
   - yamlfix

@@ -335,13 +335,51 @@ with a test message.
 
 ## Requirements Coverage
 
-| Requirement                        | Test Scenarios                                                                                |
-|------------------------------------|-----------------------------------------------------------------------------------------------|
-| `BuildMark-Context-DefaultConstruction` | Context_Create_EmptyArguments_CreatesValidContext                                        |
-| `BuildMark-Context-FlagParsing`    | Context_Create_ShortVersionFlag_SetsVersionProperty, Context_Create_LongVersionFlag_SetsVersionProperty, Context_Create_QuestionMarkHelpFlag_SetsHelpProperty, Context_Create_ShortHelpFlag_SetsHelpProperty, Context_Create_LongHelpFlag_SetsHelpProperty, Context_Create_SilentFlag_SetsSilentProperty, Context_Create_ValidateFlag_SetsValidateProperty, Context_Create_LintFlag_SetsLintProperty, Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty, Context_Create_MultipleArguments_SetsAllPropertiesCorrectly |
-| `BuildMark-Context-ArgumentParsing` | Context_Create_BuildVersionArgument_SetsBuildVersionProperty, Context_Create_ReportArgument_SetsReportFileProperty, Context_Create_DepthArgument_SetsDepthProperty, Context_Create_LegacyReportDepthArgument_SetsDepthProperty, Context_Create_ResultsArgument_SetsResultsFileProperty, Context_Create_ResultArgument_SetsResultsFileProperty, Context_Create_MultipleArguments_SetsAllPropertiesCorrectly |
-| `BuildMark-Context-LogFile`        | Context_Create_LogArgument_CreatesLogFile, Context_WriteLine_WithLogFile_WritesToLogFile, Context_WriteError_WithLogFile_WritesToLogFile, Context_Dispose_ClosesLogFileProperly |
-| `BuildMark-Context-ErrorHandling`  | Context_Create_UnsupportedArgument_ThrowsArgumentException, Context_Create_BuildVersionWithoutValue_ThrowsArgumentException, Context_Create_ReportWithoutValue_ThrowsArgumentException, Context_Create_DepthWithoutValue_ThrowsArgumentException, Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException, Context_Create_DepthWithZeroValue_ThrowsArgumentException, Context_Create_DepthWithNegativeValue_ThrowsArgumentException, Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException, Context_Create_ResultsWithoutValue_ThrowsArgumentException, Context_Create_ResultWithoutValue_ThrowsArgumentException, Context_Create_LogWithoutValue_ThrowsArgumentException, Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException |
-| `BuildMark-Context-Output`         | Context_WriteLine_NotSilent_WritesToConsole, Context_WriteError_NotSilent_WritesToConsole    |
-| `BuildMark-Context-SilentMode`     | Context_WriteLine_Silent_DoesNotWriteToConsole, Context_WriteError_Silent_DoesNotWriteToConsole |
-| `BuildMark-Context-ExitCode`       | Context_WriteError_SetsExitCodeToOne, Context_ExitCode_NoErrors_RemainsZero                  |
+- **`BuildMark-Context-DefaultConstruction`**:
+  - Context_Create_EmptyArguments_CreatesValidContext
+- **`BuildMark-Context-FlagParsing`**:
+  - Context_Create_ShortVersionFlag_SetsVersionProperty
+  - Context_Create_LongVersionFlag_SetsVersionProperty
+  - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
+  - Context_Create_ShortHelpFlag_SetsHelpProperty
+  - Context_Create_LongHelpFlag_SetsHelpProperty
+  - Context_Create_SilentFlag_SetsSilentProperty
+  - Context_Create_ValidateFlag_SetsValidateProperty
+  - Context_Create_LintFlag_SetsLintProperty
+  - Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
+  - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
+- **`BuildMark-Context-ArgumentParsing`**:
+  - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
+  - Context_Create_ReportArgument_SetsReportFileProperty
+  - Context_Create_DepthArgument_SetsDepthProperty
+  - Context_Create_LegacyReportDepthArgument_SetsDepthProperty
+  - Context_Create_ResultsArgument_SetsResultsFileProperty
+  - Context_Create_ResultArgument_SetsResultsFileProperty
+  - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
+- **`BuildMark-Context-LogFile`**:
+  - Context_Create_LogArgument_CreatesLogFile
+  - Context_WriteLine_WithLogFile_WritesToLogFile
+  - Context_WriteError_WithLogFile_WritesToLogFile
+  - Context_Dispose_ClosesLogFileProperly
+- **`BuildMark-Context-ErrorHandling`**:
+  - Context_Create_UnsupportedArgument_ThrowsArgumentException
+  - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
+  - Context_Create_ReportWithoutValue_ThrowsArgumentException
+  - Context_Create_DepthWithoutValue_ThrowsArgumentException
+  - Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException
+  - Context_Create_DepthWithZeroValue_ThrowsArgumentException
+  - Context_Create_DepthWithNegativeValue_ThrowsArgumentException
+  - Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
+  - Context_Create_ResultsWithoutValue_ThrowsArgumentException
+  - Context_Create_ResultWithoutValue_ThrowsArgumentException
+  - Context_Create_LogWithoutValue_ThrowsArgumentException
+  - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
+- **`BuildMark-Context-Output`**:
+  - Context_WriteLine_NotSilent_WritesToConsole
+  - Context_WriteError_NotSilent_WritesToConsole
+- **`BuildMark-Context-SilentMode`**:
+  - Context_WriteLine_Silent_DoesNotWriteToConsole
+  - Context_WriteError_Silent_DoesNotWriteToConsole
+- **`BuildMark-Context-ExitCode`**:
+  - Context_WriteError_SetsExitCodeToOne
+  - Context_ExitCode_NoErrors_RemainsZero

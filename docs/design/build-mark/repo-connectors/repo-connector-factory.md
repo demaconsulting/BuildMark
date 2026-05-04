@@ -22,7 +22,7 @@ following signals, checked in order:
 
 1. The `TF_BUILD` environment variable is non-empty - indicates Azure DevOps
    Pipelines; creates an `AzureDevOpsRepoConnector`.
-2. The `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable is 
+2. The `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable is
    non-empty - creates a `GitHubRepoConnector`.
 3. The git remote URL contains `dev.azure.com` or `visualstudio.com` - creates
    an `AzureDevOpsRepoConnector`.
