@@ -21,7 +21,7 @@ no mocking is needed at this level.
 
 **Scenario**: `Context.Create` is called with an empty argument array.
 
-**Expected**: All boolean flags are false; `ResultsFile` is null; `HeadingDepth` is 1;
+**Expected**: All boolean flags are false; `ResultsFile` is null; `Depth` is null;
 exit code is 0.
 
 **Requirement coverage**: `BuildMark-Context-DefaultConstruction`.
@@ -110,7 +110,7 @@ exit code is 0.
 
 **Scenario**: `Context.Create` is called with `["--depth", "3"]`.
 
-**Expected**: `HeadingDepth` property equals 3.
+**Expected**: `Depth` property equals 3.
 
 **Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
 
@@ -119,7 +119,7 @@ exit code is 0.
 **Scenario**: `Context.Create` is called with `["--report-depth", "3"]` (legacy alias for
 `--depth`).
 
-**Expected**: `HeadingDepth` property equals 3.
+**Expected**: `Depth` property equals 3.
 
 **Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
 
