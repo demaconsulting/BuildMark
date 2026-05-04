@@ -231,7 +231,7 @@ public class MockRepoConnector : RepoConnectorBase
     ///     Determines the baseline version for comparing changes.
     /// </summary>
     /// <param name="toTagInfo">Target version.</param>
-    /// <param name="tags">List of tag history.</param>
+    /// <param name="tags">List of tag history, ordered oldest first.</param>
     /// <returns>Tuple of (fromTagInfo, fromHash).</returns>
     private async Task<(VersionTag? fromTagInfo, string? fromHash)> DetermineBaselineVersionAsync(
         VersionTag toTagInfo,
@@ -243,95 +243,28 @@ public class MockRepoConnector : RepoConnectorBase
             return (null, null);
         }
 
-        // Find the position of target version in tag history
+        // Find the position of target version in the tag history
         var toIndex = FindVersionIndex(tags, toTagInfo);
 
-        // Determine baseline version based on whether target is pre-release
-        var fromTagInfo = toTagInfo.IsPreRelease
-            ? DetermineBaselineForPreRelease(toIndex, tags)
-            : DetermineBaselineForRelease(toIndex, tags);
+        // Get the commit hash of the target version for same-commit detection
+        var toHash = await GetHashForTagAsync(toTagInfo.Tag) ?? CurrentHash;
 
-        // Get commit hash for baseline version if one was found
-        if (fromTagInfo != null)
+        // Build list of preceding VersionCommitTags (oldest first, excluding target)
+        var precedingCount = toIndex >= 0 ? toIndex : tags.Count;
+        var precedingVersions = new List<VersionCommitTag>(precedingCount);
+        for (var i = 0; i < precedingCount; i++)
         {
-            var fromHash = await GetHashForTagAsync(fromTagInfo.Tag);
-            return (fromTagInfo, fromHash);
+            var hash = await GetHashForTagAsync(tags[i].Tag) ?? string.Empty;
+            precedingVersions.Add(new VersionCommitTag(tags[i], hash));
         }
 
-        // Return baseline version with null hash
-        return (fromTagInfo, null);
-    }
+        // Find baseline using base class methods
+        var baseline = toTagInfo.IsPreRelease
+            ? FindBaselineForPreRelease(precedingVersions, toHash)
+            : FindBaselineForRelease(precedingVersions);
 
-    /// <summary>
-    ///     Determines the baseline version for a pre-release.
-    /// </summary>
-    /// <param name="toIndex">Index of target version in tag history.</param>
-    /// <param name="tags">List of tags.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForPreRelease(int toIndex, List<VersionTag> tags)
-    {
-        // Pre-release versions use the immediately previous tag as baseline
-        if (toIndex > 0)
-        {
-            // Target version exists in history, use previous tag
-            return tags[toIndex - 1];
-        }
-
-        // Target version not in history, use most recent tag as baseline
-        if (toIndex == -1)
-        {
-            return tags[^1];
-        }
-
-        // If toIndex == 0, this is the first tag, no baseline
-        return null;
-    }
-
-    /// <summary>
-    ///     Determines the baseline version for a release (non-pre-release).
-    /// </summary>
-    /// <param name="toIndex">Index of target version in tag history.</param>
-    /// <param name="tags">List of tags.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForRelease(int toIndex, List<VersionTag> tags)
-    {
-        // Release versions skip pre-releases and use previous release as baseline
-        var startIndex = DetermineSearchStartIndex(toIndex, tags.Count);
-
-        // Search backward for previous non-pre-release version
-        for (var i = startIndex; i >= 0; i--)
-        {
-            if (!tags[i].IsPreRelease)
-            {
-                return tags[i];
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     Determines the starting index for searching for previous releases.
-    /// </summary>
-    /// <param name="toIndex">Index of target version in tag history.</param>
-    /// <param name="tagCount">Total number of tags.</param>
-    /// <returns>Starting index for search, or -1 if no search needed.</returns>
-    private static int DetermineSearchStartIndex(int toIndex, int tagCount)
-    {
-        // Target version exists in history, start search from previous position
-        if (toIndex > 0)
-        {
-            return toIndex - 1;
-        }
-
-        // Target version not in history, start from most recent tag
-        if (toIndex == -1)
-        {
-            return tagCount - 1;
-        }
-
-        // Target is first tag, no previous release exists
-        return -1;
+        // Return baseline version and hash if one was found
+        return (baseline?.VersionTag, baseline?.CommitHash);
     }
 
     /// <summary>

@@ -365,6 +365,48 @@ sections:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
 
+          - id: BuildMark-Report-BaselinePreRelease
+            title: >-
+              The tool shall select the previous tag with a different commit hash as the
+              baseline when generating build notes for a pre-release version.
+            justification: |
+              When two pre-release tags point to the same commit, using the immediately
+              preceding tag as the baseline would produce an empty changelog. Selecting
+              the most recent predecessor with a different commit hash ensures a meaningful
+              changelog is always generated for pre-release builds.
+            tests:
+              - BuildMark_Report_BaselinePreRelease_SkipsSameCommitPredecessor
+            children:
+              - BuildMark-RepoConnectorBase-BaselinePreRelease
+
+          - id: BuildMark-Report-BaselineRelease
+            title: >-
+              The tool shall select the previous release tag as the baseline when
+              generating build notes for a release version, skipping all pre-release tags.
+            justification: |
+              Release notes should cover all changes since the last stable release, not
+              just changes since the most recent pre-release. Skipping pre-release
+              predecessors when selecting the baseline ensures completeness and correctness
+              of the generated release notes.
+            tests:
+              - BuildMark_Report_ShowsVersionRangeFromPreviousRelease
+            children:
+              - BuildMark-RepoConnectorBase-BaselineRelease
+
+          - id: BuildMark-Report-BaselineFirstRelease
+            title: >-
+              The tool shall generate build notes from the beginning of repository history
+              when no previous version tag qualifies as a baseline.
+            justification: |
+              When a project publishes its first release there is no predecessor tag.
+              Treating the absence of a qualifying baseline as "generate from the start
+              of history" ensures that the first release still receives meaningful, complete
+              build notes rather than an error or an empty report.
+            tests:
+              - BuildMark_Report_BaselineFirstRelease_GeneratesFromBeginningOfHistory
+            children:
+              - BuildMark-RepoConnectorBase-BaselineNoHistory
+
           - id: BuildMark-Report-Hyperlinks
             title: The tool shall include hyperlinks to issues and pull requests.
             justification: |

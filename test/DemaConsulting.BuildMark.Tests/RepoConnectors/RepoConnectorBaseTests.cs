@@ -199,4 +199,132 @@ public class RepoConnectorBaseTests
         // Assert - Should return -1 when version is not found
         Assert.True(foundIndex == -1, "Should return -1 when the target version is not in the list");
     }
+
+    /// <summary>
+    ///     Test that FindBaselineForPreRelease skips same-commit tags and returns the most recent
+    ///     preceding tag that has a different commit hash.
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForPreRelease_SameCommitSkipped_ReturnsPreviousDistinctCommit()
+    {
+        // Arrange - three preceding tags; first two share the target's commit hash, third differs
+        const string targetHash = "aaaa";
+        List<VersionCommitTag> precedingVersions =
+        [
+            new(VersionTag.Create("v1.0.0"), "bbbb"),       // different hash - oldest
+            new(VersionTag.Create("v2.0.0-beta.1"), targetHash), // same hash
+            new(VersionTag.Create("v2.0.0-beta.2"), targetHash)  // same hash - newest
+        ];
+
+        // Act - find baseline for a pre-release with the shared hash
+        var baseline = RepoConnectorBase.FindBaselineForPreRelease(precedingVersions, targetHash);
+
+        // Assert - returns the first tag with a different commit hash (v1.0.0), skipping same-hash entries
+        Assert.True(baseline != null, "Baseline should not be null when a different-commit predecessor exists");
+        Assert.True(
+            baseline!.VersionTag.Tag == "v1.0.0",
+            $"Expected baseline 'v1.0.0' but got '{baseline.VersionTag.Tag}'");
+    }
+
+    /// <summary>
+    ///     Test that FindBaselineForPreRelease returns null when all preceding tags share
+    ///     the same commit hash as the target.
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForPreRelease_AllSameCommit_ReturnsNull()
+    {
+        // Arrange - all preceding tags share the same commit hash as the target
+        const string targetHash = "aaaa";
+        List<VersionCommitTag> precedingVersions =
+        [
+            new(VersionTag.Create("v1.0.0-rc.1"), targetHash),
+            new(VersionTag.Create("v1.0.0-rc.2"), targetHash)
+        ];
+
+        // Act - find baseline when all predecessors share the target hash
+        var baseline = RepoConnectorBase.FindBaselineForPreRelease(precedingVersions, targetHash);
+
+        // Assert - returns null because no different-commit predecessor exists
+        Assert.True(baseline == null, "Baseline should be null when all predecessors share the same commit hash");
+    }
+
+    /// <summary>
+    ///     Test that FindBaselineForRelease skips pre-release tags and returns the most recent
+    ///     preceding release tag.
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForRelease_SkipsPreReleaseTags_ReturnsPreviousReleaseTag()
+    {
+        // Arrange - preceding tags include several pre-releases before the previous release
+        List<VersionCommitTag> precedingVersions =
+        [
+            new(VersionTag.Create("v1.0.0"), "hash1"),         // release - oldest
+            new(VersionTag.Create("v2.0.0-alpha.1"), "hash2"), // pre-release
+            new(VersionTag.Create("v2.0.0-beta.1"), "hash3"),  // pre-release - newest
+        ];
+
+        // Act - find baseline for a release target (e.g., v2.0.0)
+        var baseline = RepoConnectorBase.FindBaselineForRelease(precedingVersions);
+
+        // Assert - returns v1.0.0, the most recent non-pre-release tag
+        Assert.True(baseline != null, "Baseline should not be null when a preceding release tag exists");
+        Assert.True(
+            baseline!.VersionTag.Tag == "v1.0.0",
+            $"Expected baseline 'v1.0.0' but got '{baseline.VersionTag.Tag}'");
+    }
+
+    /// <summary>
+    ///     Test that FindBaselineForRelease returns null when only pre-release tags precede
+    ///     the release target.
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForRelease_NoPreviousRelease_ReturnsNull()
+    {
+        // Arrange - only pre-release tags exist before the target release
+        List<VersionCommitTag> precedingVersions =
+        [
+            new(VersionTag.Create("v1.0.0-alpha.1"), "hash1"),
+            new(VersionTag.Create("v1.0.0-beta.1"), "hash2")
+        ];
+
+        // Act - find baseline when no release tag precedes the target
+        var baseline = RepoConnectorBase.FindBaselineForRelease(precedingVersions);
+
+        // Assert - returns null because no preceding release tag exists
+        Assert.True(baseline == null, "Baseline should be null when only pre-release tags precede the target");
+    }
+
+    /// <summary>
+    ///     Test that FindBaselineForRelease returns null when the version list is empty
+    ///     (first release scenario).
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForRelease_NoPreviousVersion_ReturnsNull()
+    {
+        // Arrange - empty preceding version list (first release in repository)
+        List<VersionCommitTag> precedingVersions = [];
+
+        // Act - find baseline when no preceding versions exist
+        var baseline = RepoConnectorBase.FindBaselineForRelease(precedingVersions);
+
+        // Assert - returns null because no preceding versions exist
+        Assert.True(baseline == null, "Baseline should be null when no preceding versions exist");
+    }
+
+    /// <summary>
+    ///     Test that FindBaselineForPreRelease returns null when the version list is empty
+    ///     (first pre-release scenario).
+    /// </summary>
+    [Fact]
+    public void RepoConnectorBase_FindBaselineForPreRelease_NoPreviousVersion_ReturnsNull()
+    {
+        // Arrange - empty preceding version list (first tag in repository)
+        List<VersionCommitTag> precedingVersions = [];
+
+        // Act - find baseline when no preceding versions exist
+        var baseline = RepoConnectorBase.FindBaselineForPreRelease(precedingVersions, "aaaa");
+
+        // Assert - returns null because no preceding versions exist
+        Assert.True(baseline == null, "Baseline should be null when no preceding versions exist");
+    }
 }

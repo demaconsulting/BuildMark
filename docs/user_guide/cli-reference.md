@@ -14,7 +14,7 @@
 | `--build-version <ver>` | Specify the build version for report generation |
 | `--report <file>` | Export build notes to a markdown file |
 | `--depth <n>` | Set markdown heading depth (default: 1) |
-| `--include-known-issues` | Include open bugs as known issues |
+| `--include-known-issues` | Include known issues (open bugs, plus closed bugs with matching affected-versions). |
 
 ## Display Options
 
@@ -89,7 +89,8 @@ buildmark --build-version v1.2.3 --report build-notes.md --depth 2
 
 ### `--include-known-issues`
 
-Include known issues in the generated report. Known issues are open bugs in the GitHub repository.
+Include known issues in the generated report. Known issues are open bugs in the repository,
+plus closed bugs whose `affected-versions` field intersects the current build version.
 
 ```bash
 buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues

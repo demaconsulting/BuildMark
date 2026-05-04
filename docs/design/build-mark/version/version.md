@@ -22,12 +22,12 @@ The Version subsystem is composed of six units:
 ```text
 VersionTag (raw repository tag)
     ↓ (extraction)
-VersionSemantic (parsed semantic version)  
+VersionSemantic (parsed semantic version)
     ↓ (normalization)
 VersionComparable (optimized comparison)
     ↓ (range operations)
 VersionInterval / VersionIntervalSet (version ranges)
-    ↓ (build association)  
+    ↓ (build association)
 VersionCommitTag (version + commit hash)
 ```
 
@@ -35,7 +35,7 @@ VersionCommitTag (version + commit hash)
 
 ### Semantic Versioning Compliance
 
-All version processing strictly adheres to [Semantic Versioning 2.0.0](https://semver.org/) specification
+All version processing strictly adheres to Semantic Versioning 2.0.0 (<https://semver.org/>) specification
 to ensure predictable and industry-standard behavior.
 
 ### Performance Optimization
@@ -48,7 +48,7 @@ through construction-time parsing and cached segment arrays.
 Each version type serves a specific purpose with clear boundaries:
 
 - **VersionTag**: Raw string from repository
-- **VersionSemantic**: Validated SemVer structure  
+- **VersionSemantic**: Validated SemVer structure
 - **VersionComparable**: Optimized for comparison operations
 - **VersionInterval**: Range queries and filtering
 - **VersionCommitTag**: Build metadata association
@@ -69,7 +69,7 @@ Each version type serves a specific purpose with clear boundaries:
 Version subsystem processes raw repository tags from GitHub and other sources,
 extracting semantic versions for build boundary determination.
 
-### Build Notes  
+### Build Notes
 
 Provides VersionCommitTag associations that link semantic versions to specific commit hashes for build information generation.
 

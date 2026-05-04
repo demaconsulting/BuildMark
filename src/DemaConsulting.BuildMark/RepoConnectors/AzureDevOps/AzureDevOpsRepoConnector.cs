@@ -297,92 +297,27 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             return (null, null);
         }
 
+        // Find the position of target version in the newest-first tag list
         var toIndex = FindVersionIndex(lookupData.TagVersions, toVersion);
 
-        var fromVersion = toVersion.IsPreRelease
-            ? DetermineBaselineForPreRelease(toIndex, toHash, lookupData)
-            : DetermineBaselineForRelease(toIndex, lookupData.TagVersions);
-
-        if (fromVersion != null &&
-            lookupData.TagToCommitHash.TryGetValue(fromVersion.Tag, out var fromHash))
+        // Build preceding versions list (oldest-first) for the base class selection methods.
+        // TagVersions is newest-first; preceding entries start at toIndex+1 (or 0 if target
+        // not found) and span to the end of the list. Iterating from Count-1 down gives oldest-first.
+        var startIndex = toIndex >= 0 ? toIndex + 1 : 0;
+        var preceding = new List<VersionCommitTag>();
+        for (var i = lookupData.TagVersions.Count - 1; i >= startIndex; i--)
         {
-            return (fromVersion, fromHash);
+            var tag = lookupData.TagVersions[i];
+            var hash = lookupData.TagToCommitHash.TryGetValue(tag.Tag, out var h) ? h : string.Empty;
+            preceding.Add(new VersionCommitTag(tag, hash));
         }
 
-        return (fromVersion, null);
-    }
+        // Delegate selection to the base class algorithm
+        var baseline = toVersion.IsPreRelease
+            ? FindBaselineForPreRelease(preceding, toHash)
+            : FindBaselineForRelease(preceding);
 
-    /// <summary>
-    ///     Determines the baseline version for a pre-release.
-    /// </summary>
-    /// <param name="toIndex">Index of target version in version list.</param>
-    /// <param name="toHash">Commit hash of target version.</param>
-    /// <param name="lookupData">Lookup data structures.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
-    {
-        var versions = lookupData.TagVersions;
-        int startIndex;
-
-        if (toIndex >= 0 && toIndex < versions.Count - 1)
-        {
-            startIndex = toIndex + 1;
-        }
-        else if (toIndex == -1 && versions.Count > 0)
-        {
-            startIndex = 0;
-        }
-        else
-        {
-            return null;
-        }
-
-        // Search for previous version with different commit hash
-        for (var i = startIndex; i < versions.Count; i++)
-        {
-            if (lookupData.TagToCommitHash.TryGetValue(versions[i].Tag, out var candidateHash) &&
-                candidateHash != toHash)
-            {
-                return versions[i];
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     Determines the baseline version for a release (non-pre-release).
-    /// </summary>
-    /// <param name="toIndex">Index of target version in version list.</param>
-    /// <param name="versions">List of version tags.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForRelease(int toIndex, List<VersionTag> versions)
-    {
-        int startIndex;
-
-        if (toIndex >= 0 && toIndex < versions.Count - 1)
-        {
-            startIndex = toIndex + 1;
-        }
-        else if (toIndex == -1 && versions.Count > 0)
-        {
-            startIndex = 0;
-        }
-        else
-        {
-            return null;
-        }
-
-        // Search for previous non-pre-release version
-        for (var i = startIndex; i < versions.Count; i++)
-        {
-            if (!versions[i].IsPreRelease)
-            {
-                return versions[i];
-            }
-        }
-
-        return null;
+        return (baseline?.VersionTag, baseline?.CommitHash);
     }
 
     /// <summary>

@@ -63,3 +63,45 @@ sections:
         tests:
           - RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex
           - RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne
+
+      - id: BuildMark-RepoConnectorBase-BaselinePreRelease
+        title: >-
+          For a pre-release target version, RepoConnectorBase shall select the most
+          recent preceding tag with a different commit hash as the baseline, skipping
+          tags that share the same commit hash to avoid generating empty changelogs.
+        justification: |
+          When multiple pre-release tags are created from the same commit (e.g., a tag
+          is renamed or recreated), using such a tag as the baseline would produce an
+          empty changelog because the commit range would be empty. By skipping tags with
+          the same commit hash, BuildMark always produces a meaningful changelog for
+          pre-release builds.
+        tests:
+          - RepoConnectorBase_FindBaselineForPreRelease_SameCommitSkipped_ReturnsPreviousDistinctCommit
+          - RepoConnectorBase_FindBaselineForPreRelease_AllSameCommit_ReturnsNull
+
+      - id: BuildMark-RepoConnectorBase-BaselineRelease
+        title: >-
+          For a release target version, RepoConnectorBase shall select the most recent
+          preceding release tag as the baseline, skipping all pre-release tags.
+        justification: |
+          Release notes should describe changes since the previous stable release, not
+          since the most recent pre-release candidate. Skipping pre-release tags when
+          selecting the baseline ensures that the generated changelog covers the complete
+          set of changes that went into the release.
+        tests:
+          - RepoConnectorBase_FindBaselineForRelease_SkipsPreReleaseTags_ReturnsPreviousReleaseTag
+          - RepoConnectorBase_FindBaselineForRelease_NoPreviousRelease_ReturnsNull
+
+      - id: BuildMark-RepoConnectorBase-BaselineNoHistory
+        title: >-
+          When no qualifying baseline tag exists in the version history,
+          RepoConnectorBase shall return null to indicate that build notes should be
+          generated from the beginning of repository history.
+        justification: |
+          The first release in a repository has no predecessor tag, so there is no
+          meaningful baseline from which to compute a changelog. Returning null allows
+          the connector to generate build notes covering the complete repository history
+          up to the first release, rather than producing an error or an empty report.
+        tests:
+          - RepoConnectorBase_FindBaselineForRelease_NoPreviousVersion_ReturnsNull
+          - RepoConnectorBase_FindBaselineForPreRelease_NoPreviousVersion_ReturnsNull

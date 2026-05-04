@@ -29,6 +29,7 @@ namespace DemaConsulting.BuildMark.Tests;
 /// <summary>
 ///     Tests for the Program class.
 /// </summary>
+[Collection("ProgramTests")]
 public class ProgramTests
 {
     /// <summary>
@@ -465,3 +466,11 @@ public class ProgramTests
         }
     }
 }
+
+/// <summary>
+///     Disables parallel execution for the <see cref="ProgramTests"/> collection to prevent
+///     race conditions when tests redirect the shared <see cref="Console.Out"/> and
+///     <see cref="Console.Error"/> streams via <c>Console.SetOut</c> / <c>Console.SetError</c>.
+/// </summary>
+[CollectionDefinition("ProgramTests", DisableParallelization = true)]
+public sealed class ProgramTestsCollection;

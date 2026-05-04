@@ -36,6 +36,17 @@ internal static class Program
     /// <summary>
     ///     Gets the application version string.
     /// </summary>
+    /// <remarks>
+    ///     The version is resolved using the following fallback chain:
+    ///     <list type="number">
+    ///         <item><see cref="AssemblyInformationalVersionAttribute"/> — preferred because it includes
+    ///         pre-release labels and build metadata (e.g., <c>1.2.3-beta.1+abc123</c>).</item>
+    ///         <item><c>assembly.GetName().Version</c> — numeric fallback when the informational
+    ///         attribute is absent.</item>
+    ///         <item><c>"0.0.0"</c> — final safety net for test assemblies or stripped builds that
+    ///         carry neither attribute.</item>
+    ///     </list>
+    /// </remarks>
     public static string Version
     {
         get
@@ -99,6 +110,19 @@ internal static class Program
     ///     Runs the program logic based on the provided context.
     /// </summary>
     /// <param name="context">The context containing command line arguments and program state.</param>
+    /// <remarks>
+    ///     <para>
+    ///         This method is <see langword="public"/> to serve as the test injection point.
+    ///         Unit and integration tests construct a pre-configured <see cref="Context"/> and
+    ///         call <c>Run</c> directly, bypassing the argument-parsing step in <c>Main</c> and
+    ///         allowing individual code paths to be exercised in isolation.
+    ///     </para>
+    ///     <para>
+    ///         As a side effect, the method mutates <see cref="Context.ExitCode"/> — callers
+    ///         must read <c>context.ExitCode</c> after <c>Run</c> returns to determine success
+    ///         or failure; the method itself has no return value.
+    ///     </para>
+    /// </remarks>
     public static void Run(Context context)
     {
         // Priority 1: Version query
@@ -141,6 +165,12 @@ internal static class Program
     ///     Prints the application banner.
     /// </summary>
     /// <param name="context">The context for output.</param>
+    /// <remarks>
+    ///     Called unconditionally after the version-flag check in the <see cref="Run"/> dispatch
+    ///     sequence, so the banner is visible for every execution path except <c>--version</c>.
+    ///     Factored out from <see cref="Run"/> to keep the dispatch sequence readable and to
+    ///     allow the banner format to change without modifying the dispatch logic.
+    /// </remarks>
     private static void PrintBanner(Context context)
     {
         context.WriteLine($"BuildMark version {Version}");
@@ -152,6 +182,12 @@ internal static class Program
     ///     Prints usage information.
     /// </summary>
     /// <param name="context">The context for output.</param>
+    /// <remarks>
+    ///     Called for all three help-flag variants (<c>-?</c>, <c>-h</c>, <c>--help</c>) from
+    ///     the <see cref="Run"/> dispatch sequence.  Factored out from <see cref="Run"/> so that
+    ///     the help text can evolve independently of the dispatch logic and so that a single
+    ///     method is the authoritative source of the usage message.
+    /// </remarks>
     private static void PrintHelp(Context context)
     {
         context.WriteLine("Usage: buildmark [options]");

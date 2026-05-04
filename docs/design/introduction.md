@@ -45,7 +45,7 @@ BuildMark (System)
 │   └── ProcessRunner (Unit)
 ├── Version (Subsystem)
 │   ├── VersionComparable (Unit)
-│   ├── VersionSemantic (Unit)  
+│   ├── VersionSemantic (Unit)
 │   ├── VersionTag (Unit)
 │   ├── VersionInterval (Unit)
 │   ├── VersionIntervalSet (Unit)
@@ -156,6 +156,4 @@ Throughout this document:
 ## References
 
 - See the BuildMark User Guide for user-facing documentation.
-- [BuildMark Repository][repo]
-
-[repo]: https://github.com/demaconsulting/BuildMark
+- See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

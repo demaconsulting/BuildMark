@@ -43,7 +43,7 @@ method applies the following priority order:
 2. Print the application banner (version and copyright).
 3. If `context.Help` is set, print the usage message and return.
 4. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
-5. If `context.Lint` is set, call `BuildMarkConfigReader.ReadAsync`, call
+5. If `context.Lint` is set, call `LoadConfiguration()`, call
    `result.ReportTo(context)`, and return.
 6. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
 
