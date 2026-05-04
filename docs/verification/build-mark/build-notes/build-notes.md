@@ -2,51 +2,52 @@
 
 ## Verification Approach
 
-The BuildNotes subsystem is verified at the integration level through `ProgramTests.cs`
-and `RepoConnectorsTests.cs`. There is no dedicated `BuildNotesTests.cs` file; the
-subsystem is exercised indirectly whenever `Program.Run` generates a report or when
-a connector's `GetBuildInformationAsync` is exercised with mock data.
-
-`BuildInformation.ToMarkdown` is exercised by report generation tests.
-`ItemInfo` and `WebLink` data models are exercised through the connector tests that
-populate `BuildInformation` instances with change items and web links.
+`BuildNotes` is the subsystem encompassing `BuildInformation`, `ItemInfo`, and `WebLink`. It is
+verified with dedicated subsystem tests in `BuildNotesTests.cs`. The subsystem uses
+`MockRepoConnector` to supply deterministic `BuildInformation` instances; no other mocking or test
+doubles are required.
 
 ## Dependencies
 
-| Mock / Stub         | Reason                                                    |
-| ------------------- | --------------------------------------------------------- |
-| `MockRepoConnector` | Returns deterministic `BuildInformation` with known items |
-| `Context`           | Provides output capture for markdown assertion            |
+| Mock / Stub         | Reason                                                               |
+| ------------------- | -------------------------------------------------------------------- |
+| `MockRepoConnector` | Provides deterministic `BuildInformation` for subsystem-level tests. |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-The following integration tests in `ProgramTests.cs` exercise the BuildNotes subsystem:
+### BuildNotes_ReportModel_GeneratesCorrectMarkdown
 
-### Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+**Scenario**: `MockRepoConnector.GetBuildInformationAsync` is called with version `v2.0.0`; the
+resulting `BuildInformation` is rendered via `ToMarkdown()`.
 
-**Scenario**: A full pipeline run generates a report with known issues included.
+**Expected**: Markdown contains `# Build Report`, `## Version Information`, `## Changes`,
+`## Bugs Fixed`, `v2.0.0`, and `ver-1.1.0`.
 
-**Expected**: `BuildInformation` is populated; markdown report is written to file.
+**Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
-**Requirement coverage**: `BuildMark-BuildNotes-BuildInformation`,
-`BuildMark-BuildNotes-ItemInfo`
+### BuildNotes_ReportModel_IncludesKnownIssues
 
-The following tests in `RepoConnectorsTests.cs` exercise the subsystem through
-connector output:
+**Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on a `BuildInformation` for `v2.0.0`
+that has known issues.
 
-### RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+**Expected**: Markdown contains `## Known Issues`, `Known bug A`, and `Known bug C`; `Known bug B`
+(which has `affected-versions [5.0.0,)`) does not appear.
 
-**Scenario**: Mock connector returns a fully populated `BuildInformation` instance.
+**Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
-**Expected**: All fields including changes, known issues, and web links are present.
+### BuildNotes_ReportModel_IncludesFullChangelog
 
-**Requirement coverage**: `BuildMark-BuildNotes-BuildInformation`,
-`BuildMark-BuildNotes-ItemInfo`, `BuildMark-BuildNotes-WebLink`
+**Scenario**: `ToMarkdown()` is called on a `BuildInformation` for `v2.0.0` that has a changelog
+link.
+
+**Expected**: Markdown contains `## Full Changelog` and the comparison link text
+`ver-1.1.0...v2.0.0`.
+
+**Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
 ## Requirements Coverage
 
-- **BuildMark-BuildNotes-BuildInformation**: Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues,
-  RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
-- **BuildMark-BuildNotes-ItemInfo**: Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues,
-  RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
-- **BuildMark-BuildNotes-WebLink**: RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+- **`BuildMark-BuildNotes-ReportModel`**:
+  - BuildNotes_ReportModel_GeneratesCorrectMarkdown
+  - BuildNotes_ReportModel_IncludesKnownIssues
+  - BuildNotes_ReportModel_IncludesFullChangelog

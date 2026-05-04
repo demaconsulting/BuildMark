@@ -116,9 +116,10 @@ exit code is 0.
 
 ### Context_Create_LegacyReportDepthArgument_SetsDepthProperty
 
-**Scenario**: `Context.Create` is called with the legacy depth argument form.
+**Scenario**: `Context.Create` is called with `["--report-depth", "3"]` (legacy alias for
+`--depth`).
 
-**Expected**: `HeadingDepth` property is set to the specified value.
+**Expected**: `HeadingDepth` property equals 3.
 
 **Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
 
@@ -157,15 +158,19 @@ with a test message.
 
 ### Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
 
-**Scenario**: `Context.Create` is called with multiple flags together.
+**Scenario**: `Context.Create` is called with `["--silent", "--validate", "--lint",
+"--build-version", "1.2.3", "--report", "report.md", "--depth", "2",
+"--include-known-issues", "--results", "results.trx"]`.
 
-**Expected**: All corresponding properties are set correctly; no exception is thrown.
+**Expected**: `Silent`, `Validate`, `Lint`, and `IncludeKnownIssues` are true; `BuildVersion`
+equals `"1.2.3"`; `ReportFile` equals `"report.md"`; `Depth` equals 2; `ResultsFile` equals
+`"results.trx"`; no exception is thrown.
 
 **Requirement coverage**: `BuildMark-Context-FlagParsing`, `BuildMark-Context-ArgumentParsing`.
 
 ### Context_Create_UnsupportedArgument_ThrowsArgumentException
 
-**Scenario**: `Context.Create` is called with an unrecognized argument (e.g., `["--unknown"]`).
+**Scenario**: `Context.Create` is called with `["--unsupported"]`.
 
 **Expected**: An `ArgumentException` is thrown containing the text "Unsupported argument".
 

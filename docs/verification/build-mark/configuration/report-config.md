@@ -2,30 +2,41 @@
 
 ## Verification Approach
 
-`ReportConfig` is a data model class verified indirectly through `ProgramTests.cs`.
-Report configuration fields (`File`, `Depth`, `IncludeKnownIssues`) influence the
-behavior of `Program.ProcessBuildNotes`. The test
-`Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues`
-exercises the `IncludeKnownIssues` field path.
+`ReportConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml` files
+with a `report:` block and assert that `File`, `Depth`, and `IncludeKnownIssues` properties are
+correctly parsed or that invalid values produce error issues. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason                                                               |
+| ----------- | -------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+### BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
 
-**Scenario**: `ReportConfig.IncludeKnownIssues` is set; report generation includes
-known issues.
+**Scenario**: A `.buildmark.yaml` with `report.file`, `report.depth: 2`, and
+`report.include-known-issues: true` is written; `BuildMarkConfigReader.ReadAsync` is called;
+`Config.Report` is inspected.
 
-**Expected**: Generated report contains a known issues section.
+**Expected**: `Config.Report.File` equals `"build-notes.md"`; `Config.Report.Depth` equals 2;
+`Config.Report.IncludeKnownIssues` is true.
 
-**Requirement coverage**: `BuildMark-Configuration-ReportConfig`
+**Requirement coverage**: `BuildMark-ReportConfig-Properties`.
+
+### BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
+
+**Scenario**: A `.buildmark.yaml` with `report.depth: -1` is written;
+`BuildMarkConfigReader.ReadAsync` is called.
+
+**Expected**: `Config` is null; `HasErrors` is true; issue description contains
+`"positive integer"`.
+
+**Requirement coverage**: `BuildMark-ReportConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-ReportConfig**:
-  Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+- **`BuildMark-ReportConfig-Properties`**:
+  - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
+  - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue

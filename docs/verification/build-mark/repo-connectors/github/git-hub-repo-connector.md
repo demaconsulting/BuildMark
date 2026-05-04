@@ -28,7 +28,9 @@ and edge cases such as duplicate commit SHAs and substring label matching.
 
 **Scenario**: `GitHubRepoConnector` is constructed with a `GitHubConnectorConfig`.
 
-**Expected**: Configuration overrides (e.g., owner, repo) are stored.
+**Expected**: `ConfigurationOverrides.Owner` equals `"example-owner"`;
+`ConfigurationOverrides.Repo` equals `"example-repo"`; `ConfigurationOverrides.BaseUrl`
+equals `"https://api.github.com"`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
 

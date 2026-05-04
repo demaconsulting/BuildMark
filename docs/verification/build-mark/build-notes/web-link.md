@@ -2,46 +2,28 @@
 
 ## Verification Approach
 
-`WebLink` is a utility data model with no dedicated test class. It is verified
-indirectly through connector tests that assert on web link properties within
-`ItemInfo` and `BuildInformation` instances. The `WebLink` type is used to attach
-URLs to items, releases, and changelog links.
+`WebLink` is a record type with no logic. It is verified through a dedicated test in
+`BuildInformationTests.cs` that constructs a `WebLink` directly and asserts on its properties.
+No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub         | Reason                                                     |
-| ------------------- | ---------------------------------------------------------- |
-| `MockRepoConnector` | Returns `BuildInformation` with `WebLink` entries on items |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+### WebLink_Constructor_StoresTextAndUrl
 
-**Scenario**: Mock connector returns complete build information including items with web links.
+**Scenario**: A `WebLink` is constructed with display text `"v1.0.0...v2.0.0"` and a GitHub
+compare URL.
 
-**Expected**: `ItemInfo` entries contain `WebLink` instances with non-null URL and label.
+**Expected**: `LinkText` equals `"v1.0.0...v2.0.0"`; `TargetUrl` equals the supplied URL.
 
-**Requirement coverage**: `BuildMark-BuildNotes-WebLink`
-
-### RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
-
-**Scenario**: GitHub connector populates change items with links to GitHub pull request URLs.
-
-**Expected**: `ItemInfo.Link` is a `WebLink` with a valid GitHub URL.
-
-**Requirement coverage**: `BuildMark-BuildNotes-WebLink`
-
-### RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
-
-**Scenario**: Azure DevOps connector populates change items with links to Azure DevOps URLs.
-
-**Expected**: `ItemInfo.Link` is a `WebLink` with a valid Azure DevOps URL.
-
-**Requirement coverage**: `BuildMark-BuildNotes-WebLink`
+**Requirement coverage**: `BuildMark-WebLink-Record`.
 
 ## Requirements Coverage
 
-- **BuildMark-BuildNotes-WebLink**:
-  RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation,
-  RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+- **`BuildMark-WebLink-Record`**:
+  - WebLink_Constructor_StoresTextAndUrl

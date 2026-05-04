@@ -2,40 +2,31 @@
 
 ## Verification Approach
 
-`SectionConfig` is a data model class verified indirectly through
-`RepoConnectorsTests.cs` and connector-specific tests. When `Configure` is called
-on a connector with `SectionConfig` entries, the connector creates named sections in
-the `BuildInformation.RoutedSections` output. Tests that assert on routed sections
-exercise `SectionConfig` indirectly.
+`SectionConfig` is verified through `ConfigurationTests.cs`. The test
+`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
+`BuildMarkConfig.CreateDefault()` and asserts on the `Id` and `Title` properties of the returned
+sections. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
-**Scenario**: A connector configured with `SectionConfig` entries processes items and
-populates `RoutedSections`.
+**Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Sections` collection is
+inspected.
 
-**Expected**: Routed sections are present in the result as configured.
+**Expected**: Three sections are present with ids `"changes"`, `"bugs-fixed"`, and
+`"dependency-updates"` and corresponding titles `"Changes"`, `"Bugs Fixed"`, and
+`"Dependency Updates"`.
 
-**Requirement coverage**: `BuildMark-Configuration-SectionConfig`
-
-### MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
-
-**Scenario**: `MockRepoConnector` is configured with sections; `GetBuildInformationAsync`
-populates routed sections.
-
-**Expected**: `RoutedSections` contains the configured section names.
-
-**Requirement coverage**: `BuildMark-Configuration-SectionConfig`
+**Requirement coverage**: `BuildMark-SectionConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-SectionConfig**:
-  RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
+- **`BuildMark-SectionConfig-Properties`**:
+  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

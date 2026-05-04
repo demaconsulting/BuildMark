@@ -2,46 +2,41 @@
 
 ## Verification Approach
 
-`ConnectorConfig` is a data model class verified indirectly through
-`RepoConnectorFactoryTests.cs`. Tests that pass a `ConnectorConfig` to
-`RepoConnectorFactory.Create` exercise the configuration forwarding path and confirm
-that the connector type and sub-configuration are interpreted correctly.
+`ConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml` files
+with connector blocks and assert that `ConnectorConfig.Type`, `ConnectorConfig.GitHub`, and
+`ConnectorConfig.AzureDevOps` are correctly populated by `BuildMarkConfigReader.ReadAsync`. No
+mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason                                                               |
+| ----------- | -------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
-**Scenario**: `ConnectorConfig` with GitHub settings is passed to the factory.
+**Scenario**: A `.buildmark.yaml` with a GitHub connector block is written;
+`BuildMarkConfigReader.ReadAsync` is called; `Config.Connector` is inspected.
 
-**Expected**: Factory creates a GitHub connector with the supplied settings applied.
+**Expected**: `Config.Connector.Type` equals `"github"`; `Config.Connector.GitHub` is non-null;
+`Config.Connector.AzureDevOps` is null.
 
-**Requirement coverage**: `BuildMark-Configuration-ConnectorConfig`
+**Requirement coverage**: `BuildMark-ConnectorConfig-Properties`.
 
-### RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector
+### BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
-**Scenario**: `ConnectorConfig` with Azure DevOps type is passed to the factory.
+**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block is written;
+`BuildMarkConfigReader.ReadAsync` is called; `Config.Connector` is inspected.
 
-**Expected**: Factory creates an Azure DevOps connector.
+**Expected**: `Config.Connector.Type` equals `"azure-devops"`;
+`Config.Connector.AzureDevOps` is non-null with all fields set; `Config.Connector.GitHub` is null.
 
-**Requirement coverage**: `BuildMark-Configuration-ConnectorConfig`
-
-### RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
-
-**Scenario**: `ConnectorConfig` with Azure DevOps settings is passed to the factory.
-
-**Expected**: Factory creates Azure DevOps connector with the supplied settings applied.
-
-**Requirement coverage**: `BuildMark-Configuration-ConnectorConfig`
+**Requirement coverage**: `BuildMark-ConnectorConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-ConnectorConfig**:
-  RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration,
-  RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector,
-  RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
+- **`BuildMark-ConnectorConfig-Properties`**:
+  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration

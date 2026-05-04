@@ -2,30 +2,42 @@
 
 ## Verification Approach
 
-`AzureDevOpsConnectorConfig` is a data model class verified indirectly through
-`RepoConnectorFactoryTests.cs`. Tests that supply Azure DevOps-specific configuration
-within a `ConnectorConfig` confirm that the settings are forwarded to the created
-`AzureDevOpsRepoConnector`.
+`AzureDevOpsConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write
+`.buildmark.yaml` files with Azure DevOps connector blocks and assert that `OrganizationUrl`,
+`Organization`, `Project`, and `Repository` properties are correctly parsed, including alias key
+support. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason                                                               |
+| ----------- | -------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
+### BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
-**Scenario**: A `ConnectorConfig` with an `AzureDevOpsConnectorConfig` is passed to
-the factory.
+**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block using canonical keys
+(`organization`, `repository`) is written; `BuildMarkConfigReader.ReadAsync` is called;
+`Config.Connector.AzureDevOps` is inspected.
 
-**Expected**: The resulting connector incorporates the Azure DevOps-specific
-configuration.
+**Expected**: `OrganizationUrl` equals `"https://dev.azure.com/myorg"`; `Organization` equals
+`"myorg"`; `Project` equals `"myproject"`; `Repository` equals `"myrepo"`.
 
-**Requirement coverage**: `BuildMark-Configuration-AzureDevOpsConnectorConfig`
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
+### BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
+
+**Scenario**: A `.buildmark.yaml` with Azure DevOps connector using alias keys (`org`, `repo`) is
+written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.AzureDevOps` is inspected.
+
+**Expected**: `OrganizationUrl`, `Organization`, `Project`, and `Repository` are all populated
+correctly from the alias keys.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-AzureDevOpsConnectorConfig**:
-  RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
+- **`BuildMark-AzureDevOpsConnectorConfig-Properties`**:
+  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+  - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
