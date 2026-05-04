@@ -2,33 +2,76 @@
 
 ## Verification Approach
 
-`Validation` is tested indirectly through `ProgramTests.cs`. The test
-`Program_Run_ValidateFlag_OutputsValidationMessage` invokes `Program.Run` with
-`Validate = true`, which delegates to `Validation.Run`. Successful completion without
-exception or non-zero exit code constitutes evidence that the validation framework
-is operational.
-
-The CI pipeline integration test `Run self-validation` also runs
-`buildmark --validate --results artifacts/validation-*.trx` on each operating
-system and .NET runtime combination, providing platform-level evidence.
+`Validation` is verified with dedicated unit tests in `ValidationTests.cs`. Tests construct a
+`Context` with controlled arguments, call `Validation.Run`, and assert on the created results
+files, console error output, and exit code. `MockRepoConnector` is provided as the connector
+factory; no further mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason                                                |
-| ----------- | ----------------------------------------------------- |
-| `Context`   | Provides output stream for validation result messages |
+| Mock / Stub         | Reason                                                                |
+| ------------------- | --------------------------------------------------------------------- |
+| `MockRepoConnector` | Supplies connector factory so self-check runs without network access. |
 
 ## Test Scenarios
 
-### Program_Run_ValidateFlag_OutputsValidationMessage
+### Validation_Run_WithTrxResultsFile_WritesTrxFile
 
-**Scenario**: `Program.Run` is called with `Validate = true`; control reaches
-`Validation.Run`.
+**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.trx`; console
+output is captured.
 
-**Expected**: Validation output is written to the context output; exit code is 0.
+**Expected**: `results.trx` is created; its content contains `TestRun` and
+`BuildMark Self-Validation`.
 
-**Requirement coverage**: `BuildMark-SelfTest-Validation`
+**Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-TrxOutput`.
+
+### Validation_Run_WithXmlResultsFile_WritesJUnitFile
+
+**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.xml`; console
+output is captured.
+
+**Expected**: `results.xml` is created; its content contains `testsuites` and
+`BuildMark Self-Validation`.
+
+**Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-JUnitOutput`.
+
+### Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+
+**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.json`
+(unsupported extension); console error is captured.
+
+**Expected**: Console error contains `"Unsupported results file format"`; exit code is 1.
+
+**Requirement coverage**: `BuildMark-Validation-TrxOutput`, `BuildMark-Validation-JUnitOutput`.
+
+### Validation_Run_WithInvalidResultsFilePath_ShowsError
+
+**Scenario**: `Validation.Run` is called with
+`--validate --results /invalid_path_that_does_not_exist/results.trx`; console error is captured.
+
+**Expected**: Console error contains `"Failed to write results file"`; exit code is 1.
+
+**Requirement coverage**: `BuildMark-Validation-TrxOutput`.
+
+### Validation_Run_WithoutResultsFile_CompletesSuccessfully
+
+**Scenario**: `Validation.Run` is called with `--validate --silent`; no `--results` argument is
+supplied.
+
+**Expected**: Validation completes without error; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Validation-Run`.
 
 ## Requirements Coverage
 
-- **BuildMark-SelfTest-Validation**: Program_Run_ValidateFlag_OutputsValidationMessage
+- **`BuildMark-Validation-Run`**:
+  - Validation_Run_WithTrxResultsFile_WritesTrxFile
+  - Validation_Run_WithXmlResultsFile_WritesJUnitFile
+  - Validation_Run_WithoutResultsFile_CompletesSuccessfully
+- **`BuildMark-Validation-TrxOutput`**:
+  - Validation_Run_WithTrxResultsFile_WritesTrxFile
+  - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+  - Validation_Run_WithInvalidResultsFilePath_ShowsError
+- **`BuildMark-Validation-JUnitOutput`**:
+  - Validation_Run_WithXmlResultsFile_WritesJUnitFile
+  - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError

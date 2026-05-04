@@ -2,30 +2,50 @@
 
 ## Verification Approach
 
-`ConfigurationIssue` is a data class with no dedicated test class. It is verified
-indirectly through `ProgramTests.cs` via the `ConfigurationLoadResult` pipeline.
-When configuration parsing produces issues, they are stored as `ConfigurationIssue`
-instances and reported to the context. No dedicated test exercises this path in
-isolation; it is covered by integration paths where configuration errors surface.
+`ConfigurationIssue` is a record type with no logic. It is verified through
+`ConfigurationTests.cs`, which constructs `ConfigurationIssue` instances directly and asserts on
+their `FilePath`, `Line`, `Severity`, and `Description` properties. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+### ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 
-**Scenario**: `ConfigurationLoadResult` contains no `ConfigurationIssue` entries
-when no config file is present; `ReportTo` is a no-op.
+**Scenario**: A `ConfigurationIssue` with `Error` severity is constructed and placed in a
+`ConfigurationLoadResult`; `ReportTo` is called.
 
-**Expected**: No issues reported; exit code is 0.
+**Expected**: `context.ExitCode` equals 1, confirming the issue record carries severity correctly.
 
-**Requirement coverage**: `BuildMark-Configuration-ConfigurationIssue`
+**Requirement coverage**: `BuildMark-ConfigurationIssue-Record`.
+
+### ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+
+**Scenario**: A `ConfigurationIssue` with `Warning` severity is constructed and placed in a
+`ConfigurationLoadResult`; `ReportTo` is called.
+
+**Expected**: `context.ExitCode` remains 0, confirming severity is preserved and evaluated
+correctly.
+
+**Requirement coverage**: `BuildMark-ConfigurationIssue-Record`.
+
+### ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+
+**Scenario**: A `ConfigurationIssue` is constructed with `FilePath` `"/repo/.buildmark.yaml"`,
+`Line` 7, `Error` severity, and description `"Unexpected value"`; properties are inspected.
+
+**Expected**: `FilePath` equals `"/repo/.buildmark.yaml"`; `Line` equals 7; `Severity` equals
+`Error`; `Description` equals `"Unexpected value"`.
+
+**Requirement coverage**: `BuildMark-ConfigurationIssue-Record`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-ConfigurationIssue**:
-  Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+- **`BuildMark-ConfigurationIssue-Record`**:
+  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+  - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+  - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber

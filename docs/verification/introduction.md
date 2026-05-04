@@ -139,4 +139,4 @@ match identifiers defined in the ReqStream YAML files under `docs/reqstream/`.
 
 - See the *BuildMark Software Design* document for implementation details of each unit.
 - See the *BuildMark Requirements* document for the full requirements specification.
-- [BuildMark Repository](https://github.com/demaconsulting/BuildMark)
+- See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

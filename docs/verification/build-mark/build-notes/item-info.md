@@ -2,47 +2,41 @@
 
 ## Verification Approach
 
-`ItemInfo` is a data model with no dedicated test class. It is verified indirectly
-through connector tests in `RepoConnectorsTests.cs`, `GitHubRepoConnectorTests.cs`,
-`AzureDevOpsRepoConnectorTests.cs`, and `MockRepoConnectorTests.cs` that assert on
-the items contained in `BuildInformation` instances returned by connectors.
+`ItemInfo` is a record type that carries no logic of its own. It is verified through
+`BuildInformationTests.cs`, which asserts on the ordering, identity, and link properties of
+`ItemInfo` entries returned by `MockRepoConnector`. No mocking beyond `MockRepoConnector` is
+needed.
 
 ## Dependencies
 
-| Mock / Stub         | Reason                                                   |
-| ------------------- | -------------------------------------------------------- |
-| `MockRepoConnector` | Returns `BuildInformation` with known `ItemInfo` entries |
+| Mock / Stub         | Reason                                                               |
+| ------------------- | -------------------------------------------------------------------- |
+| `MockRepoConnector` | Provides `BuildInformation` instances with known `ItemInfo` entries. |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+### BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
 
-**Scenario**: Mock connector returns complete build information with change items.
+**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"))` is
+called; the `Changes` collection is inspected.
 
-**Expected**: `BuildInformation.Changes` contains `ItemInfo` entries with correct
-title, type, visibility, and web link.
+**Expected**: `ItemInfo` entries in `Changes` are ordered by `Index` in ascending order; the first
+entry has `Index` 10 and `Id` `"1"`; the second has `Index` 13.
 
-**Requirement coverage**: `BuildMark-BuildNotes-ItemInfo`
+**Requirement coverage**: `BuildMark-ItemInfo-Record`.
 
-### RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges
+### BuildInformation_ToMarkdown_UsesBulletLists
 
-**Scenario**: GitHub connector processes pull requests into change items.
+**Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on `BuildInformation` for `v2.0.0`;
+the rendered bullet list items are inspected.
 
-**Expected**: Each pull request is represented as an `ItemInfo` in `BuildInformation.Changes`.
+**Expected**: Each `ItemInfo` entry is rendered as a `- [id](url)` bullet; no table-row format is
+present.
 
-**Requirement coverage**: `BuildMark-BuildNotes-ItemInfo`
-
-### RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
-
-**Scenario**: Azure DevOps connector processes pull requests into change items.
-
-**Expected**: Each pull request is represented as an `ItemInfo` in `BuildInformation.Changes`.
-
-**Requirement coverage**: `BuildMark-BuildNotes-ItemInfo`
+**Requirement coverage**: `BuildMark-ItemInfo-Record`.
 
 ## Requirements Coverage
 
-- **BuildMark-BuildNotes-ItemInfo**:
-  RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation,
-  RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges,
-  RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
+- **`BuildMark-ItemInfo-Record`**:
+  - BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
+  - BuildInformation_ToMarkdown_UsesBulletLists

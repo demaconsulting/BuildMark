@@ -11,8 +11,8 @@ sections:
     requirements:
       - id: BuildMark-GitHub-GraphQLClient
         title: >-
-          The GitHubGraphQLClient shall retrieve commits, releases, tags, pull requests,
-          and issues from the GitHub repository, including support for paginated responses.
+          The GitHubGraphQLClient shall retrieve repository data using the GitHub GraphQL API,
+          including support for paginated responses.
         justification: |
           The GitHub API returns large result sets in pages. The client must transparently
           follow pagination cursors to retrieve all commits, releases, tags, pull requests,

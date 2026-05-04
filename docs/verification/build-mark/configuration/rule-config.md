@@ -2,47 +2,32 @@
 
 ## Verification Approach
 
-`RuleConfig` is a data model class verified indirectly through `ItemRouterTests.cs`
-and connector configuration tests. Tests that provide `RuleConfig` instances to
-connectors or to `ItemRouter` exercise the routing logic and confirm that items
-are routed to the correct sections.
+`RuleConfig` is verified through `ConfigurationTests.cs`. The test
+`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
+`BuildMarkConfig.CreateDefault()` and asserts on the `Route` and `Match` properties of the
+returned rules. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection
+### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
-**Scenario**: A `RuleConfig` with a matching condition routes an item to the
-configured section.
+**Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Rules` collection is
+inspected.
 
-**Expected**: Item appears in the correct section of the output.
+**Expected**: Six rules are present; the first three rules have `dependency-updates`,
+`bugs-fixed`, and `bugs-fixed` as routes with appropriate label and work-item-type match
+conditions; the fourth and fifth rules have `suppressed` routes; the sixth rule has `changes` as
+route with a null match.
 
-**Requirement coverage**: `BuildMark-Configuration-RuleConfig`
-
-### ItemRouter_Route_SuppressedRouteOmitsMatchingItem
-
-**Scenario**: A `RuleConfig` with suppress set routes a matching item to be omitted.
-
-**Expected**: Item does not appear in any section of the output.
-
-**Requirement coverage**: `BuildMark-Configuration-RuleConfig`
-
-### MockRepoConnector_Configure_StoresRulesAndSections
-
-**Scenario**: `MockRepoConnector.Configure` is called with `RuleConfig` entries.
-
-**Expected**: Rules are stored; `HasRules` returns `true`.
-
-**Requirement coverage**: `BuildMark-Configuration-RuleConfig`
+**Requirement coverage**: `BuildMark-RuleConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-RuleConfig**:
-  ItemRouter_Route_MatchingRuleRoutesItemToConfiguredSection,
-  ItemRouter_Route_SuppressedRouteOmitsMatchingItem,
-  MockRepoConnector_Configure_StoresRulesAndSections
+- **`BuildMark-RuleConfig-Properties`**:
+  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

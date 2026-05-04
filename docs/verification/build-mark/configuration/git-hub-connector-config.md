@@ -2,28 +2,29 @@
 
 ## Verification Approach
 
-`GitHubConnectorConfig` is a data model class verified indirectly through
-`RepoConnectorFactoryTests.cs`. Tests that supply GitHub-specific configuration
-within a `ConnectorConfig` confirm that the settings are forwarded to the created
-`GitHubRepoConnector`.
+`GitHubConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml`
+files with a GitHub connector block and assert that `Owner`, `Repo`, and `BaseUrl` properties are
+correctly parsed. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason                                                               |
+| ----------- | -------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
-**Scenario**: A `ConnectorConfig` with a `GitHubConnectorConfig` is passed to the factory.
+**Scenario**: A `.buildmark.yaml` with `github.owner`, `github.repo`, and `github.base-url` fields
+is written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.GitHub` is inspected.
 
-**Expected**: The resulting connector incorporates the GitHub-specific configuration.
+**Expected**: `Owner` equals `"example-owner"`; `Repo` equals `"hello-world"`; `BaseUrl` equals
+`"https://api.github.com"`.
 
-**Requirement coverage**: `BuildMark-Configuration-GitHubConnectorConfig`
+**Requirement coverage**: `BuildMark-GitHubConnectorConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-GitHubConnectorConfig**:
-  RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+- **`BuildMark-GitHubConnectorConfig-Properties`**:
+  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration

@@ -86,15 +86,53 @@ to avoid live API calls where needed.
 
 **Expected**: Error is written to stderr; exit code is 1.
 
-**Requirement coverage**: `BuildMark-Program-ErrorHandling`
-
-### Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode
+**Requirement coverage**: `BuildMark-Program-ErrorHandling-InvalidBuildVersion`
 
 **Scenario**: `Program.Run` is called but connector factory throws `InvalidOperationException`.
 
 **Expected**: Error is written to stderr; exit code is 1.
 
-**Requirement coverage**: `BuildMark-Program-ErrorHandling`
+**Requirement coverage**: `BuildMark-Program-ErrorHandling-ConnectorFailure`
+
+### Program_Run_WithSilentFlag_SuppressesOutput
+
+**Scenario**: `Program.Run` is called with `--silent` and `--help` flags in context.
+
+**Expected**: Banner text is suppressed from console output; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Program-Silent`
+
+### Program_Run_WithLogFlag_WritesToLogFile
+
+**Scenario**: `Program.Run` is called with `--log <file>` flag pointing to a temporary file.
+
+**Expected**: Log file is created and contains non-empty output; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Program-Log`
+
+### Program_Run_WithResultsFlag_WritesResultsFile
+
+**Scenario**: `Program.Run` is called with `--validate` and `--results <file>` flags.
+
+**Expected**: Results file is created; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Program-Results`
+
+### Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
+
+**Scenario**: `Program.Run` is called with `--build-version 3.2.1` and a mock connector.
+
+**Expected**: Report is generated containing the specified version string; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Program-BuildVersion`
+
+### Program_Run_WithDepthFlag_SetsHeadingDepth
+
+**Scenario**: `Program.Run` is called with `--depth 3` and a mock connector.
+
+**Expected**: Report uses level-three headings (`###`) for the title; exit code is 0.
+
+**Requirement coverage**: `BuildMark-Program-Depth`
 
 ## Requirements Coverage
 
@@ -105,5 +143,10 @@ to avoid live API calls where needed.
 - **BuildMark-Program-Validate**: Program_Run_ValidateFlag_OutputsValidationMessage
 - **BuildMark-Program-Report**: Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
 - **BuildMark-Program-Lint**: Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
-- **BuildMark-Program-ErrorHandling**: Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode,
-  Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode
+- **BuildMark-Program-Silent**: Program_Run_WithSilentFlag_SuppressesOutput
+- **BuildMark-Program-Log**: Program_Run_WithLogFlag_WritesToLogFile
+- **BuildMark-Program-Results**: Program_Run_WithResultsFlag_WritesResultsFile
+- **BuildMark-Program-BuildVersion**: Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
+- **BuildMark-Program-Depth**: Program_Run_WithDepthFlag_SetsHeadingDepth
+- **BuildMark-Program-ErrorHandling-InvalidBuildVersion**: Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode
+- **BuildMark-Program-ErrorHandling-ConnectorFailure**: Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode

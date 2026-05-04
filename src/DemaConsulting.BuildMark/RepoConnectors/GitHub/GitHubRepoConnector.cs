@@ -464,131 +464,30 @@ public class GitHubRepoConnector : RepoConnectorBase
             return (null, null);
         }
 
-        // Find the position of target version in release history
+        // Find the position of target version in the newest-first release list
         var toIndex = FindVersionIndex(lookupData.ReleaseVersions, toVersion);
 
-        // Determine baseline version based on whether target is pre-release
-        var fromVersion = toVersion.IsPreRelease
-            ? DetermineBaselineForPreRelease(toIndex, toHash, lookupData)
-            : DetermineBaselineForRelease(toIndex, lookupData.ReleaseVersions);
-
-        // Get commit hash for baseline version if one was found
-        if (fromVersion != null &&
-            lookupData.TagToRelease.TryGetValue(fromVersion.Tag, out var fromRelease) &&
-            lookupData.TagsByName.TryGetValue(fromRelease.TagName!, out var fromTagCommit))
+        // Build preceding versions list (oldest-first) for the base class selection methods.
+        // ReleaseVersions is newest-first; preceding entries start at toIndex+1 (or 0 if target
+        // not found) and span to the end of the list. Iterating from Count-1 down gives oldest-first.
+        var startIndex = toIndex >= 0 ? toIndex + 1 : 0;
+        var preceding = new List<VersionCommitTag>();
+        for (var i = lookupData.ReleaseVersions.Count - 1; i >= startIndex; i--)
         {
-            return (fromVersion, fromTagCommit.Commit.Sha);
+            var tag = lookupData.ReleaseVersions[i];
+            var hash = lookupData.TagToRelease.TryGetValue(tag.Tag, out var rel) &&
+                       lookupData.TagsByName.TryGetValue(rel.TagName!, out var tagCommit)
+                ? tagCommit.Commit.Sha
+                : string.Empty;
+            preceding.Add(new VersionCommitTag(tag, hash));
         }
 
-        // Return baseline version with null hash if commit not found
-        return (fromVersion, null);
-    }
+        // Delegate selection to the base class algorithm
+        var baseline = toVersion.IsPreRelease
+            ? FindBaselineForPreRelease(preceding, toHash)
+            : FindBaselineForRelease(preceding);
 
-    /// <summary>
-    ///     Determines the baseline version for a pre-release.
-    ///     Pre-release versions pick the previous tag (release or pre-release) that isn't the same commit-hash.
-    /// </summary>
-    /// <param name="toIndex">Index of target version in release history.</param>
-    /// <param name="toHash">Commit hash of target version.</param>
-    /// <param name="lookupData">Lookup data structures.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForPreRelease(int toIndex, string toHash, LookupData lookupData)
-    {
-        var releaseVersions = lookupData.ReleaseVersions;
-
-        // Determine starting index for search
-        int startIndex;
-        if (toIndex >= 0 && toIndex < releaseVersions.Count - 1)
-        {
-            // Target exists, start from next older release
-            startIndex = toIndex + 1;
-        }
-        else if (toIndex == -1 && releaseVersions.Count > 0)
-        {
-            // Target not in history, start from most recent
-            startIndex = 0;
-        }
-        else
-        {
-            // No valid starting point
-            startIndex = -1;
-        }
-
-        // If no valid starting point, return null
-        if (startIndex < 0)
-        {
-            return null;
-        }
-
-        // Search forward through older releases (incrementing index) for previous version with different commit hash
-        for (var i = startIndex; i < releaseVersions.Count; i++)
-        {
-            var candidateVersion = releaseVersions[i];
-
-            // Get commit hash for candidate version
-            if (lookupData.TagToRelease.TryGetValue(candidateVersion.Tag, out var candidateRelease) &&
-                lookupData.TagsByName.TryGetValue(candidateRelease.TagName!, out var candidateTag) &&
-                candidateTag.Commit.Sha != toHash)
-            {
-                // Found a version with a different commit hash - use it
-                return candidateVersion;
-            }
-        }
-
-        // No version with different commit hash found
-        return null;
-    }
-
-    /// <summary>
-    ///     Determines the baseline version for a release (non-pre-release).
-    /// </summary>
-    /// <param name="toIndex">Index of target version in release history.</param>
-    /// <param name="releaseVersions">List of release versions.</param>
-    /// <returns>Baseline version or null.</returns>
-    private static VersionTag? DetermineBaselineForRelease(int toIndex, List<VersionTag> releaseVersions)
-    {
-        // Release versions skip pre-releases and use previous non-pre-release as baseline
-        var startIndex = DetermineSearchStartIndex(toIndex, releaseVersions.Count);
-
-        // Search forward through older releases (incrementing index) for previous non-pre-release version
-        if (startIndex >= 0)
-        {
-            for (var i = startIndex; i < releaseVersions.Count; i++)
-            {
-                if (!releaseVersions[i].IsPreRelease)
-                {
-                    return releaseVersions[i];
-                }
-            }
-        }
-
-        return null;
-    }
-
-    /// <summary>
-    ///     Determines the starting index for searching for previous releases.
-    /// </summary>
-    /// <param name="toIndex">Index of target version in release history.</param>
-    /// <param name="releaseCount">Total number of releases.</param>
-    /// <returns>Starting index for search, or -1 if no search needed.</returns>
-    private static int DetermineSearchStartIndex(int toIndex, int releaseCount)
-    {
-        // Target version exists in history, start search from next older release
-        if (toIndex >= 0 && toIndex < releaseCount - 1)
-        {
-            return toIndex + 1;
-        }
-
-        // Target version not in history, start from most recent release
-        if (toIndex == -1 && releaseCount > 0)
-        {
-            // Target version not in history, start from most recent release
-            // The target is newer than all existing releases, so use the most recent as baseline
-            return 0;
-        }
-
-        // Target is the oldest release or no releases exist, no previous release exists
-        return -1;
+        return (baseline?.VersionTag, baseline?.CommitHash);
     }
 
     /// <summary>

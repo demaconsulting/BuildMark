@@ -400,6 +400,75 @@ public class IntegrationTests
     }
 
     /// <summary>
+    ///     Test that the report selects the nearest predecessor with a different commit hash
+    ///     as the baseline when generating build notes for a pre-release version.
+    /// </summary>
+    [Fact]
+    public void BuildMark_Report_BaselinePreRelease_SkipsSameCommitPredecessor()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with a connector that provides a pre-release where the immediate
+            // predecessor shares the same commit hash (should be skipped), leaving v1.1.0 as baseline
+            using var context = Context.Create(
+                ["--build-version", "1.2.0-beta.2", "--report", reportFile, "--silent"],
+                () => new PreReleaseSameCommitConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report uses v1.1.0 as the baseline (same-commit predecessor was skipped)
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("v1.1.0", content);
+            Assert.Contains("v1.1.0...1.2.0-beta.2", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
+    ///     Test that the report generates from the beginning of history when no previous
+    ///     version tag qualifies as a baseline.
+    /// </summary>
+    [Fact]
+    public void BuildMark_Report_BaselineFirstRelease_GeneratesFromBeginningOfHistory()
+    {
+        // Arrange: create a temporary report file path
+        var reportFile = Path.GetTempFileName();
+        try
+        {
+            // Create context with a connector that provides a first release with no baseline
+            using var context = Context.Create(
+                ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
+                () => new FirstReleaseConnector());
+
+            // Act: run the program
+            Program.Run(context);
+
+            // Assert: report generates successfully and shows N/A for the missing baseline
+            Assert.Equal(0, context.ExitCode);
+            var content = File.ReadAllText(reportFile);
+            Assert.Contains("1.0.0", content);
+            Assert.Contains("N/A", content);
+        }
+        finally
+        {
+            if (File.Exists(reportFile))
+            {
+                File.Delete(reportFile);
+            }
+        }
+    }
+
+    /// <summary>
     ///     Test that the report includes known issues when the flag is set.
     /// </summary>
     [Fact]
@@ -1213,6 +1282,37 @@ public class IntegrationTests
                 bugs,
                 [],
                 null));
+        }
+    }
+
+    /// <summary>
+    ///     Mock connector that simulates a pre-release where the immediate predecessor
+    ///     shares the same commit hash (skipped), leaving v1.1.0 as the baseline.
+    /// </summary>
+    private sealed class PreReleaseSameCommitConnector : IRepoConnector
+    {
+        /// <inheritdoc/>
+        public Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
+        {
+            // Target is 1.2.0-beta.2; its immediate predecessor 1.2.0-beta.1 shares the same
+            // commit hash and must be skipped, so v1.1.0 is chosen as the baseline instead.
+            var currentTag = new VersionCommitTag(VersionTag.Create("1.2.0-beta.2"), "target-hash");
+            var baselineTag = new VersionCommitTag(VersionTag.Create("v1.1.0"), "prev-hash");
+            var changelogLink = new WebLink("Full Changelog", "https://example.com/compare/v1.1.0...1.2.0-beta.2");
+            return Task.FromResult(new BuildInformation(baselineTag, currentTag, [], [], [], changelogLink));
+        }
+    }
+
+    /// <summary>
+    ///     Mock connector that simulates a first release with no baseline (no preceding tags).
+    /// </summary>
+    private sealed class FirstReleaseConnector : IRepoConnector
+    {
+        /// <inheritdoc/>
+        public Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
+        {
+            var currentTag = new VersionCommitTag(VersionTag.Create("v1.0.0"), "first-hash");
+            return Task.FromResult(new BuildInformation(null, currentTag, [], [], [], null));
         }
     }
 }

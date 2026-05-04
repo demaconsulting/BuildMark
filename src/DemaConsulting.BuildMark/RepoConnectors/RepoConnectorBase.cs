@@ -146,4 +146,63 @@ public abstract class RepoConnectorBase : IRepoConnector
         // Version not found in list
         return -1;
     }
+
+    /// <summary>
+    ///     Finds the baseline version for a pre-release target.
+    ///     Returns the most recent entry from <paramref name="precedingVersions"/> whose commit hash
+    ///     differs from <paramref name="targetCommitHash"/>, skipping any entries that share the
+    ///     same commit hash as the target (which would produce an empty changelog).
+    /// </summary>
+    /// <param name="precedingVersions">
+    ///     Version-commit tags that precede the target, ordered oldest first.
+    /// </param>
+    /// <param name="targetCommitHash">Commit hash of the target version.</param>
+    /// <returns>
+    ///     The most recent preceding entry with a different commit hash, or <c>null</c> if none exists.
+    /// </returns>
+    internal static VersionCommitTag? FindBaselineForPreRelease(
+        List<VersionCommitTag> precedingVersions,
+        string targetCommitHash)
+    {
+        // Search from newest to oldest, skipping entries with the same commit hash
+        for (var i = precedingVersions.Count - 1; i >= 0; i--)
+        {
+            // Return the first entry that has a different commit hash
+            if (precedingVersions[i].CommitHash != targetCommitHash)
+            {
+                return precedingVersions[i];
+            }
+        }
+
+        // No entry with a different commit hash found
+        return null;
+    }
+
+    /// <summary>
+    ///     Finds the baseline version for a release target.
+    ///     Returns the most recent entry from <paramref name="precedingVersions"/> that is not a
+    ///     pre-release, skipping any pre-release entries.
+    /// </summary>
+    /// <param name="precedingVersions">
+    ///     Version-commit tags that precede the target, ordered oldest first.
+    /// </param>
+    /// <returns>
+    ///     The most recent preceding non-pre-release entry, or <c>null</c> if none exists.
+    /// </returns>
+    internal static VersionCommitTag? FindBaselineForRelease(
+        List<VersionCommitTag> precedingVersions)
+    {
+        // Search from newest to oldest, skipping pre-release entries
+        for (var i = precedingVersions.Count - 1; i >= 0; i--)
+        {
+            // Return the first non-pre-release entry found
+            if (!precedingVersions[i].VersionTag.IsPreRelease)
+            {
+                return precedingVersions[i];
+            }
+        }
+
+        // No non-pre-release entry found
+        return null;
+    }
 }

@@ -13,10 +13,8 @@ sections:
     requirements:
       - id: BuildMark-AzureDevOps-SubSystem
         title: >-
-          The AzureDevOps sub-subsystem shall provide a repository connector that implements
-          the IRepoConnector interface, retrieves build information from Azure DevOps, supports
-          URL parsing, item controls, configurable routing rules, REST API access, and work
-          item mapping.
+          The AzureDevOps sub-subsystem shall implement the IRepoConnector interface
+          for Azure DevOps repositories.
         justification: |
           Generating build notes from Azure DevOps repositories requires a dedicated sub-subsystem
           that can authenticate to the Azure DevOps REST API, retrieve commits, tags, pull

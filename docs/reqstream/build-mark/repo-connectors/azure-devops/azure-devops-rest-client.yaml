@@ -10,9 +10,8 @@ sections:
     requirements:
       - id: BuildMark-AzureDevOps-RestClient
         title: >-
-          The AzureDevOpsRestClient shall retrieve repository details, commits, tags,
-          pull requests, and work items from the Azure DevOps API, including support
-          for paginated responses.
+          The AzureDevOpsRestClient shall retrieve repository data using the Azure DevOps
+          REST API, including support for paginated responses.
         justification: |
           The Azure DevOps REST API returns large result sets in pages. The client must
           transparently follow pagination to retrieve complete repository data so that

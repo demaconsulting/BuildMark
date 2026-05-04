@@ -67,9 +67,10 @@ and output behavior.
 
 ### Cli_ReportFlags_SetProperties
 
-**Scenario**: Context is created with `--report path.md` and `--report-depth 2` arguments.
+**Scenario**: Context is created with `["--report", "output.md", "--depth", "3",
+"--include-known-issues"]`.
 
-**Expected**: `ReportFile` and `Depth` properties are set to the provided values.
+**Expected**: `ReportFile` equals `"output.md"`; `Depth` equals 3; `IncludeKnownIssues` is true.
 
 **Requirement coverage**: `BuildMark-Program-Report`, `BuildMark-Program-Depth`
 
@@ -91,17 +92,17 @@ and output behavior.
 
 ### Cli_ResultsFlag_SetsProperty
 
-**Scenario**: Context is created with `--results path.trx` argument.
+**Scenario**: Context is created with `["--results", "results.trx"]`.
 
-**Expected**: `Results` property equals the provided path.
+**Expected**: `ResultsFile` property equals `"results.trx"`.
 
 **Requirement coverage**: `BuildMark-Program-Results`
 
 ### Cli_ResultFlag_SetsProperty
 
-**Scenario**: Context is created with `--result path.trx` argument (alias).
+**Scenario**: Context is created with `["--result", "results.trx"]` (alias).
 
-**Expected**: `Results` property equals the provided path.
+**Expected**: `ResultsFile` property equals `"results.trx"`.
 
 **Requirement coverage**: `BuildMark-Program-Results`
 
@@ -109,23 +110,25 @@ and output behavior.
 
 **Scenario**: `context.WriteError` is called with an error message.
 
-**Expected**: Message is written to the error stream; exit code is set.
+**Expected**: The message `"Subsystem error test"` appears in the standard error stream.
 
 **Requirement coverage**: `BuildMark-Program-ErrorHandling`
 
 ### Cli_InvalidArgument_ThrowsException
 
-**Scenario**: Context is created with an unrecognized flag.
+**Scenario**: Context is created with `["--unsupported"]`.
 
-**Expected**: `ArgumentException` is thrown.
+**Expected**: `ArgumentException` is thrown with a message containing
+`"Unsupported argument '--unsupported'"`.
 
 **Requirement coverage**: `BuildMark-Cli-Context`
 
 ### Cli_MissingArgumentValue_ThrowsException
 
-**Scenario**: Context is created with a flag that requires a value but no value is provided.
+**Scenario**: Context is created with `["--build-version"]` (value missing).
 
-**Expected**: `ArgumentException` is thrown.
+**Expected**: `ArgumentException` is thrown with a message containing
+`"--build-version requires a version argument"`.
 
 **Requirement coverage**: `BuildMark-Cli-Context`
 

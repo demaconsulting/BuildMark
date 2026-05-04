@@ -25,49 +25,52 @@ and error handling for invalid tags.
 
 ### VersionTag_Create_StandardTag_ParsesCorrectly
 
-**Scenario**: `VersionTag.Create` is called with a standard `v1.2.3` tag.
+**Scenario**: `VersionTag.Create` is called with `"1.2.3"` (no prefix).
 
-**Expected**: Version components are parsed correctly.
+**Expected**: `Tag` equals `"1.2.3"`; `FullVersion` equals `"1.2.3"`; `Numbers` equals `"1.2.3"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_PrefixedTag_ParsesCorrectly
 
-**Scenario**: `VersionTag.Create` is called with a prefixed tag like `v1.2.3`.
+**Scenario**: `VersionTag.Create` is called with `"v1.2.3"`.
 
-**Expected**: `v` prefix is stripped; version parses correctly.
+**Expected**: `Tag` equals `"v1.2.3"`; `FullVersion` equals `"1.2.3"`; `Numbers` equals `"1.2.3"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_DotSeparatedPreRelease_NormalizesToHyphen
 
-**Scenario**: `VersionTag.Create` is called with a tag using dots in the pre-release
-segment.
+**Scenario**: `VersionTag.Create` is called with `"v1.2.3.alpha.1"`.
 
-**Expected**: Dots in the pre-release are normalized to hyphens.
+**Expected**: `Tag` equals `"v1.2.3.alpha.1"`; `FullVersion` equals `"1.2.3-alpha.1"`;
+`PreRelease` equals `"alpha.1"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_ComplexTag_ExtractsVersionCorrectly
 
-**Scenario**: `VersionTag.Create` is called with a complex tag containing prefix,
-version, pre-release, and build metadata.
+**Scenario**: `VersionTag.Create` is called with `"Release_1.2.3.beta.5+build.123"`.
 
-**Expected**: All components are extracted correctly.
+**Expected**: `Tag` equals `"Release_1.2.3.beta.5+build.123"`; `FullVersion` equals
+`"1.2.3-beta.5+build.123"`; `Numbers` equals `"1.2.3"`; `PreRelease` equals `"beta.5"`;
+`Metadata` equals `"build.123"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Properties_ExposeOriginalAndParsed_Correctly
 
-**Scenario**: `Tag` and `Semantic` properties are accessed after creating a tag.
+**Scenario**: `VersionTag.Create` is called with `"v1.2.3-alpha"` and the `Tag`,
+`FullVersion`, `Numbers`, and `PreRelease` properties are read.
 
-**Expected**: `Tag` returns the original string; `Semantic` returns the parsed version.
+**Expected**: `Tag` equals `"v1.2.3-alpha"`; `FullVersion` equals `"1.2.3-alpha"`;
+`Numbers` equals `"1.2.3"`; `PreRelease` equals `"alpha"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_ToString_ReturnsOriginalTag
 
-**Scenario**: `ToString` is called on a `VersionTag` instance.
+**Scenario**: `ToString` is called on a `VersionTag` created from `"v1.2.3-alpha+build.123"`.
 
 **Expected**: Returns the original tag string unchanged.
 
@@ -75,23 +78,28 @@ version, pre-release, and build metadata.
 
 ### VersionTag_Create_SimpleVPrefix_ParsesVersion
 
-**Scenario**: `VersionTag.Create` is called with `v1.0.0`.
+**Scenario**: `VersionTag.Create` is called with `"v1.2.3"`.
 
-**Expected**: Instance created with version `1.0.0`.
+**Expected**: `Tag` equals `"v1.2.3"`; `FullVersion` equals `"1.2.3"`; `Numbers` equals
+`"1.2.3"`; `PreRelease` equals `""`; `CompareVersion` equals `"1.2.3"`; `Metadata` equals
+`""`; `IsPreRelease` is false.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_ComplexVersionWithMetadata_ParsesVersion
 
-**Scenario**: `VersionTag.Create` is called with a tag including build metadata.
+**Scenario**: `VersionTag.Create` is called with `"Rel_1.2.3.rc.4+build.5"`.
 
-**Expected**: Metadata is preserved in the `Semantic` property.
+**Expected**: `Tag` equals `"Rel_1.2.3.rc.4+build.5"`; `FullVersion` equals
+`"1.2.3-rc.4+build.5"`; `Numbers` equals `"1.2.3"`; `PreRelease` equals `"rc.4"`;
+`CompareVersion` equals `"1.2.3-rc.4"`; `Metadata` equals `"build.5"`; `IsPreRelease`
+is true.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_TryCreate_InvalidTag_ReturnsNull
 
-**Scenario**: `VersionTag.TryCreate` is called with an unparseable tag string.
+**Scenario**: `VersionTag.TryCreate` is called with `"not-a-version"`.
 
 **Expected**: Returns `null`.
 
@@ -99,41 +107,45 @@ version, pre-release, and build metadata.
 
 ### VersionTag_Create_InvalidTag_ThrowsArgumentException
 
-**Scenario**: `VersionTag.Create` is called with an unparseable tag string.
+**Scenario**: `VersionTag.Create` is called with `"not-a-version"`.
 
-**Expected**: `ArgumentException` is thrown.
+**Expected**: `ArgumentException` is thrown with a message containing
+`"does not match version format"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_NoPrefix_ParsesVersion
 
-**Scenario**: `VersionTag.Create` is called with a tag that has no alphabetic prefix.
+**Scenario**: `VersionTag.Create` is called with `"1.0.0"`.
 
-**Expected**: Version is parsed directly from the string.
+**Expected**: `Tag` equals `"1.0.0"`; `FullVersion` equals `"1.0.0"`; `IsPreRelease` is false.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_HyphenPreReleaseWithMetadata_ParsesVersion
 
-**Scenario**: `VersionTag.Create` is called with a tag using hyphen pre-release and
-build metadata.
+**Scenario**: `VersionTag.Create` is called with `"Rel_1.2.3-rc.4+build.5"`.
 
-**Expected**: Both pre-release and metadata are parsed correctly.
+**Expected**: `Tag` equals `"Rel_1.2.3-rc.4+build.5"`; `FullVersion` equals
+`"1.2.3-rc.4+build.5"`; `Numbers` equals `"1.2.3"`; `PreRelease` equals `"rc.4"`;
+`CompareVersion` equals `"1.2.3-rc.4"`; `Metadata` equals `"build.5"`; `IsPreRelease`
+is true.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Semantic_AllowsComparison
 
-**Scenario**: `Semantic` property is used to compare two tags.
+**Scenario**: `Semantic.Comparable` is compared for tags `"v1.2.3"` and `"v1.11.2"`.
 
-**Expected**: Comparison behaves correctly via the underlying `VersionSemantic`.
+**Expected**: `tag1.Semantic.Comparable < tag2.Semantic.Comparable` is true (i.e.,
+`"v1.2.3"` sorts before `"v1.11.2"`).
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionComparable_Equals_DifferentPrefixesSameVersion_ReturnsTrue
 
-**Scenario**: Two tags with different prefixes but the same version are compared
-via `VersionComparable`.
+**Scenario**: `Semantic.Comparable` is extracted from `"v1.2.3"`, `"VER1.2.3"`,
+`"Release_1.2.3"`, and `"release/1.2.3"` and the four values are compared for equality.
 
 **Expected**: Comparable values are equal.
 
@@ -141,34 +153,40 @@ via `VersionComparable`.
 
 ### VersionTag_GetVersionComparable_SemanticTags_ReturnsCorrectComparison
 
-**Scenario**: `VersionComparable` extracted from two semantic tags is compared.
+**Scenario**: `Semantic.Comparable` is compared for `"v1.0.0-alpha"`, `"v1.0.0-beta"`,
+and `"v1.0.0"`.
 
-**Expected**: Returns the correct ordering.
+**Expected**: alpha < beta < release: `"v1.0.0-alpha"` sorts before `"v1.0.0-beta"`,
+which sorts before `"v1.0.0"`.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_PathSeparatorPrefix_ParsesCorrectly
 
-**Scenario**: `VersionTag.Create` is called with a tag in `prefix/1.2.3` format.
+**Scenario**: `VersionTag.Create` is called with `"release/1.2.3"`.
 
-**Expected**: Path prefix is stripped; version is parsed correctly.
+**Expected**: `Tag` equals `"release/1.2.3"`; `FullVersion` equals `"1.2.3"`; `Numbers`
+equals `"1.2.3"`; `PreRelease` equals `""`; `IsPreRelease` is false.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_PathSeparatorPrefixWithPreRelease_ParsesCorrectly
 
-**Scenario**: `VersionTag.Create` is called with `prefix/1.2.3-alpha`.
+**Scenario**: `VersionTag.Create` is called with `"release/1.2.3-rc.4"`.
 
-**Expected**: Path prefix is stripped; pre-release is parsed correctly.
+**Expected**: `Tag` equals `"release/1.2.3-rc.4"`; `FullVersion` equals `"1.2.3-rc.4"`;
+`Numbers` equals `"1.2.3"`; `PreRelease` equals `"rc.4"`; `CompareVersion` equals
+`"1.2.3-rc.4"`; `IsPreRelease` is true.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 
 ### VersionTag_Create_MultiLevelPathPrefix_ParsesCorrectly
 
-**Scenario**: `VersionTag.Create` is called with a multi-level path prefix like
-`a/b/1.2.3`.
+**Scenario**: `VersionTag.Create` is called with `"builds/release/1.2.3-beta.1+build.99"`.
 
-**Expected**: All prefix segments are stripped; version parses correctly.
+**Expected**: `Tag` equals `"builds/release/1.2.3-beta.1+build.99"`; `FullVersion` equals
+`"1.2.3-beta.1+build.99"`; `Numbers` equals `"1.2.3"`; `PreRelease` equals `"beta.1"`;
+`Metadata` equals `"build.99"`; `IsPreRelease` is true.
 
 **Requirement coverage**: `BuildMark-Version-VersionTag`
 

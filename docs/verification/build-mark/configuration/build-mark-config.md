@@ -2,40 +2,33 @@
 
 ## Verification Approach
 
-`BuildMarkConfig` is a data model class with no dedicated test class. It is verified
-indirectly through program-level and connector factory tests that exercise the
-configuration pipeline. When `BuildMarkConfigReader.ReadAsync` returns a
-`ConfigurationLoadResult`, the embedded `BuildMarkConfig` instance drives connector
-creation and report configuration.
+`BuildMarkConfig` is verified with dedicated unit tests in `ConfigurationTests.cs`. The test
+`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
+`BuildMarkConfig.CreateDefault()` and asserts on the returned sections and routing rules. No
+mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason                                                     |
-| ----------- | ---------------------------------------------------------- |
-| File system | Integration tests may create temporary configuration files |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
-**Scenario**: `Program.Run` processes a lint request; `BuildMarkConfig` is loaded
-as an empty/default instance when no file is present.
+**Scenario**: `BuildMarkConfig.CreateDefault()` is called.
 
-**Expected**: Default `BuildMarkConfig` is handled gracefully; exit code is 0.
+**Expected**: The result contains 3 sections (`changes`, `bugs-fixed`, `dependency-updates`) with
+correct titles; 6 rules are present with correct routes and match conditions; the final catch-all
+rule has a null match.
 
-**Requirement coverage**: `BuildMark-Configuration-BuildMarkConfig`
-
-### RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
-
-**Scenario**: `BuildMarkConfig.Connector` field is used by the factory to create
-a connector with GitHub settings.
-
-**Expected**: Connector reflects the `BuildMarkConfig` connector settings.
-
-**Requirement coverage**: `BuildMark-Configuration-BuildMarkConfig`
+**Requirement coverage**: `BuildMark-SectionConfig-Properties`,
+`BuildMark-RuleConfig-Properties`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-BuildMarkConfig**:
-  Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero,
-  RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+- **`BuildMark-SectionConfig-Properties`**:
+  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+- **`BuildMark-RuleConfig-Properties`**:
+  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

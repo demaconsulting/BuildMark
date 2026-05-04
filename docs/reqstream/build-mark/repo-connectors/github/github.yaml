@@ -13,9 +13,8 @@ sections:
     requirements:
       - id: BuildMark-GitHub-SubSystem
         title: >-
-          The GitHub sub-subsystem shall provide a repository connector that implements
-          the IRepoConnector interface, retrieves build information from GitHub, supports
-          item controls, description body retrieval, and configurable routing rules.
+          The GitHub sub-subsystem shall implement the IRepoConnector interface
+          for GitHub repositories.
         justification: |
           Generating build notes from GitHub repositories requires a dedicated sub-subsystem
           that can authenticate to the GitHub API, retrieve commits, releases, tags, pull

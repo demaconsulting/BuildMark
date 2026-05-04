@@ -2,30 +2,51 @@
 
 ## Verification Approach
 
-`ConfigurationLoadResult` is a data class with no dedicated test class. It is verified
-indirectly through `ProgramTests.cs`, where the result of `BuildMarkConfigReader.ReadAsync`
-is used to report issues and extract the active configuration. Tests that exercise
-the lint path confirm that `ConfigurationLoadResult` is handled correctly when no
-issues are present.
+`ConfigurationLoadResult` is verified with dedicated unit tests in `ConfigurationTests.cs`. Tests
+construct `ConfigurationLoadResult` instances directly with controlled `ConfigurationIssue` entries
+and assert on the behavior of `ReportTo(context)`. No mocking is required.
 
 ## Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason          |
+| ----------- | --------------- |
+| None        | No mocks needed |
 
-## Test Scenarios (Integration)
+## Test Scenarios
 
-### Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+### ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 
-**Scenario**: `ConfigurationLoadResult` is returned from `BuildMarkConfigReader` with
-no issues when no configuration file is present.
+**Scenario**: A `ConfigurationLoadResult` containing one `Error`-severity issue is created;
+`ReportTo` is called on a silent `Context`.
 
-**Expected**: `result.ReportTo(context)` completes without errors; exit code is 0.
+**Expected**: `context.ExitCode` equals 1.
 
-**Requirement coverage**: `BuildMark-Configuration-ConfigurationLoadResult`
+**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
+
+### ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+
+**Scenario**: A `ConfigurationLoadResult` containing one `Warning`-severity issue is created;
+`ReportTo` is called on a silent `Context`.
+
+**Expected**: `context.ExitCode` remains 0.
+
+**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
+
+### ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+
+**Scenario**: A `ConfigurationLoadResult` containing an `Error`-severity issue at `FilePath`
+`"/repo/.buildmark.yaml"`, `Line` 7, with description `"Unexpected value"` is created; `ReportTo`
+is called.
+
+**Expected**: `result.HasErrors` is true; `context.ExitCode` is 1;
+`result.Issues[0].FilePath` equals `"/repo/.buildmark.yaml"`; `result.Issues[0].Line` equals 7;
+`result.Issues[0].Description` equals `"Unexpected value"`.
+
+**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
 
 ## Requirements Coverage
 
-- **BuildMark-Configuration-ConfigurationLoadResult**:
-  Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+- **`BuildMark-ConfigLoadResult-ReportTo`**:
+  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+  - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+  - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
