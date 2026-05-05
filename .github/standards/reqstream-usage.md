@@ -33,10 +33,9 @@ docs/reqstream/
     └── {ots-name}.yaml              # Requirements for OTS components
 ```
 
-This mirrors the `docs/verification/` folder structure exactly, and mirrors `docs/design/` except
-that `docs/design/` has no `ots/` folder (OTS items have no design documentation) —
-each item's requirements, design, and verification files share the same relative path
-under their respective roots, making artifact locations deterministic.
+In-house items have matching relative paths across `docs/reqstream/`, `docs/design/`, and
+`docs/verification/`. OTS items appear only in `docs/reqstream/ots/` and
+`docs/verification/ots/` - they have no design documentation.
 
 # Requirements File Format
 
