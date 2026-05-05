@@ -86,9 +86,9 @@ Choose the appropriate category based on scope and testability:
   - Verification: `docs/verification/ots/{ots-name}.md`
   - These folders sit parallel to system folders (not inside any system folder)
 - System design documentation records which OTS items each system depends on
-- **OTS test project**: A single dedicated test project (`OtsSoftwareTests` / `ots_software_tests`,
-  cased per language) holds all OTS integration tests — one test file per OTS item. This is not
-  a system under test; it exists solely to validate that each OTS item meets its requirements.
+- **OTS test project**: If no other verification evidence is available (e.g., vendor test results,
+  published compliance reports), a dedicated test project (`OtsSoftwareTests` / `ots_software_tests`,
+  cased per language) holds OTS integration tests - one test file per OTS item requiring tests.
 
 # Software Item Artifact Model
 
