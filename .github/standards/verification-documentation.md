@@ -32,8 +32,9 @@ docs/verification/
 │   │   ├── {child-subsystem}/   # Child subsystem folder (same structure as parent)
 │   │   └── {unit-name}.md       # Unit verification - heading depth ###
 │   └── {unit-name}.md           # System-level unit verification - heading depth ##
+├── ots.md                       # OTS section overview - heading depth # (MANDATORY if OTS items exist)
 └── ots/                         # OTS items - parallel to system folders (not inside them)
-    └── {ots-name}.md            # OTS item verification evidence
+    └── {ots-name}.md            # OTS item verification evidence - heading depth ##
 ```
 
 Each scope's overview file lives in its **parent** folder, not inside the scope's own
@@ -101,6 +102,10 @@ Place `{unit-name}.md` in the parent (system or subsystem) folder. Cover:
 
 ## OTS Verification Evidence (when OTS items are used)
 
+Create `docs/verification/ots.md` at the collection root with a `#` top-level heading. This
+file introduces the OTS verification approach and ensures OTS items compile as a top-level
+section in the PDF rather than as subsystems of the last in-house system.
+
 For each OTS item, create `docs/verification/ots/{ots-name}.md` covering:
 
 - The OTS item's required functionality (reference `docs/reqstream/ots/{ots-name}.yaml`)
@@ -135,4 +140,5 @@ Before submitting verification documentation, verify:
 - [ ] All documents follow technical documentation formatting standards
 - [ ] Content is current with requirements and test implementation
 - [ ] Every OTS item has `docs/verification/ots/{ots-name}.md` with requirement coverage
+- [ ] `docs/verification/ots.md` exists with a `#` heading when OTS items are present
 - [ ] Documents are integrated into ReviewMark review-sets for formal review

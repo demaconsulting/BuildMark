@@ -68,6 +68,7 @@ input-files:
   - docs/verification/build-mark/repo-connectors/azure-devops/work-item-mapper.md
   - docs/verification/build-mark/repo-connectors/mock.md
   - docs/verification/build-mark/repo-connectors/mock/mock-repo-connector.md
+  - docs/verification/ots.md
   - docs/verification/ots/buildmark.md
   - docs/verification/ots/fileassert.md
   - docs/verification/ots/pandoc.md
