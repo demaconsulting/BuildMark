@@ -191,7 +191,7 @@ Reviews OTS item requirements and verification evidence:
 - **File Path Patterns**:
   - OTS requirements: `docs/reqstream/ots/{ots-name}.yaml`
   - OTS verification: `docs/verification/ots/{ots-name}.md`
-  - Tests (if applicable): `test/OtsSoftwareTests/{OtsName}Tests.{ext}` (cased per language)
+  - Tests (if applicable): `test/{OtsSoftwareTests}/{OtsName}Tests.{ext}` (cased per language)
 
 **Note**: File path patterns use `{ext}` as a placeholder for language-specific
 extensions (`.cs`, `.cpp`/`.hpp`, `.py`, etc.). Adapt to your repository's languages.
