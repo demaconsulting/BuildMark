@@ -339,8 +339,8 @@ reviews:
     title: Review that BuildMark RepoConnectors Mock Satisfies Sub-Subsystem Requirements
     paths:
       - "docs/reqstream/build-mark/repo-connectors/mock/mock.yaml"
-      - "docs/design/build-mark/repo-connectors/mock/mock.md"
-      - "docs/verification/build-mark/repo-connectors/mock/mock.md"
+      - "docs/design/build-mark/repo-connectors/mock.md"
+      - "docs/verification/build-mark/repo-connectors/mock.md"
       - "test/**/RepoConnectors/Mock/MockTests.cs"
 
   - id: BuildMark-RepoConnectors-Mock-MockRepoConnector
@@ -356,8 +356,8 @@ reviews:
     title: Review that BuildMark RepoConnectors GitHub Satisfies Sub-Subsystem Requirements
     paths:
       - "docs/reqstream/build-mark/repo-connectors/github/github.yaml"
-      - "docs/design/build-mark/repo-connectors/github/github.md"
-      - "docs/verification/build-mark/repo-connectors/github/github.md"
+      - "docs/design/build-mark/repo-connectors/github.md"
+      - "docs/verification/build-mark/repo-connectors/github.md"
       - "test/**/RepoConnectors/GitHub/GitHubTests.cs"
 
   - id: BuildMark-RepoConnectors-GitHub-GitHubGraphQLClient
@@ -393,8 +393,8 @@ reviews:
     title: Review that BuildMark RepoConnectors AzureDevOps Satisfies Sub-Subsystem Requirements
     paths:
       - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops.yaml"
-      - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops.md"
-      - "docs/verification/build-mark/repo-connectors/azure-devops/azure-devops.md"
+      - "docs/design/build-mark/repo-connectors/azure-devops.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops.md"
       - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs"
 
   - id: BuildMark-RepoConnectors-AzureDevOps-AzureDevOpsRestClient
