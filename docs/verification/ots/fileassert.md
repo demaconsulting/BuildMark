@@ -1,6 +1,6 @@
-# FileAssert
+## FileAssert
 
-## Verification Approach
+### Verification Approach
 
 FileAssert is an OTS tool. Verification is achieved through the tool's built-in
 self-validation (`--validate`) executed in the CI pipeline. The self-validation
@@ -13,7 +13,7 @@ generated document (Build Notes, Code Quality, Review Plan, Review Report, Desig
 User Guide, and Verification). Each successful assertion confirms that FileAssert
 is able to inspect and validate file content as required.
 
-## Evidence
+### Evidence
 
 The CI pipeline step `Run FileAssert self-validation` executes:
 
@@ -23,7 +23,7 @@ dotnet fileassert --validate --results artifacts/fileassert-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-FileAssert**: CI pipeline self-validation TRX evidence from
   `artifacts/fileassert-self-validation.trx`

@@ -1,21 +1,21 @@
-# RuleMatchConfig
+### RuleMatchConfig
 
-## Verification Approach
+#### Verification Approach
 
 `RuleMatchConfig` is a data model class verified indirectly through `ItemRouterTests.cs`.
 Tests that exercise label-based and type-based matching use `RuleMatchConfig` instances
 within `RuleConfig` to control item routing. Case-insensitive matching tests confirm
 the match comparison behavior.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Data class |
 
-## Test Scenarios (Integration)
+#### Test Scenarios (Integration)
 
-### ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
+##### ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
 
 **Scenario**: A `RuleMatchConfig` specifying a work item type is used; item with
 matching type is routed.
@@ -24,7 +24,7 @@ matching type is routed.
 
 **Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
 
-### ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem
+##### ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem
 
 **Scenario**: A `RuleMatchConfig` specifying a label is used; item with matching
 label (case-insensitive) is routed.
@@ -33,7 +33,7 @@ label (case-insensitive) is routed.
 
 **Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
 
-### ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem
+##### ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem
 
 **Scenario**: A `RuleMatchConfig` on a suppressed rule matches an item case-insensitively.
 
@@ -41,7 +41,7 @@ label (case-insensitive) is routed.
 
 **Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Configuration-RuleMatchConfig**:
   ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem,

@@ -1,6 +1,6 @@
-# MockRepoConnector
+#### MockRepoConnector
 
-## Overview
+##### Overview
 
 `MockRepoConnector` is an in-memory implementation of `IRepoConnector` used for
 self-validation and unit testing. It returns a fixed, deterministic dataset
@@ -10,7 +10,7 @@ without making any network or filesystem calls.
 the `--validate` flag must work in any deployment without requiring a separate test
 assembly or external tooling.
 
-## Data Model
+##### Data Model
 
 The connector holds hard-coded mappings used to build the `BuildInformation` response:
 
@@ -23,9 +23,9 @@ The connector holds hard-coded mappings used to build the `BuildInformation` res
 | `_openIssues`            | `List<string>`                            | IDs of issues that remain open               |
 | `_issueAffectedVersions` | `Dictionary<string, VersionIntervalSet>`  | Issue ID -> declared affected-versions range |
 
-## Methods
+##### Methods
 
-### `GetBuildInformationAsync(version?) → BuildInformation`
+###### `GetBuildInformationAsync(version?) → BuildInformation`
 
 Resolves tag history and the current commit hash from the internal dictionaries,
 determines the target and baseline versions, collects changes and known issues,
@@ -44,7 +44,7 @@ collects all items and passes them to `ApplyRules` (inherited from `RepoConnecto
 to produce the `RoutedSections` list. If no rules are configured, the legacy
 categorization into `Changes` and `Bugs` is used.
 
-## Error Conditions
+##### Error Conditions
 
 `GetBuildInformationAsync` throws `InvalidOperationException` in the following scenarios:
 
@@ -57,7 +57,7 @@ These conditions mirror the equivalent error paths in the production `GitHubRepo
 and `AzureDevOpsRepoConnector`, making the mock suitable for testing error-handling code
 paths as well as the happy path.
 
-## Interactions
+##### Interactions
 
 | Unit / Subsystem         | Role                                                                              |
 |--------------------------|-----------------------------------------------------------------------------------|

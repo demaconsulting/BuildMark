@@ -1,6 +1,6 @@
-# Utilities Subsystem
+## Utilities Subsystem
 
-## Overview
+### Overview
 
 The Utilities subsystem provides the shared helper classes used across the
 BuildMark system:
@@ -11,14 +11,14 @@ BuildMark system:
 Version parsing, comparison, tag handling, and interval logic are implemented in
 the separate `Version` subsystem.
 
-## Units
+### Units
 
 | Unit            | File                        | Responsibility             |
 |-----------------|-----------------------------|----------------------------|
 | `PathHelpers`   | `Utilities/PathHelpers.cs`  | Safe path combination      |
 | `ProcessRunner` | `Utilities/ProcessRunner.cs`| External process execution |
 
-## Interfaces
+### Interfaces
 
 `PathHelpers` exposes the following static method:
 
@@ -33,7 +33,7 @@ the separate `Version` subsystem.
 | `RunAsync(command, params arguments)`   | Method | Run a process and return stdout; throws on failure      |
 | `TryRunAsync(command, params arguments)`| Method | Run a process and return stdout, or null on any failure |
 
-## Interactions
+### Interactions
 
 `PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
 subsystems. They are consumed by any unit that needs safe path combination or

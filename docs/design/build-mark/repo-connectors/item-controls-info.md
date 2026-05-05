@@ -1,13 +1,13 @@
-# ItemControlsInfo
+### ItemControlsInfo
 
-## Overview
+#### Overview
 
 `ItemControlsInfo` is the data record used by the RepoConnectors subsystem to
 carry the controls extracted from a `buildmark` block. It stores the optional
 visibility override, type override, and affected-version interval data that
 `GitHubRepoConnector` applies while constructing `ItemInfo` records.
 
-## Data Model
+#### Data Model
 
 ```csharp
 public record ItemControlsInfo(
@@ -22,7 +22,7 @@ public record ItemControlsInfo(
 - `AffectedVersions` (`VersionIntervalSet?`) stores the optional
   affected-version interval set.
 
-## Interactions
+#### Interactions
 
 - `ItemControlsParser` creates an `ItemControlsInfo` instance when a `buildmark`
   block contains one or more recognized keys.

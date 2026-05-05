@@ -1,21 +1,21 @@
-# BuildNotes
+## BuildNotes
 
-## Verification Approach
+### Verification Approach
 
 `BuildNotes` is the subsystem encompassing `BuildInformation`, `ItemInfo`, and `WebLink`. It is
 verified with dedicated subsystem tests in `BuildNotesTests.cs`. The subsystem uses
 `MockRepoConnector` to supply deterministic `BuildInformation` instances; no other mocking or test
 doubles are required.
 
-## Dependencies
+### Dependencies
 
 | Mock / Stub         | Reason                                                               |
 | ------------------- | -------------------------------------------------------------------- |
 | `MockRepoConnector` | Provides deterministic `BuildInformation` for subsystem-level tests. |
 
-## Test Scenarios
+### Test Scenarios
 
-### BuildNotes_ReportModel_GeneratesCorrectMarkdown
+#### BuildNotes_ReportModel_GeneratesCorrectMarkdown
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync` is called with version `v2.0.0`; the
 resulting `BuildInformation` is rendered via `ToMarkdown()`.
@@ -25,7 +25,7 @@ resulting `BuildInformation` is rendered via `ToMarkdown()`.
 
 **Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
-### BuildNotes_ReportModel_IncludesKnownIssues
+#### BuildNotes_ReportModel_IncludesKnownIssues
 
 **Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on a `BuildInformation` for `v2.0.0`
 that has known issues.
@@ -35,7 +35,7 @@ that has known issues.
 
 **Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
-### BuildNotes_ReportModel_IncludesFullChangelog
+#### BuildNotes_ReportModel_IncludesFullChangelog
 
 **Scenario**: `ToMarkdown()` is called on a `BuildInformation` for `v2.0.0` that has a changelog
 link.
@@ -45,7 +45,7 @@ link.
 
 **Requirement coverage**: `BuildMark-BuildNotes-ReportModel`.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **`BuildMark-BuildNotes-ReportModel`**:
   - BuildNotes_ReportModel_GeneratesCorrectMarkdown

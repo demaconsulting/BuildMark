@@ -1,6 +1,6 @@
-# Mock Subsystem
+### Mock Subsystem
 
-## Overview
+#### Overview
 
 The Mock subsystem groups the in-memory connector used by the built-in
 `--validate` self-test. It sits within the RepoConnectors subsystem.
@@ -9,13 +9,13 @@ The Mock subsystem groups the in-memory connector used by the built-in
 the `--validate` flag must work in any deployment without requiring a separate test
 assembly or external tooling.
 
-## Units
+#### Units
 
 | Unit                 | File                                        | Responsibility                               |
 |----------------------|---------------------------------------------|----------------------------------------------|
 | `MockRepoConnector`  | `RepoConnectors/Mock/MockRepoConnector.cs`  | In-memory connector for self-validation      |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem    | Role                                                              |
 |---------------------|-------------------------------------------------------------------|

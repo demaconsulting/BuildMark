@@ -1,21 +1,21 @@
-# BuildMarkConfig
+### BuildMarkConfig
 
-## Verification Approach
+#### Verification Approach
 
 `BuildMarkConfig` is verified with dedicated unit tests in `ConfigurationTests.cs`. The test
 `BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
 `BuildMarkConfig.CreateDefault()` and asserts on the returned sections and routing rules. No
 mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason          |
 | ----------- | --------------- |
 | None        | No mocks needed |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
 **Scenario**: `BuildMarkConfig.CreateDefault()` is called.
 
@@ -26,7 +26,7 @@ rule has a null match.
 **Requirement coverage**: `BuildMark-SectionConfig-Properties`,
 `BuildMark-RuleConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-SectionConfig-Properties`**:
   - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

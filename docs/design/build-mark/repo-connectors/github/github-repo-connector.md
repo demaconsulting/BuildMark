@@ -1,6 +1,6 @@
-# GitHubRepoConnector
+#### GitHubRepoConnector
 
-## Overview
+##### Overview
 
 `GitHubRepoConnector` is the production unit in the RepoConnectors/GitHub
 subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
@@ -10,9 +10,9 @@ The unit reads the repository URL and current commit hash from Git, resolves the
 GitHub token from environment variables, and fetches all data needed to construct
 a `BuildInformation` record.
 
-## Data Model
+##### Data Model
 
-### Authentication
+###### Authentication
 
 The connector resolves the GitHub token using the following priority order:
 
@@ -22,7 +22,7 @@ The connector resolves the GitHub token using the following priority order:
 
 If no token is found, the connector throws `InvalidOperationException`.
 
-### Label Mapping
+###### Label Mapping
 
 GitHub issue and pull request labels are mapped to normalized types:
 
@@ -40,7 +40,7 @@ When routing rules are configured via `.buildmark.yaml`, the label-derived categ
 is overridden by `RepoConnectorBase.ApplyRules`, which delegates to `ItemRouter` to
 distribute all collected items into the configured report sections instead.
 
-### GraphQL Response Types
+###### GraphQL Response Types
 
 The `GitHubGraphQLClient` returns `PullRequestNode` and `IssueNode` records that
 must include the `body` field so the connector can pass description text to
@@ -75,7 +75,7 @@ internal record IssueNode(
 Both `GetPullRequestsAsync` and `GetAllIssuesAsync` must include `body` in their
 GraphQL field selections.
 
-### Item Controls Override
+###### Item Controls Override
 
 After the label-derived type is determined, the connector calls
 `ItemControlsParser.Parse(body)` on the description body of each issue and pull
@@ -95,9 +95,9 @@ overrides are applied:
 When no `buildmark` block is present, the existing label-based rules apply
 unchanged.
 
-## Methods
+##### Methods
 
-### `GetBuildInformationAsync(Version? version) → BuildInformation`
+###### `GetBuildInformationAsync(Version? version) → BuildInformation`
 
 Main entry point. Performs the following steps:
 
@@ -140,7 +140,7 @@ Main entry point. Performs the following steps:
 13. Generate the full changelog URL from the baseline and target tags.
 14. Return the assembled `BuildInformation` record.
 
-## Interactions
+##### Interactions
 
 - `GitHubConnectorConfig` is received from `RepoConnectorFactory` and overrides
   the owner, repository, and URL.

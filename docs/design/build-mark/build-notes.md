@@ -1,6 +1,6 @@
-# BuildNotes Subsystem
+## BuildNotes Subsystem
 
-## Overview
+### Overview
 
 The BuildNotes subsystem holds the output data model shared by all connectors and
 by `Program`. It defines the records that represent a build's version tags,
@@ -10,7 +10,7 @@ a markdown report.
 All connectors produce a `BuildInformation` record from these types, and `Program`
 calls `BuildInformation.ToMarkdown` to write the final report file.
 
-## Units
+### Units
 
 | Unit               | File                             | Responsibility                                   |
 |--------------------|----------------------------------|--------------------------------------------------|
@@ -18,7 +18,7 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 | `ItemInfo`         | `BuildNotes/ItemInfo.cs`         | Single issue or pull request in the report       |
 | `WebLink`          | `BuildNotes/WebLink.cs`          | Hyperlink used for the full-changelog entry      |
 
-## Interactions
+### Interactions
 
 | Unit / Subsystem    | Role                                                               |
 |---------------------|--------------------------------------------------------------------|

@@ -1,20 +1,20 @@
-# VersionSemantic
+### VersionSemantic
 
-## Verification Approach
+#### Verification Approach
 
 `VersionSemantic` is tested through `VersionSemanticTests.cs`, which contains 12 unit
 tests. The tests cover creation with and without build metadata, property delegation
 to the underlying `VersionComparable`, string formatting, and comparison.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
 
-## Test Scenarios
+#### Test Scenarios
 
-### VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
+##### VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3+build.123"`.
 
@@ -22,7 +22,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
+##### VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3"`.
 
@@ -30,7 +30,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Properties_DelegateToComparable_Correctly
+##### VersionSemantic_Properties_DelegateToComparable_Correctly
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3-alpha"` and the `Major`,
 `Minor`, `Patch`, `PreRelease`, and `CompareVersion` properties are read.
@@ -40,7 +40,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_ToString_FormatsCompletely_WithAllComponents
+##### VersionSemantic_ToString_FormatsCompletely_WithAllComponents
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3-alpha+build.123"` and
 `FullVersion` is read.
@@ -49,7 +49,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_PreRelease_ReturnsEmptyStringForRelease
+##### VersionSemantic_PreRelease_ReturnsEmptyStringForRelease
 
 **Scenario**: `PreRelease` property is accessed on a release version (no `-` suffix).
 
@@ -57,7 +57,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
+##### VersionSemantic_Parse_ValidSemanticVersions_ParsesCorrectly
 
 **Scenario**: A series of standard semver strings are parsed.
 
@@ -65,7 +65,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Create_SimpleVersion_ParsesVersion
+##### VersionSemantic_Create_SimpleVersion_ParsesVersion
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3"`.
 
@@ -75,7 +75,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Create_VersionWithMetadata_ParsesVersion
+##### VersionSemantic_Create_VersionWithMetadata_ParsesVersion
 
 **Scenario**: `VersionSemantic.Create` is called with `"1.2.3+build.5"`.
 
@@ -85,7 +85,7 @@ to the underlying `VersionComparable`, string formatting, and comparison.
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Create_PreReleaseWithMetadata_ParsesVersion
+##### VersionSemantic_Create_PreReleaseWithMetadata_ParsesVersion
 
 **Scenario**: `VersionSemantic.Create` is called with `"2.0.0-alpha.1+linux.x64"`.
 
@@ -95,7 +95,7 @@ equals `"linux.x64"`; `CompareVersion` equals `"2.0.0-alpha.1"`; `FullVersion` e
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_TryCreate_InvalidVersion_ReturnsNull
+##### VersionSemantic_TryCreate_InvalidVersion_ReturnsNull
 
 **Scenario**: `VersionSemantic.TryCreate` is called with `"not-a-version"`.
 
@@ -103,7 +103,7 @@ equals `"linux.x64"`; `CompareVersion` equals `"2.0.0-alpha.1"`; `FullVersion` e
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Create_InvalidVersion_ThrowsArgumentException
+##### VersionSemantic_Create_InvalidVersion_ThrowsArgumentException
 
 **Scenario**: `VersionSemantic.Create` is called with `"not-a-version"`.
 
@@ -112,7 +112,7 @@ equals `"linux.x64"`; `CompareVersion` equals `"2.0.0-alpha.1"`; `FullVersion` e
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-### VersionSemantic_Comparable_AllowsComparison
+##### VersionSemantic_Comparable_AllowsComparison
 
 **Scenario**: `Comparable` is compared for `"1.2.3+build1"` and `"1.2.4+build2"`.
 
@@ -121,6 +121,6 @@ before `"1.2.4"`).
 
 **Requirement coverage**: `BuildMark-Version-VersionSemantic`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Version-VersionSemantic**: All 12 tests in `VersionSemanticTests.cs`

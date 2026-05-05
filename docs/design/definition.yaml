@@ -17,15 +17,15 @@ resource-path:
 input-files:
   - docs/design/title.txt
   - docs/design/introduction.md
-  - docs/design/build-mark/build-mark.md
+  - docs/design/build-mark.md
   - docs/design/build-mark/program.md
-  - docs/design/build-mark/build-notes/build-notes.md
+  - docs/design/build-mark/build-notes.md
   - docs/design/build-mark/build-notes/build-information.md
   - docs/design/build-mark/build-notes/item-info.md
   - docs/design/build-mark/build-notes/web-link.md
-  - docs/design/build-mark/cli/cli.md
+  - docs/design/build-mark/cli.md
   - docs/design/build-mark/cli/context.md
-  - docs/design/build-mark/configuration/configuration.md
+  - docs/design/build-mark/configuration.md
   - docs/design/build-mark/configuration/build-mark-config.md
   - docs/design/build-mark/configuration/build-mark-config-reader.md
   - docs/design/build-mark/configuration/configuration-load-result.md
@@ -34,31 +34,31 @@ input-files:
   - docs/design/build-mark/configuration/report-config.md
   - docs/design/build-mark/configuration/rule-config.md
   - docs/design/build-mark/configuration/section-config.md
-  - docs/design/build-mark/self-test/self-test.md
+  - docs/design/build-mark/self-test.md
   - docs/design/build-mark/self-test/validation.md
-  - docs/design/build-mark/utilities/utilities.md
+  - docs/design/build-mark/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
   - docs/design/build-mark/utilities/process-runner.md
-  - docs/design/build-mark/version/version.md
+  - docs/design/build-mark/version.md
   - docs/design/build-mark/version/version-comparable.md
   - docs/design/build-mark/version/version-semantic.md
   - docs/design/build-mark/version/version-tag.md
   - docs/design/build-mark/version/version-interval.md
   - docs/design/build-mark/version/version-interval-set.md
   - docs/design/build-mark/version/version-commit-tag.md
-  - docs/design/build-mark/repo-connectors/repo-connectors.md
+  - docs/design/build-mark/repo-connectors.md
   - docs/design/build-mark/repo-connectors/repo-connector-base.md
   - docs/design/build-mark/repo-connectors/item-router.md
   - docs/design/build-mark/repo-connectors/item-controls-info.md
   - docs/design/build-mark/repo-connectors/item-controls-parser.md
   - docs/design/build-mark/repo-connectors/repo-connector-factory.md
-  - docs/design/build-mark/repo-connectors/github/github.md
+  - docs/design/build-mark/repo-connectors/github.md
   - docs/design/build-mark/repo-connectors/github/github-repo-connector.md
   - docs/design/build-mark/repo-connectors/github/github-graphql-client.md
   - docs/design/build-mark/repo-connectors/github/github-graphql-types.md
-  - docs/design/build-mark/repo-connectors/mock/mock.md
+  - docs/design/build-mark/repo-connectors/mock.md
   - docs/design/build-mark/repo-connectors/mock/mock-repo-connector.md
-  - docs/design/build-mark/repo-connectors/azure-devops/azure-devops.md
+  - docs/design/build-mark/repo-connectors/azure-devops.md
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md

@@ -1,21 +1,21 @@
-# ItemControlsInfo
+### ItemControlsInfo
 
-## Verification Approach
+#### Verification Approach
 
 `ItemControlsInfo` is a data model class with no dedicated test class. It is verified
 indirectly through `ItemControlsTests.cs` and `ItemControlsParserTests.cs`. The parser
 tests assert on the resulting `ItemControlsInfo` instances, confirming that visibility,
 type, and affected versions fields are populated correctly.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Data class |
 
-## Test Scenarios (via ItemControlsTests.cs - 13 tests)
+#### Test Scenarios (via ItemControlsTests.cs - 13 tests)
 
-### ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility
+##### ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility
 
 **Scenario**: A buildmark block with `visibility: public` is parsed.
 
@@ -23,7 +23,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithVisibilityInternal_ReturnsInternalVisibility
+##### ItemControls_Parse_WithVisibilityInternal_ReturnsInternalVisibility
 
 **Scenario**: A buildmark block with `visibility: internal` is parsed.
 
@@ -31,7 +31,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithTypeBug_ReturnsBugType
+##### ItemControls_Parse_WithTypeBug_ReturnsBugType
 
 **Scenario**: A buildmark block with `type: bug` is parsed.
 
@@ -39,7 +39,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithTypeFeature_ReturnsFeatureType
+##### ItemControls_Parse_WithTypeFeature_ReturnsFeatureType
 
 **Scenario**: A buildmark block with `type: feature` is parsed.
 
@@ -47,7 +47,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithAffectedVersions_ReturnsIntervalSet
+##### ItemControls_Parse_WithAffectedVersions_ReturnsIntervalSet
 
 **Scenario**: A buildmark block with `affected-versions` is parsed.
 
@@ -55,7 +55,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithHiddenBlock_ReturnsControls
+##### ItemControls_Parse_WithHiddenBlock_ReturnsControls
 
 **Scenario**: A hidden buildmark block is parsed.
 
@@ -63,7 +63,7 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-### ItemControls_Parse_WithNoBlock_ReturnsNull
+##### ItemControls_Parse_WithNoBlock_ReturnsNull
 
 **Scenario**: Text with no buildmark block is parsed.
 
@@ -71,6 +71,6 @@ type, and affected versions fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-RepoConnectors-ItemControlsInfo**: All 13 tests in `ItemControlsTests.cs`

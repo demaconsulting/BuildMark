@@ -1,6 +1,6 @@
-# ItemRouter
+### ItemRouter
 
-## Overview
+#### Overview
 
 `ItemRouter` is a shared static utility in the RepoConnectors subsystem that routes
 a list of `ItemInfo` objects into report sections. It applies a list of `RuleConfig`
@@ -10,9 +10,9 @@ routing logic across multiple connector implementations.
 All connectors (GitHub, Azure DevOps, Mock) call `ItemRouter` rather than
 each implementing their own routing.
 
-## Methods
+#### Methods
 
-### `Route(items, rules, sections) → Dictionary<string, List<ItemInfo>>`
+##### `Route(items, rules, sections) → Dictionary<string, List<ItemInfo>>`
 
 Takes a list of `ItemInfo` objects, a list of `RuleConfig` entries, and a list of
 `SectionConfig` entries, and returns a dictionary mapping each section ID to the
@@ -23,7 +23,7 @@ items assigned to that section.
   sections
 - `sections` (`IReadOnlyList<SectionConfig>`) - ordered list of report sections
 
-#### Algorithm
+###### Algorithm
 
 Rules are evaluated in order; the first matching rule wins. Items that do not match
 any rule are placed in the **default section**, which is the first entry in the
@@ -36,21 +36,21 @@ Sections not present in the configured `sections` list are created dynamically
 when a rule routes an item to an unknown section ID. This allows rules to introduce
 ad-hoc sections without requiring them to be pre-declared.
 
-#### Rule matching
+###### Rule matching
 
 - A `null` `Match` block is a **catch-all** - the rule matches every item.
 - A non-null `Match` block may specify `Label` and/or `WorkItemType` filter lists.
   Both lists are matched case-insensitively against the item's `Type` field.
   All non-empty filter lists must match for the rule to apply.
 
-#### Error Handling
+###### Error Handling
 
 No explicit error handling is performed. Callers are responsible for passing valid, non-null
 arguments. Duplicate section IDs in the `sections` list will cause an `ArgumentException` from
 the internal dictionary initialization. Null inputs will result in a `NullReferenceException`
 propagating to the caller.
 
-## Interactions
+#### Interactions
 
 - `ItemInfo` provides the input items to be routed from the BuildNotes
   subsystem.

@@ -1,11 +1,11 @@
 ---
 includes:
-  - version-comparable.yaml
-  - version-semantic.yaml
-  - version-tag.yaml
-  - version-interval.yaml
-  - version-interval-set.yaml
-  - version-commit-tag.yaml
+  - version/version-comparable.yaml
+  - version/version-semantic.yaml
+  - version/version-tag.yaml
+  - version/version-interval.yaml
+  - version/version-interval-set.yaml
+  - version/version-commit-tag.yaml
 
 sections:
   - title: Version Subsystem Requirements

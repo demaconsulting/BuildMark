@@ -1,6 +1,6 @@
-# Validation
+### Validation
 
-## Overview
+#### Overview
 
 `Validation` is the sole unit in the SelfTest subsystem. It runs a fixed set of
 self-tests that exercise the core functionality of BuildMark without requiring
@@ -9,20 +9,20 @@ optionally, to a TRX or JUnit XML results file.
 
 The unit is invoked by `Program.Run` when the `--validate` flag is set.
 
-## Data Model
+#### Data Model
 
 `Validation` has no persistent state. All data is local to the `Run` method and
 its helpers. Test results are accumulated in a list of `TestResult` records that
 are written to a file at the end of the run.
 
-### `TemporaryDirectory` Helper
+##### `TemporaryDirectory` Helper
 
 A private nested class that creates a temporary directory on construction and
 deletes it (with all contents) on disposal. Used to isolate test artifacts.
 
-## Methods
+#### Methods
 
-### `Run(Context context)`
+##### `Run(Context context)`
 
 Entry point for self-validation. It:
 
@@ -34,36 +34,36 @@ Entry point for self-validation. It:
 5. Writes any unsupported extension as an error.
 6. Sets `context.ExitCode` to `1` if any test fails.
 
-### `RunMarkdownReportGeneration`
+##### `RunMarkdownReportGeneration`
 
 Creates a `MockRepoConnector` with representative data, generates a
 `BuildInformation` record, calls `ToMarkdown`, writes the output to a temporary
 file, and verifies the file contains expected version and content markers.
 
-### `RunGitIntegration`
+##### `RunGitIntegration`
 
 Uses `MockRepoConnector` to verify that the tool correctly extracts and displays
 version, commit hash, and previous version information from repository data.
 Validates the output against expected patterns.
 
-### `RunIssueTracking`
+##### `RunIssueTracking`
 
 Uses `MockRepoConnector` to verify that issues and pull requests are categorized
 and collected correctly into the `Changes` and `Bugs` lists of `BuildInformation`.
 
-### `RunKnownIssuesReporting`
+##### `RunKnownIssuesReporting`
 
 Uses `MockRepoConnector` to verify that known issues are included in the markdown
 report when the `--include-known-issues` flag is set.
 
-### `RunRulesRouting`
+##### `RunRulesRouting`
 
 Creates a `MockRepoConnector` configured with routing rules that direct items labelled
 `bug` to a `bugs` section and all other items to a `features` section. Generates a
 `BuildInformation` record, calls `ToMarkdown`, writes the output to a temporary file,
 and verifies the file contains both `## Features` and `## Bugs` section headings.
 
-## Interactions
+#### Interactions
 
 - `Context` provides output methods, `ResultsFile`, and the exit code sink.
 - `MockRepoConnector` supplies deterministic data for all tests in the

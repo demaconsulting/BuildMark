@@ -1,21 +1,21 @@
-# MockRepoConnector
+#### MockRepoConnector
 
-## Verification Approach
+##### Verification Approach
 
 `MockRepoConnector` is tested through `MockRepoConnectorTests.cs`, which contains
 11 unit tests. The tests verify that the connector correctly returns in-memory data
 supplied via its configuration API, handles all routing and `HasRules` logic, and
 correctly implements all members of `IRepoConnector`.
 
-## Dependencies
+##### Dependencies
 
 | Mock / Stub | Reason                             |
 | ----------- | ---------------------------------- |
 | None        | Self-contained in-memory connector |
 
-## Test Scenarios
+##### Test Scenarios
 
-### MockRepoConnector_ImplementsInterface
+###### MockRepoConnector_ImplementsInterface
 
 **Scenario**: `MockRepoConnector` is checked against `IRepoConnector`.
 
@@ -23,7 +23,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
 
-### MockRepoConnector_Constructor_CreatesInstance
+###### MockRepoConnector_Constructor_CreatesInstance
 
 **Scenario**: `MockRepoConnector` is constructed with no arguments.
 
@@ -31,7 +31,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_GetBuildInformationAsync_NoData_ReturnsEmptyBuildInformation
+###### MockRepoConnector_GetBuildInformationAsync_NoData_ReturnsEmptyBuildInformation
 
 **Scenario**: `GetBuildInformationAsync` is called on an unconfigured connector.
 
@@ -39,7 +39,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_SetBuildVersion_StoresVersion
+###### MockRepoConnector_SetBuildVersion_StoresVersion
 
 **Scenario**: `SetBuildVersion` is called with a version string.
 
@@ -47,7 +47,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_SetBaselineVersion_StoresBaseline
+###### MockRepoConnector_SetBaselineVersion_StoresBaseline
 
 **Scenario**: `SetBaselineVersion` is called with a version string.
 
@@ -55,7 +55,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_AddChange_AddsItemToChanges
+###### MockRepoConnector_AddChange_AddsItemToChanges
 
 **Scenario**: `AddChange` is called with a change item.
 
@@ -63,7 +63,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_AddKnownIssue_AddsItemToKnownIssues
+###### MockRepoConnector_AddKnownIssue_AddsItemToKnownIssues
 
 **Scenario**: `AddKnownIssue` is called with a known issue item.
 
@@ -71,7 +71,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+###### MockRepoConnector_Configure_WithRules_HasRulesReturnsTrue
 
 **Scenario**: `Configure` is called with a non-empty rules list.
 
@@ -79,7 +79,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_Configure_EmptyRules_HasRulesReturnsFalse
+###### MockRepoConnector_Configure_EmptyRules_HasRulesReturnsFalse
 
 **Scenario**: `Configure` is called with an empty rules list.
 
@@ -87,7 +87,7 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+###### MockRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
 **Scenario**: Connector is configured with routing rules; changes and known issues are
 added; `GetBuildInformationAsync` is called.
@@ -96,7 +96,7 @@ added; `GetBuildInformationAsync` is called.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-### MockRepoConnector_GetBuildInformationAsync_WithChangelogLink_StoresLink
+###### MockRepoConnector_GetBuildInformationAsync_WithChangelogLink_StoresLink
 
 **Scenario**: A changelog link is set on the connector.
 
@@ -104,7 +104,7 @@ added; `GetBuildInformationAsync` is called.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-## Requirements Coverage
+##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-IRepoConnector**: MockRepoConnector_ImplementsInterface
 - **BuildMark-RepoConnectors-Mock**: All remaining 10 tests in `MockRepoConnectorTests.cs`

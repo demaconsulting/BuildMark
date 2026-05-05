@@ -1,21 +1,21 @@
-# RuleConfig
+### RuleConfig
 
-## Verification Approach
+#### Verification Approach
 
 `RuleConfig` is verified through `ConfigurationTests.cs`. The test
 `BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
 `BuildMarkConfig.CreateDefault()` and asserts on the `Route` and `Match` properties of the
 returned rules. No mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason          |
 | ----------- | --------------- |
 | None        | No mocks needed |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
 **Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Rules` collection is
 inspected.
@@ -27,7 +27,7 @@ route with a null match.
 
 **Requirement coverage**: `BuildMark-RuleConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-RuleConfig-Properties`**:
   - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

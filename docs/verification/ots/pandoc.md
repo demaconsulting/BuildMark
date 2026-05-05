@@ -1,6 +1,6 @@
-# Pandoc
+## Pandoc
 
-## Verification Approach
+### Verification Approach
 
 Pandoc is an OTS document conversion tool. Verification is achieved through
 repeated document generation in the CI pipeline. Pandoc converts markdown source
@@ -9,7 +9,7 @@ Review Report, Design, User Guide, and Verification). FileAssert then validates 
 each generated HTML file contains expected content, providing evidence of correct
 Pandoc operation.
 
-## Evidence
+### Evidence
 
 The CI pipeline generates HTML output using Pandoc for each document section, and
 FileAssert validates the output. For example, for the Design document:
@@ -23,7 +23,7 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
 `fileassert-code-review.trx`, `fileassert-design.trx`, `fileassert-user-guide.trx`,
 `fileassert-verification.trx`) are consumed by ReqStream to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-Pandoc**: CI pipeline document generation evidence from multiple
   FileAssert TRX results confirming successful HTML conversion

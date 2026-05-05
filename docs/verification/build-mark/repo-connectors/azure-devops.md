@@ -1,6 +1,6 @@
-# Azure DevOps
+### Azure DevOps
 
-## Verification Approach
+#### Verification Approach
 
 The Azure DevOps sub-subsystem is verified through `AzureDevOpsTests.cs` (5 subsystem-
 level tests), `AzureDevOpsRepoConnectorTests.cs` (25 unit tests),
@@ -8,15 +8,15 @@ level tests), `AzureDevOpsRepoConnectorTests.cs` (25 unit tests),
 tests). The subsystem tests exercise the full Azure DevOps data pipeline through mock
 HTTP responses. The unit tests are described in the individual unit chapters.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub              | Reason                                             |
 | ------------------------ | -------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to the Azure DevOps REST API |
 
-## Test Scenarios (Subsystem-Level, AzureDevOpsTests.cs)
+#### Test Scenarios (Subsystem-Level, AzureDevOpsTests.cs)
 
-### AzureDevOps_ImplementsInterface_ReturnsTrue
+##### AzureDevOps_ImplementsInterface_ReturnsTrue
 
 **Scenario**: `AzureDevOpsRepoConnector` is checked against `IRepoConnector`.
 
@@ -24,7 +24,7 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
 
-### AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+##### AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
 
 **Scenario**: Azure DevOps connector receives mocked REST API data.
 
@@ -32,7 +32,7 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOps_GetBuildInformation_WithWorkItems_GathersChanges
+##### AzureDevOps_GetBuildInformation_WithWorkItems_GathersChanges
 
 **Scenario**: Mock data includes work items linked to commits.
 
@@ -40,7 +40,7 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOps_GetBuildInformation_WithOpenBugs_IdentifiesKnownIssues
+##### AzureDevOps_GetBuildInformation_WithOpenBugs_IdentifiesKnownIssues
 
 **Scenario**: Mock data includes open bug work items.
 
@@ -48,7 +48,7 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+##### AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
 
 **Scenario**: Build version is a release; pre-release tags in history are skipped.
 
@@ -56,7 +56,7 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-RepoConnectors-IRepoConnector**: AzureDevOps_ImplementsInterface_ReturnsTrue
 - **BuildMark-RepoConnectors-AzureDevOps**: AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,

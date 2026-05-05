@@ -1,6 +1,6 @@
-# ConfigurationLoadResult
+### ConfigurationLoadResult
 
-## Overview
+#### Overview
 
 `ConfigurationLoadResult` is an immutable record that carries the output of
 `BuildMarkConfigReader.ReadAsync`. It holds the parsed configuration (or `null` if parsing
@@ -9,7 +9,7 @@ failed) together with an ordered list of issues found during parsing.
 `Program` calls `result.ReportTo(context)` immediately after reading the configuration to
 surface any issues to the user and set the exit code when errors are present.
 
-## Data Model
+#### Data Model
 
 | Member              | Kind     | Description                                              |
 |---------------------|----------|----------------------------------------------------------|
@@ -18,12 +18,12 @@ surface any issues to the user and set the exit code when errors are present.
 | `HasErrors`         | Property | `true` when any issue has `Severity` of `Error`          |
 | `ReportTo(context)` | Method   | Writes all issues to `Context`; sets exit code on errors |
 
-### `ReportTo(Context context)`
+##### `ReportTo(Context context)`
 
 Iterates `Issues` and writes each one to the context output. If any issue has severity
 `Error`, sets `context.ExitCode` to 1.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem        | Role                                                                    |
 |-------------------------|-------------------------------------------------------------------------|

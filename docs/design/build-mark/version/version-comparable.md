@@ -1,12 +1,12 @@
-# Version Comparable
+### Version Comparable
 
-## Purpose
+#### Purpose
 
 The `VersionComparable` class provides core semantic version comparison functionality.
 It handles versions in the format `major.minor.patch[-pre-release]` and implements
 proper semantic version ordering rules with optimized performance for pre-release comparison.
 
-## Structure
+#### Structure
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
@@ -18,9 +18,9 @@ proper semantic version ordering rules with optimized performance for pre-releas
 | IsPreRelease | bool | Whether this is a pre-release version |
 | CompareVersion | string | Normalized comparison string (major.minor.patch[-pre-release]) |
 
-## Performance Optimization
+#### Performance Optimization
 
-### Pre-Release Parsing
+##### Pre-Release Parsing
 
 The class implements optimized pre-release comparison through:
 
@@ -28,7 +28,7 @@ The class implements optimized pre-release comparison through:
 - **Construction-Time Parsing**: Pre-release strings are parsed once during object construction
 - **Efficient Comparison**: Comparisons use pre-parsed segments instead of repeated string operations
 
-### Implementation Details
+##### Implementation Details
 
 | Component | Description |
 | --------- | ----------- |
@@ -39,7 +39,7 @@ The class implements optimized pre-release comparison through:
 This optimization eliminates repeated string splitting and parsing during comparison operations,
 providing significant performance benefits for sorting and version range operations.
 
-## Interface
+#### Interface
 
 The class implements `IComparable<VersionComparable>` providing analytical comparison:
 
@@ -47,7 +47,7 @@ The class implements `IComparable<VersionComparable>` providing analytical compa
 - Release versions > pre-release versions for same numbers
 - SemVer-compliant pre-release ordering with numeric precedence
 
-### Pre-Release Comparison Rules
+##### Pre-Release Comparison Rules
 
 Pre-release versions follow SemVer specification:
 
@@ -57,19 +57,19 @@ Pre-release versions follow SemVer specification:
 3. Numeric identifiers have lower precedence than non-numeric
 4. Shorter pre-release lists have lower precedence than longer ones
 
-## Comparison Operators
+#### Comparison Operators
 
 Standard comparison operators are overloaded:
 
 - `<`, `<=`, `>`, `>=` delegate to `CompareTo`
 - Natural ordering for use in collections and sorting
 
-## Factory Methods
+#### Factory Methods
 
 - `Create(string version)` - Creates instance, throws on invalid input
 - `TryCreate(string version)` - Returns null for invalid input
 
-## Example
+#### Example
 
 ```csharp
 var v1 = VersionComparable.Create("1.2.3");
@@ -81,7 +81,7 @@ var v5 = VersionComparable.Create("1.2.3-alpha.10");
 // v4 < v5 < v2 < v1 < v3 (numeric pre-release comparison, pre-release < release)
 ```
 
-## Regex Pattern
+#### Regex Pattern
 
 The class uses a generated regex pattern for parsing:
 

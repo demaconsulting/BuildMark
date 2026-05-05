@@ -1,6 +1,6 @@
-# ItemControlsParser
+### ItemControlsParser
 
-## Verification Approach
+#### Verification Approach
 
 `ItemControlsParser` is tested through `ItemControlsParserTests.cs`, which contains
 15 unit tests. The tests cover parsing `null` and empty descriptions, descriptions
@@ -8,15 +8,15 @@ with no block, and descriptions containing a buildmark block with various field
 combinations (visibility, type, affected-versions, hidden). Unknown keys and
 unrecognized values are tested for graceful ignorance.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
 
-## Test Scenarios
+#### Test Scenarios
 
-### ItemControlsParser_Parse_WithNullDescription_ReturnsNull
+##### ItemControlsParser_Parse_WithNullDescription_ReturnsNull
 
 **Scenario**: `ItemControlsParser.Parse` is called with `null`.
 
@@ -24,7 +24,7 @@ unrecognized values are tested for graceful ignorance.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithEmptyDescription_ReturnsNull
+##### ItemControlsParser_Parse_WithEmptyDescription_ReturnsNull
 
 **Scenario**: `ItemControlsParser.Parse` is called with an empty string.
 
@@ -32,7 +32,7 @@ unrecognized values are tested for graceful ignorance.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithNoBlock_ReturnsNull
+##### ItemControlsParser_Parse_WithNoBlock_ReturnsNull
 
 **Scenario**: `ItemControlsParser.Parse` is called with text that contains no
 buildmark block.
@@ -41,7 +41,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility
+##### ItemControlsParser_Parse_WithVisibilityPublic_ReturnsPublicVisibility
 
 **Scenario**: Description contains a buildmark block with `visibility: public`.
 
@@ -49,7 +49,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithVisibilityInternal_ReturnsInternalVisibility
+##### ItemControlsParser_Parse_WithVisibilityInternal_ReturnsInternalVisibility
 
 **Scenario**: Description contains a buildmark block with `visibility: internal`.
 
@@ -57,7 +57,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithTypeBug_ReturnsBugType
+##### ItemControlsParser_Parse_WithTypeBug_ReturnsBugType
 
 **Scenario**: Description contains a buildmark block with `type: bug`.
 
@@ -65,7 +65,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithTypeFeature_ReturnsFeatureType
+##### ItemControlsParser_Parse_WithTypeFeature_ReturnsFeatureType
 
 **Scenario**: Description contains a buildmark block with `type: feature`.
 
@@ -73,7 +73,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet
+##### ItemControlsParser_Parse_WithAffectedVersions_ReturnsIntervalSet
 
 **Scenario**: Description contains a buildmark block with `affected-versions`.
 
@@ -81,7 +81,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls
+##### ItemControlsParser_Parse_WithHiddenBlock_ReturnsControls
 
 **Scenario**: Description contains a hidden (but valid) buildmark block.
 
@@ -89,7 +89,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithHiddenBlockVisibilityInternal_ReturnsInternalVisibility
+##### ItemControlsParser_Parse_WithHiddenBlockVisibilityInternal_ReturnsInternalVisibility
 
 **Scenario**: Hidden block contains `visibility: internal`.
 
@@ -97,7 +97,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithUnknownKey_IgnoresKey
+##### ItemControlsParser_Parse_WithUnknownKey_IgnoresKey
 
 **Scenario**: Buildmark block contains an unrecognized key.
 
@@ -105,7 +105,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithUnrecognizedVisibilityValue_IgnoresValue
+##### ItemControlsParser_Parse_WithUnrecognizedVisibilityValue_IgnoresValue
 
 **Scenario**: Buildmark block contains `visibility: unknown-value`.
 
@@ -113,7 +113,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithUnrecognizedTypeValue_IgnoresValue
+##### ItemControlsParser_Parse_WithUnrecognizedTypeValue_IgnoresValue
 
 **Scenario**: Buildmark block contains `type: unknown-value`.
 
@@ -121,7 +121,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_AllFields_ReturnsCompleteInfo
+##### ItemControlsParser_Parse_AllFields_ReturnsCompleteInfo
 
 **Scenario**: Buildmark block contains visibility, type, and affected-versions.
 
@@ -129,7 +129,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-### ItemControlsParser_Parse_WithUnrecognizedAffectedVersionsValue_IgnoresValue
+##### ItemControlsParser_Parse_WithUnrecognizedAffectedVersionsValue_IgnoresValue
 
 **Scenario**: Buildmark block contains an invalid `affected-versions` value.
 
@@ -137,7 +137,7 @@ buildmark block.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-RepoConnectors-ItemControlsParser**: All 15 tests in
   `ItemControlsParserTests.cs`

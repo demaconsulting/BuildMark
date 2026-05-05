@@ -1,6 +1,6 @@
-# ReqStream
+## ReqStream
 
-## Verification Approach
+### Verification Approach
 
 ReqStream is an OTS requirements traceability tool. Verification is achieved through
 the tool's built-in self-validation (`--validate`) executed in the CI pipeline. The
@@ -13,7 +13,7 @@ requirements YAML files against TRX evidence and enforces that all requirements 
 satisfied (`--enforce`). Successful execution of ReqStream in enforcement mode provides
 further evidence of correct operation.
 
-## Evidence
+### Evidence
 
 The CI pipeline step `Run ReqStream self-validation` executes:
 
@@ -23,7 +23,7 @@ dotnet reqstream --validate --results artifacts/reqstream-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream itself to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-ReqStream**: CI pipeline self-validation TRX evidence from
   `artifacts/reqstream-self-validation.trx`

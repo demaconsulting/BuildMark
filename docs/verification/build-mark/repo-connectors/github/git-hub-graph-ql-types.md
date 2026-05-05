@@ -1,21 +1,21 @@
-# GitHubGraphQLTypes
+#### GitHubGraphQLTypes
 
-## Verification Approach
+##### Verification Approach
 
 `GitHubGraphQLTypes` contains the data transfer object (DTO) types used to deserialize
 GitHub GraphQL API responses. These types have no dedicated test class; they are
 verified indirectly through all `GitHubGraphQLClient*Tests.cs` tests that exercise
 JSON deserialization of mocked API responses.
 
-## Dependencies
+##### Dependencies
 
 | Mock / Stub              | Reason                                                       |
 | ------------------------ | ------------------------------------------------------------ |
 | `MockHttpMessageHandler` | Provides JSON payloads whose structure matches the DTO types |
 
-## Test Scenarios (via GitHubGraphQLClient*Tests.cs)
+##### Test Scenarios (via GitHubGraphQLClient*Tests.cs)
 
-### GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
+###### GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
 
 **Scenario**: GraphQL response for issues is deserialized into issue DTOs.
 
@@ -23,7 +23,7 @@ JSON deserialization of mocked API responses.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
 
-### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
+###### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
 
 **Scenario**: GraphQL response for pull requests is deserialized into pull request DTOs.
 
@@ -31,7 +31,7 @@ JSON deserialization of mocked API responses.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
 
-### GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
+###### GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
 
 **Scenario**: GraphQL response for tags is deserialized into tag node DTOs.
 
@@ -39,7 +39,7 @@ JSON deserialization of mocked API responses.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
 
-## Requirements Coverage
+##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-GitHubGraphQLTypes**: Verified indirectly through all
   41 tests in the `GitHubGraphQLClient*Tests.cs` files

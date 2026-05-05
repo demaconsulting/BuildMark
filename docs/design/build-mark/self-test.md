@@ -1,6 +1,6 @@
-# SelfTest Subsystem
+## SelfTest Subsystem
 
-## Overview
+### Overview
 
 The SelfTest subsystem provides a self-validation capability for BuildMark. When the
 user passes `--validate`, the subsystem exercises the core functionality of the tool
@@ -9,13 +9,13 @@ in the current environment, using a `MockRepoConnector` to avoid external API ca
 The subsystem has no dependencies on the Cli subsystem beyond receiving a `Context`
 as its input parameter.
 
-## Units
+### Units
 
 | Unit         | File                     | Responsibility                               |
 |--------------|--------------------------|----------------------------------------------|
 | `Validation` | `SelfTest/Validation.cs` | Runs self-tests and writes results to a file |
 
-## Interfaces
+### Interfaces
 
 `Validation` exposes one public method:
 
@@ -23,7 +23,7 @@ as its input parameter.
 |----------------|--------|------------------------------------------------------------|
 | `Run(context)` | Method | Execute all self-tests and optionally write a results file |
 
-## Interactions
+### Interactions
 
 | Unit / Subsystem    | Role                                                                        |
 |---------------------|-----------------------------------------------------------------------------|
@@ -31,7 +31,7 @@ as its input parameter.
 | `MockRepoConnector` | Provides deterministic repository data for self-tests (RepoConnectors/Mock) |
 | `BuildInformation`  | Generated during tests to verify report content                             |
 
-## Validation Tests
+### Validation Tests
 
 `Validation.Run` executes the following self-tests in order:
 
@@ -43,7 +43,7 @@ as its input parameter.
 | `BuildMark_KnownIssuesReporting`         | Known issues are correctly included in the report when requested       |
 | `BuildMark_RulesRouting`                 | Rules-based item routing assigns items to the correct report sections  |
 
-## Error Handling
+### Error Handling
 
 If `--results` is provided with an unsupported file extension (i.e., neither `.trx` nor `.xml`),
 `Validation.Run` writes an error message via `context.WriteError` and returns without writing a

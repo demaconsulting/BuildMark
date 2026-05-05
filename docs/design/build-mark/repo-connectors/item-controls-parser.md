@@ -1,6 +1,6 @@
-# ItemControlsParser and ItemControlsInfo
+### ItemControlsParser and ItemControlsInfo
 
-## Overview
+#### Overview
 
 `ItemControlsParser` is a static utility class that extracts a `buildmark`
 fenced code block from an issue or pull request description and parses its
@@ -10,7 +10,7 @@ method returns `null` so that callers can apply default label-based rules.
 `ItemControlsInfo` is the immutable data record produced by the parser. It holds
 up to three optional fields: `Visibility`, `Type`, and `AffectedVersions`.
 
-## Block Detection
+#### Block Detection
 
 The parser locates a `buildmark` block using the following rules:
 
@@ -24,7 +24,7 @@ The parser locates a `buildmark` block using the following rules:
    itself.
 5. If no such block is found, `Parse` returns `null`.
 
-## Key-Value Parsing
+#### Key-Value Parsing
 
 Each non-empty line inside the block is treated as a `key: value` pair:
 
@@ -48,13 +48,13 @@ Recognized keys:
 Unrecognized values for a known key are silently ignored (the field remains
 `null`).
 
-## Data Model - ItemControlsInfo
+#### Data Model - ItemControlsInfo
 
 See `item-controls-info.md` for the `ItemControlsInfo` data model definition.
 
-## Methods
+#### Methods
 
-### `ItemControlsParser.Parse(string? description) → ItemControlsInfo?`
+##### `ItemControlsParser.Parse(string? description) → ItemControlsInfo?`
 
 Entry point for the parser. Steps:
 
@@ -68,7 +68,7 @@ Entry point for the parser. Steps:
 7. Build and return an `ItemControlsInfo` from the recognized keys, or `null` if no
    recognized keys were found.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem      | Role                                                                            |
 |-----------------------|---------------------------------------------------------------------------------|

@@ -1,6 +1,6 @@
-# VersionIntervalSet
+### VersionIntervalSet
 
-## Verification Approach
+#### Verification Approach
 
 `VersionIntervalSet` is tested through `VersionIntervalSetTests.cs`, which contains
 13 unit tests. The tests cover parsing single and multiple intervals, handling of
@@ -8,15 +8,15 @@ internal commas in interval strings, empty input, discarding invalid tokens, and
 `Contains` checks for strings, `VersionTag` instances, pre-release versions, and
 `VersionComparable` instances.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
 
-## Test Scenarios
+#### Test Scenarios
 
-### VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
+##### VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
 
 **Scenario**: `VersionIntervalSet.Parse` is called with a single interval string.
 
@@ -24,7 +24,7 @@ internal commas in interval strings, empty input, discarding invalid tokens, and
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals
+##### VersionIntervalSet_Parse_TwoIntervals_ReturnsTwoIntervals
 
 **Scenario**: `VersionIntervalSet.Parse` is called with two comma-separated intervals.
 
@@ -32,7 +32,7 @@ internal commas in interval strings, empty input, discarding invalid tokens, and
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly
+##### VersionIntervalSet_Parse_IntervalsWithInternalComma_ParsedCorrectly
 
 **Scenario**: `VersionIntervalSet.Parse` is called with an interval string that
 contains a comma as the separator between lower and upper bound.
@@ -41,7 +41,7 @@ contains a comma as the separator between lower and upper bound.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Parse_EmptyString_ReturnsEmptySet
+##### VersionIntervalSet_Parse_EmptyString_ReturnsEmptySet
 
 **Scenario**: `VersionIntervalSet.Parse` is called with an empty string.
 
@@ -49,7 +49,7 @@ contains a comma as the separator between lower and upper bound.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Parse_InvalidToken_DiscardedSilently
+##### VersionIntervalSet_Parse_InvalidToken_DiscardedSilently
 
 **Scenario**: `VersionIntervalSet.Parse` is called with a string containing invalid
 tokens mixed with valid intervals.
@@ -58,7 +58,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue
+##### VersionIntervalSet_Contains_StringInsideFirstInterval_ReturnsTrue
 
 **Scenario**: `Contains` is called with a string version inside the first interval.
 
@@ -66,7 +66,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue
+##### VersionIntervalSet_Contains_StringInsideLaterInterval_ReturnsTrue
 
 **Scenario**: `Contains` is called with a string version inside a later interval.
 
@@ -74,7 +74,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse
+##### VersionIntervalSet_Contains_StringOutsideAllIntervals_ReturnsFalse
 
 **Scenario**: `Contains` is called with a string version outside all intervals.
 
@@ -82,7 +82,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_EmptySet_ReturnsFalse
+##### VersionIntervalSet_Contains_EmptySet_ReturnsFalse
 
 **Scenario**: `Contains` is called on an empty set.
 
@@ -90,7 +90,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_VersionTag_DelegatesToSemanticVersion
+##### VersionIntervalSet_Contains_VersionTag_DelegatesToSemanticVersion
 
 **Scenario**: `Contains` is called with a `VersionTag` argument.
 
@@ -98,7 +98,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_PreReleaseVersions_HandlesCorrectly
+##### VersionIntervalSet_Contains_PreReleaseVersions_HandlesCorrectly
 
 **Scenario**: `Contains` is called with pre-release version strings.
 
@@ -106,7 +106,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Contains_VersionComparable_HandlesPreRelease
+##### VersionIntervalSet_Contains_VersionComparable_HandlesPreRelease
 
 **Scenario**: `Contains` is called with a `VersionComparable` that has pre-release.
 
@@ -114,7 +114,7 @@ tokens mixed with valid intervals.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-### VersionIntervalSet_Parse_PreReleaseBounds_ParsesCorrectly
+##### VersionIntervalSet_Parse_PreReleaseBounds_ParsesCorrectly
 
 **Scenario**: `VersionIntervalSet.Parse` is called with intervals using pre-release
 version bounds.
@@ -123,6 +123,6 @@ version bounds.
 
 **Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Version-VersionIntervalSet**: All 13 tests in `VersionIntervalSetTests.cs`

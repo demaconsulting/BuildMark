@@ -1,6 +1,6 @@
-# WeasyPrint
+## WeasyPrint
 
-## Verification Approach
+### Verification Approach
 
 WeasyPrint is an OTS HTML-to-PDF rendering tool. Verification is achieved through
 repeated document generation in the CI pipeline. WeasyPrint converts HTML files to PDF
@@ -9,7 +9,7 @@ Design, User Guide, and Verification). FileAssert then validates that each gener
 PDF file contains expected content and metadata, providing evidence of correct WeasyPrint
 operation.
 
-## Evidence
+### Evidence
 
 The CI pipeline generates PDF output using WeasyPrint for each document section, and
 FileAssert validates the output. For example, for the Design document:
@@ -24,7 +24,7 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
 `fileassert-code-review.trx`, `fileassert-design.trx`, `fileassert-user-guide.trx`,
 `fileassert-verification.trx`) are consumed by ReqStream to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-WeasyPrint**: CI pipeline document generation evidence from multiple
   FileAssert TRX results confirming successful PDF rendering

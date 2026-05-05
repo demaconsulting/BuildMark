@@ -1,13 +1,13 @@
-# RepoConnectorFactory
+### RepoConnectorFactory
 
-## Overview
+#### Overview
 
 `RepoConnectorFactory` is a static factory class that creates the appropriate
 `IRepoConnector` implementation based on the runtime environment.
 
-## Methods
+#### Methods
 
-### `Create(ConnectorConfig? config) → IRepoConnector`
+##### `Create(ConnectorConfig? config) → IRepoConnector`
 
 The factory method accepts an optional `ConnectorConfig` from the
 parsed `.buildmark.yaml` file and returns the appropriate
@@ -39,7 +39,7 @@ library by external callers, so this design reflects the tool-oriented execution
 model rather than a guarantee that synchronization-context-related deadlocks are
 impossible in every host.
 
-### `CreateFromRemoteUrl(ConnectorConfig? config, string? remoteUrl) → IRepoConnector` *(internal)*
+##### `CreateFromRemoteUrl(ConnectorConfig? config, string? remoteUrl) → IRepoConnector` *(internal)*
 
 An internal helper that selects a connector based on `remoteUrl` alone (skipping
 environment-variable checks). It is exposed internally so that unit tests can
@@ -52,7 +52,7 @@ exercise the URL-based detection logic without requiring a real git process.
 - If `remoteUrl` is `null` or does not match any known host, defaults to a
   `GitHubRepoConnector` initialized with `config?.GitHub`.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem             | Role                                                                   |
 | ---------------------------- | ---------------------------------------------------------------------- |

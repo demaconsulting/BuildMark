@@ -1,15 +1,15 @@
-# WorkItemMapper
+#### WorkItemMapper
 
-## Overview
+##### Overview
 
 `WorkItemMapper` maps `AzureDevOpsWorkItem` records from the Azure DevOps REST API
 into `ItemInfo` records for the `BuildInformation` model. It centralizes work item
 type normalization, state-based filtering, and item-controls extraction from both
 buildmark code blocks in work item description bodies and Azure DevOps custom fields.
 
-## Data Model
+##### Data Model
 
-### Work Item Type Mapping
+###### Work Item Type Mapping
 
 Azure DevOps work item types are mapped to normalized types for the `ItemInfo` model:
 
@@ -19,7 +19,7 @@ Azure DevOps work item types are mapped to normalized types for the `ItemInfo` m
 | `User Story`, `Feature`, `Epic`     | `"feature"`     |
 | `Task`, `Test Case`, etc.           | work item type  |
 
-### Work Item State Filtering
+###### Work Item State Filtering
 
 When identifying known issues, only work items in an unresolved state are included.
 The following state values are treated as resolved and excluded from known-issues
@@ -32,7 +32,7 @@ reporting:
 All other state values (e.g. `Active`, `New`, `In Progress`) are treated as
 unresolved and included in known-issues reporting.
 
-### Item Controls Extraction
+###### Item Controls Extraction
 
 Item controls are extracted from two sources and merged:
 
@@ -47,9 +47,9 @@ Item controls are extracted from two sources and merged:
 present for the same control. If a custom field value is non-null, it supersedes
 the corresponding value from the buildmark block.
 
-## Methods
+##### Methods
 
-### `MapWorkItemToItemInfo(workItem)`
+###### `MapWorkItemToItemInfo(workItem)`
 
 Maps a single `AzureDevOpsWorkItem` to an `ItemInfo` record.
 
@@ -65,7 +65,7 @@ Steps:
 6. Construct and return the `ItemInfo` record with the title, url, type, and
    affected versions.
 
-### `IsWorkItemResolved(workItem)`
+###### `IsWorkItemResolved(workItem)`
 
 Checks whether a work item's state is one of the known resolved states
 (`Resolved`, `Closed`, `Done`).
@@ -74,13 +74,13 @@ Returns `true` if the work item is resolved; `false` otherwise. Used by
 `AzureDevOpsRepoConnector` to filter out resolved work items when collecting
 known issues.
 
-### `GetWorkItemTypeForRuleMatching(workItem)`
+###### `GetWorkItemTypeForRuleMatching(workItem)`
 
 Returns the work item type string used for routing rule matching. This is the raw
 `System.WorkItemType` value from the work item's fields dictionary, allowing routing
 rules in `.buildmark.yaml` to match on Azure DevOps-native work item type names.
 
-### `ExtractItemControls(workItem)`
+###### `ExtractItemControls(workItem)`
 
 Combines item controls from both buildmark blocks and custom fields into a single
 `ItemControlsInfo?` record.
@@ -93,7 +93,7 @@ Steps:
    block result.
 4. Return the merged `ItemControlsInfo`, or `null` if no controls were found.
 
-## Interactions
+##### Interactions
 
 - `AzureDevOpsRepoConnector` calls `WorkItemMapper` to convert REST API work item
   records into `ItemInfo` records.

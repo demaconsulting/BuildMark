@@ -1,20 +1,20 @@
-# ConfigurationLoadResult
+### ConfigurationLoadResult
 
-## Verification Approach
+#### Verification Approach
 
 `ConfigurationLoadResult` is verified with dedicated unit tests in `ConfigurationTests.cs`. Tests
 construct `ConfigurationLoadResult` instances directly with controlled `ConfigurationIssue` entries
 and assert on the behavior of `ReportTo(context)`. No mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason          |
 | ----------- | --------------- |
 | None        | No mocks needed |
 
-## Test Scenarios
+#### Test Scenarios
 
-### ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+##### ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 
 **Scenario**: A `ConfigurationLoadResult` containing one `Error`-severity issue is created;
 `ReportTo` is called on a silent `Context`.
@@ -23,7 +23,7 @@ and assert on the behavior of `ReportTo(context)`. No mocking is required.
 
 **Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
 
-### ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+##### ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
 
 **Scenario**: A `ConfigurationLoadResult` containing one `Warning`-severity issue is created;
 `ReportTo` is called on a silent `Context`.
@@ -32,7 +32,7 @@ and assert on the behavior of `ReportTo(context)`. No mocking is required.
 
 **Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
 
-### ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+##### ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
 
 **Scenario**: A `ConfigurationLoadResult` containing an `Error`-severity issue at `FilePath`
 `"/repo/.buildmark.yaml"`, `Line` 7, with description `"Unexpected value"` is created; `ReportTo`
@@ -44,7 +44,7 @@ is called.
 
 **Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-ConfigLoadResult-ReportTo`**:
   - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
