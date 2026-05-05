@@ -1,20 +1,20 @@
-# ReportConfig
+### ReportConfig
 
-## Verification Approach
+#### Verification Approach
 
 `ReportConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml` files
 with a `report:` block and assert that `File`, `Depth`, and `IncludeKnownIssues` properties are
 correctly parsed or that invalid values produce error issues. No mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason                                                               |
 | ----------- | -------------------------------------------------------------------- |
 | File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
+##### BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
 
 **Scenario**: A `.buildmark.yaml` with `report.file`, `report.depth: 2`, and
 `report.include-known-issues: true` is written; `BuildMarkConfigReader.ReadAsync` is called;
@@ -25,7 +25,7 @@ correctly parsed or that invalid values produce error issues. No mocking is requ
 
 **Requirement coverage**: `BuildMark-ReportConfig-Properties`.
 
-### BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
+##### BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
 
 **Scenario**: A `.buildmark.yaml` with `report.depth: -1` is written;
 `BuildMarkConfigReader.ReadAsync` is called.
@@ -35,7 +35,7 @@ correctly parsed or that invalid values produce error issues. No mocking is requ
 
 **Requirement coverage**: `BuildMark-ReportConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-ReportConfig-Properties`**:
   - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig

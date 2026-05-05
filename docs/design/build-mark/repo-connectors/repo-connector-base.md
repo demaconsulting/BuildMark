@@ -1,12 +1,12 @@
-# IRepoConnector and RepoConnectorBase
+### IRepoConnector and RepoConnectorBase
 
-## Overview
+#### Overview
 
 `IRepoConnector` defines the contract that all repository connectors must satisfy.
 `RepoConnectorBase` is an abstract class implementing `IRepoConnector` and providing
 shared utilities used by concrete connectors.
 
-## Interface
+#### Interface
 
 `IRepoConnector` exposes a single method:
 
@@ -14,7 +14,7 @@ shared utilities used by concrete connectors.
 |-------------------------------------|--------|----------------------------------|
 | `GetBuildInformationAsync(version)` | Method | Fetch complete build information |
 
-## Base Class
+#### Base Class
 
 `RepoConnectorBase` provides:
 
@@ -26,26 +26,26 @@ shared utilities used by concrete connectors.
 | `RunCommandAsync(command, args)`         | Protected virtual | Delegates shell commands to ProcessRunner             |
 | `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality               |
 
-### `Configure(rules, sections)`
+##### `Configure(rules, sections)`
 
 Stores the routing rules and section definitions on the connector instance. Called
 by `Program.ProcessBuildNotes` after the connector is created, passing `Rules` and
 `Sections` from the loaded `.buildmark.yaml` configuration.
 
-### `HasRules`
+##### `HasRules`
 
 Protected boolean property that returns `true` when at least one rule has been
 stored via `Configure`. Concrete connectors use this in `GetBuildInformationAsync`
 to decide whether to call `ApplyRules` or use legacy categorization.
 
-### `ApplyRules(allItems)`
+##### `ApplyRules(allItems)`
 
 Routes the provided items using `ItemRouter.Route`, then assembles an ordered list
 of `(SectionId, SectionTitle, Items)` tuples following the configured section order.
 Any items routed to section IDs not in the configured section list are appended at
 the end using the section ID as the display title.
 
-### `FindVersionIndex(versions, targetVersion)`
+##### `FindVersionIndex(versions, targetVersion)`
 
 Protected static method that finds the index of a `targetVersion` within a list of
 `VersionTag` instances using **semantic VersionComparable equality**. This design
@@ -62,7 +62,7 @@ The `RunCommandAsync` method accepts a command and a `params string[]` arguments
 array, and is `virtual` so that test subclasses can override it with mock
 implementations that return fixed strings without spawning real processes.
 
-## Interactions
+#### Interactions
 
 - `ProcessRunner` is used by `RunCommandAsync` to execute shell commands in the
   Utilities subsystem.

@@ -1,6 +1,6 @@
-# Cli Subsystem
+## Cli Subsystem
 
-## Overview
+### Overview
 
 The Cli subsystem provides the command-line interface layer for BuildMark. It
 parses arguments supplied by the user, routes output to the console or a log file,
@@ -9,13 +9,13 @@ and exposes the parsed state to the rest of the system via the `Context` object.
 The subsystem has no dependencies on other BuildMark subsystems. All other
 subsystems receive a `Context` from the caller rather than creating one themselves.
 
-## Units
+### Units
 
 | Unit      | File             | Responsibility                              |
 |-----------|------------------|---------------------------------------------|
 | `Context` | `Cli/Context.cs` | Argument parsing, output routing, exit code |
 
-## Interfaces
+### Interfaces
 
 `Context` exposes the following outward-facing interface consumed by `Program`:
 
@@ -40,7 +40,7 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 
 > `Create(args)` throws `ArgumentException` for invalid or malformed arguments.
 
-## Interactions
+### Interactions
 
 The Cli subsystem has no dependencies on other BuildMark subsystems. `Program`
 creates a `Context` and passes it to other subsystems as needed.

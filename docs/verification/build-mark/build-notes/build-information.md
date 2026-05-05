@@ -1,6 +1,6 @@
-# BuildInformation
+### BuildInformation
 
-## Verification Approach
+#### Verification Approach
 
 `BuildInformation` is verified with dedicated unit tests in `BuildInformationTests.cs`. Tests
 construct `BuildInformation` instances either directly or via `MockRepoConnector`, invoke
@@ -8,16 +8,16 @@ construct `BuildInformation` instances either directly or via `MockRepoConnector
 to simulate connector error conditions; `MockRepoConnector` is used for the remaining tests. No
 further mocking is needed.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason |
 | --- | --- |
 | `MockRepoConnector` | Supplies deterministic `BuildInformation` instances for rendering tests. |
 | `NSubstitute` (`IRepoConnector`) | Simulates error conditions that `MockRepoConnector` cannot reproduce. |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags
+##### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags
 
 **Scenario**: A substitute connector is configured to throw `InvalidOperationException` with the
 message "No tags found"; `GetBuildInformationAsync()` is called without a version argument.
@@ -26,7 +26,7 @@ message "No tags found"; `GetBuildInformationAsync()` is called without a versio
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag
+##### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag
 
 **Scenario**: A substitute connector is configured to throw `InvalidOperationException` with the
 message "does not match any tag"; `GetBuildInformationAsync()` is called.
@@ -35,7 +35,7 @@ message "does not match any tag"; `GetBuildInformationAsync()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion
+##### BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.1.0"))` is called.
 
@@ -44,7 +44,7 @@ message "does not match any tag"; `GetBuildInformationAsync()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag
+##### BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag
 
 **Scenario**: A substitute connector returns a `BuildInformation` where `CurrentVersionTag` is
 `v2.0.0`; `GetBuildInformationAsync()` is called.
@@ -54,7 +54,7 @@ message "does not match any tag"; `GetBuildInformationAsync()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag
+##### BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0-beta.1"))` is
 called.
@@ -64,7 +64,7 @@ called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases
+##### BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"))` is called.
 
@@ -73,7 +73,7 @@ called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly
+##### BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"))` is
 called.
@@ -83,7 +83,7 @@ contains 2 items (ids `"4"` and `"6"`).
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
+##### BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"))` is
 called.
@@ -93,7 +93,7 @@ called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues
+##### BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"))` is called.
 
@@ -101,7 +101,7 @@ called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly
+##### BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly
 
 **Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"))` is called.
 
@@ -109,7 +109,7 @@ called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
+##### BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
 
 **Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` without any optional
 arguments.
@@ -119,7 +119,7 @@ arguments.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
+##### BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
 
 **Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on `BuildInformation` for `v2.0.0`.
 
@@ -128,7 +128,7 @@ is absent.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
+##### BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
 
 **Scenario**: `ToMarkdown(headingDepth: 3)` is called on `BuildInformation` for `v2.0.0`.
 
@@ -137,7 +137,7 @@ is absent.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
+##### BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
 
 **Scenario**: A `BuildInformation` with an empty `Changes` list is rendered via `ToMarkdown()`.
 
@@ -145,7 +145,7 @@ is absent.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
+##### BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
 
 **Scenario**: A `BuildInformation` with an empty `Bugs` list is rendered via `ToMarkdown()`.
 
@@ -153,7 +153,7 @@ is absent.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_IncludesIssueLinks
+##### BuildInformation_ToMarkdown_IncludesIssueLinks
 
 **Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` which has items with
 GitHub URLs.
@@ -164,7 +164,7 @@ GitHub URLs.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
+##### BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
 
 **Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v1.0.0` (no baseline).
 
@@ -173,7 +173,7 @@ GitHub URLs.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
+##### BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
 
 **Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` which has a changelog
 link.
@@ -183,7 +183,7 @@ URL containing `ver-1.1.0...v2.0.0`.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
+##### BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
 
 **Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v1.0.0` (no baseline version).
 
@@ -191,7 +191,7 @@ URL containing `ver-1.1.0...v2.0.0`.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### BuildInformation_ToMarkdown_UsesBulletLists
+##### BuildInformation_ToMarkdown_UsesBulletLists
 
 **Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on `BuildInformation` for `v2.0.0`.
 
@@ -200,7 +200,7 @@ markdown table notation (`| :-: | :---------- |`) is present in those sections.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### VersionCommitTag_Constructor_StoresVersionAndHash
+##### VersionCommitTag_Constructor_StoresVersionAndHash
 
 **Scenario**: A `VersionCommitTag` is constructed with a `VersionTag` and a commit hash string.
 
@@ -209,7 +209,7 @@ string.
 
 **Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
 
-### WebLink_Constructor_StoresTextAndUrl
+##### WebLink_Constructor_StoresTextAndUrl
 
 **Scenario**: A `WebLink` is constructed with display text and a target URL.
 
@@ -218,7 +218,7 @@ supplied URL.
 
 **Requirement coverage**: `BuildMark-WebLink-Record`.
 
-### BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
+##### BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
 
 **Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list containing
 two custom sections (Features, Bugs); `ToMarkdown()` is called.
@@ -228,7 +228,7 @@ two custom sections (Features, Bugs); `ToMarkdown()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
 
-### BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
+##### BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
 
 **Scenario**: A `BuildInformation` is constructed with `RoutedSections` left as null;
 `ToMarkdown()` is called.
@@ -237,7 +237,7 @@ two custom sections (Features, Bugs); `ToMarkdown()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-BuildInformation-Markdown`**:
   - BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags

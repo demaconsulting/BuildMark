@@ -1,6 +1,6 @@
-# SarifMark
+## SarifMark
 
-## Verification Approach
+### Verification Approach
 
 SarifMark is an OTS SARIF report generation tool. Verification is achieved through
 the tool's built-in self-validation (`--validate`) executed in the CI pipeline. The
@@ -12,7 +12,7 @@ Additionally, SarifMark is exercised operationally when it processes the CodeQL 
 output and generates the CodeQL quality report markdown. Successful report generation
 provides further evidence of correct operation.
 
-## Evidence
+### Evidence
 
 The CI pipeline step `Run SarifMark self-validation` executes:
 
@@ -22,7 +22,7 @@ dotnet sarifmark --validate --results artifacts/sarifmark-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-SarifMark**: CI pipeline self-validation TRX evidence from
   `artifacts/sarifmark-self-validation.trx`

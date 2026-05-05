@@ -1,6 +1,6 @@
-# BuildMarkConfig
+### BuildMarkConfig
 
-## Overview
+#### Overview
 
 `BuildMarkConfig` is the top-level configuration data model for BuildMark. It holds all
 settings read from the `.buildmark.yaml` file, including connector configuration, report
@@ -9,7 +9,7 @@ settings, section definitions, and item routing rules.
 When no `.buildmark.yaml` file is present, `Program` calls `BuildMarkConfig.CreateDefault()`
 to obtain a default configuration with built-in section and rule definitions.
 
-## Data Model
+#### Data Model
 
 | Property    | Type                     | Description                                           |
 |-------------|--------------------------|-------------------------------------------------------|
@@ -18,7 +18,7 @@ to obtain a default configuration with built-in section and rule definitions.
 | `Sections`  | `IList<SectionConfig>`   | Ordered list of report section definitions            |
 | `Rules`     | `IList<RuleConfig>`      | List of item routing rules                            |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem         | Role                                                                             |
 |--------------------------|----------------------------------------------------------------------------------|

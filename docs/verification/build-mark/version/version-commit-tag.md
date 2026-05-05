@@ -1,21 +1,21 @@
-# VersionCommitTag
+### VersionCommitTag
 
-## Verification Approach
+#### Verification Approach
 
 `VersionCommitTag` is a simple data class with no dedicated test class. It is verified
 through `VersionTests.cs` via the test
 `VersionCommitTag_Constructor_ValidParameters_CreatesInstance`, which constructs an
 instance and asserts that the tag and commit-hash properties are stored correctly.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Data class |
 
-## Test Scenarios
+#### Test Scenarios
 
-### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+##### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
 
 **Scenario**: `VersionCommitTag` is constructed with a `VersionTag` and a commit hash
 string.
@@ -24,6 +24,6 @@ string.
 
 **Requirement coverage**: `BuildMark-Version-VersionCommitTag`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Version-VersionCommitTag**: VersionCommitTag_Constructor_ValidParameters_CreatesInstance

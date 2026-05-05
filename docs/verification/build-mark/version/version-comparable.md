@@ -1,21 +1,21 @@
-# VersionComparable
+### VersionComparable
 
-## Verification Approach
+#### Verification Approach
 
 `VersionComparable` is tested through `VersionComparableTests.cs`, which contains
 26 unit tests. The tests cover creation (valid, invalid, null, empty), comparison
 operators, and numeric-vs-lexicographic pre-release ordering rules that follow the
 Semantic Versioning specification.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
 
-## Test Scenarios
+#### Test Scenarios
 
-### VersionComparable_Create_ValidVersion_ReturnsInstance
+##### VersionComparable_Create_ValidVersion_ReturnsInstance
 
 **Scenario**: `VersionComparable.Create` is called with a valid version string.
 
@@ -23,7 +23,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Create_SimpleVersion_ParsesVersion
+##### VersionComparable_Create_SimpleVersion_ParsesVersion
 
 **Scenario**: `VersionComparable.Create` is called with a simple `major.minor.patch` string.
 
@@ -31,7 +31,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Create_PreReleaseVersion_ParsesVersion
+##### VersionComparable_Create_PreReleaseVersion_ParsesVersion
 
 **Scenario**: `VersionComparable.Create` is called with a pre-release version string.
 
@@ -39,7 +39,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_TryCreate_InvalidVersion_ReturnsNull
+##### VersionComparable_TryCreate_InvalidVersion_ReturnsNull
 
 **Scenario**: `VersionComparable.TryCreate` is called with an invalid version string.
 
@@ -47,7 +47,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_TryCreate_NullInput_ReturnsNull
+##### VersionComparable_TryCreate_NullInput_ReturnsNull
 
 **Scenario**: `VersionComparable.TryCreate` is called with a `null` argument.
 
@@ -55,7 +55,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_TryCreate_EmptyInput_ReturnsNull
+##### VersionComparable_TryCreate_EmptyInput_ReturnsNull
 
 **Scenario**: `VersionComparable.TryCreate` is called with an empty string.
 
@@ -63,7 +63,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Create_InvalidVersion_ThrowsArgumentException
+##### VersionComparable_Create_InvalidVersion_ThrowsArgumentException
 
 **Scenario**: `VersionComparable.Create` is called with an invalid version string.
 
@@ -71,7 +71,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
+##### VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
 
 **Scenario**: Two instances with identical major.minor.patch are compared.
 
@@ -79,7 +79,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
+##### VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
 
 **Scenario**: Two instances with different major versions are compared.
 
@@ -87,7 +87,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
+##### VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
 
 **Scenario**: Two instances with different minor versions are compared.
 
@@ -95,7 +95,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
+##### VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
 
 **Scenario**: Two instances with different patch versions are compared.
 
@@ -103,7 +103,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
+##### VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
 
 **Scenario**: A pre-release version is compared to its release counterpart.
 
@@ -111,7 +111,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
+##### VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
 
 **Scenario**: Two pre-release versions with non-numeric identifiers are compared.
 
@@ -119,7 +119,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Operators_LessThan_WorksCorrectly
+##### VersionComparable_Operators_LessThan_WorksCorrectly
 
 **Scenario**: The `<` operator is applied to two version instances.
 
@@ -127,7 +127,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Operators_GreaterThan_WorksCorrectly
+##### VersionComparable_Operators_GreaterThan_WorksCorrectly
 
 **Scenario**: The `>` operator is applied to two version instances.
 
@@ -135,7 +135,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
+##### VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
 
 **Scenario**: The `<=` operator is applied to two version instances.
 
@@ -143,7 +143,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
+##### VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
 
 **Scenario**: The `>=` operator is applied to two version instances.
 
@@ -151,7 +151,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
+##### VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
 
 **Scenario**: A series of semver-compliant versions is compared.
 
@@ -159,7 +159,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_NumericComparison_CorrectOrdering
+##### VersionComparable_CompareTo_NumericComparison_CorrectOrdering
 
 **Scenario**: Numeric pre-release identifiers are compared.
 
@@ -167,7 +167,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering
+##### VersionComparable_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering
 
 **Scenario**: Release version `1.0.0` is compared to `1.0.0-alpha`.
 
@@ -175,7 +175,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_PreReleaseLexicographic_CorrectOrdering
+##### VersionComparable_CompareTo_PreReleaseLexicographic_CorrectOrdering
 
 **Scenario**: Pre-release identifiers with alphabetic content are compared.
 
@@ -183,7 +183,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
+##### VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
 
 **Scenario**: Pre-release identifiers that are purely numeric are compared.
 
@@ -191,7 +191,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
+##### VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
 
 **Scenario**: Pre-release versions are compared following all semver rules.
 
@@ -199,7 +199,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
+##### VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
 
 **Scenario**: A numeric pre-release identifier is compared to a non-numeric one.
 
@@ -207,7 +207,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_ShorterPreRelease_IsLess
+##### VersionComparable_CompareTo_ShorterPreRelease_IsLess
 
 **Scenario**: Two pre-release versions with different numbers of identifiers are compared.
 
@@ -215,7 +215,7 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-### VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
+##### VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
 
 **Scenario**: Complex multi-identifier pre-release versions are compared.
 
@@ -223,6 +223,6 @@ Semantic Versioning specification.
 
 **Requirement coverage**: `BuildMark-Version-VersionComparable`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Version-VersionComparable**: All 26 tests in `VersionComparableTests.cs`

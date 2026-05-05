@@ -1,21 +1,21 @@
-# Validation
+### Validation
 
-## Verification Approach
+#### Verification Approach
 
 `Validation` is verified with dedicated unit tests in `ValidationTests.cs`. Tests construct a
 `Context` with controlled arguments, call `Validation.Run`, and assert on the created results
 files, console error output, and exit code. `MockRepoConnector` is provided as the connector
 factory; no further mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub         | Reason                                                                |
 | ------------------- | --------------------------------------------------------------------- |
 | `MockRepoConnector` | Supplies connector factory so self-check runs without network access. |
 
-## Test Scenarios
+#### Test Scenarios
 
-### Validation_Run_WithTrxResultsFile_WritesTrxFile
+##### Validation_Run_WithTrxResultsFile_WritesTrxFile
 
 **Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.trx`; console
 output is captured.
@@ -25,7 +25,7 @@ output is captured.
 
 **Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-TrxOutput`.
 
-### Validation_Run_WithXmlResultsFile_WritesJUnitFile
+##### Validation_Run_WithXmlResultsFile_WritesJUnitFile
 
 **Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.xml`; console
 output is captured.
@@ -35,7 +35,7 @@ output is captured.
 
 **Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-JUnitOutput`.
 
-### Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+##### Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
 
 **Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.json`
 (unsupported extension); console error is captured.
@@ -44,7 +44,7 @@ output is captured.
 
 **Requirement coverage**: `BuildMark-Validation-TrxOutput`, `BuildMark-Validation-JUnitOutput`.
 
-### Validation_Run_WithInvalidResultsFilePath_ShowsError
+##### Validation_Run_WithInvalidResultsFilePath_ShowsError
 
 **Scenario**: `Validation.Run` is called with
 `--validate --results /invalid_path_that_does_not_exist/results.trx`; console error is captured.
@@ -53,7 +53,7 @@ output is captured.
 
 **Requirement coverage**: `BuildMark-Validation-TrxOutput`.
 
-### Validation_Run_WithoutResultsFile_CompletesSuccessfully
+##### Validation_Run_WithoutResultsFile_CompletesSuccessfully
 
 **Scenario**: `Validation.Run` is called with `--validate --silent`; no `--results` argument is
 supplied.
@@ -62,7 +62,7 @@ supplied.
 
 **Requirement coverage**: `BuildMark-Validation-Run`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-Validation-Run`**:
   - Validation_Run_WithTrxResultsFile_WritesTrxFile

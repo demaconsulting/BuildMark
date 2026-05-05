@@ -1,6 +1,6 @@
-# WorkItemMapper
+#### WorkItemMapper
 
-## Verification Approach
+##### Verification Approach
 
 `WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 10 unit
 tests. The tests verify mapping of Azure DevOps work items to the BuildMark model -
@@ -8,15 +8,15 @@ classification of features and bugs, title and description extraction, change li
 generation, and handling of known issue identification based on work item type and
 state.
 
-## Dependencies
+##### Dependencies
 
 | Mock / Stub          | Reason                                                      |
 | -------------------- | ----------------------------------------------------------- |
 | `WorkItem` test data | Constructed in-line with specific types, states, and fields |
 
-## Test Scenarios
+##### Test Scenarios
 
-### WorkItemMapper_MapToItemInfo_Bug_ReturnsBugType
+###### WorkItemMapper_MapToItemInfo_Bug_ReturnsBugType
 
 **Scenario**: A work item with type `"Bug"` is mapped.
 
@@ -24,7 +24,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_Feature_ReturnsFeatureType
+###### WorkItemMapper_MapToItemInfo_Feature_ReturnsFeatureType
 
 **Scenario**: A work item with type `"Feature"` is mapped.
 
@@ -32,7 +32,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_UserStory_ReturnsFeatureType
+###### WorkItemMapper_MapToItemInfo_UserStory_ReturnsFeatureType
 
 **Scenario**: A work item with type `"User Story"` is mapped.
 
@@ -40,7 +40,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_Task_ReturnsOtherType
+###### WorkItemMapper_MapToItemInfo_Task_ReturnsOtherType
 
 **Scenario**: A work item with type `"Task"` is mapped.
 
@@ -48,7 +48,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_ExtractsTitle
+###### WorkItemMapper_MapToItemInfo_ExtractsTitle
 
 **Scenario**: A work item has a title.
 
@@ -56,7 +56,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_ExtractsDescription
+###### WorkItemMapper_MapToItemInfo_ExtractsDescription
 
 **Scenario**: A work item has a description.
 
@@ -64,7 +64,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_MapToItemInfo_GeneratesWebLink
+###### WorkItemMapper_MapToItemInfo_GeneratesWebLink
 
 **Scenario**: A work item has an ID and a valid organization URL.
 
@@ -72,7 +72,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_IsKnownIssue_OpenBug_ReturnsTrue
+###### WorkItemMapper_IsKnownIssue_OpenBug_ReturnsTrue
 
 **Scenario**: Work item is an open bug.
 
@@ -80,7 +80,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_IsKnownIssue_ClosedBug_ReturnsFalse
+###### WorkItemMapper_IsKnownIssue_ClosedBug_ReturnsFalse
 
 **Scenario**: Work item is a closed bug.
 
@@ -88,7 +88,7 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-### WorkItemMapper_IsKnownIssue_OpenFeature_ReturnsFalse
+###### WorkItemMapper_IsKnownIssue_OpenFeature_ReturnsFalse
 
 **Scenario**: Work item is an open feature (not a bug).
 
@@ -96,6 +96,6 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
-## Requirements Coverage
+##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-WorkItemMapper**: All 10 tests in `WorkItemMapperTests.cs`

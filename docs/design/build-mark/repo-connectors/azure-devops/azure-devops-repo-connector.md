@@ -1,6 +1,6 @@
-# AzureDevOpsRepoConnector
+#### AzureDevOpsRepoConnector
 
-## Overview
+##### Overview
 
 `AzureDevOpsRepoConnector` is the production unit in the RepoConnectors/AzureDevOps
 subsystem. It implements `RepoConnectorBase` and uses `AzureDevOpsRestClient` to
@@ -10,9 +10,9 @@ The unit reads the repository URL and current commit hash from Git, resolves the
 Azure DevOps token from environment variables, and fetches all data needed to
 construct a `BuildInformation` record.
 
-## Data Model
+##### Data Model
 
-### Authentication
+###### Authentication
 
 The connector resolves the Azure DevOps token using the following priority order:
 
@@ -26,7 +26,7 @@ The connector resolves the Azure DevOps token using the following priority order
 
 If no token is found, the connector throws `InvalidOperationException`.
 
-### Work Item Type Mapping
+###### Work Item Type Mapping
 
 Azure DevOps work item types are mapped to normalized types:
 
@@ -42,7 +42,7 @@ When routing rules are configured via `.buildmark.yaml`, the type-derived
 categorization is overridden by `RepoConnectorBase.ApplyRules`, which delegates to
 `ItemRouter` to distribute all collected items into the configured report sections.
 
-### Item Controls Override
+###### Item Controls Override
 
 After the work-item-type-derived categorization is determined, the connector calls
 `ItemControlsParser.Parse(description)` on the description body of each work item
@@ -71,7 +71,7 @@ Custom fields take precedence over buildmark blocks when both are present.
 When neither a `buildmark` block nor custom fields are present, the existing
 work-item-type-based rules apply unchanged.
 
-### REST API Response Types
+###### REST API Response Types
 
 The `AzureDevOpsRestClient` returns the following record types:
 
@@ -93,9 +93,9 @@ The `AzureDevOpsRestClient` returns the following record types:
 - **`AzureDevOpsCollectionResponse<T>`** - wraps paginated responses with a count
   and value list.
 
-## Methods
+##### Methods
 
-### `ParseAzureDevOpsUrl(url) → (organizationUrl, project, repository)`
+###### `ParseAzureDevOpsUrl(url) → (organizationUrl, project, repository)`
 
 Internal utility that parses a Git remote URL into organization URL, project
 name, and repository name. Supports the following URL formats:
@@ -109,7 +109,7 @@ name, and repository name. Supports the following URL formats:
 
 Throws `ArgumentException` when the URL does not match any supported format.
 
-### `GetBuildInformationAsync(VersionTag? version) → BuildInformation`
+###### `GetBuildInformationAsync(VersionTag? version) → BuildInformation`
 
 Main entry point. Performs the following steps:
 
@@ -152,7 +152,7 @@ Main entry point. Performs the following steps:
     are configured, items remain in the legacy `Changes`, `Bugs`, and `KnownIssues`
     lists. Return the assembled `BuildInformation` record.
 
-## Interactions
+##### Interactions
 
 - `AzureDevOpsConnectorConfig` is received from `RepoConnectorFactory` and overrides
   the organization URL, project, and repository name.

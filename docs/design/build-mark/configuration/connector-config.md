@@ -1,6 +1,6 @@
-# ConnectorConfig, GitHubConnectorConfig, AzureDevOpsConnectorConfig
+### ConnectorConfig, GitHubConnectorConfig, AzureDevOpsConnectorConfig
 
-## Overview
+#### Overview
 
 These three configuration data models define the connector selection and per-connector
 settings read from the `connector:` section of `.buildmark.yaml`.
@@ -9,9 +9,9 @@ settings read from the `connector:` section of `.buildmark.yaml`.
 settings. `GitHubConnectorConfig` holds GitHub-specific overrides. `AzureDevOpsConnectorConfig`
 holds Azure DevOps-specific connection details.
 
-## Data Models
+#### Data Models
 
-### ConnectorConfig
+##### ConnectorConfig
 
 | Property      | Type                          | Description                                   |
 |---------------|-------------------------------|-----------------------------------------------|
@@ -19,7 +19,7 @@ holds Azure DevOps-specific connection details.
 | `GitHub`      | `GitHubConnectorConfig?`      | Optional GitHub connector settings            |
 | `AzureDevOps` | `AzureDevOpsConnectorConfig?` | Optional Azure DevOps connector settings      |
 
-### GitHubConnectorConfig
+##### GitHubConnectorConfig
 
 | Property  | Type      | Description                                                         |
 |-----------|-----------|---------------------------------------------------------------------|
@@ -27,7 +27,7 @@ holds Azure DevOps-specific connection details.
 | `Repo`    | `string?` | Repository name override                                            |
 | `BaseUrl` | `string?` | Optional GitHub Enterprise API base URL; `null` uses the public API |
 
-### AzureDevOpsConnectorConfig
+##### AzureDevOpsConnectorConfig
 
 | Property          | Type      | Description                                                               |
 |-------------------|-----------|---------------------------------------------------------------------------|
@@ -36,7 +36,7 @@ holds Azure DevOps-specific connection details.
 | `Project`         | `string?` | Azure DevOps project name                                                 |
 | `Repository`      | `string?` | Repository name within the project                                        |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem            | Role                                                                            |
 |-----------------------------|---------------------------------------------------------------------------------|

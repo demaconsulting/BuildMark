@@ -61,6 +61,17 @@ needs-review:
 # Source of review evidence
 evidence-source:
   type: none
+
+# Review-sets (each focuses on a single compliance question)
+reviews:
+  - id: Purpose
+    title: Review of user-facing capabilities and system promises
+    paths:
+      - "README.md"
+      - "docs/user_guide/**/*.md"
+      - "docs/reqstream/{system-name}/{system-name}.yaml"
+      - "docs/design/introduction.md"
+      - "docs/design/{system-name}/{system-name}.md"
 ```
 
 # Review-Set Design Principles

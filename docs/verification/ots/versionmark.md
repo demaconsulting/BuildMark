@@ -1,6 +1,6 @@
-# VersionMark
+## VersionMark
 
-## Verification Approach
+### Verification Approach
 
 VersionMark is an OTS tool version capture tool. Verification is achieved through the
 tool's built-in self-validation (`--validate`) executed in the CI pipeline across
@@ -12,7 +12,7 @@ Additionally, VersionMark is exercised operationally in every job to capture and
 tool version information. Successful version capture and publication provides further
 evidence of correct operation.
 
-## Evidence
+### Evidence
 
 The CI pipeline runs VersionMark self-validation in multiple jobs:
 
@@ -23,7 +23,7 @@ dotnet versionmark --validate --results artifacts/versionmark-self-validation.tr
 
 The resulting TRX files are consumed by ReqStream to satisfy the OTS requirement.
 
-## Requirements Coverage
+### Requirements Coverage
 
 - **BuildMark-OTS-VersionMark**: CI pipeline self-validation TRX evidence from
   `artifacts/versionmark-self-validation.trx` and

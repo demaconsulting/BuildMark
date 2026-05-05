@@ -1,6 +1,6 @@
-# VersionInterval and VersionIntervalSet
+### VersionInterval and VersionIntervalSet
 
-## Overview
+#### Overview
 
 `VersionInterval` represents a single mathematical version interval using
 inclusive or exclusive bounds, where either bound may be omitted to indicate
@@ -10,7 +10,7 @@ an ordered, immutable collection of one or more `VersionInterval` instances
 parsed from the `affected-versions` field of a `buildmark` block, and can test
 whether a version falls inside any contained interval.
 
-## Interval Notation
+#### Interval Notation
 
 The interval format follows standard mathematical notation:
 
@@ -28,7 +28,7 @@ Multiple intervals are separated by `,` **between** ranges. The parser
 distinguishes a separating comma from the commas that appear **inside** an
 interval (between the bounds) by tracking bracket depth.
 
-## Data Model - VersionInterval
+#### Data Model - VersionInterval
 
 ```csharp
 public record VersionInterval(
@@ -45,7 +45,7 @@ public record VersionInterval(
 | `UpperBound`     | `string?` | Upper version string, or `null` if unbounded   |
 | `UpperInclusive` | `bool`    | `true` if the upper bound is inclusive (`]`)   |
 
-## Data Model - VersionIntervalSet
+#### Data Model - VersionIntervalSet
 
 ```csharp
 public record VersionIntervalSet(
@@ -56,9 +56,9 @@ public record VersionIntervalSet(
 |-------------|-----------------------------------|-----------------------------------|
 | `Intervals` | `IReadOnlyList<VersionInterval>`  | Ordered list of parsed intervals  |
 
-## Methods
+#### Methods
 
-### `VersionInterval.Parse(string text) → VersionInterval?`
+##### `VersionInterval.Parse(string text) → VersionInterval?`
 
 Parses a single interval token such as `(,1.0.1]` or `[1.1.0,1.2.0)`:
 
@@ -70,7 +70,7 @@ Parses a single interval token such as `(,1.0.1]` or `[1.1.0,1.2.0)`:
 5. Treat an empty string for either bound as `null` (unbounded).
 6. Return `null` if the input does not match the expected pattern.
 
-### `VersionIntervalSet.Parse(string text) → VersionIntervalSet`
+##### `VersionIntervalSet.Parse(string text) → VersionIntervalSet`
 
 Parses a comma-separated list of intervals:
 
@@ -82,7 +82,7 @@ Parses a comma-separated list of intervals:
 4. Discard tokens that do not parse successfully.
 5. Return a `VersionIntervalSet` wrapping the resulting list.
 
-### `VersionInterval.Contains(string version) → bool`
+##### `VersionInterval.Contains(string version) → bool`
 
 Tests whether a semantic version string falls within the interval:
 
@@ -98,7 +98,7 @@ Tests whether a semantic version string falls within the interval:
    is `false`.
 9. Return `true` otherwise.
 
-### `VersionInterval.Contains(VersionComparable version) → bool`
+##### `VersionInterval.Contains(VersionComparable version) → bool`
 
 Tests whether a `VersionComparable` instance falls within the interval:
 
@@ -112,13 +112,13 @@ Tests whether a `VersionComparable` instance falls within the interval:
    is `false`.
 7. Return `true` otherwise.
 
-### `VersionInterval.Contains(VersionTag version) → bool`
+##### `VersionInterval.Contains(VersionTag version) → bool`
 
 Convenience overload for callers that already hold a parsed BuildMark
 `VersionTag`. This overload delegates to `Contains(VersionComparable)` using
 `version.Semantic.Comparable`.
 
-### `VersionIntervalSet.Contains(string version) → bool`
+##### `VersionIntervalSet.Contains(string version) → bool`
 
 Tests whether a semantic version string falls within any interval in the set:
 
@@ -127,7 +127,7 @@ Tests whether a semantic version string falls within any interval in the set:
 3. Return `true` as soon as any interval contains the candidate version.
 4. Return `false` when no interval matches.
 
-### `VersionIntervalSet.Contains(VersionComparable version) → bool`
+##### `VersionIntervalSet.Contains(VersionComparable version) → bool`
 
 Tests whether a `VersionComparable` instance falls within any interval in the set:
 
@@ -136,13 +136,13 @@ Tests whether a `VersionComparable` instance falls within any interval in the se
 3. Return `true` as soon as any interval contains the candidate version.
 4. Return `false` when no interval matches.
 
-### `VersionIntervalSet.Contains(VersionTag version) → bool`
+##### `VersionIntervalSet.Contains(VersionTag version) → bool`
 
 Convenience overload for callers that already hold a parsed BuildMark
 `VersionTag`. This overload delegates to `Contains(VersionComparable)` using
 `version.Semantic.Comparable`.
 
-## Parsing Examples
+#### Parsing Examples
 
 | Input                      | Result                                            |
 |----------------------------|---------------------------------------------------|
@@ -151,7 +151,7 @@ Convenience overload for callers that already hold a parsed BuildMark
 | `(,1.0.1],[1.1.0,1.2.0)`   | Two intervals                                     |
 | `[3.0.0,)`                 | One interval: `3.0.0` and later                   |
 
-## Interactions
+#### Interactions
 
 `VersionInterval` and `VersionIntervalSet` are general-purpose utility types.
 They are created by `ItemControlsParser`, stored on `ItemControlsInfo`, and may

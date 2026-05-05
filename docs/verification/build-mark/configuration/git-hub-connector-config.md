@@ -1,20 +1,20 @@
-# GitHubConnectorConfig
+### GitHubConnectorConfig
 
-## Verification Approach
+#### Verification Approach
 
 `GitHubConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml`
 files with a GitHub connector block and assert that `Owner`, `Repo`, and `BaseUrl` properties are
 correctly parsed. No mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason                                                               |
 | ----------- | -------------------------------------------------------------------- |
 | File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+##### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
 **Scenario**: A `.buildmark.yaml` with `github.owner`, `github.repo`, and `github.base-url` fields
 is written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.GitHub` is inspected.
@@ -24,7 +24,7 @@ is written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.GitHu
 
 **Requirement coverage**: `BuildMark-GitHubConnectorConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-GitHubConnectorConfig-Properties`**:
   - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration

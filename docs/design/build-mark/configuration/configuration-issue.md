@@ -1,12 +1,12 @@
-# ConfigurationIssue
+### ConfigurationIssue
 
-## Overview
+#### Overview
 
 `ConfigurationIssue` is an immutable record representing a single problem found while reading
 or validating the `.buildmark.yaml` file. Each issue carries a file path, line number,
 severity, and human-readable description.
 
-## Data Model
+#### Data Model
 
 | Property      | Type                        | Description                                        |
 |---------------|-----------------------------|----------------------------------------------------|
@@ -22,7 +22,7 @@ severity, and human-readable description.
 | `Warning` | Non-fatal issue; tool continues and exit code is 0       |
 | `Error`   | Fatal issue; tool reports all errors, exits with code 1  |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem          | Role                                                           |
 |---------------------------|----------------------------------------------------------------|

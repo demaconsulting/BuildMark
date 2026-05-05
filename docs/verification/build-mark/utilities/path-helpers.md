@@ -1,6 +1,6 @@
-# PathHelpers
+### PathHelpers
 
-## Verification Approach
+#### Verification Approach
 
 `PathHelpers` is a pure utility class with no dedicated test class. It is verified
 indirectly through CLI and program tests that exercise path-related flag handling
@@ -11,15 +11,15 @@ No direct unit tests exist for `PathHelpers` because the class provides straight
 path combination logic with no branching that requires isolated testing. Its behavior
 is validated through the integration tests that consume it.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
 
-## Test Scenarios (Integration)
+#### Test Scenarios (Integration)
 
-### Cli_LogFlag_CreatesLogFile
+##### Cli_LogFlag_CreatesLogFile
 
 **Scenario**: `Context` is created with a log file path; `PathHelpers` is used to
 resolve the file path.
@@ -28,7 +28,7 @@ resolve the file path.
 
 **Requirement coverage**: `BuildMark-Utilities-PathHelpers`
 
-### Cli_ReportFlags_SetProperties
+##### Cli_ReportFlags_SetProperties
 
 **Scenario**: `Context` is created with `--report` flag; path is processed by the
 context/utilities layer.
@@ -37,7 +37,7 @@ context/utilities layer.
 
 **Requirement coverage**: `BuildMark-Utilities-PathHelpers`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Utilities-PathHelpers**: Cli_LogFlag_CreatesLogFile,
   Cli_ReportFlags_SetProperties

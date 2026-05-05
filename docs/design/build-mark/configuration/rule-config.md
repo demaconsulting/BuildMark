@@ -1,6 +1,6 @@
-# RuleConfig and RuleMatchConfig
+### RuleConfig and RuleMatchConfig
 
-## Overview
+#### Overview
 
 `RuleConfig` is a configuration data model representing a single item routing rule read from
 the `rules:` list in `.buildmark.yaml`. Each rule carries match conditions and a destination
@@ -8,23 +8,23 @@ section ID. `RuleMatchConfig` holds the conditions that must be satisfied for a 
 
 Both types are defined in `Configuration/RuleConfig.cs`.
 
-## Data Models
+#### Data Models
 
-### RuleConfig
+##### RuleConfig
 
 | Property | Type              | Description                                             |
 |----------|-------------------|---------------------------------------------------------|
 | `Match`  | `RuleMatchConfig` | Match conditions (labels, work-item types) for the rule |
 | `Route`  | `string`          | Destination section `Id` for matched items              |
 
-### RuleMatchConfig
+##### RuleMatchConfig
 
 | Property       | Type            | Description                                                       |
 |----------------|-----------------|-------------------------------------------------------------------|
 | `Label`        | `IList<string>` | List of label values; rule matches when any label is present      |
 | `WorkItemType` | `IList<string>` | List of work-item type values; rule matches when any type matches |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem        | Role                                                                    |
 |-------------------------|-------------------------------------------------------------------------|

@@ -1,12 +1,12 @@
-# GitHub Subsystem
+### GitHub Subsystem
 
-## Overview
+#### Overview
 
 The GitHub subsystem groups the units responsible for querying the GitHub
 GraphQL API. It sits within the RepoConnectors subsystem and provides the
 production connector used when the repository host is GitHub or GitHub Enterprise.
 
-## Units
+#### Units
 
 - `GitHubRepoConnector` - `RepoConnectors/GitHub/GitHubRepoConnector.cs` -
   implements `IRepoConnector` for GitHub.
@@ -15,25 +15,25 @@ production connector used when the repository host is GitHub or GitHub Enterpris
 - `GitHubGraphQLTypes` - `RepoConnectors/GitHub/GitHubGraphQLTypes.cs` -
   provides record types for GraphQL request and response data.
 
-### `GitHubRepoConnector`
+##### `GitHubRepoConnector`
 
 The primary production connector. Resolves the repository URL and GitHub token from
 the environment, creates a `GitHubGraphQLClient`, fetches all required data via
 GraphQL, applies item-controls overrides, calls `ItemRouter` to assign items to
 sections, and assembles the `BuildInformation` record.
 
-### `GitHubGraphQLClient`
+##### `GitHubGraphQLClient`
 
 Handles HTTPS communication with the GitHub GraphQL endpoint. Supports paginated
 queries and authenticates via an `Authorization: bearer <token>` header. Also
 supports GitHub Enterprise by accepting an alternative base URL.
 
-### `GitHubGraphQLTypes`
+##### `GitHubGraphQLTypes`
 
 Internal C# records that mirror the GraphQL schema types returned by GitHub. Used
 as the deserialization target for responses from `GitHubGraphQLClient`.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem        | Role                                                              |
 |-------------------------|-------------------------------------------------------------------|

@@ -1,12 +1,12 @@
-# Version Subsystem Design
+## Version Subsystem Design
 
-## Overview
+### Overview
 
 The Version subsystem provides comprehensive semantic version processing capabilities for BuildMark.
 It encapsulates all version-related functionality including parsing, comparison, validation, and version
 range operations, ensuring consistent semantic versioning behavior across all BuildMark components.
 
-## Architecture
+### Architecture
 
 The Version subsystem is composed of six units:
 
@@ -17,7 +17,7 @@ The Version subsystem is composed of six units:
 - `VersionIntervalSet` (Unit) - ordered collection of version intervals for range queries
 - `VersionCommitTag` (Unit) - version-to-commit association for build information
 
-## Version Type Hierarchy
+### Version Type Hierarchy
 
 ```text
 VersionTag (raw repository tag)
@@ -31,19 +31,19 @@ VersionInterval / VersionIntervalSet (version ranges)
 VersionCommitTag (version + commit hash)
 ```
 
-## Design Principles
+### Design Principles
 
-### Semantic Versioning Compliance
+#### Semantic Versioning Compliance
 
 All version processing strictly adheres to Semantic Versioning 2.0.0 (<https://semver.org/>) specification
 to ensure predictable and industry-standard behavior.
 
-### Performance Optimization
+#### Performance Optimization
 
 Version comparison operations are optimized for high-frequency usage in repository processing
 through construction-time parsing and cached segment arrays.
 
-### Type Safety
+#### Type Safety
 
 Each version type serves a specific purpose with clear boundaries:
 
@@ -53,7 +53,7 @@ Each version type serves a specific purpose with clear boundaries:
 - **VersionInterval**: Range queries and filtering
 - **VersionCommitTag**: Build metadata association
 
-## External Interfaces
+### External Interfaces
 
 | Interface        | Direction  | Protocol / Format                         |
 |------------------|------------|-------------------------------------------|
@@ -62,22 +62,22 @@ Each version type serves a specific purpose with clear boundaries:
 | Version Compare  | Processing | IComparable<T> standard interface         |
 | Build Info       | Output     | VersionCommitTag records for build notes  |
 
-## Integration Points
+### Integration Points
 
-### Repository Connectors
+#### Repository Connectors
 
 Version subsystem processes raw repository tags from GitHub and other sources,
 extracting semantic versions for build boundary determination.
 
-### Build Notes
+#### Build Notes
 
 Provides VersionCommitTag associations that link semantic versions to specific commit hashes for build information generation.
 
-### Configuration
+#### Configuration
 
 Supports version range specifications in configuration files through VersionInterval processing.
 
-## Error Handling
+### Error Handling
 
 Version processing provides two parsing patterns:
 
@@ -86,15 +86,15 @@ Version processing provides two parsing patterns:
 - Malformed version ranges are rejected during parsing
 - Version comparison operations are guaranteed to be consistent and transitive
 
-## Performance Characteristics
+### Performance Characteristics
 
-### Version Comparison
+#### Version Comparison
 
 - **Construction**: O(n) where n is pre-release identifier count
 - **Comparison**: O(min(a,b)) where a,b are pre-release segment counts
 - **Memory**: Constant per-version overhead for parsed segments
 
-### Version Range Operations
+#### Version Range Operations
 
 - **Interval Creation**: O(1) for single ranges
 - **Set Operations**: O(n) where n is interval count

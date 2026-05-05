@@ -1,12 +1,12 @@
-# BuildInformation
+### BuildInformation
 
-## Overview
+#### Overview
 
 `BuildInformation` is a record in the BuildNotes subsystem that holds all data
 needed to produce one markdown build-notes report. It is assembled by connectors
 and passed to `Program`, which calls `ToMarkdown` to render the final file.
 
-## Data Model
+#### Data Model
 
 ```csharp
 public record BuildInformation(
@@ -30,9 +30,9 @@ public record BuildInformation(
   optional ordered list of custom report sections populated by `RepoConnectorBase.ApplyRules`
   when routing rules are configured; `null` when no rules are active
 
-## Methods
+#### Methods
 
-### `ToMarkdown(headingDepth, includeKnownIssues) → string`
+##### `ToMarkdown(headingDepth, includeKnownIssues) → string`
 
 Renders the build information as a markdown string. The `headingDepth` parameter
 controls the top-level heading depth (default `1`), allowing the report to be
@@ -57,7 +57,7 @@ The rendered output contains the following sections:
 3. **Full Changelog** *(optional)* - hyperlink from `CompleteChangelogLink`, emitted
    only when the link is non-null.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem   | Role                                                              |
 | :----------------- | :---------------------------------------------------------------- |

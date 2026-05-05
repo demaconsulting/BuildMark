@@ -1,21 +1,21 @@
-# ConnectorConfig
+### ConnectorConfig
 
-## Verification Approach
+#### Verification Approach
 
 `ConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write `.buildmark.yaml` files
 with connector blocks and assert that `ConnectorConfig.Type`, `ConnectorConfig.GitHub`, and
 `ConnectorConfig.AzureDevOps` are correctly populated by `BuildMarkConfigReader.ReadAsync`. No
 mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason                                                               |
 | ----------- | -------------------------------------------------------------------- |
 | File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+##### BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
 **Scenario**: A `.buildmark.yaml` with a GitHub connector block is written;
 `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector` is inspected.
@@ -25,7 +25,7 @@ mocking is required.
 
 **Requirement coverage**: `BuildMark-ConnectorConfig-Properties`.
 
-### BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+##### BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
 **Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block is written;
 `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector` is inspected.
@@ -35,7 +35,7 @@ mocking is required.
 
 **Requirement coverage**: `BuildMark-ConnectorConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-ConnectorConfig-Properties`**:
   - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration

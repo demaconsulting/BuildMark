@@ -1,21 +1,21 @@
-# SectionConfig
+### SectionConfig
 
-## Verification Approach
+#### Verification Approach
 
 `SectionConfig` is verified through `ConfigurationTests.cs`. The test
 `BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
 `BuildMarkConfig.CreateDefault()` and asserts on the `Id` and `Title` properties of the returned
 sections. No mocking is required.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason          |
 | ----------- | --------------- |
 | None        | No mocks needed |
 
-## Test Scenarios
+#### Test Scenarios
 
-### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
 **Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Sections` collection is
 inspected.
@@ -26,7 +26,7 @@ inspected.
 
 **Requirement coverage**: `BuildMark-SectionConfig-Properties`.
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **`BuildMark-SectionConfig-Properties`**:
   - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

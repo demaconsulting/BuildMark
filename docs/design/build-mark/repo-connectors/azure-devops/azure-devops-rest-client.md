@@ -1,13 +1,13 @@
-# AzureDevOpsRestClient
+#### AzureDevOpsRestClient
 
-## Overview
+##### Overview
 
 `AzureDevOpsRestClient` is the Azure DevOps subsystem unit responsible for issuing
 paginated REST API requests to the Azure DevOps API and translating the responses
 into typed records for connector consumption. `AzureDevOpsRepoConnector` delegates
 all Azure DevOps API communication to this client.
 
-## Authentication
+##### Authentication
 
 The client authenticates using either:
 
@@ -21,7 +21,7 @@ The client authenticates using either:
 The authentication scheme is selected automatically based on the token source
 resolved by `AzureDevOpsRepoConnector`.
 
-## JSON Deserialization
+##### JSON Deserialization
 
 The client uses `System.Net.Http.Json` extension methods (part of the .NET runtime) to
 deserialize Azure DevOps REST API responses. Specifically, each HTTP response body is
@@ -38,12 +38,12 @@ The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary - its keys are
 Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
 and are preserved as-is without any naming transformation.
 
-## Methods
+##### Methods
 
 The client provides the following methods for retrieving the repository data needed
 to build a `BuildInformation` record:
 
-### `GetRepositoryAsync(repository)`
+###### `GetRepositoryAsync(repository)`
 
 Fetches repository metadata for the specified repository.
 
@@ -52,7 +52,7 @@ Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
 remote URL.
 
-### `GetTagsAsync(repositoryId)`
+###### `GetTagsAsync(repositoryId)`
 
 Fetches all tag references for the specified repository.
 
@@ -64,7 +64,7 @@ peeled commit SHA. The `peelTags=true` query parameter instructs the API to reso
 annotated tag objects to their underlying commit SHA, which is returned in the
 `peeledObjectId` field.
 
-### `GetCommitsAsync(repositoryId)`
+###### `GetCommitsAsync(repositoryId)`
 
 Fetches the complete paginated commit history for the repository.
 
@@ -73,7 +73,7 @@ Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api
 Returns a list of `AzureDevOpsCommit` records. Automatically paginates using
 `$top` and `$skip` query parameters to retrieve all pages.
 
-### `GetPullRequestsAsync(repositoryId, status)`
+###### `GetPullRequestsAsync(repositoryId, status)`
 
 Fetches all pull requests with the specified status for the repository. Supports
 `all`, `active`, `completed`, and `abandoned` status values.
@@ -83,7 +83,7 @@ Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequest
 Returns a list of `AzureDevOpsPullRequest` records. Automatically paginates using
 `$top` and `$skip` query parameters to retrieve all pages.
 
-### `GetPullRequestWorkItemsAsync(repositoryId, pullRequestId)`
+###### `GetPullRequestWorkItemsAsync(repositoryId, pullRequestId)`
 
 Fetches the work items linked to a specific pull request.
 
@@ -92,7 +92,7 @@ Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequest
 Returns a list of work item id references from the
 `AzureDevOpsCollectionResponse<WorkItemRef>`.
 
-### `GetWorkItemsAsync(workItemIds)`
+###### `GetWorkItemsAsync(workItemIds)`
 
 Batch-fetches work item details for a list of work item ids. Splits requests into
 batches of 200 ids as required by the Azure DevOps API.
@@ -101,7 +101,7 @@ Endpoint: `GET /{organization}/{project}/_apis/wit/workitems?ids={ids}&$expand=a
 
 Returns a list of `AzureDevOpsWorkItem` records with all fields expanded.
 
-### `QueryWorkItemsAsync(wiql)`
+###### `QueryWorkItemsAsync(wiql)`
 
 Executes a WIQL (Work Item Query Language) query and returns the matching work item
 id references.
@@ -111,7 +111,7 @@ Endpoint: `POST /{organization}/{project}/_apis/wit/wiql?api-version=6.0`
 Returns an `AzureDevOpsWorkItemQuery` record containing the list of matching work
 item id references.
 
-## Interactions
+##### Interactions
 
 - `AzureDevOpsRepoConnector` creates and calls `AzureDevOpsRestClient`.
 - `AzureDevOpsApiTypes` provides the request and response record types used for

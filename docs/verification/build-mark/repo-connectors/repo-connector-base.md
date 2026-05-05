@@ -1,21 +1,21 @@
-# RepoConnectorBase
+### RepoConnectorBase
 
-## Verification Approach
+#### Verification Approach
 
 `RepoConnectorBase` is tested through `RepoConnectorBaseTests.cs`, which contains
 5 unit tests. The tests exercise `Configure` (storing rules and sections and setting
 `HasRules`), `ApplyRules` (routing items to sections), and `FindVersionIndex` (locating
 a version tag in a list, including cross-prefix equality).
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub               | Reason                                                         |
 | ------------------------- | -------------------------------------------------------------- |
 | Concrete subclass fixture | Tests instantiate a minimal concrete subclass for testing base |
 
-## Test Scenarios
+#### Test Scenarios
 
-### RepoConnectorBase_Configure_StoresRulesAndSections_HasRulesReturnsTrue
+##### RepoConnectorBase_Configure_StoresRulesAndSections_HasRulesReturnsTrue
 
 **Scenario**: `Configure` is called with a non-empty rules list.
 
@@ -23,7 +23,7 @@ a version tag in a list, including cross-prefix equality).
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
 
-### RepoConnectorBase_Configure_EmptyRules_HasRulesReturnsFalse
+##### RepoConnectorBase_Configure_EmptyRules_HasRulesReturnsFalse
 
 **Scenario**: `Configure` is called with an empty rules list.
 
@@ -31,7 +31,7 @@ a version tag in a list, including cross-prefix equality).
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
 
-### RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections
+##### RepoConnectorBase_ApplyRules_RoutesItemsToConfiguredSections
 
 **Scenario**: `ApplyRules` is called with items and configured routing rules.
 
@@ -39,7 +39,7 @@ a version tag in a list, including cross-prefix equality).
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
 
-### RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex
+##### RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex
 
 **Scenario**: `FindVersionIndex` is called with a tag list containing a tag with a
 different prefix but the same version as the search target.
@@ -48,7 +48,7 @@ different prefix but the same version as the search target.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
 
-### RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne
+##### RepoConnectorBase_FindVersionIndex_VersionNotInList_ReturnsMinusOne
 
 **Scenario**: `FindVersionIndex` is called with a version that is not in the list.
 
@@ -56,6 +56,6 @@ different prefix but the same version as the search target.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-RepoConnectors-RepoConnectorBase**: All 5 tests in `RepoConnectorBaseTests.cs`

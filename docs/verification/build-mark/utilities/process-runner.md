@@ -1,21 +1,21 @@
-# ProcessRunner
+### ProcessRunner
 
-## Verification Approach
+#### Verification Approach
 
 `ProcessRunner` is tested through `RepoConnectorsTests.cs`. The five ProcessRunner
 tests exercise `TryRunAsync` (which returns `null` on failure) and `RunAsync` (which
 throws on failure) using real OS processes to confirm the process execution logic is
 correct on the target operating system.
 
-## Dependencies
+#### Dependencies
 
 | Mock / Stub | Reason                                                      |
 | ----------- | ----------------------------------------------------------- |
 | None        | Real OS processes are used to test actual process execution |
 
-## Test Scenarios
+#### Test Scenarios
 
-### RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
+##### RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
 
 **Scenario**: `ProcessRunner.TryRunAsync` is called with a valid system command.
 
@@ -23,7 +23,7 @@ correct on the target operating system.
 
 **Requirement coverage**: `BuildMark-Utilities-ProcessRunner`
 
-### RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
+##### RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
 
 **Scenario**: `ProcessRunner.TryRunAsync` is called with an invalid command name.
 
@@ -31,7 +31,7 @@ correct on the target operating system.
 
 **Requirement coverage**: `BuildMark-Utilities-ProcessRunner`
 
-### RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+##### RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
 
 **Scenario**: `ProcessRunner.TryRunAsync` is called with a command that exits with
 a non-zero code.
@@ -40,7 +40,7 @@ a non-zero code.
 
 **Requirement coverage**: `BuildMark-Utilities-ProcessRunner`
 
-### RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
+##### RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
 
 **Scenario**: `ProcessRunner.RunAsync` is called with a valid command.
 
@@ -48,7 +48,7 @@ a non-zero code.
 
 **Requirement coverage**: `BuildMark-Utilities-ProcessRunner`
 
-### RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+##### RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
 
 **Scenario**: `ProcessRunner.RunAsync` is called with a command that returns a
 non-zero exit code.
@@ -57,7 +57,7 @@ non-zero exit code.
 
 **Requirement coverage**: `BuildMark-Utilities-ProcessRunner`
 
-## Requirements Coverage
+#### Requirements Coverage
 
 - **BuildMark-Utilities-ProcessRunner**:
   RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput,

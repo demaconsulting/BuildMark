@@ -1,6 +1,6 @@
-# RepoConnectors Subsystem
+## RepoConnectors Subsystem
 
-## Overview
+### Overview
 
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark.
 It provides an interface and base class for repository connectors, a factory for
@@ -14,7 +14,7 @@ subsystem provides the production Azure DevOps REST connector, and the `Mock`
 subsystem provides the in-memory connector used by the built-in `--validate`
 self-test.
 
-## Units
+### Units
 
 - `IRepoConnector` - `RepoConnectors/IRepoConnector.cs` - interface for all
   repository connectors
@@ -29,7 +29,7 @@ self-test.
 - `ItemControlsInfo` - `RepoConnectors/ItemControlsInfo.cs` - data record holding
   visibility, type, and version-set values
 
-## Subsystems
+### Subsystems
 
 - **`GitHub`** - `RepoConnectors/GitHub/` - `GitHubRepoConnector`, `GitHubGraphQLClient`,
   `GitHubGraphQLTypes`
@@ -37,7 +37,7 @@ self-test.
   `AzureDevOpsRestClient`, `AzureDevOpsApiTypes`, `WorkItemMapper`
 - **`Mock`** - `RepoConnectors/Mock/` - `MockRepoConnector` (used by `--validate` self-test)
 
-## Interfaces
+### Interfaces
 
 `IRepoConnector` defines the contract for all connectors:
 
@@ -45,7 +45,7 @@ self-test.
 |-------------------------------------|--------|----------------------------------|
 | `GetBuildInformationAsync(version)` | Method | Fetch complete build information |
 
-## Interactions
+### Interactions
 
 | Unit / Subsystem             | Role                                                                   |
 |------------------------------|------------------------------------------------------------------------|

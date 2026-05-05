@@ -1,6 +1,6 @@
-# Configuration Subsystem
+## Configuration Subsystem
 
-## Overview
+### Overview
 
 The Configuration subsystem is responsible for reading and parsing the optional
 `.buildmark.yaml` file located in the repository root. It uses the YamlDotNet
@@ -16,7 +16,7 @@ the file is present but malformed, the result carries `null` for the
 configuration alongside a list of `ConfigurationIssue` records describing each
 problem with its file path, line number, severity, and description.
 
-## Units
+### Units
 
 | Unit                        | File                                          | Responsibility                         |
 |-----------------------------|-----------------------------------------------|----------------------------------------|
@@ -32,7 +32,7 @@ problem with its file path, line number, severity, and description.
 | `RuleConfig`                | `Configuration/RuleConfig.cs`                 | Item routing rule data model           |
 | `RuleMatchConfig`           | `Configuration/RuleConfig.cs`                 | Conditions for an item routing rule    |
 
-## Interfaces
+### Interfaces
 
 `BuildMarkConfigReader` exposes the following outward-facing interface consumed by
 `Program`:
@@ -129,7 +129,7 @@ problem with its file path, line number, severity, and description.
 | `Label`        | Property | List of label values; the rule matches when any label is present  |
 | `WorkItemType` | Property | List of work-item type values; rule matches when any type matches |
 
-## Interactions
+### Interactions
 
 | Unit / Subsystem           | Role                                                                          |
 |----------------------------|-------------------------------------------------------------------------------|

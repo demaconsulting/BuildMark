@@ -1,12 +1,12 @@
-# ItemInfo
+### ItemInfo
 
-## Overview
+#### Overview
 
 `ItemInfo` is a record in the BuildNotes subsystem that represents a single issue
 or pull request entry in the build report. It is produced by connectors and stored
 in the `Changes`, `Bugs`, and `KnownIssues` lists of `BuildInformation`.
 
-## Data Model
+#### Data Model
 
 ```csharp
 public record ItemInfo(
@@ -27,7 +27,7 @@ public record ItemInfo(
 | `Index`            | `int`                 | Numeric issue/PR number for deterministic sorting          |
 | `AffectedVersions` | `VersionIntervalSet?` | Interval set from the `affected-versions` field, or `null` |
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem    | Role                                                        |
 |---------------------|-------------------------------------------------------------|

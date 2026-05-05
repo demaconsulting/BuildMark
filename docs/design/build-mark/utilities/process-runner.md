@@ -1,15 +1,15 @@
-# ProcessRunner
+### ProcessRunner
 
-## Overview
+#### Overview
 
 `ProcessRunner` is a static helper class in the Utilities subsystem that executes
 external shell commands and captures their standard output. It provides two public
 methods: `RunAsync`, which throws on failure, and `TryRunAsync`, which returns
 `null` on failure.
 
-## Methods
+#### Methods
 
-### `RunAsync(command, params arguments) → string`
+##### `RunAsync(command, params arguments) → string`
 
 Starts the specified process, captures stdout and stderr asynchronously, waits for
 exit, and returns the trimmed stdout string. Throws `InvalidOperationException` if
@@ -20,7 +20,7 @@ The `arguments` parameter is a `params string[]` array. Each argument is added t
 the `ProcessStartInfo.ArgumentList` collection so that the Process class handles
 argument quoting correctly, rather than concatenating into a single string.
 
-### `TryRunAsync(command, params arguments) → string?`
+##### `TryRunAsync(command, params arguments) → string?`
 
 Executes the process and returns the stdout string if the exit code is zero, or
 `null` if the process fails or throws any exception. This method never propagates
@@ -29,7 +29,7 @@ exceptions to its callers.
 The `arguments` parameter is a `params string[]` array, matching the signature of
 `RunAsync`.
 
-### `CreateStartInfo(command, arguments) → ProcessStartInfo`
+##### `CreateStartInfo(command, arguments) → ProcessStartInfo`
 
 Private helper method that creates a `ProcessStartInfo` for the given command.
 
@@ -42,7 +42,7 @@ the command is invoked directly without a shell wrapper.
 Empty or whitespace-only commands are not routed through `cmd /c`, preserving the
 exception behavior for invalid commands.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem              | Role                                                                   |
 |-------------------------------|------------------------------------------------------------------------|

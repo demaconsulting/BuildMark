@@ -1,6 +1,6 @@
-# AzureDevOpsRepoConnector
+#### AzureDevOpsRepoConnector
 
-## Verification Approach
+##### Verification Approach
 
 `AzureDevOpsRepoConnector` is tested through `AzureDevOpsRepoConnectorTests.cs`,
 which contains 25 unit tests. The tests exercise constructor behavior, the full
@@ -8,15 +8,15 @@ which contains 25 unit tests. The tests exercise constructor behavior, the full
 configuration, known issues filtering by affected versions, and edge cases including
 work item deduplication and version tag handling.
 
-## Dependencies
+##### Dependencies
 
 | Mock / Stub              | Reason                                                      |
 | ------------------------ | ----------------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the Azure DevOps REST endpoint |
 
-## Test Scenarios
+##### Test Scenarios
 
-### AzureDevOpsRepoConnector_Constructor_CreatesInstance
+###### AzureDevOpsRepoConnector_Constructor_CreatesInstance
 
 **Scenario**: Connector is constructed with no configuration.
 
@@ -24,7 +24,7 @@ work item deduplication and version tag handling.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+###### AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
 
 **Scenario**: Connector is constructed with an `AzureDevOpsConnectorConfig`.
 
@@ -32,7 +32,7 @@ work item deduplication and version tag handling.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+###### AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
 
 **Scenario**: Connector is checked against `IRepoConnector`.
 
@@ -40,7 +40,7 @@ work item deduplication and version tag handling.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
 
 **Scenario**: `GetBuildInformationAsync` processes mocked REST API responses.
 
@@ -49,7 +49,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectBaseline
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectBaseline
 
 **Scenario**: Multiple version tags exist in the mocked response.
 
@@ -57,7 +57,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithWorkItems_GathersChangesCorrectly
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithWorkItems_GathersChangesCorrectly
 
 **Scenario**: Mocked data includes work items linked to commits.
 
@@ -65,7 +65,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenBugs_IdentifiesKnownIssues
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenBugs_IdentifiesKnownIssues
 
 **Scenario**: Mocked data includes open bug work items.
 
@@ -73,7 +73,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
 
 **Scenario**: A pre-release tag shares the same commit hash as the build version.
 
@@ -81,7 +81,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
 
 **Scenario**: Build version is a release; prior history contains pre-release tags.
 
@@ -89,7 +89,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
 
 **Scenario**: Pre-release tag is not found in commit history; connector falls back.
 
@@ -97,7 +97,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
 
 **Scenario**: All previous tags share the same commit hash.
 
@@ -105,7 +105,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithDuplicateWorkItem_DeduplicatesChanges
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithDuplicateWorkItem_DeduplicatesChanges
 
 **Scenario**: Mocked data contains the same work item linked to multiple commits.
 
@@ -113,7 +113,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
 
 **Scenario**: A work item has `visibility: internal` in its buildmark block.
 
@@ -121,7 +121,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
 
 **Scenario**: A work item has `visibility: public` in its buildmark block.
 
@@ -129,7 +129,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
 
 **Scenario**: A work item has `type: bug` in its buildmark block.
 
@@ -137,7 +137,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
 
 **Scenario**: A work item has `type: feature` in its buildmark block.
 
@@ -145,7 +145,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+###### AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
 
 **Scenario**: `Configure` is called with routing rules.
 
@@ -153,7 +153,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
 **Scenario**: Connector is configured with routing rules and run with mock data.
 
@@ -161,7 +161,7 @@ changes, and known issues.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
 
 **Scenario**: Known issues have `affected-versions` set; build version is outside the
 range.
@@ -170,7 +170,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
 **Scenario**: A closed bug has `affected-versions` that includes the build version.
 
@@ -178,7 +178,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithNoTags_ReturnsEmptyBuildInformation
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithNoTags_ReturnsEmptyBuildInformation
 
 **Scenario**: Repository has no version tags.
 
@@ -186,7 +186,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithNoCommitsBetweenVersions_ReturnsEmptyChanges
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithNoCommitsBetweenVersions_ReturnsEmptyChanges
 
 **Scenario**: No commits exist between the build version and the baseline.
 
@@ -194,7 +194,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WorkItemWithNoBugType_NotKnownIssue
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WorkItemWithNoBugType_NotKnownIssue
 
 **Scenario**: Open work item is not of type bug.
 
@@ -202,7 +202,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WorkItemWithCompletedState_NotKnownIssue
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WorkItemWithCompletedState_NotKnownIssue
 
 **Scenario**: Bug work item is in a completed state.
 
@@ -210,7 +210,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAzureDevOpsUrl_GeneratesChangelogLink
+###### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAzureDevOpsUrl_GeneratesChangelogLink
 
 **Scenario**: Repository URL is an Azure DevOps URL.
 
@@ -218,7 +218,7 @@ range.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
-## Requirements Coverage
+##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-IRepoConnector**:
   AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue

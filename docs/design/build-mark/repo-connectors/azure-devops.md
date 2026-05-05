@@ -1,12 +1,12 @@
-# AzureDevOps Subsystem
+### AzureDevOps Subsystem
 
-## Overview
+#### Overview
 
 The AzureDevOps subsystem groups the units responsible for querying the Azure DevOps
 REST API. It sits within the RepoConnectors subsystem and provides the production
 connector used when the repository host is Azure DevOps.
 
-## Units
+#### Units
 
 - `AzureDevOpsRepoConnector` - `RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs` -
   implements `IRepoConnector` for Azure DevOps.
@@ -17,7 +17,7 @@ connector used when the repository host is Azure DevOps.
 - `WorkItemMapper` - `RepoConnectors/AzureDevOps/WorkItemMapper.cs` -
   maps Azure DevOps work items to `ItemInfo` objects.
 
-### `AzureDevOpsRepoConnector`
+##### `AzureDevOpsRepoConnector`
 
 The primary production connector. Resolves the repository URL, organization, and project
 from the environment or configuration, creates an `AzureDevOpsRestClient`, fetches all
@@ -25,19 +25,19 @@ required data via REST APIs, applies item-controls overrides from buildmark bloc
 custom fields, calls `ItemRouter` to assign items to sections, and assembles the
 `BuildInformation` record.
 
-### `AzureDevOpsRestClient`
+##### `AzureDevOpsRestClient`
 
 Handles HTTPS communication with the Azure DevOps REST API endpoint. Supports paginated
 requests and authenticates via a `Basic` or `Bearer` authorization header. Supports both
 cloud (`dev.azure.com`) and on-premises Azure DevOps Server instances via configurable
 organization URL.
 
-### `AzureDevOpsApiTypes`
+##### `AzureDevOpsApiTypes`
 
 Internal C# records that mirror the REST API response types returned by Azure DevOps.
 Used as the deserialization target for responses from `AzureDevOpsRestClient`.
 
-### `WorkItemMapper`
+##### `WorkItemMapper`
 
 Maps `AzureDevOpsWorkItem` records from the REST API into `ItemInfo` records for the
 `BuildInformation` model. Extracts visibility, type, and affected-version controls from
@@ -45,7 +45,7 @@ both buildmark code blocks in the work item description and Azure DevOps custom 
 (`Custom.Visibility`, `Custom.AffectedVersions`). Custom fields take precedence over
 buildmark blocks when both are present.
 
-## Interactions
+#### Interactions
 
 | Unit / Subsystem              | Role                                                                      |
 |-------------------------------|---------------------------------------------------------------------------|

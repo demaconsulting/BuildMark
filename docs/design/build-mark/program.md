@@ -1,6 +1,6 @@
-# Program
+## Program
 
-## Overview
+### Overview
 
 `Program` is the top-level unit of BuildMark. It owns the application entry point,
 creates the `Context` object from command-line arguments, and dispatches execution
@@ -11,7 +11,7 @@ and a public method `Run`, which accepts an existing `Context` and performs the 
 execution logic. `Run` is exposed separately so that integration tests can inject a
 pre-configured `Context` without repeating argument parsing.
 
-## Data Model
+### Data Model
 
 `Program` exposes a single static property:
 
@@ -23,9 +23,9 @@ The version is resolved at startup by inspecting `AssemblyInformationalVersionAt
 first, then falling back to `assembly.GetName().Version`, and finally defaulting to
 `"0.0.0"` if neither attribute is present.
 
-## Methods
+### Methods
 
-### `Main(string[] args) → int`
+#### `Main(string[] args) → int`
 
 The application entry point (declared `private static`). It creates a `Context` from
 the supplied command-line arguments and delegates to `Run`. Any `ArgumentException`
@@ -34,7 +34,7 @@ or `InvalidOperationException` is caught, written directly to `Console.Error` (n
 other exception is re-thrown after logging so the runtime can report an unhandled
 exception.
 
-### `Run(Context context) → void`
+#### `Run(Context context) → void`
 
 Executes the main program logic against an already-constructed `Context`. The
 method applies the following priority order:
@@ -49,7 +49,7 @@ method applies the following priority order:
 
 The exit code is managed through `context.ExitCode` rather than as a return value.
 
-### `ProcessBuildNotes(Context context)`
+#### `ProcessBuildNotes(Context context)`
 
 Calls `BuildMarkConfigReader.ReadAsync` to load the optional `.buildmark.yaml`
 file, then calls `result.ReportTo(context)` to surface any configuration issues.
@@ -81,23 +81,23 @@ If errors occurred, the method returns early. Otherwise:
    to the console and allows the exit code to reflect only semantic errors rather than I/O
    failures outside the tool's control.
 
-### `PrintBanner(Context context)`
+#### `PrintBanner(Context context)`
 
 Writes the application name, version, and copyright notice to the context output.
 Called unconditionally after the version-flag check in `Run`.
 
-### `PrintHelp(Context context)`
+#### `PrintHelp(Context context)`
 
 Writes the full usage message (command syntax, options list) to the context output.
 Called when any of the `-?`, `-h`, or `--help` flags is set.
 
-### `LoadConfiguration() → ConfigurationLoadResult`
+#### `LoadConfiguration() → ConfigurationLoadResult`
 
 Synchronously invokes `BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory)`.
 Called from both the lint branch of `Run` and from `ProcessBuildNotes` to keep the
 async-to-sync bridging in one place.
 
-## Interactions
+### Interactions
 
 | Unit / Subsystem         | Role                                                                            |
 |--------------------------|---------------------------------------------------------------------------------|
