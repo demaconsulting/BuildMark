@@ -59,6 +59,7 @@ reviews:
       - "docs/design/introduction.md"
       - "docs/design/build-mark/**/*.md"
       - "docs/verification/introduction.md"
+      - "docs/verification/ots.md"
 
   - id: BuildMark-AllRequirements
     title: Review of All BuildMark requirements quality and traceability
