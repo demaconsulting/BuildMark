@@ -269,7 +269,7 @@ reviews:
       - "docs/verification/build-mark/configuration/build-mark-config.md"
       - "docs/verification/build-mark/configuration/connector-config.md"
       - "docs/verification/build-mark/configuration/git-hub-connector-config.md"
-      - "docs/verification/build-mark/configuration/azure-dev-ops-connector-config.md"
+      - "docs/verification/build-mark/configuration/azure-devops-connector-config.md"
       - "docs/verification/build-mark/configuration/report-config.md"
       - "docs/verification/build-mark/configuration/section-config.md"
       - "docs/verification/build-mark/configuration/rule-config.md"
@@ -393,7 +393,7 @@ reviews:
     paths:
       - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops.yaml"
       - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops.md"
-      - "docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops/azure-devops.md"
       - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs"
 
   - id: BuildMark-RepoConnectors-AzureDevOps-AzureDevOpsRestClient
@@ -402,8 +402,8 @@ reviews:
       - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.yaml"
       - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md"
       - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md"
-      - "docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-rest-client.md"
-      - "docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-api-types.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md"
       - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs"
       - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs"
       - "test/**/RepoConnectors/AzureDevOps/MockAzureDevOpsHttpMessageHandler.cs"
@@ -414,7 +414,7 @@ reviews:
     paths:
       - "docs/reqstream/build-mark/repo-connectors/azure-devops/work-item-mapper.yaml"
       - "docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md"
-      - "docs/verification/build-mark/repo-connectors/azure-dev-ops/work-item-mapper.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops/work-item-mapper.md"
       - "src/**/RepoConnectors/AzureDevOps/WorkItemMapper.cs"
       - "test/**/RepoConnectors/AzureDevOps/WorkItemMapperTests.cs"
 
@@ -423,7 +423,7 @@ reviews:
     paths:
       - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.yaml"
       - "docs/design/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md"
-      - "docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-repo-connector.md"
+      - "docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md"
       - "src/**/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs"
       - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnectorTests.cs"
       - "test/**/RepoConnectors/AzureDevOps/MockableAzureDevOpsRepoConnector.cs"

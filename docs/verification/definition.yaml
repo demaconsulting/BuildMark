@@ -10,7 +10,7 @@ resource-path:
   - docs/verification/build-mark/configuration
   - docs/verification/build-mark/repo-connectors
   - docs/verification/build-mark/repo-connectors/github
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops
+  - docs/verification/build-mark/repo-connectors/azure-devops
   - docs/verification/build-mark/repo-connectors/mock
   - docs/verification/ots
   - docs/template
@@ -45,7 +45,7 @@ input-files:
   - docs/verification/build-mark/configuration/configuration-issue.md
   - docs/verification/build-mark/configuration/connector-config.md
   - docs/verification/build-mark/configuration/git-hub-connector-config.md
-  - docs/verification/build-mark/configuration/azure-dev-ops-connector-config.md
+  - docs/verification/build-mark/configuration/azure-devops-connector-config.md
   - docs/verification/build-mark/configuration/report-config.md
   - docs/verification/build-mark/configuration/section-config.md
   - docs/verification/build-mark/configuration/rule-config.md
@@ -61,11 +61,11 @@ input-files:
   - docs/verification/build-mark/repo-connectors/github/git-hub-repo-connector.md
   - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md
   - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-types.md
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops.md
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-repo-connector.md
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-rest-client.md
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops/azure-dev-ops-api-types.md
-  - docs/verification/build-mark/repo-connectors/azure-dev-ops/work-item-mapper.md
+  - docs/verification/build-mark/repo-connectors/azure-devops.md
+  - docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md
+  - docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md
+  - docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md
+  - docs/verification/build-mark/repo-connectors/azure-devops/work-item-mapper.md
   - docs/verification/build-mark/repo-connectors/mock.md
   - docs/verification/build-mark/repo-connectors/mock/mock-repo-connector.md
   - docs/verification/ots/buildmark.md
