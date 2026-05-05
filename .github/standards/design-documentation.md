@@ -35,19 +35,19 @@ design to implementation:
 
 ```text
 docs/design/
-├── introduction.md              # Document overview — heading depth #
-├── {system-name}.md             # System-level design — heading depth #
+├── introduction.md              # Document overview - heading depth #
+├── {system-name}.md             # System-level design - heading depth #
 └── {system-name}/               # System folder (one per system)
-    ├── {subsystem-name}.md      # Subsystem overview — heading depth ##
+    ├── {subsystem-name}.md      # Subsystem overview - heading depth ##
     ├── {subsystem-name}/        # Subsystem folder (kebab-case); may nest recursively
-    │   ├── {child-subsystem}.md # Child subsystem overview — heading depth ###
+    │   ├── {child-subsystem}.md # Child subsystem overview - heading depth ###
     │   ├── {child-subsystem}/   # Child subsystem folder (same structure as parent)
-    │   └── {unit-name}.md       # Unit design — heading depth ###
-    └── {unit-name}.md           # System-level unit design — heading depth ##
+    │   └── {unit-name}.md       # Unit design - heading depth ###
+    └── {unit-name}.md           # System-level unit design - heading depth ##
 ```
 
 Each scope's overview file lives in its **parent** folder, not inside the scope's own
-subfolder — this aligns heading depth with folder depth so the compiled PDF has a
+subfolder - this aligns heading depth with folder depth so the compiled PDF has a
 meaningful multi-level outline (see Heading Depth Rule in `technical-documentation.md`).
 
 ## introduction.md (MANDATORY)
@@ -129,15 +129,21 @@ artifact to all related files:
 Example format:
 
 ```text
-Each software item in the structure above has corresponding artifacts in
-parallel directory trees:
+Each in-house software item has corresponding artifacts in parallel directory trees:
 
 - Requirements: `docs/reqstream/{system-name}.yaml`, `docs/reqstream/{system-name}/.../{item}.yaml`
 - Design docs:  `docs/design/{system-name}.md`, `docs/design/{system-name}/.../{item}.md`
 - Verification: `docs/verification/{system-name}.md`, `docs/verification/{system-name}/.../{item}.md`
 - Source code:  `src/{SystemName}/.../{Item}.{ext}` (cased per language - see `software-items.md`)
 - Tests:        `test/{SystemName}.Tests/.../{Item}Tests.{ext}` (cased per language)
-- Review-sets:  defined in `.reviewmark.yaml`
+
+OTS items have no design documentation; their artifacts sit parallel to system folders:
+
+- Requirements: `docs/reqstream/ots/{ots-name}.yaml`
+- Verification: `docs/verification/ots/{ots-name}.md`
+- Tests (optional): `test/OtsSoftwareTests/{OtsName}Tests.{ext}` (cased per language, if integration tests are required)
+
+Review-sets: defined in `.reviewmark.yaml`
 ```
 
 ## System Design Documentation (MANDATORY)
@@ -158,7 +164,7 @@ For each system identified in the repository:
 For each subsystem identified in the software structure:
 
 - Place `{subsystem-name}.md` inside the **parent** folder (the system folder, or parent
-  subsystem folder) — not inside its own subfolder
+  subsystem folder) - not inside its own subfolder
 - Create a kebab-case folder `{subsystem-name}/` to hold its child units and subsystems
 - `{subsystem-name}.md` must cover subsystem overview and design
 
@@ -169,7 +175,7 @@ For every unit identified in the software structure:
 - Describe interactions with other units
 - Include sufficient detail for formal code review
 
-Follow the Heading Depth Rule from `technical-documentation.md` — a file's top-level
+Follow the Heading Depth Rule from `technical-documentation.md` - a file's top-level
 heading depth equals its folder depth under `docs/design/`.
 
 # Software Items Integration (CRITICAL)

@@ -81,6 +81,14 @@ Choose the appropriate category based on scope and testability:
   consumes it
 - Tested through integration tests proving required functionality works
 - Examples: System.Text.Json, Entity Framework, third-party APIs
+- **Artifact locations** (OTS items have no design documentation):
+  - Requirements: `docs/reqstream/ots/{ots-name}.yaml`
+  - Verification: `docs/verification/ots/{ots-name}.md`
+  - These folders sit parallel to system folders (not inside any system folder)
+- System design documentation records which OTS items each system depends on
+- **OTS test project**: A single dedicated test project (`OtsSoftwareTests` / `ots_software_tests`,
+  cased per language) holds all OTS integration tests — one test file per OTS item. This is not
+  a system under test; it exists solely to validate that each OTS item meets its requirements.
 
 # Software Item Artifact Model
 

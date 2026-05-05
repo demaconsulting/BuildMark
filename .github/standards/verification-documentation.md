@@ -23,21 +23,21 @@ Organize under `docs/verification/` mirroring the software item hierarchy:
 
 ```text
 docs/verification/
-├── introduction.md              # Document overview — heading depth #
-├── {system-name}.md             # System-level verification — heading depth #
-└── {system-name}/               # System folder (one per system)
-    ├── {subsystem-name}.md      # Subsystem verification — heading depth ##
-    ├── {subsystem-name}/        # Subsystem folder (kebab-case); may nest recursively
-    │   ├── {child-subsystem}.md # Child subsystem verification — heading depth ###
-    │   ├── {child-subsystem}/   # Child subsystem folder (same structure as parent)
-    │   └── {unit-name}.md       # Unit verification — heading depth ###
-    ├── {unit-name}.md           # System-level unit verification — heading depth ##
-    └── ots/                     # OTS items (one verification file per OTS item)
-        └── {ots-name}.md        # OTS item verification evidence
+├── introduction.md              # Document overview - heading depth #
+├── {system-name}.md             # System-level verification - heading depth #
+├── {system-name}/               # System folder (one per system)
+│   ├── {subsystem-name}.md      # Subsystem verification - heading depth ##
+│   ├── {subsystem-name}/        # Subsystem folder (kebab-case); may nest recursively
+│   │   ├── {child-subsystem}.md # Child subsystem verification - heading depth ###
+│   │   ├── {child-subsystem}/   # Child subsystem folder (same structure as parent)
+│   │   └── {unit-name}.md       # Unit verification - heading depth ###
+│   └── {unit-name}.md           # System-level unit verification - heading depth ##
+└── ots/                         # OTS items - parallel to system folders (not inside them)
+    └── {ots-name}.md            # OTS item verification evidence
 ```
 
 Each scope's overview file lives in its **parent** folder, not inside the scope's own
-subfolder — this keeps artifact locations consistent with design and requirements trees
+subfolder - this keeps artifact locations consistent with design and requirements trees
 so any item's files are deterministically locatable, and aligns heading depth with folder
 depth for correct PDF structure (see Heading Depth Rule in `technical-documentation.md`).
 
@@ -57,10 +57,10 @@ In-house items have parallel artifacts in:
 - Source:        `src/{SystemName}/.../{Item}.{ext}` (cased per language)
 - Tests:         `test/{SystemName}.Tests/.../{Item}Tests.{ext}` (cased per language)
 
-OTS items have parallel artifacts in:
+OTS items (no design documentation) have artifacts parallel to system folders:
 - Requirements: `docs/reqstream/ots/{ots-name}.yaml`
 - Verification: `docs/verification/ots/{ots-name}.md`
-- Tests: `test/{OtsName}.Tests/...` (cased per language, if required)
+- Tests: `test/OtsSoftwareTests/{OtsName}Tests.{ext}` (cased per language, if required)
 
 Review-sets: defined in `.reviewmark.yaml`
 ```
