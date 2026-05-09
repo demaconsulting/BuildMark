@@ -814,11 +814,16 @@ public class AzureDevOpsRepoConnectorTests
         // Act
         var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
-        // Assert: the WIQL request body must contain an area-path constraint
+        // Assert: the WIQL request body must contain an area-path constraint.
+        // Deserialize the JSON body to inspect the raw WIQL string, avoiding
+        // brittleness from JSON escaping of backslashes.
         Assert.NotNull(mockHandler.LastWiqlRequestBody);
-        Assert.Contains("System.AreaPath", mockHandler.LastWiqlRequestBody, StringComparison.OrdinalIgnoreCase);
-        // The JSON body encodes backslash as \\, so MyProject\MyRepo appears as MyProject\\MyRepo
-        Assert.Contains(@"MyProject\\MyRepo", mockHandler.LastWiqlRequestBody, StringComparison.OrdinalIgnoreCase);
+        var wiqlBody = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>(
+            mockHandler.LastWiqlRequestBody);
+        var wiqlQuery = wiqlBody.GetProperty("query").GetString();
+        Assert.NotNull(wiqlQuery);
+        Assert.Contains("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(@"MyProject\MyRepo", wiqlQuery, StringComparison.OrdinalIgnoreCase);
 
         // Assert: the known issue returned by the mock is still collected correctly
         Assert.NotNull(buildInfo);
