@@ -2,11 +2,11 @@
 
 ##### Verification Approach
 
-`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 10 unit
+`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 11 unit
 tests. The tests verify mapping of Azure DevOps work items to the BuildMark model -
-classification of features and bugs, title and description extraction, change link
-generation, and handling of known issue identification based on work item type and
-state.
+classification of features and bugs, type normalization, suppression of Removed work
+items, resolved-state identification, rule-matching type retrieval, and custom field
+extraction for visibility and affected-versions controls.
 
 ##### Dependencies
 
@@ -16,86 +16,110 @@ state.
 
 ##### Test Scenarios
 
-###### WorkItemMapper_MapToItemInfo_Bug_ReturnsBugType
+###### WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
 
 **Scenario**: A work item with type `"Bug"` is mapped.
 
-**Expected**: `ItemInfo.Type` is bug.
+**Expected**: `ItemInfo.Type` is `"bug"`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_MapToItemInfo_Feature_ReturnsFeatureType
-
-**Scenario**: A work item with type `"Feature"` is mapped.
-
-**Expected**: `ItemInfo.Type` is feature.
-
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
-
-###### WorkItemMapper_MapToItemInfo_UserStory_ReturnsFeatureType
+###### WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem
 
 **Scenario**: A work item with type `"User Story"` is mapped.
 
-**Expected**: `ItemInfo.Type` is feature.
+**Expected**: `ItemInfo.Type` is `"feature"`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_MapToItemInfo_Task_ReturnsOtherType
+###### WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem
+
+**Scenario**: A work item with type `"Epic"` is mapped.
+
+**Expected**: `ItemInfo.Type` is `"feature"`.
+
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
+
+###### WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem
 
 **Scenario**: A work item with type `"Task"` is mapped.
 
-**Expected**: `ItemInfo.Type` is other (or a non-bug, non-feature classification).
+**Expected**: `ItemInfo.Type` is the raw type name (`"Task"`), not a normalized type.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_MapToItemInfo_ExtractsTitle
+###### WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue
 
-**Scenario**: A work item has a title.
+**Scenario**: Work items with states `Resolved`, `Closed`, and `Done` are checked.
 
-**Expected**: Mapped `ItemInfo.Title` matches the work item title.
+**Expected**: `IsWorkItemResolved` returns `true` for each.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_MapToItemInfo_ExtractsDescription
+###### WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse
 
-**Scenario**: A work item has a description.
+**Scenario**: Work items with states `Active` and `New` are checked.
 
-**Expected**: Mapped `ItemInfo.Description` matches the work item description.
+**Expected**: `IsWorkItemResolved` returns `false` for each.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_MapToItemInfo_GeneratesWebLink
+###### WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName
 
-**Scenario**: A work item has an ID and a valid organization URL.
+**Scenario**: Work items with types `"Bug"` and `"User Story"` are queried for rule matching.
 
-**Expected**: `ItemInfo.WebLink` contains the Azure DevOps work item URL.
+**Expected**: The raw `System.WorkItemType` value is returned unchanged.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
-###### WorkItemMapper_IsKnownIssue_OpenBug_ReturnsTrue
+###### WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull
 
-**Scenario**: Work item is an open bug.
+**Scenario**: Work items with state `Removed` are mapped (one bug, one feature).
 
-**Expected**: `IsKnownIssue` returns `true`.
+**Expected**: `MapWorkItemToItemInfo` returns `null` for both, suppressing them from
+all sections of build notes.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-SuppressRemovedWorkItems`
 
-###### WorkItemMapper_IsKnownIssue_ClosedBug_ReturnsFalse
+###### WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls
 
-**Scenario**: Work item is a closed bug.
+**Scenario**: A work item has a `Custom.Visibility` field set to `"internal"`.
 
-**Expected**: `IsKnownIssue` returns `false`.
+**Expected**: `ExtractItemControls` returns controls with `Visibility` set to `"internal"`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-CustomFields`
 
-###### WorkItemMapper_IsKnownIssue_OpenFeature_ReturnsFalse
+###### WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet
 
-**Scenario**: Work item is an open feature (not a bug).
+**Scenario**: A work item has a `Custom.AffectedVersions` field set to a version range.
 
-**Expected**: `IsKnownIssue` returns `false`.
+**Expected**: `ExtractItemControls` returns controls with a non-empty `AffectedVersions`
+interval set.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
+**Requirement coverage**: `BuildMark-AzureDevOps-CustomFields`
+
+###### WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock
+
+**Scenario**: A work item has both a buildmark block (visibility `"public"`) and a
+`Custom.Visibility` field (visibility `"internal"`).
+
+**Expected**: The custom field value (`"internal"`) takes precedence over the buildmark
+block value.
+
+**Requirement coverage**: `BuildMark-AzureDevOps-CustomFields`
 
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-WorkItemMapper**: All 10 tests in `WorkItemMapperTests.cs`
+- **BuildMark-AzureDevOps-WorkItemMapper**: `WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem`,
+  `WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem`,
+  `WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem`,
+  `WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem`,
+  `WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue`,
+  `WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse`,
+  `WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName` in `WorkItemMapperTests.cs`
+- **BuildMark-AzureDevOps-SuppressRemovedWorkItems**:
+  `WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull` in `WorkItemMapperTests.cs`
+- **BuildMark-AzureDevOps-CustomFields**:
+  `WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls`,
+  `WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet`,
+  `WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock` in `WorkItemMapperTests.cs`

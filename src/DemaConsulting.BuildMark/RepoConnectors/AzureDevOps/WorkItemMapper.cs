@@ -58,6 +58,14 @@ internal static class WorkItemMapper
     };
 
     /// <summary>
+    ///     Work item states that are suppressed entirely from build notes.
+    /// </summary>
+    private static readonly HashSet<string> SuppressedStates = new(StringComparer.OrdinalIgnoreCase)
+    {
+        "Removed"
+    };
+
+    /// <summary>
     ///     Maps a single Azure DevOps work item to an ItemInfo record.
     /// </summary>
     /// <param name="workItem">Azure DevOps work item.</param>
@@ -66,6 +74,13 @@ internal static class WorkItemMapper
     /// <returns>ItemInfo instance, or null if the item should be excluded.</returns>
     public static ItemInfo? MapWorkItemToItemInfo(AzureDevOpsWorkItem workItem, string workItemUrl, int index = 0)
     {
+        // Exclude items in suppressed states (e.g. Removed) from all sections of build notes
+        var state = GetFieldValue(workItem, "System.State") ?? string.Empty;
+        if (SuppressedStates.Contains(state))
+        {
+            return null;
+        }
+
         // Read core fields from the work item
         var title = GetFieldValue(workItem, "System.Title") ?? string.Empty;
         var workItemType = GetFieldValue(workItem, "System.WorkItemType") ?? string.Empty;

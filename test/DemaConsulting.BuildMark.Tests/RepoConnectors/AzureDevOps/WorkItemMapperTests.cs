@@ -139,6 +139,25 @@ public class WorkItemMapperTests
     }
 
     /// <summary>
+    ///     Verify that a work item in the Removed state is suppressed from all sections of build notes.
+    /// </summary>
+    [Fact]
+    public void WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull()
+    {
+        // Arrange
+        var removedBug = CreateWorkItem(200, "Removed bug", "Bug", "Removed");
+        var removedFeature = CreateWorkItem(201, "Removed feature", "User Story", "Removed");
+
+        // Act
+        var bugInfo = WorkItemMapper.MapWorkItemToItemInfo(removedBug, "https://example.com/200", 1);
+        var featureInfo = WorkItemMapper.MapWorkItemToItemInfo(removedFeature, "https://example.com/201", 2);
+
+        // Assert - Removed items should be suppressed regardless of type
+        Assert.Null(bugInfo);
+        Assert.Null(featureInfo);
+    }
+
+    /// <summary>
     ///     Verify that GetWorkItemTypeForRuleMatching returns the raw work item type name.
     /// </summary>
     [Fact]
