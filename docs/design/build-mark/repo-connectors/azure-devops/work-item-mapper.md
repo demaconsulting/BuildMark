@@ -29,6 +29,12 @@ reporting:
 - `Closed`
 - `Done`
 
+The following state values are **suppressed** entirely from all sections of build
+notes (both changes and known issues). `MapWorkItemToItemInfo` returns `null` for
+these states before any other processing:
+
+- `Removed`
+
 All other state values (e.g. `Active`, `New`, `In Progress`) are treated as
 unresolved and included in known-issues reporting.
 
@@ -55,14 +61,16 @@ Maps a single `AzureDevOpsWorkItem` to an `ItemInfo` record.
 
 Steps:
 
-1. Read `System.Title`, `System.WorkItemType`, and `System.State` from the
+1. Read `System.State` from the work item's fields dictionary. If the state is in the
+   suppressed-states set (e.g. `Removed`), return `null` immediately.
+2. Read `System.Title`, `System.WorkItemType`, and `System.State` from the
    work item's fields dictionary.
-2. Apply work item type mapping to determine the normalized type.
-3. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
-4. If item controls specify a visibility of `internal`, return `null` to signal that
+3. Apply work item type mapping to determine the normalized type.
+4. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
+5. If item controls specify a visibility of `internal`, return `null` to signal that
    the item should be excluded.
-5. If item controls specify a type override, apply it to the normalized type.
-6. Construct and return the `ItemInfo` record with the title, url, type, and
+6. If item controls specify a type override, apply it to the normalized type.
+7. Construct and return the `ItemInfo` record with the title, url, type, and
    affected versions.
 
 ###### `IsWorkItemResolved(workItem)`

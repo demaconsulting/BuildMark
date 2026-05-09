@@ -2,11 +2,11 @@
 
 ##### Verification Approach
 
-`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 10 unit
+`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 11 unit
 tests. The tests verify mapping of Azure DevOps work items to the BuildMark model -
 classification of features and bugs, title and description extraction, change link
-generation, and handling of known issue identification based on work item type and
-state.
+generation, suppression of Removed work items, and handling of known issue
+identification based on work item type and state.
 
 ##### Dependencies
 
@@ -96,6 +96,16 @@ state.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-WorkItemMapper`
 
+###### WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull
+
+**Scenario**: Work items with state `Removed` are mapped (one bug, one feature).
+
+**Expected**: `MapWorkItemToItemInfo` returns `null` for both, suppressing them from
+all sections of build notes.
+
+**Requirement coverage**: `BuildMark-AzureDevOps-SuppressRemovedWorkItems`
+
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-WorkItemMapper**: All 10 tests in `WorkItemMapperTests.cs`
+- **BuildMark-RepoConnectors-WorkItemMapper**: Tests in `WorkItemMapperTests.cs`
+- **BuildMark-AzureDevOps-SuppressRemovedWorkItems**: `WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull` in `WorkItemMapperTests.cs`

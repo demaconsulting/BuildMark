@@ -26,6 +26,20 @@ sections:
           - WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse
           - WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName
 
+      - id: BuildMark-AzureDevOps-SuppressRemovedWorkItems
+        title: >-
+          The WorkItemMapper class shall suppress work items in the Removed state from all
+          sections of build notes.
+        justification: |
+          Azure DevOps work items in the Removed state represent items that were explicitly
+          abandoned or cancelled. Surfacing these items in build notes is misleading — they
+          imply work was delivered (in changes) or an open bug exists (in known issues) when
+          the team has decided the item no longer exists. Suppressing Removed items in
+          MapWorkItemToItemInfo with an early-exit null return covers both the changes and
+          known-issues code paths with a single check.
+        tests:
+          - WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull
+
       - id: BuildMark-AzureDevOps-CustomFields
         title: >-
           The WorkItemMapper class shall read Custom.Visibility and Custom.AffectedVersions
