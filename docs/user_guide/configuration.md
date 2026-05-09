@@ -131,7 +131,7 @@ back to well-known names or the GitHub CLI. An error is raised if the variable i
 | :-- | :------- | :---------- |
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
-| `token-variable` | No | Name of the environment variable holding the access token. When set, only this variable is used. |
+| `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
 
 Example using a custom token variable:
 
@@ -164,7 +164,7 @@ back to well-known names or the Azure CLI. An error is raised if the variable is
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
-| `token-variable` | No | Name of the environment variable holding the access token. When set, only this variable is used. |
+| `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
 
 Example using a custom token variable:
 
