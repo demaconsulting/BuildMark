@@ -458,7 +458,7 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "token-variable":
-                    if (value == null)
+                    if (string.IsNullOrWhiteSpace(value))
                     {
                         AddError(issues, filePath, GetLine(entry.Value), "Azure DevOps token-variable must be a non-empty string.");
                     }
