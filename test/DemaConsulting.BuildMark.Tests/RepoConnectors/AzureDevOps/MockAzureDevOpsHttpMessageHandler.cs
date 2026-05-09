@@ -253,45 +253,57 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
     }
 
     /// <summary>
+    ///     Gets the body of the last WIQL query request sent to the mock handler,
+    ///     or <see langword="null"/> if no WIQL request has been received.
+    /// </summary>
+    public string? LastWiqlRequestBody { get; private set; }
+
+    /// <summary>
     ///     Processes an HTTP request and returns the mock response.
     /// </summary>
     /// <param name="request">HTTP request message.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Mock HTTP response message.</returns>
-    protected override Task<HttpResponseMessage> SendAsync(
+    protected override async Task<HttpResponseMessage> SendAsync(
         HttpRequestMessage request,
         CancellationToken cancellationToken)
     {
         var requestUrl = request.RequestUri?.ToString() ?? string.Empty;
+
+        // Capture WIQL request body for assertions
+        if (requestUrl.Contains("wit/wiql", StringComparison.OrdinalIgnoreCase) && request.Content != null)
+        {
+            LastWiqlRequestBody = await request.Content.ReadAsStringAsync(cancellationToken).ConfigureAwait(false);
+        }
 
         // Check for matching URL patterns
         foreach (var (pattern, (content, statusCode)) in _responses)
         {
             if (requestUrl.Contains(pattern, StringComparison.OrdinalIgnoreCase))
             {
-                return Task.FromResult(new HttpResponseMessage(statusCode)
+                return new HttpResponseMessage(statusCode)
                 {
                     Content = new StringContent(content, Encoding.UTF8, "application/json")
-                });
+                };
             }
         }
 
         // Return default response if configured
         if (_defaultResponse != null)
         {
-            return Task.FromResult(new HttpResponseMessage(_defaultStatusCode)
+            return new HttpResponseMessage(_defaultStatusCode)
             {
                 Content = new StringContent(_defaultResponse, Encoding.UTF8, "application/json")
-            });
+            };
         }
 
         // Return 404 when no response configured
-        return Task.FromResult(new HttpResponseMessage(HttpStatusCode.NotFound)
+        return new HttpResponseMessage(HttpStatusCode.NotFound)
         {
             Content = new StringContent(
                 $"{{\"message\":\"No mock response configured for URL: {requestUrl}\"}}",
                 Encoding.UTF8,
                 "application/json")
-        });
+        };
     }
 }

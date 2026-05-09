@@ -785,6 +785,48 @@ public class AzureDevOpsRepoConnectorTests
     }
 
     // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-AzureDevOps-AreaPath
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Verify that when AreaPath is configured the WIQL query includes an area-path filter,
+    ///     scoping known issues to the specified area and its descendants.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath()
+    {
+        // Arrange
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse(500)
+            .AddWorkItemsResponse(
+                new MockAdoWorkItem(500, "Open bug in area", "Bug", "Active"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var config = new AzureDevOpsConnectorConfig { AreaPath = "MyProject\\MyRepo" };
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, config);
+        connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv", "mock-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert: the WIQL request body must contain an area-path constraint
+        Assert.NotNull(mockHandler.LastWiqlRequestBody);
+        Assert.Contains("System.AreaPath", mockHandler.LastWiqlRequestBody, StringComparison.OrdinalIgnoreCase);
+        // The JSON body encodes backslash as \\, so MyProject\MyRepo appears as MyProject\\MyRepo
+        Assert.Contains(@"MyProject\\MyRepo", mockHandler.LastWiqlRequestBody, StringComparison.OrdinalIgnoreCase);
+
+        // Assert: the known issue returned by the mock is still collected correctly
+        Assert.NotNull(buildInfo);
+        Assert.True(buildInfo.KnownIssues.Exists(i => i.Id == "500"),
+            "Work item 500 should be reported as a known issue");
+    }
+
+    // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-AzureDevOps-TokenVariable
     // ─────────────────────────────────────────────────────────────────────────
 

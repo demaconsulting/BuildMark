@@ -268,6 +268,48 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that the area-path key in the Azure DevOps connector block is parsed correctly.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                project: myproject
+                repository: myrepo
+                area-path: myproject\myrepo
+            sections:
+              - id: changes
+                title: Changes
+            """,
+            TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.NotNull(result.Config);
+            Assert.False(result.HasErrors);
+            Assert.Equal(@"myproject\myrepo", result.Config.Connector?.AzureDevOps?.AreaPath);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
     ///     Test that an unsupported key inside the Azure DevOps connector block produces an error.
     /// </summary>
     [Fact]

@@ -57,4 +57,16 @@ public sealed record AzureDevOpsConnectorConfig
     ///     (PAT) credential when loaded from a custom variable.
     /// </remarks>
     public string? TokenVariable { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the optional Area Path used to scope the known-issues WIQL query.
+    /// </summary>
+    /// <remarks>
+    ///     When set, the WIQL query that collects known issues uses
+    ///     <c>[System.AreaPath] UNDER '{AreaPath}'</c> to restrict results to work items
+    ///     that belong to the specified area (and its descendants). Use this when the ADO
+    ///     project contains multiple repositories or products and you want to exclude
+    ///     work items from unrelated areas.
+    /// </remarks>
+    public string? AreaPath { get; init; }
 }

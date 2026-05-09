@@ -164,6 +164,7 @@ back to well-known names or the Azure CLI. An error is raised if the variable is
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
+| `area-path` | No | Area path used to scope known-issues queries. When the ADO project contains multiple repositories or products, set this to restrict known issues to a specific area and its descendants (e.g. `MyProject\MyRepo`). |
 | `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
 
 Example using a custom token variable:
@@ -176,6 +177,18 @@ connector:
     project: MyProject
     repository: MyRepo
     token-variable: MY_CUSTOM_ADO_TOKEN
+```
+
+Example with area-path scoping (for projects containing multiple repositories):
+
+```yaml
+connector:
+  type: azure-devops
+  azure-devops:
+    url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+    area-path: MyProject\MyRepo
 ```
 
 ## Report Sections

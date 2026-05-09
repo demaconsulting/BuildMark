@@ -154,6 +154,10 @@ Main entry point. Performs the following steps:
     batch-fetch work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
 13. Collect known issues from **all** bugs (resolved and unresolved), via a WIQL
     query, applying item controls from description bodies and custom fields.
+    When `AzureDevOpsConnectorConfig.AreaPath` is set the query is scoped with
+    `AND [System.AreaPath] UNDER '{AreaPath}'` to restrict results to work items
+    belonging to that area path and its descendants, excluding work items from
+    unrelated repositories or products in the same ADO project.
     For each candidate bug:
     - If `AffectedVersions` is declared, the bug is a known issue if and only if
       `AffectedVersions.Contains(toVersion)` is true, regardless of resolved

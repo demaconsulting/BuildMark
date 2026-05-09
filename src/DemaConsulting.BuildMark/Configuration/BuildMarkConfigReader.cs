@@ -432,6 +432,7 @@ public static class BuildMarkConfigReader
         string? project = null;
         string? repository = null;
         string? tokenVariable = null;
+        string? areaPath = null;
 
         foreach (var entry in mapping.Children)
         {
@@ -469,6 +470,10 @@ public static class BuildMarkConfigReader
 
                     break;
 
+                case "area-path":
+                    areaPath = value;
+                    break;
+
                 default:
                     AddError(issues, filePath, GetLine(entry.Key),
                         $"Unsupported Azure DevOps connector key '{key}'.");
@@ -482,7 +487,8 @@ public static class BuildMarkConfigReader
             Organization = organization,
             Project = project,
             Repository = repository,
-            TokenVariable = tokenVariable
+            TokenVariable = tokenVariable,
+            AreaPath = areaPath
         };
     }
 

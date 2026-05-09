@@ -4,8 +4,8 @@
 
 `AzureDevOpsConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write
 `.buildmark.yaml` files with Azure DevOps connector blocks and assert that `OrganizationUrl`,
-`Organization`, `Project`, and `Repository` properties are correctly parsed, including alias key
-support. No mocking is required.
+`Organization`, `Project`, `Repository`, and `AreaPath` properties are correctly parsed, including
+alias key support. No mocking is required.
 
 #### Dependencies
 
@@ -36,8 +36,29 @@ correctly from the alias keys.
 
 **Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
 
+##### BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration
+
+**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block containing `area-path` is
+written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.AzureDevOps` is inspected.
+
+**Expected**: `AreaPath` equals the configured area path string.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
+##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
+
+**Scenario**: A connector is created with `AreaPath` set to `"MyProject\\MyRepo"`;
+`GetBuildInformationAsync` is called; the captured WIQL request body is inspected.
+
+**Expected**: The WIQL request body contains `System.AreaPath` and the configured area path value,
+confirming that known-issues queries are scoped to the specified area.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
 #### Requirements Coverage
 
 - **`BuildMark-AzureDevOpsConnectorConfig-Properties`**:
   - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
   - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
+  - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration
+  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
