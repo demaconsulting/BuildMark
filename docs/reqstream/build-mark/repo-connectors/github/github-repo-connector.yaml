@@ -81,3 +81,18 @@ sections:
         tests:
           - GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
           - GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+
+      - id: BuildMark-GitHub-TokenVariable
+        title: >-
+          The GitHubRepoConnector class shall use only the configured token variable when
+          TokenVariable is set, and shall throw InvalidOperationException when the variable
+          is absent or empty.
+        justification: |
+          When an operator explicitly names a token variable in the configuration, the
+          connector must not silently fall back to other credential sources. Strict
+          enforcement ensures that misconfigured environments produce clear error messages
+          rather than accidentally using a different token with unexpected permissions.
+        tests:
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

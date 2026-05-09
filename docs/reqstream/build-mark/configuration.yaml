@@ -117,6 +117,20 @@ sections:
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
+      - id: BuildMark-GitHubConnectorConfig-TokenVariable
+        title: >-
+          GitHubConnectorConfig shall expose a TokenVariable property that specifies the
+          name of the environment variable holding the GitHub access token.
+        justification: |
+          Teams that store their GitHub access token in a non-standard environment variable
+          need a way to tell the connector which variable to read. When TokenVariable is set,
+          the connector must use only that variable and must not fall back to well-known names
+          or the gh CLI, so that the operator retains full control over credential sourcing.
+        tests:
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+
   - title: AzureDevOpsConnectorConfig Unit Requirements
     requirements:
       - id: BuildMark-AzureDevOpsConnectorConfig-Properties
@@ -130,6 +144,20 @@ sections:
           name, project, and repository name explicitly in the configuration file.
         tests:
           - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+
+      - id: BuildMark-AzureDevOpsConnectorConfig-TokenVariable
+        title: >-
+          AzureDevOpsConnectorConfig shall expose a TokenVariable property that specifies
+          the name of the environment variable holding the Azure DevOps access token.
+        justification: |
+          Teams that store their Azure DevOps access token in a non-standard environment
+          variable need a way to tell the connector which variable to read. When TokenVariable
+          is set, the connector must use only that variable and must not fall back to well-known
+          names or the az CLI, so that the operator retains full control over credential sourcing.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
 
   - title: ReportConfig Unit Requirements
     requirements:

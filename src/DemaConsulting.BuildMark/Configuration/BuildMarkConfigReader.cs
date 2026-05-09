@@ -321,6 +321,7 @@ public static class BuildMarkConfigReader
         string? owner = null;
         string? repo = null;
         string? baseUrl = null;
+        string? tokenVariable = null;
 
         foreach (var entry in mapping.Children)
         {
@@ -346,13 +347,17 @@ public static class BuildMarkConfigReader
                     baseUrl = value;
                     break;
 
+                case "token-variable":
+                    tokenVariable = string.IsNullOrWhiteSpace(value) ? null : value;
+                    break;
+
                 default:
                     AddError(issues, filePath, GetLine(entry.Key), $"Unsupported GitHub connector key '{key}'.");
                     break;
             }
         }
 
-        return new GitHubConnectorConfig { Owner = owner, Repo = repo, BaseUrl = baseUrl };
+        return new GitHubConnectorConfig { Owner = owner, Repo = repo, BaseUrl = baseUrl, TokenVariable = tokenVariable };
     }
 
     /// <summary>
@@ -418,6 +423,7 @@ public static class BuildMarkConfigReader
         string? organization = null;
         string? project = null;
         string? repository = null;
+        string? tokenVariable = null;
 
         foreach (var entry in mapping.Children)
         {
@@ -443,6 +449,10 @@ public static class BuildMarkConfigReader
                     repository = value;
                     break;
 
+                case "token-variable":
+                    tokenVariable = string.IsNullOrWhiteSpace(value) ? null : value;
+                    break;
+
                 default:
                     AddError(issues, filePath, GetLine(entry.Key),
                         $"Unsupported Azure DevOps connector key '{key}'.");
@@ -455,7 +465,8 @@ public static class BuildMarkConfigReader
             OrganizationUrl = organizationUrl,
             Organization = organization,
             Project = project,
-            Repository = repository
+            Repository = repository,
+            TokenVariable = tokenVariable
         };
     }
 

@@ -783,4 +783,101 @@ public class AzureDevOpsRepoConnectorTests
             buildInfo.KnownIssues.Exists(i => i.Id == "406"),
             "Resolved bug 406 with no AV should NOT be a known issue (resolved, no AV)");
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-AzureDevOps-TokenVariable
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Verify that a non-empty custom token variable is used as the Azure DevOps access token.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable()
+    {
+        // Arrange: set a custom environment variable with a known token value
+        const string varName = "BUILDMARK_TEST_ADO_TOKEN_VALID";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
+        Environment.SetEnvironmentVariable(varName, "my-custom-ado-token");
+        try
+        {
+            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+                .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
+                .AddCommitsResponse(new MockAdoCommit("abc123"))
+                .AddPullRequestsResponse()
+                .AddWiqlResponse();
+
+            using var mockHttpClient = new HttpClient(mockHandler);
+            var config = new AzureDevOpsConnectorConfig { TokenVariable = varName };
+            var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, config);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+
+            // Act: connector should resolve the token from the custom variable without throwing
+            var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+            // Assert: full build information is returned, confirming the token was accepted
+            Assert.NotNull(buildInfo);
+            Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, savedValue);
+        }
+    }
+
+    /// <summary>
+    ///     Verify that an empty custom token variable throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException()
+    {
+        // Arrange: set the custom variable to an empty string
+        const string varName = "BUILDMARK_TEST_ADO_TOKEN_EMPTY_3B7D";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
+        Environment.SetEnvironmentVariable(varName, string.Empty);
+        try
+        {
+            var config = new AzureDevOpsConnectorConfig { TokenVariable = varName };
+            var connector = new MockableAzureDevOpsRepoConnector(null, config);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+
+            // Act / Assert: connector must throw because the variable is empty
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0")));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, savedValue);
+        }
+    }
+
+    /// <summary>
+    ///     Verify that a missing custom token variable throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException()
+    {
+        // Arrange: ensure the custom variable is not set
+        const string varName = "BUILDMARK_TEST_ADO_TOKEN_UNSET_C51E";
+        Environment.SetEnvironmentVariable(varName, null);
+        try
+        {
+            var config = new AzureDevOpsConnectorConfig { TokenVariable = varName };
+            var connector = new MockableAzureDevOpsRepoConnector(null, config);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123");
+
+            // Act / Assert: connector must throw because the variable is not set
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0")));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, null);
+        }
+    }
 }

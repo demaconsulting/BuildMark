@@ -14,7 +14,20 @@ a `BuildInformation` record.
 
 ###### Authentication
 
-The connector resolves the GitHub token using the following priority order:
+The connector resolves the GitHub token in two modes depending on whether `GitHubConnectorConfig.TokenVariable` is set.
+
+**Custom variable mode** (when `TokenVariable` is set):
+
+The connector reads the named environment variable exclusively and does not fall back
+to well-known names or the gh CLI:
+
+1. If the variable is not set (null), the connector throws `InvalidOperationException` with
+   a message identifying the missing variable.
+2. If the variable is set but empty, the connector throws `InvalidOperationException` with a
+   message identifying the empty variable.
+3. Otherwise the token value is used directly.
+
+**Default mode** (when `TokenVariable` is not set):
 
 1. `GH_TOKEN` environment variable
 2. `GITHUB_TOKEN` environment variable

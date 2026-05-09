@@ -21,20 +21,22 @@ holds Azure DevOps-specific connection details.
 
 ##### GitHubConnectorConfig
 
-| Property  | Type      | Description                                                         |
-|-----------|-----------|---------------------------------------------------------------------|
-| `Owner`   | `string?` | Repository owner override                                           |
-| `Repo`    | `string?` | Repository name override                                            |
-| `BaseUrl` | `string?` | Optional GitHub Enterprise API base URL; `null` uses the public API |
+| Property        | Type      | Description                                                                          |
+|-----------------|-----------|--------------------------------------------------------------------------------------|
+| `Owner`         | `string?` | Repository owner override                                                            |
+| `Repo`          | `string?` | Repository name override                                                             |
+| `BaseUrl`       | `string?` | Optional GitHub Enterprise API base URL; `null` uses the public API                  |
+| `TokenVariable` | `string?` | Name of the env variable holding the access token; `null` uses well-known names      |
 
 ##### AzureDevOpsConnectorConfig
 
-| Property          | Type      | Description                                                               |
-|-------------------|-----------|---------------------------------------------------------------------------|
-| `OrganizationUrl` | `string?` | Azure DevOps organization URL (e.g. `https://dev.azure.com/myorg`)        |
-| `Organization`    | `string?` | Optional organization name override; `null` when not specified            |
-| `Project`         | `string?` | Azure DevOps project name                                                 |
-| `Repository`      | `string?` | Repository name within the project                                        |
+| Property          | Type      | Description                                                                          |
+|-------------------|-----------|--------------------------------------------------------------------------------------|
+| `OrganizationUrl` | `string?` | Azure DevOps organization URL (e.g. `https://dev.azure.com/myorg`)                   |
+| `Organization`    | `string?` | Optional organization name override; `null` when not specified                       |
+| `Project`         | `string?` | Azure DevOps project name                                                            |
+| `Repository`      | `string?` | Repository name within the project                                                   |
+| `TokenVariable`   | `string?` | Name of the env variable holding the access token; `null` uses well-known names      |
 
 #### Interactions
 

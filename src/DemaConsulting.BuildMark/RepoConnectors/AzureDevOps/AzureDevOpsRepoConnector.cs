@@ -562,8 +562,40 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     ///     Gets Azure DevOps authentication token from environment or Azure CLI.
     /// </summary>
     /// <returns>Tuple of (token, isBearer).</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when a custom token variable is configured but the variable is absent or empty,
+    ///     or when no token can be found through the default resolution chain.
+    /// </exception>
     private async Task<(string token, bool isBearer)> GetAzureDevOpsTokenAsync()
     {
+        // When a custom token variable is configured, use only that variable -
+        // do not fall back to well-known names or the az CLI so that the operator
+        // retains full control over which credential is used
+        var tokenVariable = _config?.TokenVariable;
+        if (!string.IsNullOrEmpty(tokenVariable))
+        {
+            var customToken = Environment.GetEnvironmentVariable(tokenVariable);
+
+            // Null means the variable is not set at all
+            if (customToken == null)
+            {
+                throw new InvalidOperationException(
+                    $"Azure DevOps token variable '{tokenVariable}' is not set. " +
+                    $"Set the '{tokenVariable}' environment variable to a valid Azure DevOps access token.");
+            }
+
+            // Empty string means the variable exists but carries no value
+            if (customToken.Length == 0)
+            {
+                throw new InvalidOperationException(
+                    $"Azure DevOps token variable '{tokenVariable}' is set but empty. " +
+                    $"Set '{tokenVariable}' to a non-empty Azure DevOps access token.");
+            }
+
+            // Custom token variables are always treated as Basic (PAT) credentials
+            return (customToken, false);
+        }
+
         // Check explicit user tokens first
         var token = Environment.GetEnvironmentVariable("AZURE_DEVOPS_PAT");
         if (!string.IsNullOrEmpty(token))

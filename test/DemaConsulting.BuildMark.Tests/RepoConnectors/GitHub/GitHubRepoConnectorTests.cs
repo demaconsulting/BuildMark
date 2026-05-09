@@ -978,6 +978,107 @@ public class GitHubRepoConnectorTests
             buildInfo.KnownIssues.Exists(i => i.Id == "306"),
             "Closed bug 306 with no AV should NOT be a known issue (closed, no AV)");
     }
+
+    // ─────────────────────────────────────────────────────────────────────────
+    // BuildMark-GitHub-TokenVariable
+    // ─────────────────────────────────────────────────────────────────────────
+
+    /// <summary>
+    ///     Verify that a non-empty custom token variable is used as the GitHub access token.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable()
+    {
+        // Arrange: set a custom environment variable with a known token value
+        const string varName = "BUILDMARK_TEST_GH_TOKEN_VALID";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
+        Environment.SetEnvironmentVariable(varName, "my-custom-token-value");
+        try
+        {
+            using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+                .AddCommitsResponse("abc123def456")
+                .AddReleasesResponse(new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+                .AddPullRequestsResponse()
+                .AddIssuesResponse()
+                .AddTagsResponse(new MockTag("v1.0.0", "abc123def456"));
+
+            using var mockHttpClient = new HttpClient(mockHandler);
+            var config = new GitHubConnectorConfig { TokenVariable = varName };
+            var connector = new MockableGitHubRepoConnector(config, mockHttpClient);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+            connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123def456");
+
+            // Act: connector should resolve the token from the custom variable without throwing
+            var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+            // Assert: full build information is returned, confirming the token was accepted
+            Assert.NotNull(buildInfo);
+            Assert.Equal("1.0.0", buildInfo.CurrentVersionTag.VersionTag.FullVersion);
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, savedValue);
+        }
+    }
+
+    /// <summary>
+    ///     Verify that an empty custom token variable throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException()
+    {
+        // Arrange: set the custom variable to an empty string
+        const string varName = "BUILDMARK_TEST_GH_TOKEN_EMPTY_3B7D";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
+        Environment.SetEnvironmentVariable(varName, string.Empty);
+        try
+        {
+            var config = new GitHubConnectorConfig { TokenVariable = varName };
+            var connector = new MockableGitHubRepoConnector(config);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+            connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123def456");
+
+            // Act / Assert: connector must throw because the variable is empty
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0")));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, savedValue);
+        }
+    }
+
+    /// <summary>
+    ///     Verify that a missing custom token variable throws InvalidOperationException.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException()
+    {
+        // Arrange: ensure the custom variable is not set
+        const string varName = "BUILDMARK_TEST_GH_TOKEN_UNSET_C51E";
+        Environment.SetEnvironmentVariable(varName, null);
+        try
+        {
+            var config = new GitHubConnectorConfig { TokenVariable = varName };
+            var connector = new MockableGitHubRepoConnector(config);
+
+            connector.SetCommandResponse("git remote get-url origin", "https://github.com/test/repo.git");
+            connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+            connector.SetCommandResponse("git rev-parse HEAD", "abc123def456");
+
+            // Act / Assert: connector must throw because the variable is not set
+            await Assert.ThrowsAsync<InvalidOperationException>(
+                () => connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0")));
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable(varName, null);
+        }
+    }
 }
 
 

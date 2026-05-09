@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
 
 namespace DemaConsulting.BuildMark.Tests.RepoConnectors.GitHub;
@@ -46,6 +47,20 @@ internal sealed class MockableGitHubRepoConnector : GitHubRepoConnector
     /// </summary>
     /// <param name="mockHttpClient">Optional mock HttpClient for GraphQL requests.</param>
     public MockableGitHubRepoConnector(HttpClient? mockHttpClient = null)
+    {
+        _mockHttpClient = mockHttpClient;
+    }
+
+    /// <summary>
+    ///     Initializes a new instance of the <see cref="MockableGitHubRepoConnector"/> class
+    ///     with an explicit connector configuration.
+    /// </summary>
+    /// <param name="config">GitHub connector configuration including optional overrides.</param>
+    /// <param name="mockHttpClient">Optional mock HttpClient for GraphQL requests.</param>
+    public MockableGitHubRepoConnector(
+        GitHubConnectorConfig? config,
+        HttpClient? mockHttpClient = null)
+        : base(config)
     {
         _mockHttpClient = mockHttpClient;
     }

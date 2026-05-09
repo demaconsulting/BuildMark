@@ -14,7 +14,21 @@ construct a `BuildInformation` record.
 
 ###### Authentication
 
-The connector resolves the Azure DevOps token using the following priority order:
+The connector resolves the Azure DevOps token in two modes depending on whether
+`AzureDevOpsConnectorConfig.TokenVariable` is set.
+
+**Custom variable mode** (when `TokenVariable` is set):
+
+The connector reads the named environment variable exclusively and does not fall back
+to well-known names or the az CLI. The token is always treated as a Basic (PAT) credential:
+
+1. If the variable is not set (null), the connector throws `InvalidOperationException` with
+   a message identifying the missing variable.
+2. If the variable is set but empty, the connector throws `InvalidOperationException` with a
+   message identifying the empty variable.
+3. Otherwise the token value is used directly as a Basic (PAT) credential.
+
+**Default mode** (when `TokenVariable` is not set):
 
 1. `AZURE_DEVOPS_PAT` environment variable - authenticated as Basic (PAT)
 2. `AZURE_DEVOPS_TOKEN` environment variable - authenticated as Basic (PAT)
