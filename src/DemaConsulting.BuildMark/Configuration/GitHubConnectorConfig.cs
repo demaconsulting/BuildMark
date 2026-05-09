@@ -39,4 +39,15 @@ public sealed record GitHubConnectorConfig
     ///     Gets or sets the optional GitHub GraphQL base endpoint override.
     /// </summary>
     public string? BaseUrl { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the name of the environment variable that holds the GitHub access token.
+    /// </summary>
+    /// <remarks>
+    ///     When set, the connector reads the token exclusively from this environment variable and does
+    ///     not fall back to well-known names (GH_TOKEN, GITHUB_TOKEN) or the gh CLI. If the variable
+    ///     is absent or empty the connector throws <see cref="InvalidOperationException"/> with a
+    ///     message that identifies the expected variable, so operators receive a clear diagnostic.
+    /// </remarks>
+    public string? TokenVariable { get; init; }
 }

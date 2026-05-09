@@ -970,8 +970,39 @@ public class GitHubRepoConnector : RepoConnectorBase
     ///     Gets GitHub token from environment or gh CLI.
     /// </summary>
     /// <returns>GitHub token.</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when a custom token variable is configured but the variable is absent or empty,
+    ///     or when no token can be found through the default resolution chain.
+    /// </exception>
     private async Task<string> GetGitHubTokenAsync()
     {
+        // When a custom token variable is configured, use only that variable -
+        // do not fall back to well-known names or the gh CLI so that the operator
+        // retains full control over which credential is used
+        var tokenVariable = _config?.TokenVariable;
+        if (!string.IsNullOrEmpty(tokenVariable))
+        {
+            var customToken = Environment.GetEnvironmentVariable(tokenVariable);
+
+            // Null means the variable is not set at all
+            if (customToken == null)
+            {
+                throw new InvalidOperationException(
+                    $"GitHub token variable '{tokenVariable}' is not set. " +
+                    $"Set the '{tokenVariable}' environment variable to a valid GitHub access token.");
+            }
+
+            // Empty string means the variable exists but carries no value
+            if (customToken.Length == 0)
+            {
+                throw new InvalidOperationException(
+                    $"GitHub token variable '{tokenVariable}' is set but empty. " +
+                    $"Set '{tokenVariable}' to a non-empty GitHub access token.");
+            }
+
+            return customToken;
+        }
+
         // Try GH_TOKEN environment variable first
         var token = Environment.GetEnvironmentVariable("GH_TOKEN");
         if (!string.IsNullOrEmpty(token))

@@ -89,3 +89,18 @@ sections:
         tests:
           - AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
           - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+
+      - id: BuildMark-AzureDevOps-TokenVariable
+        title: >-
+          The AzureDevOpsRepoConnector class shall use only the configured token variable when
+          TokenVariable is set, and shall throw InvalidOperationException when the variable
+          is absent or empty.
+        justification: |
+          When an operator explicitly names a token variable in the configuration, the
+          connector must not silently fall back to other credential sources. Strict
+          enforcement ensures that misconfigured environments produce clear error messages
+          rather than accidentally using a different token with unexpected permissions.
+        tests:
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

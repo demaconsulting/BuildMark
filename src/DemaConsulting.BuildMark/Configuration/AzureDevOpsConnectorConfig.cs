@@ -45,4 +45,16 @@ public sealed record AzureDevOpsConnectorConfig
     ///     Gets or sets the repository name override within the project.
     /// </summary>
     public string? Repository { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the name of the environment variable that holds the Azure DevOps access token.
+    /// </summary>
+    /// <remarks>
+    ///     When set, the connector reads the token exclusively from this environment variable and does
+    ///     not fall back to well-known names (AZURE_DEVOPS_PAT, SYSTEM_ACCESSTOKEN, etc.) or the az
+    ///     CLI. If the variable is absent or empty the connector throws <see cref="InvalidOperationException"/>
+    ///     with a message that identifies the expected variable. The token is always treated as a Basic
+    ///     (PAT) credential when loaded from a custom variable.
+    /// </remarks>
+    public string? TokenVariable { get; init; }
 }

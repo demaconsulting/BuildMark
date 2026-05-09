@@ -116,17 +116,42 @@ The `type` key selects the connector:
 
 ### GitHub connector settings
 
-BuildMark resolves the GitHub access token automatically from `GH_TOKEN`, then
-`GITHUB_TOKEN`, then `gh auth token`.
+BuildMark resolves the GitHub access token in one of two modes depending on whether `token-variable` is set.
+
+**When `token-variable` is set**, BuildMark reads **only** that environment variable and does not fall
+back to well-known names or the GitHub CLI. An error is raised if the variable is not set or is empty.
+
+**When `token-variable` is not set**, BuildMark resolves the token automatically in this order:
+
+1. `GH_TOKEN` environment variable
+2. `GITHUB_TOKEN` environment variable
+3. `gh auth token` (GitHub CLI, if authenticated)
 
 | Key | Required | Description |
 | :-- | :------- | :---------- |
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
+| `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
+
+Example using a custom token variable:
+
+```yaml
+connector:
+  type: github
+  github:
+    repository: owner/repo
+    token-variable: MY_CUSTOM_GH_TOKEN
+```
 
 ### Azure DevOps connector settings
 
-BuildMark resolves the Azure DevOps access token automatically in this order:
+BuildMark resolves the Azure DevOps access token in one of two modes depending on whether
+`token-variable` is set.
+
+**When `token-variable` is set**, BuildMark reads **only** that environment variable and does not fall
+back to well-known names or the Azure CLI. An error is raised if the variable is not set or is empty.
+
+**When `token-variable` is not set**, BuildMark resolves the token automatically in this order:
 
 1. `AZURE_DEVOPS_PAT` environment variable (Personal Access Token)
 2. `AZURE_DEVOPS_TOKEN` environment variable (PAT or Entra ID token)
@@ -139,6 +164,19 @@ BuildMark resolves the Azure DevOps access token automatically in this order:
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
+| `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
+
+Example using a custom token variable:
+
+```yaml
+connector:
+  type: azure-devops
+  azure-devops:
+    url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+    token-variable: MY_CUSTOM_ADO_TOKEN
+```
 
 ## Report Sections
 
