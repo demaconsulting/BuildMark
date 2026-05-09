@@ -862,6 +862,7 @@ public class AzureDevOpsRepoConnectorTests
     {
         // Arrange: ensure the custom variable is not set
         const string varName = "BUILDMARK_TEST_ADO_TOKEN_UNSET_C51E";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
         Environment.SetEnvironmentVariable(varName, null);
         try
         {
@@ -877,7 +878,7 @@ public class AzureDevOpsRepoConnectorTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(varName, null);
+            Environment.SetEnvironmentVariable(varName, savedValue);
         }
     }
 }

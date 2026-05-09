@@ -348,7 +348,15 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "token-variable":
-                    tokenVariable = string.IsNullOrWhiteSpace(value) ? null : value;
+                    if (string.IsNullOrWhiteSpace(value))
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value), "GitHub token-variable must be a non-empty string.");
+                    }
+                    else
+                    {
+                        tokenVariable = value;
+                    }
+
                     break;
 
                 default:
@@ -450,7 +458,15 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "token-variable":
-                    tokenVariable = string.IsNullOrWhiteSpace(value) ? null : value;
+                    if (value == null)
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value), "Azure DevOps token-variable must be a non-empty string.");
+                    }
+                    else
+                    {
+                        tokenVariable = value;
+                    }
+
                     break;
 
                 default:

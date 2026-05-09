@@ -539,4 +539,82 @@ public class ConfigurationTests
             Directory.Delete(directory, recursive: true);
         }
     }
+
+    /// <summary>
+    ///     Test that an empty GitHub token-variable produces an error issue.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_GitHubEmptyTokenVariable_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: github
+              github:
+                repository: owner/repo
+                token-variable: ""
+            """,
+            TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("token-variable", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
+    ///     Test that an empty Azure DevOps token-variable produces an error issue.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsEmptyTokenVariable_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                project: MyProject
+                repository: MyRepo
+                token-variable: ""
+            """,
+            TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("token-variable", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
 }

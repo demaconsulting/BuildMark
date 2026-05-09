@@ -1060,6 +1060,7 @@ public class GitHubRepoConnectorTests
     {
         // Arrange: ensure the custom variable is not set
         const string varName = "BUILDMARK_TEST_GH_TOKEN_UNSET_C51E";
+        var savedValue = Environment.GetEnvironmentVariable(varName);
         Environment.SetEnvironmentVariable(varName, null);
         try
         {
@@ -1076,7 +1077,7 @@ public class GitHubRepoConnectorTests
         }
         finally
         {
-            Environment.SetEnvironmentVariable(varName, null);
+            Environment.SetEnvironmentVariable(varName, savedValue);
         }
     }
 }
