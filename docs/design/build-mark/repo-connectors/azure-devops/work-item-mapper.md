@@ -63,8 +63,7 @@ Steps:
 
 1. Read `System.State` from the work item's fields dictionary. If the state is in the
    suppressed-states set (e.g. `Removed`), return `null` immediately.
-2. Read `System.Title`, `System.WorkItemType`, and `System.State` from the
-   work item's fields dictionary.
+2. Read `System.Title` and `System.WorkItemType` from the work item's fields dictionary.
 3. Apply work item type mapping to determine the normalized type.
 4. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
 5. If item controls specify a visibility of `internal`, return `null` to signal that
