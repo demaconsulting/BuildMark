@@ -353,6 +353,50 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that a non-scalar area-path value in the Azure DevOps connector block produces an error.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsNonScalarAreaPath_ReturnsErrorIssue()
+    {
+        // Arrange
+        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
+        Directory.CreateDirectory(directory);
+        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                project: myproject
+                repository: myrepo
+                area-path:
+                  - foo
+            sections:
+              - id: changes
+                title: Changes
+            """,
+            TestContext.Current.CancellationToken);
+
+        try
+        {
+            // Act
+            var result = await BuildMarkConfigReader.ReadAsync(directory);
+
+            // Assert
+            Assert.Null(result.Config);
+            Assert.True(result.HasErrors);
+            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+            Assert.Contains("Azure DevOps area-path must be a scalar string value", result.Issues[0].Description);
+        }
+        finally
+        {
+            Directory.Delete(directory, recursive: true);
+        }
+    }
+
+    /// <summary>
     ///     Test that an unsupported key inside the Azure DevOps connector block produces an error.
     /// </summary>
     [Fact]

@@ -471,9 +471,20 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "area-path":
-                    // Use raw scalar value so that an explicit empty string ("") is preserved.
-                    // An empty area-path disables filtering; null (absent key) means "use the default".
-                    areaPath = GetScalarValue(entry.Value);
+                    // area-path must be a scalar. Reject non-scalar values (e.g. sequences or mappings)
+                    // so that a mis-typed config produces a clear error rather than silently disabling
+                    // area-path filtering. An explicit empty string ("") is preserved as-is to allow
+                    // the caller to distinguish "empty string (disable filter)" from "absent (use default)".
+                    if (entry.Value is YamlScalarNode areaPathScalar)
+                    {
+                        areaPath = areaPathScalar.Value ?? string.Empty;
+                    }
+                    else
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Azure DevOps area-path must be a scalar string value.");
+                    }
+
                     break;
 
                 default:
