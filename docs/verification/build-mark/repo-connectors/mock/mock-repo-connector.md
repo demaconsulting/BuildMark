@@ -104,7 +104,18 @@ added; `GetBuildInformationAsync` is called.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
+###### MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections
+
+**Scenario**: Connector is configured with routing rules; `GetBuildInformationAsync` is called for a
+version that has known issues; routing rules include a rule that would match bug items.
+
+**Expected**: `BuildInformation.KnownIssues` is non-empty and `BuildInformation.RoutedSections` is
+populated, but no item ID that appears in `KnownIssues` also appears in any routed section, proving
+that known issues are excluded from the routing path and kept in their dedicated collection.
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
 ##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-IRepoConnector**: MockRepoConnector_ImplementsInterface
-- **BuildMark-RepoConnectors-Mock**: All remaining 10 tests in `MockRepoConnectorTests.cs`
+- **BuildMark-RepoConnectors-Mock**: All remaining 11 tests in `MockRepoConnectorTests.cs`
