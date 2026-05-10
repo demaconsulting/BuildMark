@@ -41,3 +41,5 @@ sections:
         tests:
           - BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
           - BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
+          - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection
+          - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection

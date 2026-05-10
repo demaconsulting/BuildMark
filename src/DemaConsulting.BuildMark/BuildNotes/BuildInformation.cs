@@ -81,8 +81,16 @@ public record BuildInformation(
         // Use custom routed sections if configured, otherwise fall back to legacy Changes/Bugs sections
         if (RoutedSections != null && RoutedSections.Count > 0)
         {
-            // Render each configured section instead of the legacy sections
+            // Render each configured section instead of the legacy sections.
+            // Known issues are excluded from routing and are therefore appended
+            // separately after the routed sections when the caller requests them.
             AppendRoutedSections(markdown, subHeading);
+
+            // Add known issues section after routed sections if requested
+            if (includeKnownIssues)
+            {
+                AppendKnownIssuesSection(markdown, subHeading);
+            }
         }
         else
         {

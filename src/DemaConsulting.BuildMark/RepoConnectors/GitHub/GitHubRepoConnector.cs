@@ -163,12 +163,14 @@ public class GitHubRepoConnector : RepoConnectorBase
         bugs.Sort((a, b) => a.Index.CompareTo(b.Index));
         knownIssues.Sort((a, b) => a.Index.CompareTo(b.Index));
 
-        // Apply routing rules if configured, otherwise use legacy categorization
+        // Apply routing rules if configured, otherwise use legacy categorization.
+        // Known issues are intentionally excluded from routing: they are not linked to any
+        // commit in the build range and must appear in the separate Known Issues section.
         IReadOnlyList<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)>? routedSections = null;
         if (HasRules)
         {
-            // Route all collected items into configured sections
-            var allItems = nonBugChanges.Concat(bugs).Concat(knownIssues);
+            // Route commit-linked items only; known issues are rendered separately by ToMarkdown
+            var allItems = nonBugChanges.Concat(bugs);
             routedSections = ApplyRules(allItems);
         }
 

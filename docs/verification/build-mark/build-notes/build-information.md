@@ -237,6 +237,26 @@ two custom sections (Features, Bugs); `ToMarkdown()` is called.
 
 **Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
 
+##### BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection
+
+**Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list and a
+non-empty `KnownIssues` list; `ToMarkdown(includeKnownIssues: true)` is called.
+
+**Expected**: Markdown contains the routed section headings (e.g. `## Features`) and also contains
+a `## Known Issues` section appearing after all routed sections.
+
+**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
+
+##### BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection
+
+**Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list and a
+non-empty `KnownIssues` list; `ToMarkdown(includeKnownIssues: false)` is called.
+
+**Expected**: Markdown does not contain a `## Known Issues` section or any known-issue item text,
+confirming the flag is respected in routed mode as well as legacy mode.
+
+**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
+
 #### Requirements Coverage
 
 - **`BuildMark-BuildInformation-Markdown`**:
@@ -266,3 +286,5 @@ two custom sections (Features, Bugs); `ToMarkdown()` is called.
 - **`BuildMark-BuildInformation-RoutedSections`**:
   - BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
   - BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
+  - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection
+  - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection

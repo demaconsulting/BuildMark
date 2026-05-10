@@ -41,8 +41,11 @@ whether the Known Issues section is emitted.
 
 When `RoutedSections` is non-null and non-empty, `ToMarkdown` renders each section
 from the `RoutedSections` list (using `AppendRoutedSections`) instead of the legacy
-`Changes`, `Bugs`, and `KnownIssues` lists. When `RoutedSections` is `null` or
-empty, `ToMarkdown` falls back to the legacy sections.
+`Changes` and `Bugs` lists. Known issues are **always excluded from routing** because
+they are not linked to any commit in the build range; when `includeKnownIssues` is
+`true`, a `## Known Issues` section is appended after the routed sections regardless
+of which rendering mode is active. When `RoutedSections` is `null` or empty,
+`ToMarkdown` falls back to the legacy sections.
 
 The rendered output contains the following sections:
 
@@ -52,9 +55,10 @@ The rendered output contains the following sections:
    **OR** the following legacy sections *(when no rules are configured)*:
    - **Changes** - list of `ItemInfo` records from `Changes`.
    - **Bugs Fixed** - list of `ItemInfo` records from `Bugs`.
-   - **Known Issues** *(optional)* - list of `ItemInfo` records from `KnownIssues`,
-     emitted only when `includeKnownIssues` is `true`.
-3. **Full Changelog** *(optional)* - hyperlink from `CompleteChangelogLink`, emitted
+3. **Known Issues** *(optional)* - list of `ItemInfo` records from `KnownIssues`,
+   emitted only when `includeKnownIssues` is `true`. Appears after routed sections
+   in routed mode and after legacy sections in legacy mode.
+4. **Full Changelog** *(optional)* - hyperlink from `CompleteChangelogLink`, emitted
    only when the link is non-null.
 
 #### Interactions

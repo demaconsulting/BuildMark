@@ -3,7 +3,7 @@
 ##### Verification Approach
 
 `MockRepoConnector` is tested through `MockRepoConnectorTests.cs`, which contains
-11 unit tests. The tests verify that the connector correctly returns in-memory data
+12 unit tests. The tests verify that the connector correctly returns in-memory data
 supplied via its configuration API, handles all routing and `HasRules` logic, and
 correctly implements all members of `IRepoConnector`.
 
@@ -31,80 +31,101 @@ correctly implements all members of `IRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-###### MockRepoConnector_GetBuildInformationAsync_NoData_ReturnsEmptyBuildInformation
+###### MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion
 
-**Scenario**: `GetBuildInformationAsync` is called on an unconfigured connector.
+**Scenario**: `GetBuildInformationAsync` is called with an explicit version tag.
 
-**Expected**: Returns an empty `BuildInformation` instance.
-
-**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-###### MockRepoConnector_SetBuildVersion_StoresVersion
-
-**Scenario**: `SetBuildVersion` is called with a version string.
-
-**Expected**: `BuildInformation.Version` equals the supplied version.
+**Expected**: `BuildInformation.CurrentVersionTag` reflects the supplied version and commit hash.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-###### MockRepoConnector_SetBaselineVersion_StoresBaseline
+###### MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline
 
-**Scenario**: `SetBaselineVersion` is called with a version string.
+**Scenario**: `GetBuildInformationAsync` is called for a version that exists in the mock tag data.
 
-**Expected**: `BuildInformation.BaselineVersion` equals the supplied version.
-
-**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-###### MockRepoConnector_AddChange_AddsItemToChanges
-
-**Scenario**: `AddChange` is called with a change item.
-
-**Expected**: `BuildInformation.Changes` contains the added item.
+**Expected**: Build information is returned with the correct version tag and a non-null commit hash.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-###### MockRepoConnector_AddKnownIssue_AddsItemToKnownIssues
+###### MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
 
-**Scenario**: `AddKnownIssue` is called with a known issue item.
+**Scenario**: `GetBuildInformationAsync` is called for a version that has associated changes.
 
-**Expected**: `BuildInformation.KnownIssues` contains the added item.
-
-**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-###### MockRepoConnector_Configure_WithRules_HasRulesReturnsTrue
-
-**Scenario**: `Configure` is called with a non-empty rules list.
-
-**Expected**: `HasRules` returns `true`.
+**Expected**: All expected components (`Changes`, `Bugs`, `KnownIssues`, `CurrentVersionTag`) are present and non-null.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-###### MockRepoConnector_Configure_EmptyRules_HasRulesReturnsFalse
+###### MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly
 
-**Scenario**: `Configure` is called with an empty rules list.
+**Scenario**: `GetBuildInformationAsync` is called for a version that has both bug and non-bug changes.
 
-**Expected**: `HasRules` returns `false`.
-
-**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-###### MockRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
-
-**Scenario**: Connector is configured with routing rules; changes and known issues are
-added; `GetBuildInformationAsync` is called.
-
-**Expected**: `BuildInformation.RoutedSections` is populated according to the rules.
+**Expected**: Items with type `bug` appear only in `Bugs`; all items in `Bugs` have type `bug`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
-###### MockRepoConnector_GetBuildInformationAsync_WithChangelogLink_StoresLink
+###### MockRepoConnector_Configure_StoresRulesAndSections
 
-**Scenario**: A changelog link is set on the connector.
+**Scenario**: `Configure` is called with a non-empty rules and sections list, then `GetBuildInformationAsync` is called.
 
-**Expected**: `BuildInformation.ChangelogLink` equals the supplied link.
+**Expected**: `BuildInformation.RoutedSections` is non-null, confirming rules were stored and applied.
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
+###### MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
+
+**Scenario**: Connector is configured with two routing rules (`bug` label → `bugs`, catch-all → `features`).
+
+**Expected**: `RoutedSections` contains exactly two sections with titles `Features` and `Bugs`.
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
+###### MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections
+
+**Scenario**: `GetBuildInformationAsync` is called on a connector with no rules configured.
+
+**Expected**: `RoutedSections` is null (legacy mode).
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
+###### MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+
+**Scenario**: Version v2.0.0 is requested; issue 5 has affected-versions `[5.0.0,)` (outside range)
+while issues 4 and 6 have no affected-versions restriction.
+
+**Expected**: Issues 4 and 6 appear in `KnownIssues`; issue 5 does not.
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
+###### MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+
+**Scenario**: Issue 7 is a closed bug with affected-versions `[1.0.0,1.0.0]`. Build is requested for v1.0.0 and then v2.0.0.
+
+**Expected**: Issue 7 appears in `KnownIssues` for v1.0.0 (in-range); issue 7 does not appear for v2.0.0 (out-of-range).
+
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
+
+###### MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections
+
+**Scenario**: Connector is configured with routing rules; `GetBuildInformationAsync` is called for a
+version that has known issues; routing rules include a rule that would match bug items.
+
+**Expected**: `BuildInformation.KnownIssues` is non-empty and `BuildInformation.RoutedSections` is
+populated, but no item ID that appears in `KnownIssues` also appears in any routed section, proving
+that known issues are excluded from the routing path and kept in their dedicated collection.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
 ##### Requirements Coverage
 
 - **BuildMark-RepoConnectors-IRepoConnector**: MockRepoConnector_ImplementsInterface
-- **BuildMark-RepoConnectors-Mock**: All remaining 10 tests in `MockRepoConnectorTests.cs`
+- **BuildMark-RepoConnectors-Mock**: MockRepoConnector_Constructor_CreatesInstance,
+  MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion,
+  MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline,
+  MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation,
+  MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly,
+  MockRepoConnector_Configure_StoresRulesAndSections,
+  MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections,
+  MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections,
+  MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions,
+  MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue,
+  MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections
