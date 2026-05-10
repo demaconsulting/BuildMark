@@ -237,6 +237,23 @@ internal sealed class MockAzureDevOpsHttpMessageHandler : HttpMessageHandler
     }
 
     /// <summary>
+    ///     Adds a mock error response for the WIQL query endpoint, simulating an Azure DevOps
+    ///     API error such as an invalid area path (HTTP 400 Bad Request).
+    /// </summary>
+    /// <param name="statusCode">HTTP status code to return (defaults to 400 Bad Request).</param>
+    /// <param name="errorMessage">ADO error message to include in the response body.</param>
+    /// <param name="typeKey">ADO error type key to include in the response body.</param>
+    /// <returns>This instance for method chaining.</returns>
+    public MockAzureDevOpsHttpMessageHandler AddWiqlErrorResponse(
+        HttpStatusCode statusCode = HttpStatusCode.BadRequest,
+        string errorMessage = "The area path does not exist.",
+        string typeKey = "UnknownProjectException")
+    {
+        var json = JsonSerializer.Serialize(new { message = errorMessage, typeKey });
+        return AddResponse("wit/wiql", json, statusCode);
+    }
+
+    /// <summary>
     ///     Adds a mock response for the repository endpoint.
     /// </summary>
     /// <param name="id">Repository ID.</param>

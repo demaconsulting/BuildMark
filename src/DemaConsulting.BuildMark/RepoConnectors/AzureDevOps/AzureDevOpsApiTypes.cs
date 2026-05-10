@@ -126,3 +126,12 @@ internal sealed record AzureDevOpsRef(
 internal sealed record AzureDevOpsCollectionResponse<T>(
     int Count,
     List<T> Value);
+
+/// <summary>
+///     Error response body returned by the Azure DevOps REST API on failure (e.g. 400 Bad Request).
+/// </summary>
+/// <param name="Message">Human-readable error description from the ADO service.</param>
+/// <param name="TypeKey">Short exception type key (e.g. "UnknownProjectException").</param>
+internal sealed record AzureDevOpsApiError(
+    string? Message,
+    string? TypeKey);

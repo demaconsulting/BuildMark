@@ -897,6 +897,38 @@ public class AzureDevOpsRepoConnectorTests
         Assert.DoesNotContain("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
     }
 
+    /// <summary>
+    ///     Verify that when Azure DevOps returns a 400 Bad Request for the WIQL query
+    ///     (e.g. because the area path does not exist), an <see cref="InvalidOperationException"/>
+    ///     is thrown with the ADO error message extracted from the response body.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage()
+    {
+        // Arrange: WIQL endpoint returns 400 with an ADO-style error body
+        const string adoErrorMessage = "No area nodes were found under 'project\\BadPath'. Verify the area path exists.";
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlErrorResponse(
+                System.Net.HttpStatusCode.BadRequest,
+                adoErrorMessage,
+                "UnknownProjectException");
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var config = new AzureDevOpsConnectorConfig { AreaPath = @"project\BadPath" };
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, config);
+        connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv", "mock-token");
+
+        // Act + Assert: the ADO error message from the 400 response body must be surfaced
+        var ex = await Assert.ThrowsAsync<InvalidOperationException>(
+            () => connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0")));
+        Assert.Contains(adoErrorMessage, ex.Message, StringComparison.Ordinal);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-AzureDevOps-TokenVariable
     // ─────────────────────────────────────────────────────────────────────────

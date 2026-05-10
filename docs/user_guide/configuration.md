@@ -235,6 +235,19 @@ connector:
     area-path: ""   # no filter; returns all bugs in the ADO project
 ```
 
+**Invalid area paths:**
+
+If the configured `area-path` does not exist in Azure DevOps, the API returns an error and
+BuildMark will fail with a message like:
+
+```text
+Error: No area nodes were found under 'MyProject\BadPath'. Verify the area path exists.
+```
+
+This message is extracted directly from the Azure DevOps API response. Check that the area path
+is spelled correctly and that it has been created in the ADO project settings before running
+BuildMark again.
+
 ## Report Sections
 
 The `sections` sequence defines which sections appear in the generated build notes and in what

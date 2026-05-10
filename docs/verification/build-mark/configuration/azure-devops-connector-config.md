@@ -85,6 +85,18 @@ area path disables area-path filtering and produces a project-wide query.
 
 **Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
 
+##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage
+
+**Scenario**: A connector is created with `AreaPath` set to a path that does not exist in ADO;
+the mock WIQL endpoint returns HTTP 400 with an ADO-style JSON error body; `GetBuildInformationAsync`
+is called.
+
+**Expected**: An `InvalidOperationException` is thrown and its message contains the ADO error
+description from the 400 response body, so the user receives a meaningful diagnostic rather than
+a generic HTTP failure.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
 #### Requirements Coverage
 
 - **`BuildMark-AzureDevOpsConnectorConfig-Properties`**:
@@ -95,3 +107,4 @@ area path disables area-path filtering and produces a project-wide query.
   - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
   - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject
   - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter
+  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage
