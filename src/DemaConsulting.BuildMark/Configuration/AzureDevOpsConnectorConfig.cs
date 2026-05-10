@@ -63,7 +63,7 @@ public sealed record AzureDevOpsConnectorConfig
     /// </summary>
     /// <remarks>
     ///     <para>
-    ///         When <see langword="null"/> (the default), the connector automatically scopes the
+    ///         When <see langword="null"/>, the connector automatically scopes the
     ///         known-issues WIQL query to <c>{Project}\{Repository}</c>, which is the conventional
     ///         area path for a single repository inside an ADO project. This prevents bugs that
     ///         belong to other products or repositories in the same project from appearing in the

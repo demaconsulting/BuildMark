@@ -863,7 +863,7 @@ public class AzureDevOpsRepoConnectorTests
         var wiqlQuery = wiqlBody.GetProperty("query").GetString();
         Assert.NotNull(wiqlQuery);
         Assert.Contains("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(@"project\repo", wiqlQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(@"project\repo", wiqlQuery, StringComparison.Ordinal);
     }
 
     /// <summary>
