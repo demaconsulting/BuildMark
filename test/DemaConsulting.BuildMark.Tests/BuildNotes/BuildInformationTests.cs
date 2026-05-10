@@ -564,6 +564,92 @@ public class BuildInformationTests
         Assert.Contains("## Changes", markdown);
         Assert.Contains("## Bugs Fixed", markdown);
     }
+
+    /// <summary>
+    ///     Test that ToMarkdown renders Known Issues after routed sections when both are present
+    ///     and includeKnownIssues is true.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: BuildInformation.ToMarkdown with RoutedSections AND KnownIssues
+    ///     What the assertions prove: Custom routed sections appear AND Known Issues section
+    ///     is appended after them, confirming known issues are never suppressed by routing
+    /// </remarks>
+    [Fact]
+    public void BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection()
+    {
+        // Arrange - Build information with routed sections and known issues
+        var versionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
+        var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
+        var knownIssueItem = new ItemInfo("9", "Known bug Z", "https://example.com/9", "bug", 9);
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> routedSections =
+        [
+            ("features", "Features", new List<ItemInfo> { featureItem })
+        ];
+        var buildInfo = new BuildInformation(
+            null,
+            versionCommitTag,
+            [],
+            [],
+            [knownIssueItem],
+            null)
+        {
+            RoutedSections = routedSections
+        };
+
+        // Act - Generate markdown with includeKnownIssues enabled
+        var markdown = buildInfo.ToMarkdown(includeKnownIssues: true);
+
+        // Assert - Custom routed section appears
+        Assert.Contains("## Features", markdown);
+        Assert.Contains("Add feature X", markdown);
+
+        // Assert - Known Issues section appears after the routed sections
+        Assert.Contains("## Known Issues", markdown);
+        Assert.Contains("Known bug Z", markdown);
+        var featuresPos = markdown.IndexOf("## Features", StringComparison.Ordinal);
+        var knownIssuesPos = markdown.IndexOf("## Known Issues", StringComparison.Ordinal);
+        Assert.True(featuresPos < knownIssuesPos, "Known Issues section should appear after the routed sections");
+    }
+
+    /// <summary>
+    ///     Test that ToMarkdown does NOT render Known Issues when includeKnownIssues is false,
+    ///     even when RoutedSections is populated.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: BuildInformation.ToMarkdown with RoutedSections AND KnownIssues
+    ///     but includeKnownIssues set to false
+    ///     What the assertions prove: Known Issues section is absent when the flag is false,
+    ///     ensuring the flag is respected in routed mode as well as legacy mode
+    /// </remarks>
+    [Fact]
+    public void BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection()
+    {
+        // Arrange - Build information with routed sections and known issues
+        var versionCommitTag = new VersionCommitTag(VersionTag.Create("1.0.0"), "abc123");
+        var featureItem = new ItemInfo("1", "Add feature X", "https://example.com/1", "feature", 1);
+        var knownIssueItem = new ItemInfo("9", "Known bug Z", "https://example.com/9", "bug", 9);
+        List<(string SectionId, string SectionTitle, IReadOnlyList<ItemInfo> Items)> routedSections =
+        [
+            ("features", "Features", new List<ItemInfo> { featureItem })
+        ];
+        var buildInfo = new BuildInformation(
+            null,
+            versionCommitTag,
+            [],
+            [],
+            [knownIssueItem],
+            null)
+        {
+            RoutedSections = routedSections
+        };
+
+        // Act - Generate markdown with includeKnownIssues disabled (the default)
+        var markdown = buildInfo.ToMarkdown(includeKnownIssues: false);
+
+        // Assert - Known Issues section is absent
+        Assert.DoesNotContain("## Known Issues", markdown);
+        Assert.DoesNotContain("Known bug Z", markdown);
+    }
 }
 
 

@@ -310,5 +310,53 @@ public class MockRepoConnectorTests
             buildInfoV2.KnownIssues.Exists(i => i.Id == "7"),
             "Closed bug 7 with AV [1.0.0,1.0.0] should NOT be a known issue for v2.0.0");
     }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync with routing rules does NOT place known issues
+    ///     into any routed section; known issues must appear only in KnownIssues.
+    /// </summary>
+    /// <remarks>
+    ///     What is being tested: MockRepoConnector routing exclusion of known issues
+    ///     What the assertions prove: Known issues are present in KnownIssues and absent from
+    ///     all RoutedSections, confirming that routing only applies to commit-linked items
+    /// </remarks>
+    [Fact]
+    public async Task MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections()
+    {
+        // Arrange - Configure connector with routing rules; v2.0.0 has known issues 4 and 6
+        var connector = new MockRepoConnector();
+        connector.Configure(
+            [
+                new() { Match = new RuleMatchConfig { Label = { "bug" } }, Route = "bugs" },
+                new() { Route = "features" }
+            ],
+            [
+                new() { Id = "features", Title = "Features" },
+                new() { Id = "bugs", Title = "Bugs" }
+            ]);
+
+        // Act - Get build information; routing rules are active
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"));
+
+        // Assert - Known issues are present in the KnownIssues list
+        Assert.NotNull(buildInfo.KnownIssues);
+        Assert.True(buildInfo.KnownIssues.Count > 0, "KnownIssues should be non-empty for v2.0.0");
+
+        // Assert - RoutedSections is populated (rules were applied)
+        Assert.NotNull(buildInfo.RoutedSections);
+
+        // Assert - No known issue ID appears in any routed section
+        // This proves that known issues are excluded from routing and kept separate
+        var knownIssueIds = buildInfo.KnownIssues.Select(i => i.Id).ToHashSet();
+        foreach (var (sectionId, sectionTitle, items) in buildInfo.RoutedSections)
+        {
+            foreach (var item in items)
+            {
+                Assert.False(
+                    knownIssueIds.Contains(item.Id),
+                    $"Known issue {item.Id} should not appear in routed section '{sectionTitle}' (id: '{sectionId}')");
+            }
+        }
+    }
 }
 
