@@ -3,7 +3,7 @@
 ##### Verification Approach
 
 `MockRepoConnector` is tested through `MockRepoConnectorTests.cs`, which contains
-11 unit tests. The tests verify that the connector correctly returns in-memory data
+12 unit tests. The tests verify that the connector correctly returns in-memory data
 supplied via its configuration API, handles all routing and `HasRules` logic, and
 correctly implements all members of `IRepoConnector`.
 
