@@ -313,7 +313,8 @@ public class MockRepoConnectorTests
 
     /// <summary>
     ///     Test that GetBuildInformationAsync with routing rules does NOT place known issues
-    ///     into any routed section; known issues must appear only in KnownIssues.
+    ///     into any routed section; known issues remain in KnownIssues and are rendered
+    ///     in a dedicated Known Issues section when includeKnownIssues is true.
     /// </summary>
     /// <remarks>
     ///     What is being tested: MockRepoConnector routing exclusion of known issues

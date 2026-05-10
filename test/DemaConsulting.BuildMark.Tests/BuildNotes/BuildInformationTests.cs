@@ -643,7 +643,7 @@ public class BuildInformationTests
             RoutedSections = routedSections
         };
 
-        // Act - Generate markdown with includeKnownIssues disabled (the default)
+        // Act - Generate markdown with includeKnownIssues disabled
         var markdown = buildInfo.ToMarkdown(includeKnownIssues: false);
 
         // Assert - Known Issues section is absent
