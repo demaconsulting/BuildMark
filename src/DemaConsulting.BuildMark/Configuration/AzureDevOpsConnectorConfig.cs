@@ -59,14 +59,27 @@ public sealed record AzureDevOpsConnectorConfig
     public string? TokenVariable { get; init; }
 
     /// <summary>
-    ///     Gets or sets the optional Area Path used to scope the known-issues WIQL query.
+    ///     Gets or sets the Area Path used to scope the known-issues WIQL query.
     /// </summary>
     /// <remarks>
-    ///     When set, the WIQL query that collects known issues uses
-    ///     <c>[System.AreaPath] UNDER '{AreaPath}'</c> to restrict results to work items
-    ///     that belong to the specified area (and its descendants). Use this when the ADO
-    ///     project contains multiple repositories or products and you want to exclude
-    ///     work items from unrelated areas.
+    ///     <para>
+    ///         When <see langword="null"/> (the default), the connector automatically scopes the
+    ///         known-issues WIQL query to <c>{Project}\{Repository}</c>, which is the conventional
+    ///         area path for a single repository inside an ADO project. This prevents bugs that
+    ///         belong to other products or repositories in the same project from appearing in the
+    ///         generated build notes.
+    ///     </para>
+    ///     <para>
+    ///         Set this property to an explicit value when your team's area hierarchy does not
+    ///         follow the <c>{Project}\{Repository}</c> convention — for example,
+    ///         <c>MyProject\TeamA\Backend</c>. The connector will then use
+    ///         <c>[System.AreaPath] UNDER '{AreaPath}'</c> to include the specified area and all
+    ///         of its descendants.
+    ///     </para>
+    ///     <para>
+    ///         Set this property to an empty string (<c>""</c>) to disable area-path filtering
+    ///         entirely and query all bugs in the ADO project.
+    ///     </para>
     /// </remarks>
     public string? AreaPath { get; init; }
 }

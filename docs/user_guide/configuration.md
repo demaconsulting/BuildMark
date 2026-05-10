@@ -164,7 +164,7 @@ back to well-known names or the Azure CLI. An error is raised if the variable is
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
-| `area-path` | No | Area path used to scope known-issues queries. When the ADO project contains multiple repositories or products, set this to restrict known issues to a specific area and its descendants (e.g. `MyProject\MyRepo`). |
+| `area-path` | No | Area path used to scope known-issues queries. See [Area Path scoping](#area-path-scoping) below. |
 | `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
 
 Example using a custom token variable:
@@ -179,7 +179,40 @@ connector:
     token-variable: MY_CUSTOM_ADO_TOKEN
 ```
 
-Example with area-path scoping (for projects containing multiple repositories):
+#### Area Path scoping
+
+Azure DevOps (ADO) organizes **work items** (bugs, user stories, tasks) into a separate hierarchy
+called *Area Paths*, independently of how git repositories are named. A project may contain many
+repositories and many area paths, and they do not automatically correspond to each other. The same
+area path can cover bugs for several repositories, or one repository's bugs might be spread across
+multiple area paths — depending entirely on how the team chose to configure ADO.
+
+When BuildMark queries the ADO work-item store for known issues, it must decide which bugs to
+include. Without scoping, the query returns **every open bug in the entire ADO project**, including
+bugs that belong to other products, services, or repositories hosted in the same project.
+
+To avoid that noise, BuildMark automatically scopes the known-issues WIQL query to the area path
+`{project}\{repository}` by default. This is the most common convention — ADO project administrators
+frequently create a top-level area path named after each repository — and it produces correct results
+without any configuration.
+
+**Scoping summary:**
+
+| `area-path` value | Behaviour |
+| :---------------- | :-------- |
+| Not set (default) | Scoped to `{project}\{repository}` |
+| Explicit value (e.g. `MyProject\TeamA\Backend`) | Scoped to that area path and all descendants |
+| Empty string (`""`) | No scoping — queries all bugs in the ADO project |
+
+**When to override `area-path`:**
+
+- Your team's area structure does not follow `{project}\{repository}`. For example, if the area
+  path is `MyProject\TeamA` or `MyProject\Product\Backend`, set `area-path` to that value.
+- A single area path spans multiple repositories and you want all of them included.
+- You have confirmed that your project contains only one repository and want to query all project
+  bugs without worrying about area paths (set `area-path: ""`).
+
+**Example — custom area path:**
 
 ```yaml
 connector:
@@ -188,7 +221,19 @@ connector:
     url: https://dev.azure.com/myorg
     project: MyProject
     repository: MyRepo
-    area-path: MyProject\MyRepo
+    area-path: MyProject\TeamA\Backend   # bugs in this area and all sub-areas
+```
+
+**Example — disable area-path filtering (project-wide):**
+
+```yaml
+connector:
+  type: azure-devops
+  azure-devops:
+    url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+    area-path: ""   # no filter; returns all bugs in the ADO project
 ```
 
 ## Report Sections

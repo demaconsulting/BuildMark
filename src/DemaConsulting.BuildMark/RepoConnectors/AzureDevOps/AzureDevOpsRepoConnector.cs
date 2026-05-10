@@ -104,8 +104,13 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         // Fetch all data from Azure DevOps
         var adoData = await FetchAzureDevOpsDataAsync(restClient, repository);
 
-        // Build lookup dictionaries and mappings
-        var lookupData = BuildLookupData(adoData, project, organizationUrl, repository, _config?.AreaPath);
+        // Build lookup dictionaries and mappings.
+        // The effective area path defaults to "{project}\{repository}" when not explicitly
+        // configured, scoping known-issues queries to the most likely area. Users whose ADO
+        // area structure differs can override this with the "area-path" connector option; an
+        // explicit empty string ("") disables all area-path filtering (project-wide query).
+        var effectiveAreaPath = _config?.AreaPath ?? $@"{project}\{repository}";
+        var lookupData = BuildLookupData(adoData, project, organizationUrl, repository, effectiveAreaPath);
 
         // Determine the target version and hash
         var (toVersion, toHash) = DetermineTargetVersion(version, currentCommitHash.Trim(), lookupData);

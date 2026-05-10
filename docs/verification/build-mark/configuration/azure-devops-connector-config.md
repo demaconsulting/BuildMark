@@ -55,6 +55,27 @@ confirming that known-issues queries are scoped to the specified area.
 
 **Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
 
+##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProjectRepository
+
+**Scenario**: A connector is created with no `AreaPath` configured; the git origin URL resolves to
+project `project` and repository `repo`; `GetBuildInformationAsync` is called; the captured WIQL
+request body is inspected.
+
+**Expected**: The WIQL request body contains `System.AreaPath` scoped to `project\repo`,
+confirming that the default area path is derived from the parsed project and repository names.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
+##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter
+
+**Scenario**: A connector is created with `AreaPath` set to an empty string;
+`GetBuildInformationAsync` is called; the captured WIQL request body is inspected.
+
+**Expected**: The WIQL request body does not contain `System.AreaPath`, confirming that an empty
+area path disables area-path filtering and produces a project-wide query.
+
+**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+
 #### Requirements Coverage
 
 - **`BuildMark-AzureDevOpsConnectorConfig-Properties`**:
@@ -62,3 +83,5 @@ confirming that known-issues queries are scoped to the specified area.
   - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
   - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration
   - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
+  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProjectRepository
+  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter

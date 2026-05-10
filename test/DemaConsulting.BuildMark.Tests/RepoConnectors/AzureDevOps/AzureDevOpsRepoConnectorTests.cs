@@ -831,6 +831,73 @@ public class AzureDevOpsRepoConnectorTests
             "Work item 500 should be reported as a known issue");
     }
 
+    /// <summary>
+    ///     Verify that when AreaPath is not configured the WIQL query defaults to
+    ///     scoping known issues by the parsed project and repository names.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProjectRepository()
+    {
+        // Arrange: origin URL contains "project" and "repo" which will be parsed
+        // as the default area path "project\repo".
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+
+        // No AreaPath configured — connector must derive the default from origin URL
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, null);
+        connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv", "mock-token");
+
+        // Act
+        await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert: WIQL query must be scoped to the default "project\repo" area path.
+        Assert.NotNull(mockHandler.LastWiqlRequestBody);
+        var wiqlBody = JsonSerializer.Deserialize<JsonElement>(mockHandler.LastWiqlRequestBody);
+        var wiqlQuery = wiqlBody.GetProperty("query").GetString();
+        Assert.NotNull(wiqlQuery);
+        Assert.Contains("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
+        Assert.Contains(@"project\repo", wiqlQuery, StringComparison.OrdinalIgnoreCase);
+    }
+
+    /// <summary>
+    ///     Verify that setting AreaPath to an empty string disables area-path filtering,
+    ///     producing a project-wide WIQL query.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter()
+    {
+        // Arrange
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var config = new AzureDevOpsConnectorConfig { AreaPath = string.Empty };
+        var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, config);
+        connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit1");
+        connector.SetCommandResponse("az account get-access-token --resource 499b84ac-1321-427f-aa17-267ca6975798 --query accessToken -o tsv", "mock-token");
+
+        // Act
+        await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
+
+        // Assert: WIQL query must NOT contain any AreaPath filter.
+        Assert.NotNull(mockHandler.LastWiqlRequestBody);
+        var wiqlBody = JsonSerializer.Deserialize<JsonElement>(mockHandler.LastWiqlRequestBody);
+        var wiqlQuery = wiqlBody.GetProperty("query").GetString();
+        Assert.NotNull(wiqlQuery);
+        Assert.DoesNotContain("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
+    }
+
     // ─────────────────────────────────────────────────────────────────────────
     // BuildMark-AzureDevOps-TokenVariable
     // ─────────────────────────────────────────────────────────────────────────
