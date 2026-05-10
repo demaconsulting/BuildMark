@@ -15,7 +15,6 @@ language: en
 # Project-specific technical terms and tool names
 words:
   - ACCESSTOKEN
-  - Behaviour
   - buildmark
   - demaconsulting
   - Dema

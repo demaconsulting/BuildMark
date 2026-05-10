@@ -197,7 +197,7 @@ default works correctly without any configuration for the vast majority of teams
 
 **Scoping summary:**
 
-| `area-path` value | Behaviour |
+| `area-path` value | Behavior |
 | :---------------- | :-------- |
 | Not set (default) | Scoped to `{project}` (the project root area) |
 | Explicit value (e.g. `MyProject\MyRepo`) | Scoped to that area path and all descendants |
