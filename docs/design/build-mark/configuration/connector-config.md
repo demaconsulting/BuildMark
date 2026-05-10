@@ -37,7 +37,7 @@ holds Azure DevOps-specific connection details.
 | `Project`         | `string?` | Azure DevOps project name                                                            |
 | `Repository`      | `string?` | Repository name within the project                                                   |
 | `TokenVariable`   | `string?` | Name of the env variable holding the access token; `null` uses well-known names      |
-| `AreaPath`        | `string?` | Area path for scoping known-issues WIQL queries; defaults to `{Project}` when `null`; empty string disables filtering |
+| `AreaPath`        | `string?` | Scopes WIQL queries to area path; defaults to `{Project}` when `null`; empty = all   |
 
 #### Interactions
 
