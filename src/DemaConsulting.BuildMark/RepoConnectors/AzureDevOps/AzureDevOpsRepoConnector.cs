@@ -104,8 +104,14 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         // Fetch all data from Azure DevOps
         var adoData = await FetchAzureDevOpsDataAsync(restClient, repository);
 
-        // Build lookup dictionaries and mappings
-        var lookupData = BuildLookupData(adoData, project, organizationUrl, repository);
+        // Build lookup dictionaries and mappings.
+        // The effective area path defaults to the project name when not explicitly configured.
+        // Azure DevOps creates an area path for every project by default, so this scopes
+        // known-issues queries to the project's own area hierarchy. Users whose work items
+        // live in a different area can override this with the "area-path" connector option; an
+        // explicit empty string ("") disables all area-path filtering (project-wide query).
+        var effectiveAreaPath = _config?.AreaPath ?? project;
+        var lookupData = BuildLookupData(adoData, project, organizationUrl, repository, effectiveAreaPath);
 
         // Determine the target version and hash
         var (toVersion, toHash) = DetermineTargetVersion(version, currentCommitHash.Trim(), lookupData);
@@ -174,7 +180,8 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         Dictionary<string, string> TagToCommitHash,
         string Project,
         string OrganizationUrl,
-        string Repository);
+        string Repository,
+        string? AreaPath);
 
     /// <summary>
     ///     Fetches all required data from Azure DevOps API in parallel.
@@ -206,8 +213,9 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     /// <param name="project">Azure DevOps project name.</param>
     /// <param name="organizationUrl">Azure DevOps organization URL.</param>
     /// <param name="repository">Azure DevOps repository name.</param>
+    /// <param name="areaPath">Optional area path for scoping known-issues WIQL queries.</param>
     /// <returns>Container with all lookup data structures.</returns>
-    private static LookupData BuildLookupData(AzureDevOpsData data, string project, string organizationUrl, string repository)
+    private static LookupData BuildLookupData(AzureDevOpsData data, string project, string organizationUrl, string repository, string? areaPath = null)
     {
         // Build a set of commit hashes in the current branch
         var branchCommitHashes = data.Commits.Select(c => c.CommitId).ToHashSet(StringComparer.Ordinal);
@@ -236,7 +244,7 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
             .GroupBy(p => p.MergeCommitId!)
             .ToDictionary(g => g.Key, g => g.First());
 
-        return new LookupData(commitHashToPr, tagVersions, tagToCommitHash, project, organizationUrl, repository);
+        return new LookupData(commitHashToPr, tagVersions, tagToCommitHash, project, organizationUrl, repository, areaPath);
     }
 
     /// <summary>
@@ -512,8 +520,15 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
     {
         // Query all bugs and issues — state filtering is applied in code so that resolved
         // bugs with a declared affected-versions range are still considered as known issues.
-        const string wiql = "SELECT [System.Id] FROM workitems " +
-                            "WHERE [System.WorkItemType] IN ('Bug', 'Issue')";
+        // When an area path is configured, scope the query to that area path and its descendants
+        // to avoid returning work items from unrelated repositories or products in the same project.
+        var wiql = "SELECT [System.Id] FROM workitems " +
+                   "WHERE [System.WorkItemType] IN ('Bug', 'Issue')";
+
+        if (!string.IsNullOrEmpty(lookupData.AreaPath))
+        {
+            wiql += $" AND [System.AreaPath] UNDER '{lookupData.AreaPath.Replace("'", "''")}'";
+        }
 
         var queryResult = await restClient.QueryWorkItemsAsync(wiql);
         if (queryResult.WorkItems.Count == 0)

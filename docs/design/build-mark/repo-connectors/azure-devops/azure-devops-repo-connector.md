@@ -154,6 +154,13 @@ Main entry point. Performs the following steps:
     batch-fetch work item details via `GET /wit/workitems?ids={ids}&$expand=all`.
 13. Collect known issues from **all** bugs (resolved and unresolved), via a WIQL
     query, applying item controls from description bodies and custom fields.
+    The effective area path is computed as follows: if `AzureDevOpsConnectorConfig.AreaPath`
+    is `null` (not configured), the connector defaults to the project name. Azure DevOps
+    creates a root area path for every project by default, so this ensures only bugs in the
+    configured project are returned. If `AreaPath` is set to a non-empty string, the query
+    is scoped with `AND [System.AreaPath] UNDER '{AreaPath}'` to restrict results to work items
+    belonging to that area path and its descendants. If `AreaPath` is set to an empty string,
+    no area-path filter is applied and all bugs in the project are considered.
     For each candidate bug:
     - If `AffectedVersions` is declared, the bug is a known issue if and only if
       `AffectedVersions.Contains(toVersion)` is true, regardless of resolved

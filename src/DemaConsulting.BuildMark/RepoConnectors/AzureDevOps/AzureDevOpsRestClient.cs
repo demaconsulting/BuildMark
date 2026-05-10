@@ -266,6 +266,10 @@ internal sealed class AzureDevOpsRestClient : IDisposable
     /// </summary>
     /// <param name="wiql">WIQL query string.</param>
     /// <returns>Work item query result with matching id references.</returns>
+    /// <exception cref="InvalidOperationException">
+    ///     Thrown when the Azure DevOps API returns an error response.
+    ///     The exception message contains the ADO error description (e.g. when the area path does not exist).
+    /// </exception>
     public async Task<AzureDevOpsWorkItemQuery> QueryWorkItemsAsync(string wiql)
     {
         var url = $"{_organizationUrl}/{_project}/_apis/wit/wiql?api-version={ApiVersion}";
@@ -275,10 +279,41 @@ internal sealed class AzureDevOpsRestClient : IDisposable
             "application/json");
 
         var response = await _httpClient.PostAsync(url, content).ConfigureAwait(false);
-        response.EnsureSuccessStatusCode();
+
+        if (!response.IsSuccessStatusCode)
+        {
+            // Try to extract a meaningful error message from the ADO JSON error body.
+            // ADO returns a JSON object with a "message" field on 400/403/404 responses.
+            var errorMessage = await TryReadAdoErrorMessageAsync(response).ConfigureAwait(false);
+            throw new InvalidOperationException(
+                errorMessage ?? $"Azure DevOps WIQL query failed with status {(int)response.StatusCode} ({response.ReasonPhrase}).");
+        }
 
         var result = await response.Content.ReadFromJsonAsync<AzureDevOpsWorkItemQuery>(JsonOptions).ConfigureAwait(false);
         return result ?? new AzureDevOpsWorkItemQuery([]);
+    }
+
+    /// <summary>
+    ///     Attempts to extract a human-readable error message from an Azure DevOps error response body.
+    /// </summary>
+    /// <param name="response">The failed HTTP response.</param>
+    /// <returns>
+    ///     The ADO error message string if the body could be parsed; otherwise <see langword="null"/>.
+    /// </returns>
+    private static async Task<string?> TryReadAdoErrorMessageAsync(HttpResponseMessage response)
+    {
+        try
+        {
+            var error = await response.Content
+                .ReadFromJsonAsync<AzureDevOpsApiError>(JsonOptions)
+                .ConfigureAwait(false);
+            return string.IsNullOrWhiteSpace(error?.Message) ? null : error.Message;
+        }
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
+        {
+            // Expected when the error body is not JSON or does not match the expected schema.
+            return null;
+        }
     }
 
     /// <summary>

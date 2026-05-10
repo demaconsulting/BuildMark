@@ -57,4 +57,28 @@ public sealed record AzureDevOpsConnectorConfig
     ///     (PAT) credential when loaded from a custom variable.
     /// </remarks>
     public string? TokenVariable { get; init; }
+
+    /// <summary>
+    ///     Gets or sets the Area Path used to scope the known-issues WIQL query.
+    /// </summary>
+    /// <remarks>
+    ///     <para>
+    ///         When <see langword="null"/>, the connector automatically scopes the
+    ///         known-issues WIQL query to the ADO project name. Azure DevOps creates a root
+    ///         area path for every project by default, so this restricts results to the
+    ///         project's own work items and prevents bugs from other projects appearing in the
+    ///         generated build notes.
+    ///     </para>
+    ///     <para>
+    ///         Set this property to an explicit value to scope the query to a sub-area — for
+    ///         example, <c>MyProject\MyRepo</c> or <c>MyProject\TeamA\Backend</c>. The
+    ///         connector will then use <c>[System.AreaPath] UNDER '{AreaPath}'</c> to include
+    ///         the specified area and all of its descendants.
+    ///     </para>
+    ///     <para>
+    ///         Set this property to an empty string (<c>""</c>) to disable area-path filtering
+    ///         entirely and query all bugs in the ADO project.
+    ///     </para>
+    /// </remarks>
+    public string? AreaPath { get; init; }
 }

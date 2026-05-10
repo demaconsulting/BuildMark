@@ -164,6 +164,7 @@ back to well-known names or the Azure CLI. An error is raised if the variable is
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
+| `area-path` | No | Area path used to scope known-issues queries. See [Area Path scoping](#area-path-scoping) below. |
 | `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
 
 Example using a custom token variable:
@@ -177,6 +178,75 @@ connector:
     repository: MyRepo
     token-variable: MY_CUSTOM_ADO_TOKEN
 ```
+
+#### Area Path scoping
+
+Azure DevOps (ADO) organizes **work items** (bugs, user stories, tasks) into a separate hierarchy
+called *Area Paths*, independently of how git repositories are named. A project may contain many
+repositories and many area paths, and they do not automatically correspond to each other. The same
+area path can cover bugs for several repositories, or one repository's bugs might be spread across
+multiple area paths — depending entirely on how the team chose to configure ADO.
+
+When BuildMark queries the ADO work-item store for known issues, it must decide which bugs to
+include. Without scoping, the query returns **every open bug in the entire ADO project**, including
+bugs that belong to other products, services, or repositories hosted in the same project.
+
+To avoid that noise, BuildMark automatically scopes the known-issues WIQL query to the **project**
+area path by default. Azure DevOps creates a root area path for every project automatically, so this
+default works correctly without any configuration for the vast majority of teams.
+
+**Scoping summary:**
+
+| `area-path` value | Behavior |
+| :---------------- | :-------- |
+| Not set (default) | Scoped to `{project}` (the project root area) |
+| Explicit value (e.g. `MyProject\MyRepo`) | Scoped to that area path and all descendants |
+| Empty string (`""`) | No scoping — queries all bugs in the ADO project |
+
+**When to override `area-path`:**
+
+- Your team's area hierarchy has sub-areas per repository or product (e.g. `MyProject\MyRepo`).
+  Set `area-path: MyProject\MyRepo` to restrict known issues to that sub-area.
+- A single area path spans multiple repositories and you want all of them included.
+- You manage multiple ADO projects sharing a single BuildMark configuration and need per-project
+  filtering that differs from the default.
+
+**Example — custom area path:**
+
+```yaml
+connector:
+  type: azure-devops
+  azure-devops:
+    url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+    area-path: MyProject\TeamA\Backend   # bugs in this area and all sub-areas
+```
+
+**Example — disable area-path filtering (project-wide):**
+
+```yaml
+connector:
+  type: azure-devops
+  azure-devops:
+    url: https://dev.azure.com/myorg
+    project: MyProject
+    repository: MyRepo
+    area-path: ""   # no filter; returns all bugs in the ADO project
+```
+
+**Invalid area paths:**
+
+If the configured `area-path` does not exist in Azure DevOps, the API returns an error and
+BuildMark will fail with a message like:
+
+```text
+Error: No area nodes were found under 'MyProject\BadPath'. Verify the area path exists.
+```
+
+This message is extracted directly from the Azure DevOps API response. Check that the area path
+is spelled correctly and that it has been created in the ADO project settings before running
+BuildMark again.
 
 ## Report Sections
 

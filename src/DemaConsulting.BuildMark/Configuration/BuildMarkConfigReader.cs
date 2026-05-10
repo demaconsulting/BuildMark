@@ -432,6 +432,7 @@ public static class BuildMarkConfigReader
         string? project = null;
         string? repository = null;
         string? tokenVariable = null;
+        string? areaPath = null;
 
         foreach (var entry in mapping.Children)
         {
@@ -469,6 +470,23 @@ public static class BuildMarkConfigReader
 
                     break;
 
+                case "area-path":
+                    // area-path must be a scalar. Reject non-scalar values (e.g. sequences or mappings)
+                    // so that a mis-typed config produces a clear error rather than silently disabling
+                    // area-path filtering. An explicit empty string ("") is preserved as-is to allow
+                    // the caller to distinguish "empty string (disable filter)" from "absent (use default)".
+                    if (entry.Value is YamlScalarNode areaPathScalar)
+                    {
+                        areaPath = areaPathScalar.Value ?? string.Empty;
+                    }
+                    else
+                    {
+                        AddError(issues, filePath, GetLine(entry.Value),
+                            "Azure DevOps area-path must be a scalar string value.");
+                    }
+
+                    break;
+
                 default:
                     AddError(issues, filePath, GetLine(entry.Key),
                         $"Unsupported Azure DevOps connector key '{key}'.");
@@ -482,7 +500,8 @@ public static class BuildMarkConfigReader
             Organization = organization,
             Project = project,
             Repository = repository,
-            TokenVariable = tokenVariable
+            TokenVariable = tokenVariable,
+            AreaPath = areaPath
         };
     }
 
