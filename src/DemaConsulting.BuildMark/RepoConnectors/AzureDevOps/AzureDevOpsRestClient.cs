@@ -309,7 +309,7 @@ internal sealed class AzureDevOpsRestClient : IDisposable
                 .ConfigureAwait(false);
             return string.IsNullOrWhiteSpace(error?.Message) ? null : error.Message;
         }
-        catch (Exception ex) when (ex is JsonException or NotSupportedException or InvalidOperationException)
+        catch (Exception ex) when (ex is JsonException or NotSupportedException)
         {
             // Expected when the error body is not JSON or does not match the expected schema.
             return null;
