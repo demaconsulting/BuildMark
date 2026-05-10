@@ -105,11 +105,12 @@ public class AzureDevOpsRepoConnector : RepoConnectorBase
         var adoData = await FetchAzureDevOpsDataAsync(restClient, repository);
 
         // Build lookup dictionaries and mappings.
-        // The effective area path defaults to "{project}\{repository}" when not explicitly
-        // configured, scoping known-issues queries to the most likely area. Users whose ADO
-        // area structure differs can override this with the "area-path" connector option; an
+        // The effective area path defaults to the project name when not explicitly configured.
+        // Azure DevOps creates an area path for every project by default, so this scopes
+        // known-issues queries to the project's own area hierarchy. Users whose work items
+        // live in a different area can override this with the "area-path" connector option; an
         // explicit empty string ("") disables all area-path filtering (project-wide query).
-        var effectiveAreaPath = _config?.AreaPath ?? $@"{project}\{repository}";
+        var effectiveAreaPath = _config?.AreaPath ?? project;
         var lookupData = BuildLookupData(adoData, project, organizationUrl, repository, effectiveAreaPath);
 
         // Determine the target version and hash

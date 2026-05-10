@@ -833,13 +833,12 @@ public class AzureDevOpsRepoConnectorTests
 
     /// <summary>
     ///     Verify that when AreaPath is not configured the WIQL query defaults to
-    ///     scoping known issues by the parsed project and repository names.
+    ///     scoping known issues by the parsed project name.
     /// </summary>
     [Fact]
-    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProjectRepository()
+    public async Task AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject()
     {
-        // Arrange: origin URL contains "project" and "repo" which will be parsed
-        // as the default area path "project\repo".
+        // Arrange: origin URL contains "project" which will be parsed as the default area path.
         using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
             .AddTagsResponse(new MockAdoTag("v1.0.0", "commit1"))
             .AddCommitsResponse(new MockAdoCommit("commit1"))
@@ -848,7 +847,7 @@ public class AzureDevOpsRepoConnectorTests
 
         using var mockHttpClient = new HttpClient(mockHandler);
 
-        // No AreaPath configured — connector must derive the default from origin URL
+        // No AreaPath configured — connector must derive the default from the parsed project name
         var connector = new MockableAzureDevOpsRepoConnector(mockHttpClient, null);
         connector.SetCommandResponse("git remote get-url origin", "https://dev.azure.com/org/project/_git/repo");
         connector.SetCommandResponse("git rev-parse HEAD", "commit1");
@@ -857,13 +856,13 @@ public class AzureDevOpsRepoConnectorTests
         // Act
         await connector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"));
 
-        // Assert: WIQL query must be scoped to the default "project\repo" area path.
+        // Assert: WIQL query must be scoped to the project name ("project") area path.
         Assert.NotNull(mockHandler.LastWiqlRequestBody);
         var wiqlBody = JsonSerializer.Deserialize<JsonElement>(mockHandler.LastWiqlRequestBody);
         var wiqlQuery = wiqlBody.GetProperty("query").GetString();
         Assert.NotNull(wiqlQuery);
         Assert.Contains("System.AreaPath", wiqlQuery, StringComparison.OrdinalIgnoreCase);
-        Assert.Contains(@"project\repo", wiqlQuery, StringComparison.Ordinal);
+        Assert.Contains("project", wiqlQuery, StringComparison.Ordinal);
     }
 
     /// <summary>

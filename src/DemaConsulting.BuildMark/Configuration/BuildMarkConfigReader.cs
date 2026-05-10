@@ -471,7 +471,9 @@ public static class BuildMarkConfigReader
                     break;
 
                 case "area-path":
-                    areaPath = value;
+                    // Use raw scalar value so that an explicit empty string ("") is preserved.
+                    // An empty area-path disables filtering; null (absent key) means "use the default".
+                    areaPath = GetScalarValue(entry.Value);
                     break;
 
                 default:

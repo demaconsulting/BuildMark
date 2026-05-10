@@ -191,26 +191,25 @@ When BuildMark queries the ADO work-item store for known issues, it must decide 
 include. Without scoping, the query returns **every open bug in the entire ADO project**, including
 bugs that belong to other products, services, or repositories hosted in the same project.
 
-To avoid that noise, BuildMark automatically scopes the known-issues WIQL query to the area path
-`{project}\{repository}` by default. This is the most common convention — ADO project administrators
-frequently create a top-level area path named after each repository — and it produces correct results
-without any configuration.
+To avoid that noise, BuildMark automatically scopes the known-issues WIQL query to the **project**
+area path by default. Azure DevOps creates a root area path for every project automatically, so this
+default works correctly without any configuration for the vast majority of teams.
 
 **Scoping summary:**
 
 | `area-path` value | Behaviour |
 | :---------------- | :-------- |
-| Not set (default) | Scoped to `{project}\{repository}` |
-| Explicit value (e.g. `MyProject\TeamA\Backend`) | Scoped to that area path and all descendants |
+| Not set (default) | Scoped to `{project}` (the project root area) |
+| Explicit value (e.g. `MyProject\MyRepo`) | Scoped to that area path and all descendants |
 | Empty string (`""`) | No scoping — queries all bugs in the ADO project |
 
 **When to override `area-path`:**
 
-- Your team's area structure does not follow `{project}\{repository}`. For example, if the area
-  path is `MyProject\TeamA` or `MyProject\Product\Backend`, set `area-path` to that value.
+- Your team's area hierarchy has sub-areas per repository or product (e.g. `MyProject\MyRepo`).
+  Set `area-path: MyProject\MyRepo` to restrict known issues to that sub-area.
 - A single area path spans multiple repositories and you want all of them included.
-- You have confirmed that your project contains only one repository and want to query all project
-  bugs without worrying about area paths (set `area-path: ""`).
+- You manage multiple ADO projects sharing a single BuildMark configuration and need per-project
+  filtering that differs from the default.
 
 **Example — custom area path:**
 

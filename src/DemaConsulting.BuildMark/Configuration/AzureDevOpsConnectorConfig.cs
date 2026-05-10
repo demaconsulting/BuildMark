@@ -64,17 +64,16 @@ public sealed record AzureDevOpsConnectorConfig
     /// <remarks>
     ///     <para>
     ///         When <see langword="null"/>, the connector automatically scopes the
-    ///         known-issues WIQL query to <c>{Project}\{Repository}</c>, which is the conventional
-    ///         area path for a single repository inside an ADO project. This prevents bugs that
-    ///         belong to other products or repositories in the same project from appearing in the
+    ///         known-issues WIQL query to the ADO project name. Azure DevOps creates a root
+    ///         area path for every project by default, so this restricts results to the
+    ///         project's own work items and prevents bugs from other projects appearing in the
     ///         generated build notes.
     ///     </para>
     ///     <para>
-    ///         Set this property to an explicit value when your team's area hierarchy does not
-    ///         follow the <c>{Project}\{Repository}</c> convention — for example,
-    ///         <c>MyProject\TeamA\Backend</c>. The connector will then use
-    ///         <c>[System.AreaPath] UNDER '{AreaPath}'</c> to include the specified area and all
-    ///         of its descendants.
+    ///         Set this property to an explicit value to scope the query to a sub-area — for
+    ///         example, <c>MyProject\MyRepo</c> or <c>MyProject\TeamA\Backend</c>. The
+    ///         connector will then use <c>[System.AreaPath] UNDER '{AreaPath}'</c> to include
+    ///         the specified area and all of its descendants.
     ///     </para>
     ///     <para>
     ///         Set this property to an empty string (<c>""</c>) to disable area-path filtering
