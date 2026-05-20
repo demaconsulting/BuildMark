@@ -1,6 +1,6 @@
 ### BuildInformation
 
-#### Overview
+#### Purpose
 
 `BuildInformation` is a record in the BuildNotes subsystem that holds all data
 needed to produce one markdown build-notes report. It is assembled by connectors
@@ -30,7 +30,7 @@ public record BuildInformation(
   optional ordered list of custom report sections populated by `RepoConnectorBase.ApplyRules`
   when routing rules are configured; `null` when no rules are active
 
-#### Methods
+#### Key Methods
 
 ##### `ToMarkdown(headingDepth, includeKnownIssues) → string`
 
@@ -60,6 +60,11 @@ The rendered output contains the following sections:
    in routed mode and after legacy sections in legacy mode.
 4. **Full Changelog** *(optional)* - hyperlink from `CompleteChangelogLink`, emitted
    only when the link is non-null.
+
+#### Error Handling
+
+N/A — `BuildInformation` is an immutable data record. `ToMarkdown` renders content from
+already-validated data and does not throw under normal operation.
 
 #### Interactions
 

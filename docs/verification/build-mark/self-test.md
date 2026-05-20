@@ -1,6 +1,6 @@
 ## SelfTest
 
-### Verification Approach
+### Verification Strategy
 
 The SelfTest subsystem is verified with dedicated subsystem tests in `SelfTestTests.cs`. Tests
 invoke `Validation.Run` through a `Context` constructed with controlled argument arrays, then

@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD025 -->
-
 # Configuration File
 
 BuildMark can be configured with a `.buildmark.yaml` file placed in the repository root. This file

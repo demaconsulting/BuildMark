@@ -1,6 +1,6 @@
 ### ItemInfo
 
-#### Overview
+#### Purpose
 
 `ItemInfo` is a record in the BuildNotes subsystem that represents a single issue
 or pull request entry in the build report. It is produced by connectors and stored
@@ -26,6 +26,10 @@ public record ItemInfo(
 | `Type`             | `string`              | Normalized type: `"bug"`, `"feature"`, or a label name     |
 | `Index`            | `int`                 | Numeric issue/PR number for deterministic sorting          |
 | `AffectedVersions` | `VersionIntervalSet?` | Interval set from the `affected-versions` field, or `null` |
+
+#### Error Handling
+
+N/A — This is an immutable data record with no methods that detect or propagate errors.
 
 #### Interactions
 

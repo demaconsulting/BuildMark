@@ -1,6 +1,6 @@
 ### Validation
 
-#### Overview
+#### Purpose
 
 `Validation` is the sole unit in the SelfTest subsystem. It runs a fixed set of
 self-tests that exercise the core functionality of BuildMark without requiring
@@ -20,7 +20,7 @@ are written to a file at the end of the run.
 A private nested class that creates a temporary directory on construction and
 deletes it (with all contents) on disposal. Used to isolate test artifacts.
 
-#### Methods
+#### Key Methods
 
 ##### `Run(Context context)`
 
@@ -62,6 +62,12 @@ Creates a `MockRepoConnector` configured with routing rules that direct items la
 `bug` to a `bugs` section and all other items to a `features` section. Generates a
 `BuildInformation` record, calls `ToMarkdown`, writes the output to a temporary file,
 and verifies the file contains both `## Features` and `## Bugs` section headings.
+
+#### Error Handling
+
+If `--results` is provided with an unsupported file extension (i.e., neither `.trx` nor
+`.xml`), `Validation.Run` writes an error message via `context.WriteError` and returns
+without writing a file. No exception is propagated to the caller.
 
 #### Interactions
 

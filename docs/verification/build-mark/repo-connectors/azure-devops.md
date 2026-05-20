@@ -1,6 +1,6 @@
 ### Azure DevOps
 
-#### Verification Approach
+#### Verification Strategy
 
 The Azure DevOps sub-subsystem is verified through `AzureDevOpsTests.cs` (5 subsystem-
 level tests), `AzureDevOpsRepoConnectorTests.cs` (25 unit tests),

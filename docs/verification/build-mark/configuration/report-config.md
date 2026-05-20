@@ -12,6 +12,14 @@ correctly parsed or that invalid values produce error issues. No mocking is requ
 | ----------- | -------------------------------------------------------------------- |
 | File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
+#### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig

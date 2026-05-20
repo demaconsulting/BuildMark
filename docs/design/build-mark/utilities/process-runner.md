@@ -1,13 +1,17 @@
 ### ProcessRunner
 
-#### Overview
+#### Purpose
 
 `ProcessRunner` is a static helper class in the Utilities subsystem that executes
 external shell commands and captures their standard output. It provides two public
 methods: `RunAsync`, which throws on failure, and `TryRunAsync`, which returns
 `null` on failure.
 
-#### Methods
+#### Data Model
+
+N/A — `ProcessRunner` is a static utility class with no instance state.
+
+#### Key Methods
 
 ##### `RunAsync(command, params arguments) → string`
 
@@ -41,6 +45,13 @@ the command is invoked directly without a shell wrapper.
 
 Empty or whitespace-only commands are not routed through `cmd /c`, preserving the
 exception behavior for invalid commands.
+
+#### Error Handling
+
+`RunAsync` throws `InvalidOperationException` when the process exits with a non-zero exit
+code or when the command is not found (wrapping `Win32Exception` with a descriptive message).
+`TryRunAsync` catches all exceptions and returns `null` on any failure, never propagating
+exceptions to callers.
 
 #### Interactions
 

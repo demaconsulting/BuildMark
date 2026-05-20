@@ -14,6 +14,14 @@ work item deduplication and version tag handling.
 | ------------------------ | ----------------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the Azure DevOps REST endpoint |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or Azure DevOps token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### AzureDevOpsRepoConnector_Constructor_CreatesInstance

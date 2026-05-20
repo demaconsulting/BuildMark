@@ -13,6 +13,14 @@ handling.
 | ------------------------ | ------------------------------------------------------------ |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the Azure DevOps REST endpoints |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or Azure DevOps token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags

@@ -1,6 +1,6 @@
 ## RepoConnectors
 
-### Verification Approach
+### Verification Strategy
 
 The RepoConnectors subsystem is verified through `RepoConnectorsTests.cs`, which
 contains 33 subsystem-level integration tests. These tests exercise the connector

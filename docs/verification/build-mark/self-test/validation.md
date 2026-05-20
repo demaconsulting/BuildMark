@@ -13,6 +13,14 @@ factory; no further mocking is required.
 | ------------------- | --------------------------------------------------------------------- |
 | `MockRepoConnector` | Supplies connector factory so self-check runs without network access. |
 
+#### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### Validation_Run_WithTrxResultsFile_WritesTrxFile

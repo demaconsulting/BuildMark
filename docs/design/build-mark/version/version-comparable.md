@@ -6,7 +6,7 @@ The `VersionComparable` class provides core semantic version comparison function
 It handles versions in the format `major.minor.patch[-pre-release]` and implements
 proper semantic version ordering rules with optimized performance for pre-release comparison.
 
-#### Structure
+#### Data Model
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
@@ -93,3 +93,14 @@ This pattern matches:
 
 - Required: major.minor.patch numbers
 - Optional: hyphen followed by pre-release identifier
+
+#### Error Handling
+
+`Create(string version)` throws `ArgumentException` when the input string does not match
+the expected `major.minor.patch[-pre-release]` format. `TryCreate(string version)` returns
+`null` instead of throwing, allowing callers to test validity without exception handling.
+Comparison operations on a valid instance never fail.
+
+#### Interactions
+
+Consumed by `VersionSemantic`, `VersionInterval`, and `VersionIntervalSet` for range evaluation.

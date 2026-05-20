@@ -51,9 +51,3 @@ mutable state; each creates its own `MockRepoConnector` instance.
 | `BuildMark_IssueTracking`                | GitHub issue and pull request tracking works correctly                 |
 | `BuildMark_KnownIssuesReporting`         | Known issues are correctly included in the report when requested       |
 | `BuildMark_RulesRouting`                 | Rules-based item routing assigns items to the correct report sections  |
-
-### Error Handling
-
-If `--results` is provided with an unsupported file extension (i.e., neither `.trx` nor `.xml`),
-`Validation.Run` writes an error message via `context.WriteError` and returns without writing a
-file. No exception is propagated to the caller.

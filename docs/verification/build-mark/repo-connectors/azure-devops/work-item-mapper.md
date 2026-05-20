@@ -14,9 +14,17 @@ extraction for visibility and affected-versions controls.
 | -------------------- | ----------------------------------------------------------- |
 | `WorkItem` test data | Constructed in-line with specific types, states, and fields |
 
-##### Test Scenarios
+##### Test Environment
 
-###### WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
+#### Test Scenarios
+
+##### WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
 
 **Scenario**: A work item with type `"Bug"` is mapped.
 

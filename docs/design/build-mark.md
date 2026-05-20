@@ -9,7 +9,7 @@ retrieve commits, issues or work items, pull requests, and version tags, then
 formats the results as a structured markdown report suitable for embedding in
 release documentation.
 
-## System Architecture
+## Architecture
 
 BuildMark is composed of seven subsystems and a top-level entry point:
 
@@ -97,7 +97,7 @@ no subsystems that require isolation from each other for risk-control purposes. 
 subsystems run in the same process and share the same memory address space; no
 inter-process or memory-boundary segregation is required.
 
-## System-Wide Design Constraints
+## Design Constraints
 
 - **Target framework**: .NET 8, .NET 9, and .NET 10
 - **Platform support**: Windows, Linux, macOS

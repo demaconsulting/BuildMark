@@ -207,7 +207,6 @@ sections:
               - BuildMark_Report_ConsumesConfigurationFileDuringGeneration
             children:
               - BuildMark-Configuration-Read
-              - BuildMark-Program-Lint
               - BuildMark-ReportConfig-Properties
 
           - id: BuildMark-Config-Connector

@@ -1,6 +1,6 @@
 #### GitHubRepoConnector
 
-##### Overview
+##### Purpose
 
 `GitHubRepoConnector` is the production unit in the RepoConnectors/GitHub
 subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
@@ -108,7 +108,7 @@ overrides are applied:
 When no `buildmark` block is present, the existing label-based rules apply
 unchanged.
 
-##### Methods
+##### Key Methods
 
 ###### `GetBuildInformationAsync(Version? version) → BuildInformation`
 
@@ -152,6 +152,14 @@ Main entry point. Performs the following steps:
     lists.
 13. Generate the full changelog URL from the baseline and target tags.
 14. Return the assembled `BuildInformation` record.
+
+##### Error Handling
+
+`GetBuildInformationAsync` throws `InvalidOperationException` when no GitHub token can be
+resolved, when no release matches the current commit hash and no version is specified
+explicitly, or when a git command fails. These exceptions propagate to
+`Program.ProcessBuildNotes`, which catches them, writes an error message via
+`context.WriteError`, and returns early without generating a report.
 
 ##### Interactions
 

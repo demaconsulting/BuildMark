@@ -14,6 +14,14 @@ and edge cases such as duplicate commit SHAs and substring label matching.
 | ------------------------ | -------------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the GitHub GraphQL endpoint |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or GitHub token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### GitHubRepoConnector_Constructor_CreatesInstance

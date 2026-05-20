@@ -14,6 +14,14 @@ deserialized data.
 | ------------------------ | ------------------------------------------------------------ |
 | `MockHttpMessageHandler` | Provides JSON payloads whose structure matches the DTO types |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or Azure DevOps token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios (via AzureDevOpsRestClientTests.cs)
 
 ###### AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags

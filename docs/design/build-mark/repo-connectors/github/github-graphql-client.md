@@ -1,6 +1,6 @@
 #### GitHubGraphQLClient
 
-##### Overview
+##### Purpose
 
 `GitHubGraphQLClient` is the GitHub subsystem unit responsible for issuing
 paginated GraphQL requests to the GitHub API and translating the responses into
@@ -28,14 +28,21 @@ Callers that construct `GitHubGraphQLClient` via the public constructor must
 wrap usage in a `using` statement or otherwise dispose the instance to release
 the underlying HTTP connection resources.
 
-##### Error Strategy
+##### Error Handling
 
 All API methods catch exceptions from the underlying `HttpClient` and return
 empty lists rather than propagating the exception to the caller. This allows
 the connector to continue with partial data when the GitHub API is transiently
 unavailable.
 
-##### Methods
+##### Data Model
+
+`GitHubGraphQLClient` holds a single `HttpClient` instance. When constructed via the public
+constructor, the client owns the `HttpClient` and disposes it on disposal. When constructed
+via the internal constructor (for test injection), the caller retains ownership and the client
+does not dispose the injected instance.
+
+##### Key Methods
 
 The client provides methods for retrieving the repository data needed to build a
 `BuildInformation` record:

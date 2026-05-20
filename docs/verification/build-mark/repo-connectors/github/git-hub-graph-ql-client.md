@@ -23,6 +23,14 @@ pagination.
 | ------------------------ | ------------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls; returns controlled JSON payloads |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or GitHub token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds

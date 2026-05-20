@@ -1,6 +1,6 @@
 ### SectionConfig
 
-#### Overview
+#### Purpose
 
 `SectionConfig` is a configuration data model representing a single report section definition
 read from the `sections:` list in `.buildmark.yaml`. Each section has a unique identifier
@@ -12,6 +12,10 @@ used by routing rules and a display title used as the markdown heading.
 |----------|----------|--------------------------------------|
 | `Id`     | `string` | Unique identifier for the section    |
 | `Title`  | `string` | Display title for the report section |
+
+#### Error Handling
+
+N/A — This is an immutable configuration data record with no methods that detect or propagate errors.
 
 #### Interactions
 

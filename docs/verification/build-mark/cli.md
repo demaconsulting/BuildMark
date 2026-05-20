@@ -1,6 +1,6 @@
 ## Cli
 
-### Verification Approach
+### Verification Strategy
 
 The Cli subsystem is verified through `CliTests.cs`, which exercises the `Context`
 class directly by constructing instances with various argument combinations and

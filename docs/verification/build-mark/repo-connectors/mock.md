@@ -1,6 +1,6 @@
 ### Mock
 
-#### Verification Approach
+#### Verification Strategy
 
 The Mock sub-subsystem is verified through `MockTests.cs` (3 subsystem-level tests)
 and `MockRepoConnectorTests.cs` (11 unit tests). The subsystem tests confirm

@@ -33,4 +33,5 @@ This document is intended for:
 
 ## References
 
-- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled requirements, trace matrix, and quality reports
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) —
+  compiled requirements, trace matrix, and quality reports

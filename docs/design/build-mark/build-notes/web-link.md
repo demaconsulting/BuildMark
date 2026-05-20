@@ -1,6 +1,6 @@
 ### WebLink
 
-#### Overview
+#### Purpose
 
 `WebLink` is a record in the BuildNotes subsystem that represents a hyperlink. It
 is used by `BuildInformation` to carry the optional complete-changelog link that
@@ -16,6 +16,10 @@ public record WebLink(
 
 - `LinkText` (`string`) is the human-readable link label shown in the report.
 - `TargetUrl` (`string`) is the fully-qualified URL that the link points to.
+
+#### Error Handling
+
+N/A — This is an immutable data record with no methods that detect or propagate errors.
 
 #### Interactions
 

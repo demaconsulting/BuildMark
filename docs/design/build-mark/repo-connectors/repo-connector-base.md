@@ -1,10 +1,16 @@
 ### IRepoConnector and RepoConnectorBase
 
-#### Overview
+#### Purpose
 
 `IRepoConnector` defines the contract that all repository connectors must satisfy.
 `RepoConnectorBase` is an abstract class implementing `IRepoConnector` and providing
 shared utilities used by concrete connectors.
+
+#### Data Model
+
+`IRepoConnector` is a pure interface with no instance state. `RepoConnectorBase` stores
+the routing rules and section definitions supplied via `Configure(rules, sections)`; these
+are held as internal fields accessible to subclasses via `HasRules` and `ApplyRules`.
 
 #### Interface
 
@@ -61,6 +67,13 @@ Returns the zero-based index if found, or -1 if no semantically equivalent versi
 The `RunCommandAsync` method accepts a command and a `params string[]` arguments
 array, and is `virtual` so that test subclasses can override it with mock
 implementations that return fixed strings without spawning real processes.
+
+#### Error Handling
+
+`RunCommandAsync` propagates `InvalidOperationException` from `ProcessRunner.RunAsync`
+when a shell command fails. `FindVersionIndex` returns `-1` rather than throwing when no
+matching version is found. Error handling for `GetBuildInformationAsync` is delegated to
+concrete implementations.
 
 #### Interactions
 

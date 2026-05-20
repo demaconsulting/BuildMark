@@ -14,6 +14,14 @@ to avoid live API calls where needed.
 | `Context`              | Constructed with controlled arguments and output capture |
 | Connector factory mock | Injected to avoid live API calls                         |
 
+### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ### Test Scenarios
 
 #### Program_Version_ReturnsValidVersion
@@ -87,6 +95,8 @@ to avoid live API calls where needed.
 **Expected**: Error is written to stderr; exit code is 1.
 
 **Requirement coverage**: `BuildMark-Program-ErrorHandling-InvalidBuildVersion`
+
+#### Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode
 
 **Scenario**: `Program.Run` is called but connector factory throws `InvalidOperationException`.
 

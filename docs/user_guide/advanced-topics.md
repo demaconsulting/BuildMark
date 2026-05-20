@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD025 -->
-
 # Common Use Cases
 
 ## CI/CD Integration
@@ -152,12 +150,12 @@ whose `affected-versions` field includes the current build version:
 - [#51](https://github.com/owner/repo/issues/51): UI glitch in dark mode
 ```
 
-## Complete Changelog
+## Full Changelog
 
 Provides a link to the full changelog on GitHub comparing the baseline and current versions:
 
 ```markdown
-## Complete Changelog
+## Full Changelog
 
 [View Full Changelog](https://github.com/owner/repo/compare/v1.2.0...v1.2.3)
 ```

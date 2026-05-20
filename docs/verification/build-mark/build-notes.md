@@ -1,6 +1,6 @@
 ## BuildNotes
 
-### Verification Approach
+### Verification Strategy
 
 `BuildNotes` is the subsystem encompassing `BuildInformation`, `ItemInfo`, and `WebLink`. It is
 verified with dedicated subsystem tests in `BuildNotesTests.cs`. The subsystem uses

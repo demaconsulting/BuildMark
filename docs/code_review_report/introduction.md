@@ -35,4 +35,5 @@ This document is intended for:
 ## References
 
 - [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
-- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) — methodology for continuous compliance evidence generation
+- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) —
+  methodology for continuous compliance evidence generation

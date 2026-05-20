@@ -1,6 +1,6 @@
 ### BuildMarkConfig
 
-#### Overview
+#### Purpose
 
 `BuildMarkConfig` is the top-level configuration data model for BuildMark. It holds all
 settings read from the `.buildmark.yaml` file, including connector configuration, report
@@ -17,6 +17,11 @@ to obtain a default configuration with built-in section and rule definitions.
 | `Report`    | `ReportConfig?`          | Optional report settings; `null` when absent          |
 | `Sections`  | `IList<SectionConfig>`   | Ordered list of report section definitions            |
 | `Rules`     | `IList<RuleConfig>`      | List of item routing rules                            |
+
+#### Error Handling
+
+N/A — `BuildMarkConfig` is a configuration data record. No methods on this type detect
+or propagate errors; all validation occurs in `BuildMarkConfigReader`.
 
 #### Interactions
 

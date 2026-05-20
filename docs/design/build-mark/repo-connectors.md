@@ -55,7 +55,7 @@ infrastructure, and concrete implementations into three layers:
    concrete connector at runtime without the caller needing to know which
    platform is in use.
 
-2. **Base layer**: `RepoConnectorBase` provides shared behaviour inherited by
+2. **Base layer**: `RepoConnectorBase` provides shared behavior inherited by
    all production connectors — token resolution is handled in the concrete
    classes, while `Configure`, `HasRules`, `ApplyRules`, `FindVersionIndex`, and
    `RunCommandAsync` are provided by the base. `ItemControlsParser` and

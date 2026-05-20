@@ -1,6 +1,6 @@
 ## Configuration
 
-### Verification Approach
+### Verification Strategy
 
 The Configuration subsystem is verified with dedicated subsystem tests in
 `ConfigurationSubsystemTests.cs`. Tests create temporary `.buildmark.yaml` files, call

@@ -1,6 +1,6 @@
 ### GitHub
 
-#### Verification Approach
+#### Verification Strategy
 
 The GitHub sub-subsystem is verified through `GitHubTests.cs` (6 subsystem-level
 tests), `GitHubRepoConnectorTests.cs` (22 unit tests), and 5 `GitHubGraphQLClient*Tests.cs`

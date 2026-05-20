@@ -167,5 +167,5 @@ Throughout this document:
 
 ## References
 
-- See the BuildMark User Guide for user-facing documentation.
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled user guide and documentation
 - See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

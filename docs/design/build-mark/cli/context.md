@@ -1,6 +1,6 @@
 ### Context
 
-#### Overview
+#### Purpose
 
 `Context` is the sole unit in the Cli subsystem. It owns the lifecycle of
 command-line argument parsing, console and log-file output, and exit-code tracking.
@@ -39,7 +39,7 @@ so that any open log file is properly flushed and closed.
 |------------|-------|---------------------------------------------------|
 | `ExitCode` | `int` | `0` if no errors have been written; `1` otherwise |
 
-#### Methods
+#### Key Methods
 
 ##### `Create(string[] args) → Context`
 
@@ -87,3 +87,17 @@ iterates over the argument array and classifies each token:
 - `--depth` additionally validates that the value is a positive integer.
 - The legacy `--report-depth` argument is also accepted as an undocumented alias for `--depth`.
 - Any unrecognized token causes `ArgumentException` to be thrown.
+
+#### Error Handling
+
+`Create(string[] args)` throws `ArgumentException` when an unrecognized flag or missing
+value argument is encountered, and `InvalidOperationException` if the log file path cannot
+be opened. `OpenLogFile` throws `InvalidOperationException` if the target directory does
+not exist. `WriteError` sets the internal error flag so that `ExitCode` returns `1` but
+does not throw.
+
+#### Interactions
+
+`Program` creates exactly one `Context` per invocation using `Context.Create(args)` and
+passes it to `Validation`, `BuildMarkConfigReader`, and all connector subsystems. `Context`
+must be disposed after use to flush and close any open log file.

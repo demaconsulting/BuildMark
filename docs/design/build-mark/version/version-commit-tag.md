@@ -1,6 +1,6 @@
 ### VersionCommitTag
 
-#### Overview
+#### Purpose
 
 `VersionCommitTag` is a record in the Version subsystem that pairs a parsed
 `VersionTag` value with the Git commit hash at which that tag was created. It is
@@ -19,6 +19,10 @@ public record VersionCommitTag(
 |--------------|--------------|------------------------------------------------|
 | `VersionTag` | `VersionTag` | Parsed version information for this tag        |
 | `CommitHash` | `string`     | Git commit hash at the point this tag was made |
+
+#### Error Handling
+
+N/A — `VersionCommitTag` is an immutable data record with no methods that detect or propagate errors.
 
 #### Interactions
 

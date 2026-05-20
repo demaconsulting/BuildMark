@@ -1,6 +1,6 @@
 ## Program
 
-### Overview
+### Purpose
 
 `Program` is the top-level unit of BuildMark. It owns the application entry point,
 creates the `Context` object from command-line arguments, and dispatches execution
@@ -23,7 +23,7 @@ The version is resolved at startup by inspecting `AssemblyInformationalVersionAt
 first, then falling back to `assembly.GetName().Version`, and finally defaulting to
 `"0.0.0"` if neither attribute is present.
 
-### Methods
+### Key Methods
 
 #### `Main(string[] args) → int`
 
@@ -96,6 +96,15 @@ Called when any of the `-?`, `-h`, or `--help` flags is set.
 Synchronously invokes `BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory)`.
 Called from both the lint branch of `Run` and from `ProcessBuildNotes` to keep the
 async-to-sync bridging in one place.
+
+### Error Handling
+
+`Main` catches `ArgumentException` and `InvalidOperationException` from `Context`
+construction and writes them directly to `Console.Error`, returning exit code `1`. Any
+other exception is re-thrown. `ProcessBuildNotes` catches file-system exceptions during
+report writing and reports them via `context.WriteError` without propagating the exception;
+`InvalidOperationException` from `connector.GetBuildInformationAsync` is caught, reported,
+and causes early return.
 
 ### Interactions
 

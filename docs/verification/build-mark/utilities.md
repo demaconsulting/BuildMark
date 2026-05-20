@@ -1,12 +1,11 @@
 ## Utilities
 
-### Verification Approach
+### Verification Strategy
 
-The Utilities subsystem is verified through `RepoConnectorsTests.cs` (for
-`ProcessRunner`) and indirectly through `CliTests.cs` (for `PathHelpers` via
-path-related flag handling). There is no dedicated `UtilitiesTests.cs` file;
-coverage is provided by integration-level tests that exercise the utility classes
-as they are used by other units.
+The Utilities subsystem is verified through `PathHelpersTests.cs` (7 unit tests for
+`PathHelpers`) and through `RepoConnectorsTests.cs` (for `ProcessRunner`). There is no
+dedicated `UtilitiesTests.cs` subsystem file; unit coverage is provided by the
+dedicated class-level test files described above.
 
 ### Dependencies
 
@@ -78,3 +77,11 @@ The following integration tests in `RepoConnectorsTests.cs` exercise `ProcessRun
   RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull,
   RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput,
   RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+- **BuildMark-Utilities-PathHelpers**:
+  PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly,
+  PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException,
+  PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException,
+  PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException,
+  PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException,
+  PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException,
+  PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly

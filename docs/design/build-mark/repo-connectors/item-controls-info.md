@@ -1,6 +1,6 @@
 ### ItemControlsInfo
 
-#### Overview
+#### Purpose
 
 `ItemControlsInfo` is the data record used by the RepoConnectors subsystem to
 carry the controls extracted from a `buildmark` block. It stores the optional
@@ -21,6 +21,10 @@ public record ItemControlsInfo(
 - `Type` (`string?`) stores the optional type override (`bug` or `feature`).
 - `AffectedVersions` (`VersionIntervalSet?`) stores the optional
   affected-version interval set.
+
+#### Error Handling
+
+N/A — This is an immutable data record with no methods that detect or propagate errors.
 
 #### Interactions
 

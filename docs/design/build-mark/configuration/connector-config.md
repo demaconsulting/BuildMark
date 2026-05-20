@@ -1,6 +1,6 @@
 ### ConnectorConfig, GitHubConnectorConfig, AzureDevOpsConnectorConfig
 
-#### Overview
+#### Purpose
 
 These three configuration data models define the connector selection and per-connector
 settings read from the `connector:` section of `.buildmark.yaml`.
@@ -9,7 +9,7 @@ settings read from the `connector:` section of `.buildmark.yaml`.
 settings. `GitHubConnectorConfig` holds GitHub-specific overrides. `AzureDevOpsConnectorConfig`
 holds Azure DevOps-specific connection details.
 
-#### Data Models
+#### Data Model
 
 ##### ConnectorConfig
 
@@ -38,6 +38,10 @@ holds Azure DevOps-specific connection details.
 | `Repository`      | `string?` | Repository name within the project                                                   |
 | `TokenVariable`   | `string?` | Name of the env variable holding the access token; `null` uses well-known names      |
 | `AreaPath`        | `string?` | Scopes WIQL queries to area path; defaults to `{Project}` when `null`; empty = all   |
+
+#### Error Handling
+
+N/A — These are immutable configuration data records with no methods that detect or propagate errors.
 
 #### Interactions
 

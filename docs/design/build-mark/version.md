@@ -35,8 +35,9 @@ VersionCommitTag (version + commit hash)
 
 #### Semantic Versioning Compliance
 
-All version processing strictly adheres to Semantic Versioning 2.0.0 (<https://semver.org/>) specification
-to ensure predictable and industry-standard behavior.
+All version processing substantially adheres to Semantic Versioning 2.0.0 (<https://semver.org/>).
+Pre-release identifiers are compared case-insensitively rather than using the ASCII
+case-sensitive sort defined by SemVer 2.0.0.
 
 #### Performance Optimization
 
@@ -59,12 +60,12 @@ The Version subsystem exposes all six unit types as public records or classes.
 The primary interface consumed by other subsystems is:
 
 | Member | Kind | Description |
-|---|---|---|
+| --- | --- | --- |
 | `VersionTag.Create(tag)` | Static method | Parse a repository tag; throws on invalid input |
 | `VersionTag.TryCreate(tag)` | Static method | Parse a repository tag; returns `null` on invalid input |
 | `VersionIntervalSet.Parse(text)` | Static method | Parse a comma-separated set of version intervals |
 | `VersionIntervalSet.Contains(version)` | Method | Test whether a version falls in any interval in the set |
-| `VersionComparable.Create(version)` | Static method | Parse a semantic version for comparison; throws on invalid input |
+| `VersionComparable.Create(version)` | Static method | Parse semantic version for comparison; throws on invalid input |
 | `VersionComparable.TryCreate(version)` | Static method | Parse a semantic version; returns `null` on invalid input |
 
 ### External Interfaces

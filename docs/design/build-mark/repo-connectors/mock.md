@@ -20,7 +20,7 @@ assembly or external tooling.
 The Mock subsystem exposes `MockRepoConnector`, which implements `IRepoConnector`.
 
 | Member | Kind | Description |
-|---|---|---|
+| --- | --- | --- |
 | `MockRepoConnector()` | Constructor | Create the connector with hard-coded in-memory data |
 | `GetBuildInformationAsync(version)` | Method | Return a deterministic `BuildInformation` record from in-memory data |
 

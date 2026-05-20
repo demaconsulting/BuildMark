@@ -56,17 +56,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_VersionFlag_OutputsVersion()
     {
-        // Run the application with --version flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--version");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify version is output
         Assert.False(string.IsNullOrWhiteSpace(output));
         Assert.DoesNotContain("Error", output);
     }
@@ -77,17 +77,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_HelpFlag_OutputsUsageInformation()
     {
-        // Run the application with --help flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify usage information
         Assert.Contains("Usage: buildmark", output);
         Assert.Contains("Options:", output);
         Assert.Contains("--version", output);
@@ -100,7 +100,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_SilentFlag_SuppressesOutput()
     {
-        // Run the application with --silent and --help flags
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -108,10 +110,8 @@ public class IntegrationTests
             "--silent",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify no banner in output
         Assert.DoesNotContain("BuildMark version", output);
     }
 
@@ -121,17 +121,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_InvalidArgument_ShowsError()
     {
-        // Run the application with invalid argument
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--invalid-argument");
 
-        // Verify error exit code
+        // Assert:
         Assert.Equal(1, exitCode);
-
-        // Verify error message
         Assert.Contains("Error:", output);
         Assert.Contains("Unsupported argument", output);
     }
@@ -179,17 +179,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ValidateFlag_RunsSelfValidation()
     {
-        // Run the application with --validate flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--validate");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify validation runs
         Assert.False(string.IsNullOrWhiteSpace(output));
     }
 
@@ -199,7 +199,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_LogParameter_IsAccepted()
     {
-        // Run the application with log parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -207,10 +209,8 @@ public class IntegrationTests
             "--log", "test.log",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -220,7 +220,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ReportParameter_IsAccepted()
     {
-        // Run the application with report parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -228,10 +230,8 @@ public class IntegrationTests
             "--report", "output.md",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -241,7 +241,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_DepthParameter_IsAccepted()
     {
-        // Run the application with depth parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -249,10 +251,8 @@ public class IntegrationTests
             "--depth", "2",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -262,7 +262,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_BuildVersionParameter_IsAccepted()
     {
-        // Run the application with build-version parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -270,10 +272,8 @@ public class IntegrationTests
             "--build-version", "1.0.0",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -283,7 +283,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ResultsParameter_IsAccepted()
     {
-        // Run the application with results parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -291,10 +293,8 @@ public class IntegrationTests
             "--results", "results.trx",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -539,6 +539,8 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_LintFlag_IsAccepted()
     {
+        // Arrange: (no setup required)
+
         // Act: run the application with --lint flag
         var exitCode = Runner.Run(
             out var output,

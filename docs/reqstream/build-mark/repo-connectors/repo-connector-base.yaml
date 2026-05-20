@@ -22,13 +22,14 @@ sections:
 
       - id: BuildMark-RepoConnectorBase-CommandExecution
         title: >-
-          The RepoConnectorBase class shall allow shell command execution to be
-          substituted for testing purposes without spawning real processes.
+          Repository connectors shall execute shell commands and return their output
+          to retrieve repository information.
         justification: |
-          Repository connectors run git and gh CLI commands to retrieve repository
-          information. Tests must be able to substitute controlled responses for those
-          commands to produce deterministic, repeatable results without network or
-          filesystem dependencies.
+          Repository connectors run git and CLI commands to retrieve repository
+          information such as version tags, commit hashes, and remote URLs. The base
+          class centralizes process execution so that all connector implementations
+          consistently invoke commands and propagate their output without duplicating
+          subprocess-management logic.
         tests:
           - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
           - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink

@@ -1,6 +1,6 @@
 ### ItemRouter
 
-#### Overview
+#### Purpose
 
 `ItemRouter` is a shared static utility in the RepoConnectors subsystem that routes
 a list of `ItemInfo` objects into report sections. It applies a list of `RuleConfig`
@@ -10,7 +10,11 @@ routing logic across multiple connector implementations.
 All connectors (GitHub, Azure DevOps, Mock) call `ItemRouter` rather than
 each implementing their own routing.
 
-#### Methods
+#### Data Model
+
+N/A — `ItemRouter` is a static utility class with no instance state.
+
+#### Key Methods
 
 ##### `Route(items, rules, sections) → Dictionary<string, List<ItemInfo>>`
 
@@ -43,7 +47,7 @@ ad-hoc sections without requiring them to be pre-declared.
   Both lists are matched case-insensitively against the item's `Type` field.
   All non-empty filter lists must match for the rule to apply.
 
-###### Error Handling
+#### Error Handling
 
 No explicit error handling is performed. Callers are responsible for passing valid, non-null
 arguments. Duplicate section IDs in the `sections` list will cause an `ArgumentException` from

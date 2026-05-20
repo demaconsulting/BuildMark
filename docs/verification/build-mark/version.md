@@ -1,6 +1,6 @@
 ## Version
 
-### Verification Approach
+### Verification Strategy
 
 The Version subsystem is verified through `VersionTests.cs` (subsystem integration
 tests), plus dedicated unit test files for each version class. The subsystem tests
@@ -58,6 +58,14 @@ requirements have at least one test in the Requirements Coverage mapping.
 
 **Requirement coverage**: `BuildMark-Version-VersionInterval`
 
+#### VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
+
+**Scenario**: `VersionIntervalSet.Parse` is called with a single interval string.
+
+**Expected**: Returns a set containing exactly one `VersionInterval`.
+
+**Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
+
 #### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
 
 **Scenario**: `VersionCommitTag` is constructed with a valid tag and commit hash.
@@ -104,4 +112,5 @@ requirements have at least one test in the Requirements Coverage mapping.
   Version_Subsystem_CreateAllVersionTypes_WorksCorrectly,
   Version_Subsystem_TagToComparableIntegration_WorksCorrectly
 - **BuildMark-Version-VersionInterval**: VersionInterval_Create_ValidInterval_ReturnsVersionInterval
+- **BuildMark-Version-VersionIntervalSet**: VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
 - **BuildMark-Version-VersionCommitTag**: VersionCommitTag_Constructor_ValidParameters_CreatesInstance

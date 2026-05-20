@@ -1,6 +1,6 @@
 ### ConfigurationLoadResult
 
-#### Overview
+#### Purpose
 
 `ConfigurationLoadResult` is an immutable record that carries the output of
 `BuildMarkConfigReader.ReadAsync`. It holds the parsed configuration (or `null` if parsing
@@ -22,6 +22,11 @@ surface any issues to the user and set the exit code when errors are present.
 
 Iterates `Issues` and writes each one to the context output. If any issue has severity
 `Error`, sets `context.ExitCode` to 1.
+
+#### Error Handling
+
+N/A — `ConfigurationLoadResult` is an immutable record. `ReportTo(context)` writes issues
+to the context output and may set the exit code to `1`, but does not throw exceptions.
 
 #### Interactions
 

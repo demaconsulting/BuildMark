@@ -51,7 +51,7 @@ The AzureDevOps subsystem exposes `AzureDevOpsRepoConnector`, which implements
 `IRepoConnector`. All other types in the subsystem are internal.
 
 | Member | Kind | Description |
-|---|---|---|
+| --- | --- | --- |
 | `AzureDevOpsRepoConnector(config)` | Constructor | Create the connector with optional configuration overrides |
 | `GetBuildInformationAsync(version)` | Method | Fetch complete build information from the Azure DevOps REST API |
 

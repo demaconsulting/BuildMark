@@ -22,7 +22,8 @@ Delegate each group to a sub-agent.
 
 - **Root config files** - all non-collection files at the repository root
 - **One group per flat `docs/` folder** - e.g. `docs/build_notes/`, `docs/user_guide/`
-- **One group per system subtree** in `docs/design/`, `docs/verification/`, `docs/reqstream/` - each subtree and all its descendants is one group
+- **One group per system subtree** in `docs/design/`, `docs/verification/`, `docs/reqstream/` -
+  each subtree and all its descendants is one group
 
 # Orchestration
 

@@ -8,7 +8,7 @@ original tag and parsed semantic version. **Critically, VersionTag instances are
 compared based on their semantic version content (VersionComparable), not their
 tag strings, enabling version equality across different tag formats.**
 
-#### Structure
+#### Data Model
 
 | Property | Type            | Description                  |
 |----------|-----------------|------------------------------|
@@ -83,3 +83,13 @@ var tag1 = VersionTag.Create("v1.2.3");
 var tag2 = VersionTag.Create("VER1.2.3");
 // tag1.Semantic.Comparable.Equals(tag2.Semantic.Comparable) == true
 ```
+
+#### Error Handling
+
+`Create(string tag)` throws `ArgumentException` when the tag cannot be parsed into a
+recognizable semantic version format. `TryCreate(string tag)` returns `null` instead of
+throwing. Once constructed, property access and `ToString()` cannot fail.
+
+#### Interactions
+
+Consumed by `VersionCommitTag`, RepoConnectors (for tag parsing), and `Program` (for filtering).

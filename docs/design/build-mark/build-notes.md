@@ -22,9 +22,9 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 
 The primary interface consumed by `Program` is:
 
-| Member                                   | Kind   | Description                                                       |
-|------------------------------------------|--------|-------------------------------------------------------------------|
-| `BuildInformation.ToMarkdown(depth, includeKnownIssues)` | Method | Renders assembled build data as a markdown string |
+| Member | Kind | Description |
+| --- | --- | --- |
+| `BuildInformation.ToMarkdown(depth, includeKnownIssues)` | Method | Renders assembled build data as markdown string |
 
 The data records `BuildInformation`, `ItemInfo`, and `WebLink` are the shared
 output types exposed to all connectors for assembly, and to `Program` and

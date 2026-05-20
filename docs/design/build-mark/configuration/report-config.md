@@ -1,6 +1,6 @@
 ### ReportConfig
 
-#### Overview
+#### Purpose
 
 `ReportConfig` is a configuration data model holding the optional report output settings
 read from the `report:` section of `.buildmark.yaml`. All properties are nullable; when
@@ -13,6 +13,10 @@ absent, `Program` uses CLI argument values or built-in defaults.
 | `File`               | `string?` | Optional output file path override; `null` uses the `--report` CLI argument    |
 | `Depth`              | `int?`    | Optional heading depth for report sections; `null` defaults to 1               |
 | `IncludeKnownIssues` | `bool?`   | Optional flag to include known issues; `null` defaults to `false`              |
+
+#### Error Handling
+
+N/A — This is an immutable configuration data record with no methods that detect or propagate errors.
 
 #### Interactions
 

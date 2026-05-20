@@ -7,7 +7,7 @@ support. As a C# `record`, it provides structural equality by default - two `Ver
 instances are equal when all their properties compare equal. It provides the full semantic
 version structure including build metadata while preserving comparison functionality.
 
-#### Structure
+#### Data Model
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
@@ -53,3 +53,13 @@ var version = VersionSemantic.Create("1.2.3-beta.1+build.123");
 // version.FullVersion = "1.2.3-beta.1+build.123"
 // version.CompareVersion = "1.2.3-beta.1"
 ```
+
+#### Error Handling
+
+`Create(string version)` throws `ArgumentException` for invalid input. `TryCreate(string version)`
+returns `null` instead of throwing. Once constructed, property access and comparison operations
+cannot fail.
+
+#### Interactions
+
+Consumed by `VersionTag` for version extraction from Git tag strings.

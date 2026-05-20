@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD025 -->
-
 # Command-Line Options
 
 | Option | Description |
