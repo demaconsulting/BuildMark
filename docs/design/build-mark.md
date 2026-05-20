@@ -82,6 +82,21 @@ BuildMark is composed of seven subsystems and a top-level entry point:
                    [Markdown Report File]
 ```
 
+## Dependencies
+
+- **YamlDotNet**: used for parsing `.buildmark.yaml` configuration files via the
+  `YamlStream` representation model - see *YamlDotNet Integration Design*
+- **System.Net.Http / System.Net.Http.Json** (.NET built-in): used by
+  `GitHubGraphQLClient` and `AzureDevOpsRestClient` for HTTPS communication with
+  the GitHub GraphQL and Azure DevOps REST APIs
+
+## Risk Control Measures
+
+N/A - BuildMark is a build-tooling utility with no safety-critical functions and
+no subsystems that require isolation from each other for risk-control purposes. All
+subsystems run in the same process and share the same memory address space; no
+inter-process or memory-boundary segregation is required.
+
 ## System-Wide Design Constraints
 
 - **Target framework**: .NET 8, .NET 9, and .NET 10

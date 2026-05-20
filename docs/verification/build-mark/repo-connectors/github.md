@@ -13,6 +13,17 @@ mock HTTP responses. The unit tests are described in the individual unit chapter
 | ------------------------ | ----------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to the GitHub GraphQL API |
 
+#### Test Environment
+
+N/A - standard test environment. All HTTP calls to the GitHub GraphQL API are
+intercepted by `MockHttpMessageHandler`; no live network access is required.
+
+#### Acceptance Criteria
+
+All 6 subsystem tests in `GitHubTests.cs` pass with zero failures. All
+`BuildMark-RepoConnectors-GitHub` requirements have at least one test in the
+Requirements Coverage mapping.
+
 #### Test Scenarios (Subsystem-Level, GitHubTests.cs)
 
 ##### GitHub_ImplementsInterface_ReturnsTrue

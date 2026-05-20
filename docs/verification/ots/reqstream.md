@@ -23,6 +23,15 @@ dotnet reqstream --validate --results artifacts/reqstream-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream itself to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *ReqStream self-validation*: CI pipeline executes
+  `dotnet reqstream --validate --results artifacts/reqstream-self-validation.trx`;
+  expects exit code 0 and a non-empty TRX file containing self-test results.
+- *ReqStream requirements enforcement*: CI pipeline executes ReqStream in enforcement
+  mode (`--enforce`) against the project requirements YAML files and evidence TRX files;
+  expects exit code 0 confirming all requirements are fully satisfied.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-ReqStream**: CI pipeline self-validation TRX evidence from

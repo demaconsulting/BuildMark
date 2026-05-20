@@ -7,6 +7,11 @@ This document contains the requirements trace matrix for the BuildMark project.
 The trace matrix links requirements to their corresponding test cases, ensuring complete
 test coverage and traceability from requirements to implementation.
 
+## Scope
+
+This document covers all requirements defined in `docs/reqstream/` for BuildMark and their
+corresponding test evidence from unit, integration, and self-validation test runs.
+
 ## Test Sources
 
 Requirements traceability in BuildMark uses two types of tests:
@@ -46,3 +51,7 @@ All requirements must have:
 - At least one test case mapped to verify the requirement
 - All mapped tests must pass for the requirement to be satisfied
 - Tests must execute on supported platforms and .NET runtimes
+
+## References
+
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled requirements, trace matrix, and quality reports

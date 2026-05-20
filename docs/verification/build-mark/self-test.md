@@ -13,6 +13,18 @@ repository access is needed.
 | --- | --- |
 | `MockRepoConnector` | Provides a real connector factory that does not require external network access. |
 
+### Test Environment
+
+Tests create temporary directories and results files (`.trx`, `.xml`) under
+`Path.GetTempPath()`. Write access to the system temporary directory is required. No
+network access or external API calls are made; `MockRepoConnector` provides all
+repository data.
+
+### Acceptance Criteria
+
+All tests in `SelfTestTests.cs` pass with zero failures. All `BuildMark-SelfTest-*`
+requirements have at least one test in the Requirements Coverage mapping.
+
 ### Test Scenarios
 
 #### SelfTest_Validation_WithTrxFile_WritesResults

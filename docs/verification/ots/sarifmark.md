@@ -22,6 +22,15 @@ dotnet sarifmark --validate --results artifacts/sarifmark-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *SarifMark self-validation*: CI pipeline executes
+  `dotnet sarifmark --validate --results artifacts/sarifmark-self-validation.trx`;
+  expects exit code 0 and a non-empty TRX file containing self-test results.
+- *SarifMark SARIF report generation*: CI pipeline uses SarifMark to process the CodeQL
+  SARIF output and generate the code quality markdown report; expects exit code 0 and a
+  non-empty markdown report.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-SarifMark**: CI pipeline self-validation TRX evidence from

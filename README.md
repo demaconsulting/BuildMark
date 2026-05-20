@@ -151,6 +151,16 @@ buildmark --validate
 buildmark --validate --results validation-results.trx
 ```
 
+## Building
+
+```pwsh
+pwsh ./build.ps1
+```
+
+## User Guide
+
+See the [BuildMark User Guide](https://github.com/demaconsulting/BuildMark/releases) for full documentation.
+
 ## Configuration File
 
 BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root, with

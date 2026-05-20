@@ -13,6 +13,18 @@ is required; the real file system is used with temporary directories.
 | ----------- | -------------------------------------------------------------------- |
 | File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
 
+### Test Environment
+
+Tests create temporary `.buildmark.yaml` files under `Path.GetTempPath()`. Write access
+to the system temporary directory is required. No network access or external services
+are needed.
+
+### Acceptance Criteria
+
+All tests in `ConfigurationSubsystemTests.cs` pass with zero failures. All
+`BuildMark-Configuration-*` requirements have at least one test in the Requirements
+Coverage mapping.
+
 ### Test Scenarios
 
 #### Configuration_ReadAsync_ValidFile_ReturnsConfiguration

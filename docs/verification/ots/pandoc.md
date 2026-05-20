@@ -23,6 +23,13 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
 `fileassert-code-review.trx`, `fileassert-design.trx`, `fileassert-user-guide.trx`,
 `fileassert-verification.trx`) are consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *Pandoc document conversion*: CI pipeline invokes Pandoc for each document collection
+  (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide, Verification);
+  FileAssert validates the generated HTML output; expects exit code 0 for each invocation
+  and non-empty HTML files containing expected content markers.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-Pandoc**: CI pipeline document generation evidence from multiple

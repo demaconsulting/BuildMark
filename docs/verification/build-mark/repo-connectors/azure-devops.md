@@ -14,6 +14,17 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 | ------------------------ | -------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to the Azure DevOps REST API |
 
+#### Test Environment
+
+N/A - standard test environment. All HTTP calls to the Azure DevOps REST API are
+intercepted by `MockHttpMessageHandler`; no live network access is required.
+
+#### Acceptance Criteria
+
+All 5 subsystem tests in `AzureDevOpsTests.cs` pass with zero failures. All
+`BuildMark-RepoConnectors-AzureDevOps` requirements have at least one test in the
+Requirements Coverage mapping.
+
 #### Test Scenarios (Subsystem-Level, AzureDevOpsTests.cs)
 
 ##### AzureDevOps_ImplementsInterface_ReturnsTrue

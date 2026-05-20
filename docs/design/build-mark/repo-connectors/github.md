@@ -33,6 +33,30 @@ supports GitHub Enterprise by accepting an alternative base URL.
 Internal C# records that mirror the GraphQL schema types returned by GitHub. Used
 as the deserialization target for responses from `GitHubGraphQLClient`.
 
+#### Interfaces
+
+The GitHub subsystem exposes `GitHubRepoConnector`, which implements
+`IRepoConnector`. All other types in the subsystem are internal.
+
+| Member | Kind | Description |
+|---|---|---|
+| `GitHubRepoConnector(config)` | Constructor | Create the connector with optional configuration overrides |
+| `GetBuildInformationAsync(version)` | Method | Fetch complete build information from the GitHub GraphQL API |
+
+#### Design
+
+`GitHubRepoConnector` orchestrates the subsystem's data flow. It uses
+`GitHubGraphQLClient` for all HTTPS communication, `GitHubGraphQLTypes` records
+as GraphQL deserialization targets, and `ItemControlsParser` to extract buildmark
+block overrides from issue and pull request description bodies.
+
+The connector calls `ItemControlsParser.Parse` on the `body` field of each issue
+and pull request. If a non-null `ItemControlsInfo` is returned, the connector
+applies visibility, type, and affected-versions overrides before adding the item
+to the appropriate list. When routing rules have been configured, the connector
+passes all collected items to `ApplyRules` (inherited from `RepoConnectorBase`)
+to populate `BuildInformation.RoutedSections`.
+
 #### Interactions
 
 | Unit / Subsystem        | Role                                                              |

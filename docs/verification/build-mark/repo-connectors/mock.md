@@ -13,6 +13,17 @@ described in the individual unit chapter.
 | ----------- | --------- |
 | None        | Pure mock |
 
+#### Test Environment
+
+N/A - standard test environment. The Mock sub-subsystem has no external dependencies;
+`MockRepoConnector` operates entirely in memory.
+
+#### Acceptance Criteria
+
+All 3 subsystem tests in `MockTests.cs` pass with zero failures. All
+`BuildMark-RepoConnectors-Mock` requirements have at least one test in the Requirements
+Coverage mapping.
+
 #### Test Scenarios (Subsystem-Level, MockTests.cs)
 
 ##### Mock_ImplementsInterface_ReturnsTrue

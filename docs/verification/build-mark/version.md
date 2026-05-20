@@ -14,6 +14,16 @@ are described in the individual unit chapters.
 | ----------- | ---------- |
 | None        | Pure logic |
 
+### Test Environment
+
+N/A - standard test environment. `VersionTests.cs` contains pure logic tests with no
+external dependencies, network access, or file system requirements.
+
+### Acceptance Criteria
+
+All tests in `VersionTests.cs` pass with zero failures. All `BuildMark-Version-*`
+requirements have at least one test in the Requirements Coverage mapping.
+
 ### Test Scenarios
 
 #### VersionComparable_Create_ValidVersions_ReturnsVersionComparable

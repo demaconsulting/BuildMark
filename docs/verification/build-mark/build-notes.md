@@ -13,6 +13,17 @@ doubles are required.
 | ------------------- | -------------------------------------------------------------------- |
 | `MockRepoConnector` | Provides deterministic `BuildInformation` for subsystem-level tests. |
 
+### Test Environment
+
+N/A - standard test environment. `BuildNotesTests.cs` runs within the standard
+`dotnet test` host; no external services, live network, or special configuration
+are required.
+
+### Acceptance Criteria
+
+All tests in `BuildNotesTests.cs` pass with zero failures. All `BuildMark-BuildNotes-*`
+requirements have at least one test in the Requirements Coverage mapping.
+
 ### Test Scenarios
 
 #### BuildNotes_ReportModel_GeneratesCorrectMarkdown

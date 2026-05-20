@@ -14,6 +14,18 @@ as they are used by other units.
 | ------------- | --------------------------------------------------------------------- |
 | None required | `ProcessRunner` tests use real processes; `PathHelpers` is pure logic |
 
+### Test Environment
+
+`ProcessRunner` tests invoke real OS commands (e.g., `git --version`) and therefore
+require a working shell and a `git` executable on the host. Tests run on Windows,
+Ubuntu, and macOS in the CI matrix. `PathHelpers` tests have no external dependencies.
+
+### Acceptance Criteria
+
+All `ProcessRunner` integration tests in `RepoConnectorsTests.cs` pass with zero
+failures on all supported operating systems. All `BuildMark-Utilities-*` requirements
+have at least one test in the Requirements Coverage mapping.
+
 ### Test Scenarios (Integration)
 
 The following integration tests in `RepoConnectorsTests.cs` exercise `ProcessRunner`:

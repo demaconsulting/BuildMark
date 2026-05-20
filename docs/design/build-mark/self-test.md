@@ -23,6 +23,15 @@ as its input parameter.
 |----------------|--------|------------------------------------------------------------|
 | `Run(context)` | Method | Execute all self-tests and optionally write a results file |
 
+### Design
+
+The SelfTest subsystem contains a single unit (`Validation`), so there is no
+inter-unit collaboration to describe. `Validation.Run` executes each self-test
+method in sequence using a `MockRepoConnector` for deterministic data, accumulates
+`TestResult` records, and writes the results file in TRX or JUnit XML format at
+the end of the run. The test methods are independent of each other and share no
+mutable state; each creates its own `MockRepoConnector` instance.
+
 ### Interactions
 
 | Unit / Subsystem    | Role                                                                        |

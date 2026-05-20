@@ -16,6 +16,18 @@ unit tests for sub-components are described in the unit-level chapters.
 | `MockRepoConnector`      | Used directly for factory and base class tests                |
 | `ProcessRunner` (real)   | Used by ProcessRunner tests with actual OS commands           |
 
+### Test Environment
+
+No external network access is required; all HTTP calls to the GitHub GraphQL API and
+Azure DevOps REST API are intercepted by `MockHttpMessageHandler`. Tests run within
+the standard `dotnet test` host.
+
+### Acceptance Criteria
+
+All 33 integration tests in `RepoConnectorsTests.cs` pass with zero failures. All
+`BuildMark-RepoConnectors-*` requirements have at least one test in the Requirements
+Coverage mapping.
+
 ### Test Scenarios
 
 #### RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue

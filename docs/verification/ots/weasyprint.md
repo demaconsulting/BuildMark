@@ -24,6 +24,13 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
 `fileassert-code-review.trx`, `fileassert-design.trx`, `fileassert-user-guide.trx`,
 `fileassert-verification.trx`) are consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *WeasyPrint PDF rendering*: CI pipeline invokes WeasyPrint for each document collection
+  (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide, Verification);
+  FileAssert validates the generated PDF output; expects exit code 0 for each invocation
+  and non-empty PDF files confirmed by FileAssert to contain expected content and metadata.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-WeasyPrint**: CI pipeline document generation evidence from multiple
