@@ -151,6 +151,15 @@ reviews:
       - "src/**/Utilities/ProcessRunner.cs"
       - "test/**/Utilities/ProcessRunnerTests.cs"
 
+  - id: BuildMark-Utilities-TemporaryDirectory
+    title: Review of BuildMark Utilities TemporaryDirectory unit implementation
+    paths:
+      - "docs/reqstream/build-mark/utilities/temporary-directory.yaml"
+      - "docs/design/build-mark/utilities/temporary-directory.md"
+      - "docs/verification/build-mark/utilities/temporary-directory.md"
+      - "src/**/Utilities/TemporaryDirectory.cs"
+      - "test/**/Utilities/TemporaryDirectoryTests.cs"
+
   # BuildMark - Version
   - id: BuildMark-Version
     title: Review that BuildMark Version Satisfies Subsystem Requirements

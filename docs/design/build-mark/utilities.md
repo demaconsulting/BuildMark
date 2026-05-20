@@ -7,16 +7,18 @@ BuildMark system:
 
 - `PathHelpers` for safe path combination with traversal prevention
 - `ProcessRunner` for executing external shell commands
+- `TemporaryDirectory` for disposable temporary directory management
 
 Version parsing, comparison, tag handling, and interval logic are implemented in
 the separate `Version` subsystem.
 
 ### Units
 
-| Unit            | File                        | Responsibility             |
-|-----------------|-----------------------------|----------------------------|
-| `PathHelpers`   | `Utilities/PathHelpers.cs`  | Safe path combination      |
-| `ProcessRunner` | `Utilities/ProcessRunner.cs`| External process execution |
+| Unit                 | File                               | Responsibility                    |
+|----------------------|------------------------------------|-----------------------------------|
+| `PathHelpers`        | `Utilities/PathHelpers.cs`         | Safe path combination             |
+| `ProcessRunner`      | `Utilities/ProcessRunner.cs`       | External process execution        |
+| `TemporaryDirectory` | `Utilities/TemporaryDirectory.cs`  | Disposable temporary directory    |
 
 ### Interfaces
 
@@ -33,10 +35,19 @@ the separate `Version` subsystem.
 | `RunAsync(command, params arguments)`   | Method | Run a process and return stdout; throws on failure      |
 | `TryRunAsync(command, params arguments)`| Method | Run a process and return stdout, or null on any failure |
 
+`TemporaryDirectory` exposes the following members:
+
+| Member                         | Kind        | Description                                                  |
+|--------------------------------|-------------|--------------------------------------------------------------|
+| `TemporaryDirectory()`         | Constructor | Creates a uniquely-named directory under `CurrentDirectory`  |
+| `DirectoryPath`                | Property    | Absolute path to the temporary directory on disk             |
+| `GetFilePath(relativePath)`    | Method      | Resolve a relative path, creating intermediate directories   |
+| `Dispose()`                    | Method      | Delete the directory and all contents; suppress I/O errors   |
+
 ### Design
 
-The Utilities subsystem contains two independent, stateless units with no
-dependencies on each other or on any other BuildMark subsystem:
+The Utilities subsystem contains three units. `PathHelpers` and `ProcessRunner` are
+stateless; `TemporaryDirectory` is instance-based and manages directory lifetime:
 
 - `PathHelpers.SafePathCombine` is a pure function that combines a base path and
   a relative path, normalizes both to absolute form, and rejects the result if the
@@ -50,10 +61,18 @@ dependencies on each other or on any other BuildMark subsystem:
   and factory code that needs to run Git, `gh`, or `az` CLI commands delegates
   to `ProcessRunner` via `RepoConnectorBase.RunCommandAsync`.
 
+- `TemporaryDirectory` creates a uniquely-named directory under
+  `Environment.CurrentDirectory` on construction and deletes it recursively on
+  disposal. `GetFilePath` delegates path validation to `PathHelpers.SafePathCombine`
+  before creating any missing intermediate directories, ensuring all paths remain
+  within the temporary directory.
+
 ### Interactions
 
 `PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
-subsystems. They are consumed by any unit that needs safe path combination or
-external process execution.
+subsystems. `TemporaryDirectory` depends on `PathHelpers.SafePathCombine` for
+path validation in `GetFilePath`. All three units are consumed by any subsystem
+that needs safe path combination, external process execution, or temporary directory
+management.
 
 Version-specific consumers should use the separate `Version` subsystem.

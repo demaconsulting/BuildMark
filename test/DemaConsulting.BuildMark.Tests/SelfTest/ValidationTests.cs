@@ -21,6 +21,7 @@
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.SelfTest;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.SelfTest;
 
@@ -36,51 +37,38 @@ public class ValidationTests
     public void Validation_Run_WithTrxResultsFile_WritesTrxFile()
     {
         // Arrange
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var trxFile = tempDir.GetFilePath("results.trx");
+        var args = new[] { "--validate", "--results", trxFile };
 
+        using var outputWriter = new StringWriter();
+        using var errorWriter = new StringWriter();
+
+        var originalOut = Console.Out;
+        var originalError = Console.Error;
         try
         {
-            var trxFile = Path.Combine(tempDir, "results.trx");
-            var args = new[] { "--validate", "--results", trxFile };
+            // Capture console output
+            Console.SetOut(outputWriter);
+            Console.SetError(errorWriter);
 
-            using var outputWriter = new StringWriter();
-            using var errorWriter = new StringWriter();
+            // Act
+            using var context = Context.Create(args, () => new MockRepoConnector());
+            Validation.Run(context);
 
-            var originalOut = Console.Out;
-            var originalError = Console.Error;
-            try
-            {
-                // Capture console output
-                Console.SetOut(outputWriter);
-                Console.SetError(errorWriter);
+            // Assert - Verify TRX file was created
+            Assert.True(File.Exists(trxFile), "TRX file should be created");
 
-                // Act
-                using var context = Context.Create(args, () => new MockRepoConnector());
-                Validation.Run(context);
-
-                // Assert - Verify TRX file was created
-                Assert.True(File.Exists(trxFile), "TRX file should be created");
-
-                // Verify TRX file contains expected content
-                var trxContent = File.ReadAllText(trxFile);
-                Assert.Contains("TestRun", trxContent);
-                Assert.Contains("BuildMark Self-Validation", trxContent);
-            }
-            finally
-            {
-                // Restore console output
-                Console.SetOut(originalOut);
-                Console.SetError(originalError);
-            }
+            // Verify TRX file contains expected content
+            var trxContent = File.ReadAllText(trxFile);
+            Assert.Contains("TestRun", trxContent);
+            Assert.Contains("BuildMark Self-Validation", trxContent);
         }
         finally
         {
-            // Cleanup
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
+            // Restore console output
+            Console.SetOut(originalOut);
+            Console.SetError(originalError);
         }
     }
 
@@ -91,51 +79,38 @@ public class ValidationTests
     public void Validation_Run_WithXmlResultsFile_WritesJUnitFile()
     {
         // Arrange
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var xmlFile = tempDir.GetFilePath("results.xml");
+        var args = new[] { "--validate", "--results", xmlFile };
 
+        using var outputWriter = new StringWriter();
+        using var errorWriter = new StringWriter();
+
+        var originalOut = Console.Out;
+        var originalError = Console.Error;
         try
         {
-            var xmlFile = Path.Combine(tempDir, "results.xml");
-            var args = new[] { "--validate", "--results", xmlFile };
+            // Capture console output
+            Console.SetOut(outputWriter);
+            Console.SetError(errorWriter);
 
-            using var outputWriter = new StringWriter();
-            using var errorWriter = new StringWriter();
+            // Act
+            using var context = Context.Create(args, () => new MockRepoConnector());
+            Validation.Run(context);
 
-            var originalOut = Console.Out;
-            var originalError = Console.Error;
-            try
-            {
-                // Capture console output
-                Console.SetOut(outputWriter);
-                Console.SetError(errorWriter);
+            // Assert - Verify XML file was created
+            Assert.True(File.Exists(xmlFile), "XML file should be created");
 
-                // Act
-                using var context = Context.Create(args, () => new MockRepoConnector());
-                Validation.Run(context);
-
-                // Assert - Verify XML file was created
-                Assert.True(File.Exists(xmlFile), "XML file should be created");
-
-                // Verify XML file contains expected content
-                var xmlContent = File.ReadAllText(xmlFile);
-                Assert.Contains("testsuites", xmlContent);
-                Assert.Contains("BuildMark Self-Validation", xmlContent);
-            }
-            finally
-            {
-                // Restore console output
-                Console.SetOut(originalOut);
-                Console.SetError(originalError);
-            }
+            // Verify XML file contains expected content
+            var xmlContent = File.ReadAllText(xmlFile);
+            Assert.Contains("testsuites", xmlContent);
+            Assert.Contains("BuildMark Self-Validation", xmlContent);
         }
         finally
         {
-            // Cleanup
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
+            // Restore console output
+            Console.SetOut(originalOut);
+            Console.SetError(originalError);
         }
     }
 
@@ -146,46 +121,33 @@ public class ValidationTests
     public void Validation_Run_WithUnsupportedResultsFileExtension_ShowsError()
     {
         // Arrange
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var unsupportedFile = tempDir.GetFilePath("results.json");
+        var args = new[] { "--validate", "--results", unsupportedFile };
 
+        using var errorWriter = new StringWriter();
+
+        var originalError = Console.Error;
         try
         {
-            var unsupportedFile = Path.Combine(tempDir, "results.json");
-            var args = new[] { "--validate", "--results", unsupportedFile };
+            // Capture console error output
+            Console.SetError(errorWriter);
 
-            using var errorWriter = new StringWriter();
+            // Act
+            using var context = Context.Create(args, () => new MockRepoConnector());
+            Validation.Run(context);
 
-            var originalError = Console.Error;
-            try
-            {
-                // Capture console error output
-                Console.SetError(errorWriter);
+            // Assert - Verify error message in error output (WriteError writes to Console.Error)
+            var output = errorWriter.ToString();
+            Assert.Contains("Unsupported results file format", output);
 
-                // Act
-                using var context = Context.Create(args, () => new MockRepoConnector());
-                Validation.Run(context);
-
-                // Assert - Verify error message in error output (WriteError writes to Console.Error)
-                var output = errorWriter.ToString();
-                Assert.Contains("Unsupported results file format", output);
-
-                // Assert - Verify exit code is 1 when an error is reported
-                Assert.True(context.ExitCode == 1);
-            }
-            finally
-            {
-                // Restore console error output
-                Console.SetError(originalError);
-            }
+            // Assert - Verify exit code is 1 when an error is reported
+            Assert.True(context.ExitCode == 1);
         }
         finally
         {
-            // Cleanup
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
+            // Restore console error output
+            Console.SetError(originalError);
         }
     }
 

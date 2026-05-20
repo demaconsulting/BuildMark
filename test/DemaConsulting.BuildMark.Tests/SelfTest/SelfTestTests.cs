@@ -21,6 +21,7 @@
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
 using DemaConsulting.BuildMark.SelfTest;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.SelfTest;
 
@@ -36,32 +37,19 @@ public class SelfTestTests
     public void SelfTest_Validation_WithTrxFile_WritesResults()
     {
         // Arrange: create a temporary directory and define a TRX results file path
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var trxFile = tempDir.GetFilePath("results.trx");
+        var args = new[] { "--validate", "--results", trxFile, "--silent" };
 
-        try
-        {
-            var trxFile = Path.Combine(tempDir, "results.trx");
-            var args = new[] { "--validate", "--results", trxFile, "--silent" };
+        // Act: run the validation subsystem
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
 
-            // Act: run the validation subsystem
-            using var context = Context.Create(args, () => new MockRepoConnector());
-            Validation.Run(context);
-
-            // Assert: TRX file was created and contains expected content
-            Assert.True(File.Exists(trxFile), "TRX file should be created");
-            var trxContent = File.ReadAllText(trxFile);
-            Assert.Contains("TestRun", trxContent);
-            Assert.Contains("BuildMark Self-Validation", trxContent);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
-        }
+        // Assert: TRX file was created and contains expected content
+        Assert.True(File.Exists(trxFile), "TRX file should be created");
+        var trxContent = File.ReadAllText(trxFile);
+        Assert.Contains("TestRun", trxContent);
+        Assert.Contains("BuildMark Self-Validation", trxContent);
     }
 
     /// <summary>
@@ -71,32 +59,19 @@ public class SelfTestTests
     public void SelfTest_Validation_WithXmlFile_WritesResults()
     {
         // Arrange: create a temporary directory and define an XML results file path
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var xmlFile = tempDir.GetFilePath("results.xml");
+        var args = new[] { "--validate", "--results", xmlFile, "--silent" };
 
-        try
-        {
-            var xmlFile = Path.Combine(tempDir, "results.xml");
-            var args = new[] { "--validate", "--results", xmlFile, "--silent" };
+        // Act: run the validation subsystem
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
 
-            // Act: run the validation subsystem
-            using var context = Context.Create(args, () => new MockRepoConnector());
-            Validation.Run(context);
-
-            // Assert: XML file was created and contains expected content
-            Assert.True(File.Exists(xmlFile), "XML file should be created");
-            var xmlContent = File.ReadAllText(xmlFile);
-            Assert.Contains("testsuites", xmlContent);
-            Assert.Contains("BuildMark Self-Validation", xmlContent);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
-        }
+        // Assert: XML file was created and contains expected content
+        Assert.True(File.Exists(xmlFile), "XML file should be created");
+        var xmlContent = File.ReadAllText(xmlFile);
+        Assert.Contains("testsuites", xmlContent);
+        Assert.Contains("BuildMark Self-Validation", xmlContent);
     }
 
     /// <summary>
@@ -106,31 +81,18 @@ public class SelfTestTests
     public void SelfTest_ResultsOutput_WithTrxFile_CreatesFile()
     {
         // Arrange: create a temporary directory and define a TRX results file path
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var trxFile = tempDir.GetFilePath("output.trx");
+        var args = new[] { "--validate", "--results", trxFile, "--silent" };
 
-        try
-        {
-            var trxFile = Path.Combine(tempDir, "output.trx");
-            var args = new[] { "--validate", "--results", trxFile, "--silent" };
+        // Act: run validation and check results file creation
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
 
-            // Act: run validation and check results file creation
-            using var context = Context.Create(args, () => new MockRepoConnector());
-            Validation.Run(context);
-
-            // Assert: results file exists and has non-zero content
-            Assert.True(File.Exists(trxFile), "TRX results file should be created");
-            var fileInfo = new FileInfo(trxFile);
-            Assert.True(fileInfo.Length > 0, "TRX results file should have content");
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
-        }
+        // Assert: results file exists and has non-zero content
+        Assert.True(File.Exists(trxFile), "TRX results file should be created");
+        var fileInfo = new FileInfo(trxFile);
+        Assert.True(fileInfo.Length > 0, "TRX results file should have content");
     }
 
     /// <summary>
@@ -140,31 +102,18 @@ public class SelfTestTests
     public void SelfTest_ResultsOutput_WithXmlFile_CreatesFile()
     {
         // Arrange: create a temporary directory and define an XML results file path
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var xmlFile = tempDir.GetFilePath("output.xml");
+        var args = new[] { "--validate", "--results", xmlFile, "--silent" };
 
-        try
-        {
-            var xmlFile = Path.Combine(tempDir, "output.xml");
-            var args = new[] { "--validate", "--results", xmlFile, "--silent" };
+        // Act: run validation and check results file creation
+        using var context = Context.Create(args, () => new MockRepoConnector());
+        Validation.Run(context);
 
-            // Act: run validation and check results file creation
-            using var context = Context.Create(args, () => new MockRepoConnector());
-            Validation.Run(context);
-
-            // Assert: results file exists and has non-zero content
-            Assert.True(File.Exists(xmlFile), "XML results file should be created");
-            var fileInfo = new FileInfo(xmlFile);
-            Assert.True(fileInfo.Length > 0, "XML results file should have content");
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
-        }
+        // Assert: results file exists and has non-zero content
+        Assert.True(File.Exists(xmlFile), "XML results file should be created");
+        var fileInfo = new FileInfo(xmlFile);
+        Assert.True(fileInfo.Length > 0, "XML results file should have content");
     }
 
     /// <summary>
@@ -174,34 +123,21 @@ public class SelfTestTests
     public void SelfTest_Qualification_WithoutResultsFile_Succeeds()
     {
         // Arrange: create a temporary directory and define a log file path (no results file)
-        var tempDir = Path.Combine(Path.GetTempPath(), $"buildmark_subsystem_test_{Guid.NewGuid()}");
-        Directory.CreateDirectory(tempDir);
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("validation.log");
+        var args = new[] { "--validate", "--log", logFile, "--silent" };
 
-        try
+        // Act: run the validation subsystem without specifying --results.
+        // Dispose the context before reading the log file to release the file lock.
+        using (var context = Context.Create(args, () => new MockRepoConnector()))
         {
-            var logFile = Path.Combine(tempDir, "validation.log");
-            var args = new[] { "--validate", "--log", logFile, "--silent" };
-
-            // Act: run the validation subsystem without specifying --results.
-            // Dispose the context before reading the log file to release the file lock.
-            using (var context = Context.Create(args, () => new MockRepoConnector()))
-            {
-                Validation.Run(context);
-            }
-
-            // Assert: validation ran and produced log output; no results file was created
-            Assert.True(File.Exists(logFile), "Log file should be created");
-            var logContent = File.ReadAllText(logFile);
-            Assert.Contains("BuildMark Self-validation", logContent);
-            Assert.Contains("Total Tests:", logContent);
+            Validation.Run(context);
         }
-        finally
-        {
-            // Cleanup temporary directory
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, true);
-            }
-        }
+
+        // Assert: validation ran and produced log output; no results file was created
+        Assert.True(File.Exists(logFile), "Log file should be created");
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("BuildMark Self-validation", logContent);
+        Assert.Contains("Total Tests:", logContent);
     }
 }

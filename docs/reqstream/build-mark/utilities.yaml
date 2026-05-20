@@ -3,7 +3,7 @@
 #
 # PURPOSE:
 # - Define requirements for the BuildMark Utilities subsystem
-# - The Utilities subsystem spans PathHelpers.cs and ProcessRunner.cs
+# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs, and TemporaryDirectory.cs
 # - Subsystem requirements describe the shared utility behavior available to all other subsystems
 
 sections:
@@ -37,3 +37,19 @@ sections:
           - Utilities_ProcessRunner_FailingCommand_ThrowsException
         children:
           - BuildMark-ProcessRunner-RunAsync
+
+      - id: BuildMark-Utilities-TemporaryDirectory
+        title: The Utilities subsystem shall provide a disposable temporary directory for isolating file-system artifacts.
+        justification: |
+          Multiple subsystems need a safe, isolated location to write temporary files during
+          self-test and integration operations. Placing TemporaryDirectory in the shared
+          Utilities subsystem ensures consistent creation, path-safety, and cleanup behavior
+          across all consumers, without each caller reimplementing ad-hoc temporary-file logic.
+        tests:
+          - TemporaryDirectory_Constructor_CreatesDirectory
+          - TemporaryDirectory_Dispose_DeletesDirectory
+        children:
+          - BuildMark-TemporaryDirectory-Creation
+          - BuildMark-TemporaryDirectory-FilePath
+          - BuildMark-TemporaryDirectory-Traversal
+          - BuildMark-TemporaryDirectory-Cleanup

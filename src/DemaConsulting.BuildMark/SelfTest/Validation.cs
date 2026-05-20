@@ -307,8 +307,8 @@ internal static class Validation
         try
         {
             using var tempDir = new TemporaryDirectory();
-            var logFile = PathHelpers.SafePathCombine(tempDir.DirectoryPath, $"{testName}.log");
-            var reportFile = reportFileName != null ? PathHelpers.SafePathCombine(tempDir.DirectoryPath, reportFileName) : null;
+            var logFile = tempDir.GetFilePath($"{testName}.log");
+            var reportFile = reportFileName != null ? tempDir.GetFilePath(reportFileName) : null;
 
             // Build command line arguments
             List<string> args =
@@ -466,51 +466,5 @@ internal static class Validation
         test.Outcome = DemaConsulting.TestResults.TestOutcome.Failed;
         test.ErrorMessage = $"Exception: {ex.Message}";
         context.WriteError($"✗ {displayName} - Failed: {ex.Message}");
-    }
-
-    /// <summary>
-    ///     Represents a temporary directory that is automatically deleted when disposed.
-    /// </summary>
-    private sealed class TemporaryDirectory : IDisposable
-    {
-        /// <summary>
-        ///     Gets the path to the temporary directory.
-        /// </summary>
-        public string DirectoryPath { get; }
-
-        /// <summary>
-        ///     Initializes a new instance of the <see cref="TemporaryDirectory"/> class.
-        /// </summary>
-        public TemporaryDirectory()
-        {
-            DirectoryPath = PathHelpers.SafePathCombine(Path.GetTempPath(), $"buildmark_validation_{Guid.NewGuid()}");
-
-            try
-            {
-                Directory.CreateDirectory(DirectoryPath);
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException)
-            {
-                throw new InvalidOperationException($"Failed to create temporary directory: {ex.Message}", ex);
-            }
-        }
-
-        /// <summary>
-        ///     Deletes the temporary directory and all its contents.
-        /// </summary>
-        public void Dispose()
-        {
-            try
-            {
-                if (Directory.Exists(DirectoryPath))
-                {
-                    Directory.Delete(DirectoryPath, true);
-                }
-            }
-            catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
-            {
-                // Ignore cleanup errors during disposal
-            }
-        }
     }
 }

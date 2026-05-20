@@ -15,11 +15,6 @@ The unit is invoked by `Program.Run` when the `--validate` flag is set.
 its helpers. Test results are accumulated in a list of `TestResult` records that
 are written to a file at the end of the run.
 
-##### `TemporaryDirectory` Helper
-
-A private nested class that creates a temporary directory on construction and
-deletes it (with all contents) on disposal. Used to isolate test artifacts.
-
 #### Key Methods
 
 ##### `Run(Context context)`
@@ -75,5 +70,5 @@ without writing a file. No exception is propagated to the caller.
 - `MockRepoConnector` supplies deterministic data for all tests in the
   `RepoConnectors/Mock` subsystem.
 - `BuildInformation` is the test target validated against expected content.
-- `PathHelpers` is used directly, for example through `SafePathCombine`, to
-  build temporary, log, and report file paths.
+- `TemporaryDirectory` (Utilities subsystem) provides temporary directory management
+  for test artifact isolation in `RunMarkdownReportGeneration` and `RunRulesRouting`.
