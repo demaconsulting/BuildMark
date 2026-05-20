@@ -21,12 +21,14 @@ public record VersionIntervalSet(
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `Parse(string text)` | Parses a comma-separated list of interval expressions into a `VersionIntervalSet`; discards unrecognized tokens silently |
-| `Contains(string version)` | Tests whether a semantic version string falls within any interval in the set; returns `false` for invalid version strings |
-| `Contains(VersionComparable version)` | Tests whether a `VersionComparable` instance falls within any interval in the set |
-| `Contains(VersionTag version)` | Convenience overload delegating to `Contains(VersionComparable)` using `version.Semantic.Comparable` |
+- `Parse(string text)` — Parses a comma-separated list of interval expressions into a
+  `VersionIntervalSet`; discards unrecognized tokens silently
+- `Contains(string version)` — Tests whether a semantic version string falls within
+  any interval in the set; returns `false` for invalid version strings
+- `Contains(VersionComparable version)` — Tests whether a `VersionComparable` instance
+  falls within any interval in the set
+- `Contains(VersionTag version)` — Convenience overload delegating to
+  `Contains(VersionComparable)` using `version.Semantic.Comparable`
 
 See _VersionInterval and VersionIntervalSet Design_ for the full algorithmic descriptions of
 each method.
@@ -42,8 +44,8 @@ propagating a parse error.
 
 | Unit / Subsystem     | Role                                                                     |
 |----------------------|--------------------------------------------------------------------------|
-| `VersionInterval`    | Each element of `Intervals`; `Contains` overloads delegate to it     |
-| `VersionComparable`  | Used by `Contains(VersionComparable)` for ordered semantic comparison   |
-| `VersionTag`         | Accepted by the `Contains(VersionTag)` convenience overload             |
-| `ItemControlsParser` | Creates `VersionIntervalSet` from the `affected-versions` field value |
-| `ItemControlsInfo`   | Holds the `VersionIntervalSet` for the `affected-versions` field      |
+| `VersionInterval`    | Each element of `Intervals`; `Contains` overloads delegate to it         |
+| `VersionComparable`  | Used by `Contains(VersionComparable)` for ordered semantic comparison    |
+| `VersionTag`         | Accepted by the `Contains(VersionTag)` convenience overload              |
+| `ItemControlsParser` | Creates `VersionIntervalSet` from the `affected-versions` field value    |
+| `ItemControlsInfo`   | Holds the `VersionIntervalSet` for the `affected-versions` field         |

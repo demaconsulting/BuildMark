@@ -773,6 +773,7 @@ public class GitHubRepoConnectorTests
         // Assert - Connector is still a valid instance after configuration
         Assert.NotNull(connector);
         Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.True(connector.HasRules, "HasRules should return true after Configure is called with rules");
     }
 
     /// <summary>

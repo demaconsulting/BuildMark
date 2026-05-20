@@ -110,6 +110,14 @@ Generic wrapper for paginated collection responses from the Azure DevOps REST AP
 
 Fields: `count`, `value` (list of `T`)
 
+###### `AzureDevOpsApiError`
+
+Error response body returned by the Azure DevOps REST API when a request fails.
+Used by `AzureDevOpsRestClient.TryReadAdoErrorMessageAsync` to extract a human-readable
+error message from non-success HTTP responses.
+
+Fields: `message`, `typeKey`
+
 ##### Key Methods
 
 N/A — `AzureDevOpsApiTypes` is a collection of immutable record types used purely for JSON

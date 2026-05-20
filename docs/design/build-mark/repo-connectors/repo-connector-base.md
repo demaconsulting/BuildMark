@@ -14,13 +14,20 @@ are held as internal fields accessible to subclasses via `HasRules` and `ApplyRu
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `Configure(rules, sections)` | Stores routing rules and section definitions on the connector instance; called by `Program.ProcessBuildNotes` before the first `GetBuildInformationAsync` call |
-| `HasRules` | Protected property returning `true` when at least one rule has been stored via `Configure` |
-| `ApplyRules(allItems)` | Protected method routing items via `ItemRouter.Route`, then assembling an ordered list of `(SectionId, SectionTitle, Items)` tuples following configured section order |
-| `FindVersionIndex(versions, targetVersion)` | Protected static method finding the index of `targetVersion` in a `VersionTag` list using semantic `VersionComparable` equality; returns `-1` if not found |
-| `RunCommandAsync(command, args)` | Protected virtual method delegating shell commands to `ProcessRunner.RunAsync`; `virtual` so test subclasses can override without spawning real processes |
+- `Configure(rules, sections)` — Stores routing rules and section definitions on the
+  connector instance; called by `Program.ProcessBuildNotes` before the first
+  `GetBuildInformationAsync` call
+- `HasRules` — Protected property returning `true` when at least one rule has been
+  stored via `Configure`
+- `ApplyRules(allItems)` — Protected method routing items via `ItemRouter.Route`,
+  then assembling an ordered list of `(SectionId, SectionTitle, Items)` tuples
+  following configured section order
+- `FindVersionIndex(versions, targetVersion)` — Protected static method finding the
+  index of `targetVersion` in a `VersionTag` list using semantic `VersionComparable`
+  equality; returns `-1` if not found
+- `RunCommandAsync(command, args)` — Protected virtual method delegating shell commands
+  to `ProcessRunner.RunAsync`; `virtual` so test subclasses can override without
+  spawning real processes
 
 #### Interface
 

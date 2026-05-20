@@ -56,7 +56,7 @@ Fetches repository metadata for the specified repository.
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=6.0`
 
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
-remote URL.
+remote URL. Returns `null` when the repository cannot be found (HTTP 404).
 
 ###### `GetTagsAsync(repositoryId)`
 
@@ -123,6 +123,17 @@ HTTP and deserialization errors from the underlying `HttpClient` are propagated 
 `AzureDevOpsRepoConnector`. Network failures, authentication errors (HTTP 401/403), and
 malformed JSON responses result in exceptions that propagate up to
 `Program.ProcessBuildNotes`.
+
+`GetRepositoryAsync` additionally throws `InvalidOperationException` when the HTTP
+response is successful but JSON deserialization returns `null` (the `result ?? throw`
+pattern). This guards against a response body that is valid JSON but does not
+deserialize into the expected `AzureDevOpsRepository` record.
+
+When an HTTP error response includes a JSON body in the Azure DevOps error format, the
+internal `TryReadAdoErrorMessageAsync` helper deserializes the body into an
+`AzureDevOpsApiError` record and extracts the `message` field to include in the thrown
+`InvalidOperationException`. This provides a human-readable error description (e.g.,
+`"The area path does not exist."`) rather than a raw HTTP status code.
 
 ##### Interactions
 

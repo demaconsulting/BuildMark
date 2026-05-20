@@ -25,8 +25,6 @@ The following record types are defined for GitHub GraphQL request and response s
 - **Commit nodes**: records carrying commit SHAs from GraphQL commit range queries
 - **Pagination types**: `PageInfo`, connection, and edge wrapper types carrying `endCursor`
   and `hasNextPage` fields for cursor-based pagination across all paginated queries
-- **Request payload types**: GraphQL query request wrappers used to serialize requests to
-  the GitHub API endpoint
 
 ##### Key Methods
 

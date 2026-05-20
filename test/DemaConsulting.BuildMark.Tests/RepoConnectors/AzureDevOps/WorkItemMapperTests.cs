@@ -22,8 +22,9 @@ using DemaConsulting.BuildMark.RepoConnectors.AzureDevOps;
 
 namespace DemaConsulting.BuildMark.Tests.RepoConnectors.AzureDevOps;
 
-/// <inheritdoc/>
-/// <inheritdoc/>
+/// <summary>
+///     Unit tests for the WorkItemMapper class.
+/// </summary>
 public class WorkItemMapperTests
 {
     // ─────────────────────────────────────────────────────────────────────────
@@ -50,6 +51,25 @@ public class WorkItemMapperTests
     }
 
     /// <summary>
+    ///     Verify that Issue work item type maps to a bug ItemInfo.
+    /// </summary>
+    [Fact]
+    public void WorkItemMapper_MapWorkItemToItemInfo_IssueType_ReturnsBugItem()
+    {
+        // Arrange:
+        var workItem = CreateWorkItem(100, "An issue", "Issue", "Active");
+
+        // Act:
+        var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/100", 1);
+
+        // Assert:
+        Assert.NotNull(itemInfo);
+        Assert.Equal("100", itemInfo.Id);
+        Assert.Equal("An issue", itemInfo.Title);
+        Assert.Equal("bug", itemInfo.Type);
+    }
+
+    /// <summary>
     ///     Verify that User Story work item type maps to a feature ItemInfo.
     /// </summary>
     [Fact]
@@ -65,6 +85,25 @@ public class WorkItemMapperTests
         Assert.NotNull(itemInfo);
         Assert.Equal("101", itemInfo.Id);
         Assert.Equal("A user story", itemInfo.Title);
+        Assert.Equal("feature", itemInfo.Type);
+    }
+
+    /// <summary>
+    ///     Verify that Feature work item type maps to a feature ItemInfo.
+    /// </summary>
+    [Fact]
+    public void WorkItemMapper_MapWorkItemToItemInfo_FeatureType_ReturnsFeatureItem()
+    {
+        // Arrange:
+        var workItem = CreateWorkItem(104, "A feature", "Feature", "Active");
+
+        // Act:
+        var itemInfo = WorkItemMapper.MapWorkItemToItemInfo(workItem, "https://example.com/104", 5);
+
+        // Assert:
+        Assert.NotNull(itemInfo);
+        Assert.Equal("104", itemInfo.Id);
+        Assert.Equal("A feature", itemInfo.Title);
         Assert.Equal("feature", itemInfo.Type);
     }
 
@@ -267,3 +306,4 @@ public class WorkItemMapperTests
         return new AzureDevOpsWorkItem(id, fields);
     }
 }
+

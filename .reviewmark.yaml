@@ -402,7 +402,7 @@ reviews:
   - id: BuildMark-RepoConnectors-AzureDevOps
     title: Review that BuildMark RepoConnectors AzureDevOps Satisfies Sub-Subsystem Requirements
     paths:
-      - "docs/reqstream/build-mark/repo-connectors/azure-devops/azure-devops.yaml"
+      - "docs/reqstream/build-mark/repo-connectors/azure-devops.yaml"
       - "docs/design/build-mark/repo-connectors/azure-devops.md"
       - "docs/verification/build-mark/repo-connectors/azure-devops.md"
       - "test/**/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs"

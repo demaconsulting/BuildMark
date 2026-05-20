@@ -20,9 +20,9 @@ to obtain a default configuration with built-in section and rule definitions.
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `CreateDefault()` | Static factory returning a `BuildMarkConfig` populated with built-in section and rule definitions, used when no `.buildmark.yaml` file is present |
+- `CreateDefault()` — Static factory returning a `BuildMarkConfig` populated with
+  built-in section and rule definitions, used when no `.buildmark.yaml` file is
+  present
 
 #### Error Handling
 

@@ -92,8 +92,7 @@ internal static class WorkItemMapper
         var controls = ExtractItemControls(workItem);
 
         // Exclude item if visibility is "internal"
-        var forceInclude = controls?.Visibility == "public";
-        if (!forceInclude && controls?.Visibility == "internal")
+        if (controls?.Visibility == "internal")
         {
             return null;
         }

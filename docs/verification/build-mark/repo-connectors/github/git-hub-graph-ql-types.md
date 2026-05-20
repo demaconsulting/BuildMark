@@ -29,7 +29,7 @@ All tests in the test class pass with no errors or warnings.
 
 **Expected**: Issue DTOs contain the expected fields including `body`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
 
@@ -37,7 +37,7 @@ All tests in the test class pass with no errors or warnings.
 
 **Expected**: Pull request DTOs contain the expected fields including `body`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
 
@@ -45,9 +45,9 @@ All tests in the test class pass with no errors or warnings.
 
 **Expected**: Tag node DTOs contain `name` and target commit hash fields.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-GitHubGraphQLTypes**: Verified indirectly through all
-  41 tests in the `GitHubGraphQLClient*Tests.cs` files
+- **BuildMark-GitHub-GraphQLClient**: Verified indirectly through all
+  49 tests in the `GitHubGraphQLClient*Tests.cs` files

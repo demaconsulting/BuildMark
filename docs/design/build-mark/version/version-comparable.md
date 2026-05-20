@@ -20,11 +20,12 @@ proper semantic version ordering rules with optimized performance for pre-releas
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `Create(string version)` | Parses a `major.minor.patch[-pre-release]` string; throws `ArgumentException` on invalid input |
-| `TryCreate(string version)` | Parses a version string; returns `null` on invalid input instead of throwing |
-| `CompareTo(VersionComparable other)` | Implements `IComparable<VersionComparable>` using numeric major/minor/patch comparison followed by SemVer pre-release ordering |
+- `Create(string version)` — Parses a `major.minor.patch[-pre-release]` string;
+  throws `ArgumentException` on invalid input
+- `TryCreate(string version)` — Parses a version string; returns `null` on invalid
+  input instead of throwing
+- `CompareTo(VersionComparable other)` — Implements `IComparable<VersionComparable>`
+  using numeric major/minor/patch comparison followed by SemVer pre-release ordering
 
 `Create` and `TryCreate` use a source-generated `Regex` pattern to validate and parse the
 input. Pre-release segments are split at construction time by `ParsePreReleaseSegments` into a

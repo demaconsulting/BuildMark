@@ -137,5 +137,6 @@ match identifiers defined in the ReqStream YAML files under `docs/reqstream/`.
 
 ## References
 
-- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled design, requirements, and compliance documents
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) —
+  compiled design, requirements, and compliance documents
 - See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

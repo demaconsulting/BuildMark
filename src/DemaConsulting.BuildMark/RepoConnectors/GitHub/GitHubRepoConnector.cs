@@ -121,10 +121,20 @@ public class GitHubRepoConnector : RepoConnectorBase
         var branch = await RunCommandAsync("git", "rev-parse", "--abbrev-ref", "HEAD");
         var currentCommitHash = await RunCommandAsync("git", "rev-parse", "HEAD");
 
-        // Parse owner and repo from URL
-        var (parsedOwner, parsedRepo) = ParseGitHubUrl(repoUrl);
-        var owner = _config?.Owner ?? parsedOwner;
-        var repo = _config?.Repo ?? parsedRepo;
+        // Parse owner and repo from URL, using config values directly if available
+        string owner, repo;
+        if (!string.IsNullOrEmpty(_config?.Owner) && !string.IsNullOrEmpty(_config?.Repo))
+        {
+            owner = _config.Owner;
+            repo = _config.Repo;
+        }
+        else
+        {
+            // Fall back to parsing owner and repo from the remote URL
+            var (parsedOwner, parsedRepo) = ParseGitHubUrl(repoUrl);
+            owner = _config?.Owner ?? parsedOwner;
+            repo = _config?.Repo ?? parsedRepo;
+        }
 
         // Get GitHub token
         var token = await GetGitHubTokenAsync();
@@ -937,16 +947,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Item type string.</returns>
     private static string GetTypeFromLabels(IReadOnlyList<IssueLabelInfo> labels)
     {
-        // Find first matching label type by checking label names against the type map
-        var matchingType = labels
-            .Select(label => label.Name.ToLowerInvariant())
-            .SelectMany(lowerLabel => LabelTypeMap
-                .Where(kvp => lowerLabel == kvp.Key)
-                .Select(kvp => kvp.Value))
-            .FirstOrDefault();
-
-        // Return matched type or default to "other"
-        return matchingType ?? "other";
+        return GetTypeFromLabelNames(labels.Select(l => l.Name));
     }
 
     /// <summary>
@@ -956,9 +957,19 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <returns>Item type string.</returns>
     private static string GetTypeFromLabels(IReadOnlyList<PullRequestLabelInfo> labels)
     {
+        return GetTypeFromLabelNames(labels.Select(l => l.Name));
+    }
+
+    /// <summary>
+    ///     Determines item type from a sequence of label names.
+    /// </summary>
+    /// <param name="names">Label name strings.</param>
+    /// <returns>Item type string, defaulting to "other" when no match is found.</returns>
+    private static string GetTypeFromLabelNames(IEnumerable<string> names)
+    {
         // Find first matching label type by checking label names against the type map
-        var matchingType = labels
-            .Select(label => label.Name.ToLowerInvariant())
+        var matchingType = names
+            .Select(name => name.ToLowerInvariant())
             .SelectMany(lowerLabel => LabelTypeMap
                 .Where(kvp => lowerLabel == kvp.Key)
                 .Select(kvp => kvp.Value))

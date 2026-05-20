@@ -67,7 +67,8 @@ Steps:
 3. Apply work item type mapping to determine the normalized type.
 4. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
 5. If item controls specify a visibility of `internal`, return `null` to signal that
-   the item should be excluded.
+   the item should be excluded. Items with `visibility: public` (or no visibility
+   override) are included normally; there is no separate "force include" logic.
 6. If item controls specify a type override, apply it to the normalized type.
 7. Construct and return the `ItemInfo` record with the title, url, type, and
    affected versions.

@@ -81,3 +81,13 @@ populate `BuildInformation.RoutedSections`.
 | `AzureDevOpsConnectorConfig`  | Supplies organization URL, project, and repository overrides              |
 | `ItemControlsParser`          | Parses buildmark blocks from work item description bodies                 |
 | `BuildInformation`            | The output record assembled and returned by `AzureDevOpsRepoConnector`    |
+
+#### Error Handling
+
+`AzureDevOpsRestClient` propagates HTTP errors and JSON deserialization failures as
+`InvalidOperationException`. The exception message includes the Azure DevOps error
+message read via `TryReadAdoErrorMessageAsync` when the response body contains an
+Azure DevOps error object; otherwise the raw HTTP status code is included.
+
+`AzureDevOpsRepoConnector` does not suppress these exceptions; a failed REST API call
+therefore aborts `GetBuildInformationAsync` and propagates the exception to the caller.

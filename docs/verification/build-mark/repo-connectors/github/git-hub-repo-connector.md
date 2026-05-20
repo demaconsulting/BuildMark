@@ -3,7 +3,7 @@
 ##### Verification Approach
 
 `GitHubRepoConnector` is tested through `GitHubRepoConnectorTests.cs`, which contains
-22 unit tests. The tests exercise constructor behavior (with and without config),
+25 unit tests. The tests exercise constructor behavior (with and without config),
 the full `GetBuildInformationAsync` pipeline with various scenarios, visibility and
 type overrides, routing configuration, known issues filtering by affected versions,
 and edge cases such as duplicate commit SHAs and substring label matching.
@@ -48,7 +48,7 @@ equals `"https://api.github.com"`.
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-RepoConnectorBase-Interface`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
 
@@ -204,7 +204,58 @@ classification.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
 
+###### GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+
+**Scenario**: `GetBuildInformationAsync` is called with a `GitHubConnectorConfig` that
+specifies a `TokenVariable` name; the environment variable is set to a non-empty token.
+
+**Expected**: Build information is returned successfully, confirming the custom token
+variable was resolved and used without throwing.
+
+**Requirement coverage**: `BuildMark-GitHub-TokenVariable`
+
+###### GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+
+**Scenario**: `GetBuildInformationAsync` is called with a `TokenVariable` config whose
+corresponding environment variable is set to an empty string.
+
+**Expected**: `InvalidOperationException` is thrown.
+
+**Requirement coverage**: `BuildMark-GitHub-TokenVariable`
+
+###### GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+
+**Scenario**: `GetBuildInformationAsync` is called with a `TokenVariable` config whose
+corresponding environment variable is not set (null).
+
+**Expected**: `InvalidOperationException` is thrown.
+
+**Requirement coverage**: `BuildMark-GitHub-TokenVariable`
+
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-IRepoConnector**: GitHubRepoConnector_ImplementsInterface_ReturnsTrue
-- **BuildMark-RepoConnectors-GitHub**: All remaining 21 tests in `GitHubRepoConnectorTests.cs`
+- **BuildMark-RepoConnectorBase-Interface**: GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+- **BuildMark-GitHub-ConnectorConfig**: GitHubRepoConnector_Constructor_CreatesInstance,
+  GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+- **BuildMark-GitHub-BuildInformation**: GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation,
+  GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink,
+  GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly,
+  GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues,
+  GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash,
+  GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases,
+  GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash,
+  GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline,
+  GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow,
+  GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug,
+  GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue,
+  GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions,
+  GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+- **BuildMark-GitHub-ItemControls**: GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem,
+  GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem,
+  GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug,
+  GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+- **BuildMark-GitHub-Rules**: GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue,
+  GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+- **BuildMark-GitHub-TokenVariable**: GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable,
+  GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException,
+  GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

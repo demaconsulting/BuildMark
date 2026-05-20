@@ -21,7 +21,7 @@ sections:
           requests, and work items, apply item-controls overrides from buildmark blocks and
           custom fields, and assemble them into structured build information.
         tests:
-          - AzureDevOps_ImplementsInterface_ReturnsTrue
+          - AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface
           - AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
           - AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
           - AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues

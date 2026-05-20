@@ -17,11 +17,13 @@ tag strings, enabling version equality across different tag formats.**
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `Create(string tag)` | Parses a repository tag string and extracts the embedded semantic version; throws `ArgumentException` when no recognizable semantic version can be found |
-| `TryCreate(string tag)` | Parses a repository tag string; returns `null` when no semantic version can be extracted instead of throwing |
-| `ToString()` | Returns the original `Tag` string verbatim, preserving the repository tag format for display and logging |
+- `Create(string tag)` — Parses a repository tag string and extracts the embedded
+  semantic version; throws `ArgumentException` when no recognizable semantic version
+  can be found
+- `TryCreate(string tag)` — Parses a repository tag string; returns `null` when no
+  semantic version can be extracted instead of throwing
+- `ToString()` — Returns the original `Tag` string verbatim, preserving the repository
+  tag format for display and logging
 
 The parsing algorithm strips known prefix patterns (e.g., `v`, `ver`, `release/`) and then
 attempts `VersionSemantic.TryCreate` on the remainder. Equality between `VersionTag`

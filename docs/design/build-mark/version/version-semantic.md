@@ -17,10 +17,10 @@ version structure including build metadata while preserving comparison functiona
 
 #### Key Methods
 
-| Method | Description |
-|--------|-------------|
-| `Create(string version)` | Parses a full semantic version string including optional `+metadata`; throws `ArgumentException` on invalid input |
-| `TryCreate(string version)` | Parses a full semantic version string; returns `null` on invalid input instead of throwing |
+- `Create(string version)` — Parses a full semantic version string including optional
+  `+metadata`; throws `ArgumentException` on invalid input
+- `TryCreate(string version)` — Parses a full semantic version string; returns `null`
+  on invalid input instead of throwing
 
 Both methods split the input on `+` (using `Split('+', 2)`) to separate the core version from
 optional build metadata, then delegate the core version part to `VersionComparable.TryCreate`.

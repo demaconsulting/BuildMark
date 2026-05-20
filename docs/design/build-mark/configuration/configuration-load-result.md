@@ -18,7 +18,7 @@ surface any issues to the user and set the exit code when errors are present.
 | `HasErrors`         | Property | `true` when any issue has `Severity` of `Error`          |
 | `ReportTo(context)` | Method   | Writes all issues to `Context`; sets exit code on errors |
 
-##### `ReportTo(Context context)`
+##### ReportTo Overview
 
 Iterates `Issues` and writes each one to the context output. If any issue has severity
 `Error`, sets `context.ExitCode` to 1.
