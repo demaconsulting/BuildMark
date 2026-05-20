@@ -15,6 +15,19 @@ version structure including build metadata while preserving comparison functiona
 | Metadata | string? | Build metadata (+metadata), or `null` when absent |
 | FullVersion | string | Complete version string (major.minor.patch\[-pre-release\]\[+metadata\]) |
 
+#### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `Create(string version)` | Parses a full semantic version string including optional `+metadata`; throws `ArgumentException` on invalid input |
+| `TryCreate(string version)` | Parses a full semantic version string; returns `null` on invalid input instead of throwing |
+
+Both methods split the input on `+` (using `Split('+', 2)`) to separate the core version from
+optional build metadata, then delegate the core version part to `VersionComparable.TryCreate`.
+An empty metadata segment is normalized to `null`. Comparison operations delegate entirely to
+the wrapped `Comparable` instance; build metadata does not affect ordering per the SemVer
+specification.
+
 #### Delegated Properties
 
 For convenience, the following properties delegate to the `Comparable` instance:

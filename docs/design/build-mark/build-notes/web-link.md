@@ -17,6 +17,11 @@ public record WebLink(
 - `LinkText` (`string`) is the human-readable link label shown in the report.
 - `TargetUrl` (`string`) is the fully-qualified URL that the link points to.
 
+#### Key Methods
+
+N/A — `WebLink` is an immutable data record with no methods beyond those auto-generated
+by C#.
+
 #### Error Handling
 
 N/A — This is an immutable data record with no methods that detect or propagate errors.

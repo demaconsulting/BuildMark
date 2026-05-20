@@ -23,6 +23,14 @@ surface any issues to the user and set the exit code when errors are present.
 Iterates `Issues` and writes each one to the context output. If any issue has severity
 `Error`, sets `context.ExitCode` to 1.
 
+#### Key Methods
+
+##### `ReportTo(Context context)`
+
+Iterates `Issues` and writes each one to the context output. Issues with `Error` severity
+are written via `context.WriteError`, which sets the exit code to `1`. Non-error issues are
+written via `context.WriteLine`. Does not throw exceptions.
+
 #### Error Handling
 
 N/A — `ConfigurationLoadResult` is an immutable record. `ReportTo(context)` writes issues

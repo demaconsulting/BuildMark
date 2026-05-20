@@ -27,6 +27,11 @@ public record ItemInfo(
 | `Index`            | `int`                 | Numeric issue/PR number for deterministic sorting          |
 | `AffectedVersions` | `VersionIntervalSet?` | Interval set from the `affected-versions` field, or `null` |
 
+#### Key Methods
+
+N/A — `ItemInfo` is an immutable data record with no methods beyond those auto-generated
+by C#.
+
 #### Error Handling
 
 N/A — This is an immutable data record with no methods that detect or propagate errors.

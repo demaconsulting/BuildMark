@@ -18,6 +18,12 @@ to obtain a default configuration with built-in section and rule definitions.
 | `Sections`  | `IList<SectionConfig>`   | Ordered list of report section definitions            |
 | `Rules`     | `IList<RuleConfig>`      | List of item routing rules                            |
 
+#### Key Methods
+
+| Method | Description |
+|--------|-------------|
+| `CreateDefault()` | Static factory returning a `BuildMarkConfig` populated with built-in section and rule definitions, used when no `.buildmark.yaml` file is present |
+
 #### Error Handling
 
 N/A — `BuildMarkConfig` is a configuration data record. No methods on this type detect

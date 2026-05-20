@@ -110,6 +110,11 @@ Generic wrapper for paginated collection responses from the Azure DevOps REST AP
 
 Fields: `count`, `value` (list of `T`)
 
+##### Key Methods
+
+N/A — `AzureDevOpsApiTypes` is a collection of immutable record types used purely for JSON
+deserialization. No methods beyond C#-generated record members are defined.
+
 ##### Error Handling
 
 N/A — These are immutable data record types used purely for JSON deserialization. No
