@@ -56,7 +56,7 @@ Fetches repository metadata for the specified repository.
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=6.0`
 
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
-remote URL. Returns `null` when the repository cannot be found (HTTP 404).
+remote URL. Throws when the request is unsuccessful (including HTTP 404).
 
 ###### `GetTagsAsync(repositoryId)`
 

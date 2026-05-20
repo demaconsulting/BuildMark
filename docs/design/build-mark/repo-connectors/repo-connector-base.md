@@ -17,7 +17,7 @@ are held as internal fields accessible to subclasses via `HasRules` and `ApplyRu
 - `Configure(rules, sections)` — Stores routing rules and section definitions on the
   connector instance; called by `Program.ProcessBuildNotes` before the first
   `GetBuildInformationAsync` call
-- `HasRules` — Protected property returning `true` when at least one rule has been
+- `HasRules` — Internal property returning `true` when at least one rule has been
   stored via `Configure`
 - `ApplyRules(allItems)` — Protected method routing items via `ItemRouter.Route`,
   then assembling an ordered list of `(SectionId, SectionTitle, Items)` tuples
@@ -44,7 +44,7 @@ are held as internal fields accessible to subclasses via `HasRules` and `ApplyRu
 | Member                                   | Kind              | Description                                           |
 |------------------------------------------|-------------------|-------------------------------------------------------|
 | `Configure(rules, sections)`             | Public method     | Stores routing rules and section definitions          |
-| `HasRules`                               | Protected bool    | True when at least one rule has been configured       |
+| `HasRules`                               | Internal bool     | True when at least one rule has been configured       |
 | `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules     |
 | `RunCommandAsync(command, args)`         | Protected virtual | Delegates shell commands to ProcessRunner             |
 | `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality               |
@@ -57,7 +57,7 @@ by `Program.ProcessBuildNotes` after the connector is created, passing `Rules` a
 
 ##### `HasRules`
 
-Protected boolean property that returns `true` when at least one rule has been
+Internal boolean property that returns `true` when at least one rule has been
 stored via `Configure`. Concrete connectors use this in `GetBuildInformationAsync`
 to decide whether to call `ApplyRules` or use legacy categorization.
 
