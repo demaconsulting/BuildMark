@@ -121,9 +121,9 @@ public class GitHubRepoConnector : RepoConnectorBase
         var branch = await RunCommandAsync("git", "rev-parse", "--abbrev-ref", "HEAD");
         var currentCommitHash = await RunCommandAsync("git", "rev-parse", "HEAD");
 
-        // Parse owner and repo from URL, using config values directly if available
+        // Parse owner and repo from URL, using non-empty config overrides when available
         string owner, repo;
-        if (!string.IsNullOrEmpty(_config?.Owner) && !string.IsNullOrEmpty(_config?.Repo))
+        if (!string.IsNullOrWhiteSpace(_config?.Owner) && !string.IsNullOrWhiteSpace(_config?.Repo))
         {
             owner = _config.Owner;
             repo = _config.Repo;
@@ -132,8 +132,8 @@ public class GitHubRepoConnector : RepoConnectorBase
         {
             // Fall back to parsing owner and repo from the remote URL
             var (parsedOwner, parsedRepo) = ParseGitHubUrl(repoUrl);
-            owner = _config?.Owner ?? parsedOwner;
-            repo = _config?.Repo ?? parsedRepo;
+            owner = string.IsNullOrWhiteSpace(_config?.Owner) ? parsedOwner : _config.Owner;
+            repo = string.IsNullOrWhiteSpace(_config?.Repo) ? parsedRepo : _config.Repo;
         }
 
         // Get GitHub token

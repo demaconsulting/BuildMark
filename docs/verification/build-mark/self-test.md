@@ -15,8 +15,9 @@ repository access is needed.
 
 ### Test Environment
 
-Tests create temporary directories and results files (`.trx`, `.xml`) under
-`Path.GetTempPath()`. Write access to the system temporary directory is required. No
+Tests create temporary directories and results files (`.trx`, `.xml`) through
+`TemporaryDirectory`, which creates a unique `tmp-*` subdirectory under the current
+working directory. Write access to the current working directory is required. No
 network access or external API calls are made; `MockRepoConnector` provides all
 repository data.
 

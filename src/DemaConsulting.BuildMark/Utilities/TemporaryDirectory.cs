@@ -98,22 +98,20 @@ internal sealed class TemporaryDirectory : IDisposable
     ///     Deletes the temporary directory and all its contents.
     /// </summary>
     /// <remarks>
-    ///     <see cref="IOException"/> and <see cref="UnauthorizedAccessException"/> are
-    ///     intentionally suppressed during disposal. Cleanup failures are non-fatal: the
-    ///     operating system or the user's temp-folder maintenance process will eventually
-    ///     reclaim the directory, and allowing an exception to escape from
-    ///     <c>Dispose</c> would break <c>using</c> blocks and mask the original outcome.
+    ///     <see cref="IOException"/>, <see cref="UnauthorizedAccessException"/>, and
+    ///     <see cref="DirectoryNotFoundException"/> are intentionally suppressed during
+    ///     disposal. Cleanup failures are non-fatal: the operating system or the user's
+    ///     temp-folder maintenance process will eventually reclaim the directory, and
+    ///     allowing an exception to escape from <c>Dispose</c> would break
+    ///     <c>using</c> blocks and mask the original outcome.
     /// </remarks>
     public void Dispose()
     {
         try
         {
-            if (Directory.Exists(DirectoryPath))
-            {
-                Directory.Delete(DirectoryPath, recursive: true);
-            }
+            Directory.Delete(DirectoryPath, recursive: true);
         }
-        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or DirectoryNotFoundException)
         {
             // Ignore cleanup errors during disposal
         }

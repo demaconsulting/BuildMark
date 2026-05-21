@@ -9,15 +9,16 @@ is required; the real file system is used with temporary directories.
 
 ### Dependencies
 
-| Mock / Stub | Reason                                                               |
-| ----------- | -------------------------------------------------------------------- |
-| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
+| Mock / Stub | Reason                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files via `TemporaryDirectory` in the current working directory. |
 
 ### Test Environment
 
-Tests create temporary `.buildmark.yaml` files under `Path.GetTempPath()`. Write access
-to the system temporary directory is required. No network access or external services
-are needed.
+Tests create temporary `.buildmark.yaml` files through `TemporaryDirectory`, which
+creates a unique `tmp-*` subdirectory under the current working directory. Write
+access to the current working directory is required. No network access or external
+services are needed.
 
 ### Acceptance Criteria
 
