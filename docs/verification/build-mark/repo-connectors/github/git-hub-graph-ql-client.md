@@ -2,7 +2,7 @@
 
 ##### Verification Approach
 
-`GitHubGraphQLClient` is tested through five dedicated test files, each covering one
+`GitHubGraphQLClient` is tested through six dedicated test files, each covering one
 query method. All tests use `MockHttpMessageHandler` to intercept HTTP requests and
 return controlled JSON responses. Tests cover successful responses, empty data,
 missing required properties, HTTP errors, invalid JSON, single-item responses, and
@@ -23,6 +23,14 @@ pagination.
 | ------------------------ | ------------------------------------------------------- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls; returns controlled JSON payloads |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or GitHub token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
@@ -31,7 +39,7 @@ pagination.
 
 **Expected**: Returns the list of issue IDs extracted from the response.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_NoIssues_ReturnsEmptyList
 
@@ -39,7 +47,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_MissingData_ReturnsEmptyList
 
@@ -47,7 +55,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_HttpError_ReturnsEmptyList
 
@@ -55,7 +63,7 @@ pagination.
 
 **Expected**: Returns an empty list without throwing.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_InvalidJson_ReturnsEmptyList
 
@@ -63,7 +71,7 @@ pagination.
 
 **Expected**: Returns an empty list without throwing.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_SingleIssue_ReturnsOneIssueId
 
@@ -71,7 +79,7 @@ pagination.
 
 **Expected**: Returns a list with one issue ID.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_MissingNumberProperty_SkipsInvalidNodes
 
@@ -79,7 +87,7 @@ pagination.
 
 **Expected**: Invalid node is skipped; valid nodes are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues
 
@@ -87,7 +95,7 @@ pagination.
 
 **Expected**: All pages are fetched and all issue IDs are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssues
 
@@ -95,7 +103,7 @@ pagination.
 
 **Expected**: Returns all issues from the response.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_NoIssues_ReturnsEmptyList
 
@@ -103,7 +111,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_MissingData_ReturnsEmptyList
 
@@ -111,7 +119,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_NullNodes_ReturnsEmptyList
 
@@ -119,7 +127,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_InvalidIssues_FiltersThemOut
 
@@ -127,7 +135,7 @@ pagination.
 
 **Expected**: Invalid issues are filtered out; valid issues are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues
 
@@ -135,7 +143,7 @@ pagination.
 
 **Expected**: All pages are fetched and all issues are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_Exception_ReturnsEmptyList
 
@@ -143,7 +151,7 @@ pagination.
 
 **Expected**: Returns an empty list without re-throwing.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
 
@@ -151,7 +159,7 @@ pagination.
 
 **Expected**: Returned issues include the body content.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
 
@@ -159,7 +167,7 @@ pagination.
 
 **Expected**: Returns all tag nodes from the response.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_NoTags_ReturnsEmptyList
 
@@ -167,7 +175,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_MissingData_ReturnsEmptyList
 
@@ -175,7 +183,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_HttpError_ReturnsEmptyList
 
@@ -183,7 +191,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_InvalidJson_ReturnsEmptyList
 
@@ -191,7 +199,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_SingleTag_ReturnsOneTagNode
 
@@ -199,7 +207,7 @@ pagination.
 
 **Expected**: Returns a list with one tag node.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_MissingNameProperty_SkipsInvalidNodes
 
@@ -207,7 +215,7 @@ pagination.
 
 **Expected**: Invalid node is skipped.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags
 
@@ -215,7 +223,7 @@ pagination.
 
 **Expected**: All pages are fetched and all tags are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
 
@@ -223,7 +231,7 @@ pagination.
 
 **Expected**: Returns all commit SHAs.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_NoCommits_ReturnsEmptyList
 
@@ -231,7 +239,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_MissingData_ReturnsEmptyList
 
@@ -239,7 +247,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_HttpError_ReturnsEmptyList
 
@@ -247,7 +255,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_InvalidJson_ReturnsEmptyList
 
@@ -255,7 +263,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_SingleCommit_ReturnsOneCommitSha
 
@@ -263,7 +271,7 @@ pagination.
 
 **Expected**: Returns a list with one commit SHA.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_MissingOidProperty_SkipsInvalidNodes
 
@@ -271,7 +279,7 @@ pagination.
 
 **Expected**: Invalid node is skipped.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits
 
@@ -279,7 +287,7 @@ pagination.
 
 **Expected**: All pages are fetched and all commit SHAs are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
 
@@ -287,7 +295,7 @@ pagination.
 
 **Expected**: Returns all pull requests.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_NoPullRequests_ReturnsEmptyList
 
@@ -295,7 +303,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_MissingData_ReturnsEmptyList
 
@@ -303,7 +311,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_HttpError_ReturnsEmptyList
 
@@ -311,7 +319,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_InvalidJson_ReturnsEmptyList
 
@@ -319,7 +327,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_SinglePullRequest_ReturnsOnePullRequest
 
@@ -327,7 +335,7 @@ pagination.
 
 **Expected**: Returns a list with one pull request.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_MissingNumberOrTitle_SkipsInvalidNodes
 
@@ -335,7 +343,7 @@ pagination.
 
 **Expected**: Invalid node is skipped.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_WithPagination_ReturnsAllPullRequests
 
@@ -343,7 +351,7 @@ pagination.
 
 **Expected**: All pages are fetched and all pull requests are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
 
@@ -351,7 +359,7 @@ pagination.
 
 **Expected**: Returned pull requests include the body content.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames
 
@@ -359,7 +367,7 @@ pagination.
 
 **Expected**: Returns all release tag names.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_NoReleases_ReturnsEmptyList
 
@@ -367,7 +375,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_MissingData_ReturnsEmptyList
 
@@ -375,7 +383,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList
 
@@ -383,7 +391,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList
 
@@ -391,7 +399,7 @@ pagination.
 
 **Expected**: Returns an empty list.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_SingleRelease_ReturnsOneTagName
 
@@ -399,7 +407,7 @@ pagination.
 
 **Expected**: Returns a list with one tag name.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_MissingTagNameProperty_SkipsInvalidNodes
 
@@ -407,7 +415,7 @@ pagination.
 
 **Expected**: Invalid node is skipped.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases
 
@@ -415,9 +423,11 @@ pagination.
 
 **Expected**: All pages are fetched and all release tag names are returned.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLClient`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-GitHubGraphQLClient**: All 41 tests across the five
+- **BuildMark-GitHub-GraphQLClient**: All 49 tests across the six
   `GitHubGraphQLClient*Tests.cs` files
+- **BuildMark-GitHub-ErrorHandling**: HTTP error, invalid JSON, and exception tests
+  across all six `GitHubGraphQLClient*Tests.cs` files

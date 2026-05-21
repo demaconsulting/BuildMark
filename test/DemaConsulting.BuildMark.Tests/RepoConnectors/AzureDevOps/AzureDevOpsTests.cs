@@ -39,7 +39,7 @@ public class AzureDevOpsTests
     ///     Test that the AzureDevOps sub-subsystem provides a connector that implements IRepoConnector.
     /// </summary>
     [Fact]
-    public void AzureDevOps_ImplementsInterface_ReturnsTrue()
+    public void AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface()
     {
         // Arrange: create an AzureDevOpsRepoConnector instance from the AzureDevOps sub-subsystem
         var connector = new AzureDevOpsRepoConnector();

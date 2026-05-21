@@ -18,6 +18,12 @@ sections:
           follow pagination cursors to retrieve all commits, releases, tags, pull requests,
           issues, and linked issue IDs so that build information reflects the complete
           repository history rather than only the first page of results.
+
+          This requirement serves as a parent summary requirement. Its children
+          (BuildMark-GitHub-GetCommits, BuildMark-GitHub-GetReleases, BuildMark-GitHub-GetTags,
+          BuildMark-GitHub-GetPullRequests, BuildMark-GitHub-GetIssues, and
+          BuildMark-GitHub-ErrorHandling) each cover one specific aspect of the client's
+          observable behavior and carry the detailed test mappings.
         tests:
           - GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
           - GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits
@@ -37,6 +43,7 @@ sections:
           - BuildMark-GitHub-GetTags
           - BuildMark-GitHub-GetPullRequests
           - BuildMark-GitHub-GetIssues
+          - BuildMark-GitHub-ErrorHandling
 
       - id: BuildMark-GitHub-DescriptionBody
         title: >-
@@ -99,3 +106,25 @@ sections:
           - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
           - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
           - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues
+
+      - id: BuildMark-GitHub-ErrorHandling
+        title: >-
+          The GitHubGraphQLClient shall return an empty list rather than propagating
+          exceptions when a GitHub API query fails.
+        justification: |
+          Transient network failures, HTTP error responses, and malformed JSON payloads
+          must not crash the build-notes pipeline. Returning an empty list on any query
+          failure allows the connector to produce a partial result or a meaningful error
+          message rather than an unhandled exception.
+        tests:
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_HttpError_ReturnsEmptyList
+          - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_InvalidJson_ReturnsEmptyList
+          - GitHubGraphQLClient_GetAllIssuesAsync_Exception_ReturnsEmptyList
+          - GitHubGraphQLClient_GetAllTagsAsync_HttpError_ReturnsEmptyList
+          - GitHubGraphQLClient_GetAllTagsAsync_InvalidJson_ReturnsEmptyList
+          - GitHubGraphQLClient_GetCommitsAsync_HttpError_ReturnsEmptyList
+          - GitHubGraphQLClient_GetCommitsAsync_InvalidJson_ReturnsEmptyList
+          - GitHubGraphQLClient_GetPullRequestsAsync_HttpError_ReturnsEmptyList
+          - GitHubGraphQLClient_GetPullRequestsAsync_InvalidJson_ReturnsEmptyList
+          - GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList
+          - GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList

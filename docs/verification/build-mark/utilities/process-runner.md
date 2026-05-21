@@ -13,6 +13,15 @@ correct on the target operating system.
 | ----------- | ----------------------------------------------------------- |
 | None        | Real OS processes are used to test actual process execution |
 
+#### Test Environment
+
+Tests invoke real OS processes. A working shell and `git` executable must be present on
+the host.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput

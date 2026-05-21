@@ -30,3 +30,8 @@ This document is intended for:
 - Quality assurance teams validating requirements
 - Project stakeholders reviewing project scope
 - Users understanding the tool's capabilities
+
+## References
+
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) —
+  compiled requirements, trace matrix, and quality reports

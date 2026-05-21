@@ -22,6 +22,15 @@ dotnet sonarmark --validate --results artifacts/sonarmark-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *SonarMark self-validation*: CI pipeline executes
+  `dotnet sonarmark --validate --results artifacts/sonarmark-self-validation.trx`;
+  expects exit code 0 and a non-empty TRX file containing self-test results.
+- *SonarMark quality report generation*: CI pipeline uses SonarMark to query the
+  SonarCloud API and generate the SonarCloud quality report markdown; expects exit
+  code 0 and a non-empty markdown report.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-SonarMark**: CI pipeline self-validation TRX evidence from

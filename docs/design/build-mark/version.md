@@ -35,8 +35,9 @@ VersionCommitTag (version + commit hash)
 
 #### Semantic Versioning Compliance
 
-All version processing strictly adheres to Semantic Versioning 2.0.0 (<https://semver.org/>) specification
-to ensure predictable and industry-standard behavior.
+All version processing substantially adheres to Semantic Versioning 2.0.0 (<https://semver.org/>).
+Pre-release identifiers are compared case-insensitively rather than using the ASCII
+case-sensitive sort defined by SemVer 2.0.0.
 
 #### Performance Optimization
 
@@ -52,6 +53,20 @@ Each version type serves a specific purpose with clear boundaries:
 - **VersionComparable**: Optimized for comparison operations
 - **VersionInterval**: Range queries and filtering
 - **VersionCommitTag**: Build metadata association
+
+### Interfaces
+
+The Version subsystem exposes all six unit types as public records or classes.
+The primary interface consumed by other subsystems is:
+
+| Member | Kind | Description |
+| --- | --- | --- |
+| `VersionTag.Create(tag)` | Static method | Parse a repository tag; throws on invalid input |
+| `VersionTag.TryCreate(tag)` | Static method | Parse a repository tag; returns `null` on invalid input |
+| `VersionIntervalSet.Parse(text)` | Static method | Parse a comma-separated set of version intervals |
+| `VersionIntervalSet.Contains(version)` | Method | Test whether a version falls in any interval in the set |
+| `VersionComparable.Create(version)` | Static method | Parse semantic version for comparison; throws on invalid input |
+| `VersionComparable.TryCreate(version)` | Static method | Parse a semantic version; returns `null` on invalid input |
 
 ### External Interfaces
 
@@ -85,6 +100,25 @@ Version processing provides two parsing patterns:
 - `Create()` factory methods throw `ArgumentException` for invalid input, enabling fail-fast behavior
 - Malformed version ranges are rejected during parsing
 - Version comparison operations are guaranteed to be consistent and transitive
+
+### Design
+
+The units in the Version subsystem form a directed processing hierarchy. Raw
+repository tag strings flow in from connectors and pass through `VersionTag`,
+which strips tag prefixes and extracts a `VersionSemantic`. `VersionSemantic`
+wraps a `VersionComparable` that exposes numeric major/minor/patch fields and
+pre-release segments for sorting. `VersionCommitTag` pairs a `VersionTag` with
+its Git commit hash so that `BuildInformation` can record the exact commit at
+each version boundary.
+
+Version range expressions flow in from `ItemControlsParser` as text and are
+parsed by `VersionIntervalSet.Parse`, which delegates to `VersionInterval.Parse`
+for each token. `VersionInterval.Contains` tests a candidate version using
+`VersionComparable.TryCreate` for the bound comparisons.
+
+No unit in the subsystem holds mutable state; all types are records or
+effectively immutable classes instantiated via `Create`/`TryCreate` factory
+methods.
 
 ### Performance Characteristics
 

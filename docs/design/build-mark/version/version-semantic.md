@@ -7,13 +7,26 @@ support. As a C# `record`, it provides structural equality by default - two `Ver
 instances are equal when all their properties compare equal. It provides the full semantic
 version structure including build metadata while preserving comparison functionality.
 
-#### Structure
+#### Data Model
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
 | Comparable | VersionComparable | Core comparison logic and version components |
 | Metadata | string? | Build metadata (+metadata), or `null` when absent |
 | FullVersion | string | Complete version string (major.minor.patch\[-pre-release\]\[+metadata\]) |
+
+#### Key Methods
+
+- `Create(string version)` — Parses a full semantic version string including optional
+  `+metadata`; throws `ArgumentException` on invalid input
+- `TryCreate(string version)` — Parses a full semantic version string; returns `null`
+  on invalid input instead of throwing
+
+Both methods split the input on `+` (using `Split('+', 2)`) to separate the core version from
+optional build metadata, then delegate the core version part to `VersionComparable.TryCreate`.
+An empty metadata segment is normalized to `null`. Comparison operations delegate entirely to
+the wrapped `Comparable` instance; build metadata does not affect ordering per the SemVer
+specification.
 
 #### Delegated Properties
 
@@ -53,3 +66,13 @@ var version = VersionSemantic.Create("1.2.3-beta.1+build.123");
 // version.FullVersion = "1.2.3-beta.1+build.123"
 // version.CompareVersion = "1.2.3-beta.1"
 ```
+
+#### Error Handling
+
+`Create(string version)` throws `ArgumentException` for invalid input. `TryCreate(string version)`
+returns `null` instead of throwing. Once constructed, property access and comparison operations
+cannot fail.
+
+#### Interactions
+
+Consumed by `VersionTag` for version extraction from Git tag strings.

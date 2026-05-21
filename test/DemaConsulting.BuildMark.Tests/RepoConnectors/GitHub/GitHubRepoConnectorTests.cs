@@ -167,6 +167,80 @@ public class GitHubRepoConnectorTests
     }
 
     /// <summary>
+    ///     Test that GetBuildInformationAsync falls back to the remote owner when the configured owner is blank.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithBlankConfiguredOwner_FallsBackPerField()
+    {
+        // Arrange - Create mock responses with a previous version so a changelog link is generated
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit2", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("v1.1.0", "commit2"),
+                new MockTag("v1.0.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(
+            new GitHubConnectorConfig { Owner = "   ", Repo = "configured-repo" },
+            mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/parsed-owner/parsed-repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit2");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
+
+        // Assert
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
+        Assert.Contains("https://github.com/parsed-owner/configured-repo/compare/", buildInfo.CompleteChangelogLink.TargetUrl);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync falls back to the remote repo when the configured repo is blank.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_WithBlankConfiguredRepo_FallsBackPerField()
+    {
+        // Arrange - Create mock responses with a previous version so a changelog link is generated
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit2", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("v1.1.0", "commit2"),
+                new MockTag("v1.0.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(
+            new GitHubConnectorConfig { Owner = "configured-owner", Repo = "" },
+            mockHttpClient);
+
+        // Set up mock command responses
+        connector.SetCommandResponse("git remote get-url origin", "https://github.com/parsed-owner/parsed-repo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit2");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
+
+        // Assert
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
+        Assert.Contains("https://github.com/configured-owner/parsed-repo/compare/", buildInfo.CompleteChangelogLink.TargetUrl);
+    }
+
+    /// <summary>
     ///     Test that GetBuildInformationAsync correctly gathers changes from PRs with labels.
     /// </summary>
     [Fact]
@@ -773,6 +847,7 @@ public class GitHubRepoConnectorTests
         // Assert - Connector is still a valid instance after configuration
         Assert.NotNull(connector);
         Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.True(connector.HasRules, "HasRules should return true after Configure is called with rules");
     }
 
     /// <summary>
@@ -1081,6 +1156,5 @@ public class GitHubRepoConnectorTests
         }
     }
 }
-
 
 

@@ -1,6 +1,6 @@
 #### WorkItemMapper
 
-##### Overview
+##### Purpose
 
 `WorkItemMapper` maps `AzureDevOpsWorkItem` records from the Azure DevOps REST API
 into `ItemInfo` records for the `BuildInformation` model. It centralizes work item
@@ -53,7 +53,7 @@ Item controls are extracted from two sources and merged:
 present for the same control. If a custom field value is non-null, it supersedes
 the corresponding value from the buildmark block.
 
-##### Methods
+##### Key Methods
 
 ###### `MapWorkItemToItemInfo(workItem)`
 
@@ -67,7 +67,8 @@ Steps:
 3. Apply work item type mapping to determine the normalized type.
 4. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
 5. If item controls specify a visibility of `internal`, return `null` to signal that
-   the item should be excluded.
+   the item should be excluded. Items with `visibility: public` (or no visibility
+   override) are included normally; there is no separate "force include" logic.
 6. If item controls specify a type override, apply it to the normalized type.
 7. Construct and return the `ItemInfo` record with the title, url, type, and
    affected versions.
@@ -99,6 +100,12 @@ Steps:
 3. If custom fields are present, override the corresponding values from the buildmark
    block result.
 4. Return the merged `ItemControlsInfo`, or `null` if no controls were found.
+
+##### Error Handling
+
+`MapWorkItemToItemInfo` returns `null` rather than throwing when a work item should be
+excluded (suppressed state or `visibility: internal`). Missing or unexpected field values
+are handled defensively; no exceptions are thrown for absent dictionary keys.
 
 ##### Interactions
 

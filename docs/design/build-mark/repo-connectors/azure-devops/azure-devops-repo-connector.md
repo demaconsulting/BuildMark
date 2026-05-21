@@ -1,6 +1,6 @@
 #### AzureDevOpsRepoConnector
 
-##### Overview
+##### Purpose
 
 `AzureDevOpsRepoConnector` is the production unit in the RepoConnectors/AzureDevOps
 subsystem. It implements `RepoConnectorBase` and uses `AzureDevOpsRestClient` to
@@ -107,7 +107,7 @@ The `AzureDevOpsRestClient` returns the following record types:
 - **`AzureDevOpsCollectionResponse<T>`** - wraps paginated responses with a count
   and value list.
 
-##### Methods
+##### Key Methods
 
 ###### `ParseAzureDevOpsUrl(url) → (organizationUrl, project, repository)`
 
@@ -172,6 +172,14 @@ Main entry point. Performs the following steps:
     report sections and populate `BuildInformation.RoutedSections`. If no rules
     are configured, items remain in the legacy `Changes`, `Bugs`, and `KnownIssues`
     lists. Return the assembled `BuildInformation` record.
+
+##### Error Handling
+
+`GetBuildInformationAsync` throws `InvalidOperationException` when no Azure DevOps token
+can be resolved, when `ParseAzureDevOpsUrl` receives an unsupported URL format (propagated
+as `ArgumentException`), or when a git command fails. These exceptions propagate to
+`Program.ProcessBuildNotes`, which catches them, writes an error message via
+`context.WriteError`, and returns early without generating a report.
 
 ##### Interactions
 

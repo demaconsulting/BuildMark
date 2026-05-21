@@ -40,6 +40,15 @@ subsystems receive a `Context` from the caller rather than creating one themselv
 
 > `Create(args)` throws `ArgumentException` for invalid or malformed arguments.
 
+### Design
+
+The Cli subsystem contains a single unit (`Context`), so there is no inter-unit
+collaboration to describe. `Context.Create` parses the argument array and opens
+the optional log file. The resulting `Context` object is then passed by `Program`
+to every other subsystem that needs to write output, read flags, or set the exit
+code. No other subsystem creates a `Context`; all output and exit-code management
+flows through the single instance created at startup.
+
 ### Interactions
 
 The Cli subsystem has no dependencies on other BuildMark subsystems. `Program`

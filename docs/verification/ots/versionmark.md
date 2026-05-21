@@ -23,6 +23,18 @@ dotnet versionmark --validate --results artifacts/versionmark-self-validation.tr
 
 The resulting TRX files are consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *VersionMark self-validation (quality job)*: CI pipeline executes
+  `dotnet versionmark --validate --results artifacts/versionmark-self-validation-quality.trx`;
+  expects exit code 0 and a non-empty TRX file.
+- *VersionMark self-validation (main job)*: CI pipeline executes
+  `dotnet versionmark --validate --results artifacts/versionmark-self-validation.trx`;
+  expects exit code 0 and a non-empty TRX file.
+- *VersionMark operational use*: VersionMark is invoked in every CI job to capture and
+  publish tool version information; expects exit code 0 and correct version output for
+  each job.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-VersionMark**: CI pipeline self-validation TRX evidence from

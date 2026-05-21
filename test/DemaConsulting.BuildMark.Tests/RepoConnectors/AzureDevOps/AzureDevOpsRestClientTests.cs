@@ -250,4 +250,63 @@ public class AzureDevOpsRestClientTests
         Assert.Equal(300, query.WorkItems[0].Id);
         Assert.Equal(301, query.WorkItems[1].Id);
     }
+
+    /// <summary>
+    ///     Verify that QueryWorkItemsAsync throws InvalidOperationException when the
+    ///     Azure DevOps API returns an HTTP error response.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRestClient_QueryWorkItemsAsync_WithHttpError_ThrowsInvalidOperationException()
+    {
+        // Arrange:
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddWiqlErrorResponse();
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act:
+        var act = async () => await client.QueryWorkItemsAsync(
+            "SELECT [System.Id] FROM workitems WHERE [System.AreaPath] = 'NonExistent'");
+
+        // Assert:
+        await Assert.ThrowsAsync<InvalidOperationException>(act);
+    }
+
+    /// <summary>
+    ///     Verify that GetRepositoryAsync throws HttpRequestException when the REST API returns an HTTP error.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRestClient_GetRepositoryAsync_HttpError_ThrowsHttpRequestException()
+    {
+        // Arrange:
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddResponse("git/repositories/", "{}", System.Net.HttpStatusCode.NotFound);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act:
+        var act = async () => await client.GetRepositoryAsync("NonExistent");
+
+        // Assert:
+        await Assert.ThrowsAsync<HttpRequestException>(act);
+    }
+
+    /// <summary>
+    ///     Verify that GetWorkItemsAsync returns an empty list when given an empty id list.
+    /// </summary>
+    [Fact]
+    public async Task AzureDevOpsRestClient_GetWorkItemsAsync_WithEmptyInput_ReturnsEmptyList()
+    {
+        // Arrange:
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler();
+        using var mockHttpClient = new HttpClient(mockHandler);
+        using var client = new AzureDevOpsRestClient(mockHttpClient, "https://dev.azure.com/org", "project");
+
+        // Act:
+        var workItems = await client.GetWorkItemsAsync([]);
+
+        // Assert:
+        Assert.NotNull(workItems);
+        Assert.Empty(workItems);
+    }
 }

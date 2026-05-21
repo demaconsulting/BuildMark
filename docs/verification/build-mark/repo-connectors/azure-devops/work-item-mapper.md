@@ -2,7 +2,7 @@
 
 ##### Verification Approach
 
-`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 11 unit
+`WorkItemMapper` is tested through `WorkItemMapperTests.cs`, which contains 13 unit
 tests. The tests verify mapping of Azure DevOps work items to the BuildMark model -
 classification of features and bugs, type normalization, suppression of Removed work
 items, resolved-state identification, rule-matching type retrieval, and custom field
@@ -14,6 +14,14 @@ extraction for visibility and affected-versions controls.
 | -------------------- | ----------------------------------------------------------- |
 | `WorkItem` test data | Constructed in-line with specific types, states, and fields |
 
+##### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios
 
 ###### WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem
@@ -24,9 +32,25 @@ extraction for visibility and affected-versions controls.
 
 **Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
 
+###### WorkItemMapper_MapWorkItemToItemInfo_IssueType_ReturnsBugItem
+
+**Scenario**: A work item with type `"Issue"` is mapped.
+
+**Expected**: `ItemInfo.Type` is `"bug"`.
+
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
+
 ###### WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem
 
 **Scenario**: A work item with type `"User Story"` is mapped.
+
+**Expected**: `ItemInfo.Type` is `"feature"`.
+
+**Requirement coverage**: `BuildMark-AzureDevOps-WorkItemMapper`
+
+###### WorkItemMapper_MapWorkItemToItemInfo_FeatureType_ReturnsFeatureItem
+
+**Scenario**: A work item with type `"Feature"` is mapped.
 
 **Expected**: `ItemInfo.Type` is `"feature"`.
 
@@ -111,7 +135,9 @@ block value.
 ##### Requirements Coverage
 
 - **BuildMark-AzureDevOps-WorkItemMapper**: `WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem`,
+  `WorkItemMapper_MapWorkItemToItemInfo_IssueType_ReturnsBugItem`,
   `WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem`,
+  `WorkItemMapper_MapWorkItemToItemInfo_FeatureType_ReturnsFeatureItem`,
   `WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem`,
   `WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem`,
   `WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue`,

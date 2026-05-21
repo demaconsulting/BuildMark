@@ -25,6 +25,8 @@ sections:
           - WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue
           - WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse
           - WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName
+        children:
+          - BuildMark-AzureDevOps-SuppressRemovedWorkItems
 
       - id: BuildMark-AzureDevOps-SuppressRemovedWorkItems
         title: >-

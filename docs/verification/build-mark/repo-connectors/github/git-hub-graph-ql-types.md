@@ -13,6 +13,14 @@ JSON deserialization of mocked API responses.
 | ------------------------ | ------------------------------------------------------------ |
 | `MockHttpMessageHandler` | Provides JSON payloads whose structure matches the DTO types |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or GitHub token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios (via GitHubGraphQLClient*Tests.cs)
 
 ###### GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssuesWithBody
@@ -21,7 +29,7 @@ JSON deserialization of mocked API responses.
 
 **Expected**: Issue DTOs contain the expected fields including `body`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequestsWithBody
 
@@ -29,7 +37,7 @@ JSON deserialization of mocked API responses.
 
 **Expected**: Pull request DTOs contain the expected fields including `body`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ###### GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
 
@@ -37,9 +45,9 @@ JSON deserialization of mocked API responses.
 
 **Expected**: Tag node DTOs contain `name` and target commit hash fields.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHubGraphQLTypes`
+**Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
 
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-GitHubGraphQLTypes**: Verified indirectly through all
-  41 tests in the `GitHubGraphQLClient*Tests.cs` files
+- **BuildMark-GitHub-GraphQLClient**: Verified indirectly through all
+  49 tests in the `GitHubGraphQLClient*Tests.cs` files

@@ -143,6 +143,18 @@ src/DemaConsulting.BuildMark/
 
 The test project mirrors the same layout under `test/DemaConsulting.BuildMark.Tests/`.
 
+## Companion Artifact Structure
+
+Each local software item has corresponding artifacts in parallel directory trees:
+
+- Requirements: `docs/reqstream/build-mark.yaml`, `docs/reqstream/build-mark/.../{item}.yaml`
+- Design: `docs/design/build-mark.md`, `docs/design/build-mark/.../{item}.md`
+- Verification: `docs/verification/build-mark.md`, `docs/verification/build-mark/.../{item}.md`
+- Source: `src/DemaConsulting.BuildMark/.../{Item}.cs`
+- Tests: `test/DemaConsulting.BuildMark.Tests/.../{Item}Tests.cs`
+
+Review-sets: defined in `.reviewmark.yaml`
+
 ## Document Conventions
 
 Throughout this document:
@@ -155,5 +167,5 @@ Throughout this document:
 
 ## References
 
-- See the BuildMark User Guide for user-facing documentation.
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled user guide and documentation
 - See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

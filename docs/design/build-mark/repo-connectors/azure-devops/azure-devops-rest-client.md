@@ -1,6 +1,6 @@
 #### AzureDevOpsRestClient
 
-##### Overview
+##### Purpose
 
 `AzureDevOpsRestClient` is the Azure DevOps subsystem unit responsible for issuing
 paginated REST API requests to the Azure DevOps API and translating the responses
@@ -38,7 +38,13 @@ The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary - its keys are
 Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
 and are preserved as-is without any naming transformation.
 
-##### Methods
+##### Data Model
+
+`AzureDevOpsRestClient` holds a single `HttpClient` instance configured with the
+organization URL as the base address and the resolved authentication header (Basic for
+PAT tokens, Bearer for Entra ID tokens).
+
+##### Key Methods
 
 The client provides the following methods for retrieving the repository data needed
 to build a `BuildInformation` record:
@@ -50,7 +56,7 @@ Fetches repository metadata for the specified repository.
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=6.0`
 
 Returns an `AzureDevOpsRepository` record containing the repository id, name, and
-remote URL.
+remote URL. Throws when the request is unsuccessful (including HTTP 404).
 
 ###### `GetTagsAsync(repositoryId)`
 
@@ -110,6 +116,24 @@ Endpoint: `POST /{organization}/{project}/_apis/wit/wiql?api-version=6.0`
 
 Returns an `AzureDevOpsWorkItemQuery` record containing the list of matching work
 item id references.
+
+##### Error Handling
+
+HTTP and deserialization errors from the underlying `HttpClient` are propagated to
+`AzureDevOpsRepoConnector`. Network failures, authentication errors (HTTP 401/403), and
+malformed JSON responses result in exceptions that propagate up to
+`Program.ProcessBuildNotes`.
+
+`GetRepositoryAsync` additionally throws `InvalidOperationException` when the HTTP
+response is successful but JSON deserialization returns `null` (the `result ?? throw`
+pattern). This guards against a response body that is valid JSON but does not
+deserialize into the expected `AzureDevOpsRepository` record.
+
+When an HTTP error response includes a JSON body in the Azure DevOps error format, the
+internal `TryReadAdoErrorMessageAsync` helper deserializes the body into an
+`AzureDevOpsApiError` record and extracts the `message` field to include in the thrown
+`InvalidOperationException`. This provides a human-readable error description (e.g.,
+`"The area path does not exist."`) rather than a raw HTTP status code.
 
 ##### Interactions
 

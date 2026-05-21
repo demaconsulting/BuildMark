@@ -43,7 +43,7 @@ public abstract class RepoConnectorBase : IRepoConnector
     /// <summary>
     ///     Gets a value indicating whether routing rules have been configured.
     /// </summary>
-    protected bool HasRules => _rules.Count > 0;
+    internal bool HasRules => _rules.Count > 0;
 
     /// <summary>
     ///     Configures the routing rules and section definitions for this connector.

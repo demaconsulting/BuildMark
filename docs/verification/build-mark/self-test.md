@@ -1,6 +1,6 @@
 ## SelfTest
 
-### Verification Approach
+### Verification Strategy
 
 The SelfTest subsystem is verified with dedicated subsystem tests in `SelfTestTests.cs`. Tests
 invoke `Validation.Run` through a `Context` constructed with controlled argument arrays, then
@@ -12,6 +12,19 @@ repository access is needed.
 | Mock / Stub | Reason |
 | --- | --- |
 | `MockRepoConnector` | Provides a real connector factory that does not require external network access. |
+
+### Test Environment
+
+Tests create temporary directories and results files (`.trx`, `.xml`) through
+`TemporaryDirectory`, which creates a unique `tmp-*` subdirectory under the current
+working directory. Write access to the current working directory is required. No
+network access or external API calls are made; `MockRepoConnector` provides all
+repository data.
+
+### Acceptance Criteria
+
+All tests in `SelfTestTests.cs` pass with zero failures. All `BuildMark-SelfTest-*`
+requirements have at least one test in the Requirements Coverage mapping.
 
 ### Test Scenarios
 

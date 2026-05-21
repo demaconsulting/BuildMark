@@ -1,6 +1,6 @@
 ## Cli
 
-### Verification Approach
+### Verification Strategy
 
 The Cli subsystem is verified through `CliTests.cs`, which exercises the `Context`
 class directly by constructing instances with various argument combinations and
@@ -14,6 +14,18 @@ and output behavior.
 | -------------------- | ------------------------------------------------------------------ |
 | `StringWriter`       | Captures context output for assertion without console side effects |
 | In-process arguments | Passed directly to `Context` constructor instead of `args[]`       |
+
+### Test Environment
+
+N/A - standard test environment. `CliTests.cs` runs within the standard `dotnet test`
+host; no external services, live network, or file system side effects beyond an
+in-process `StringWriter` are required.
+
+### Acceptance Criteria
+
+All tests in `CliTests.cs` pass with zero failures. All `BuildMark-Cli-*` and referenced
+`BuildMark-Program-*` requirements have at least one test in the Requirements Coverage
+mapping.
 
 ### Test Scenarios
 

@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.Cli;
 
@@ -251,24 +252,15 @@ public class ContextTests
     [Fact]
     public void Context_Create_LogArgument_CreatesLogFile()
     {
-        // Create temporary log file path
-        var logFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with --log argument
-            using var context = Context.Create(["--log", logFile]);
+        // Arrange: create a temporary log file path
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-            // Verify log file exists
-            Assert.True(File.Exists(logFile));
-        }
-        finally
-        {
-            // Clean up log file
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
-        }
+        // Act: create context with --log argument
+        using var context = Context.Create(["--log", logFile]);
+
+        // Assert: log file exists
+        Assert.True(File.Exists(logFile));
     }
 
     /// <summary>
@@ -498,29 +490,20 @@ public class ContextTests
     [Fact]
     public void Context_WriteLine_WithLogFile_WritesToLogFile()
     {
-        // Create temporary log file path
-        var logFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with log file and write a message
-            using (var context = Context.Create(["--log", logFile]))
-            {
-                // Write a line
-                context.WriteLine("Test message");
-            }
+        // Arrange: create a temporary log file path
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-            // Verify message was written to log file
-            var logContent = File.ReadAllText(logFile);
-            Assert.Equal("Test message" + Environment.NewLine, logContent);
-        }
-        finally
+        // Act: create context with log file and write a message
+        using (var context = Context.Create(["--log", logFile]))
         {
-            // Clean up log file
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
+            // Write a line
+            context.WriteLine("Test message");
         }
+
+        // Assert: message was written to log file
+        var logContent = File.ReadAllText(logFile);
+        Assert.Equal("Test message" + Environment.NewLine, logContent);
     }
 
     /// <summary>
@@ -587,29 +570,20 @@ public class ContextTests
     [Fact]
     public void Context_WriteError_WithLogFile_WritesToLogFile()
     {
-        // Create temporary log file path
-        var logFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with log file and write an error
-            using (var context = Context.Create(["--log", logFile]))
-            {
-                // Write an error
-                context.WriteError("Error message");
-            }
+        // Arrange: create a temporary log file path
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-            // Verify message was written to log file
-            var logContent = File.ReadAllText(logFile);
-            Assert.Equal("Error message" + Environment.NewLine, logContent);
-        }
-        finally
+        // Act: create context with log file and write an error
+        using (var context = Context.Create(["--log", logFile]))
         {
-            // Clean up log file
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
+            // Write an error
+            context.WriteError("Error message");
         }
+
+        // Assert: message was written to log file
+        var logContent = File.ReadAllText(logFile);
+        Assert.Equal("Error message" + Environment.NewLine, logContent);
     }
 
     /// <summary>
@@ -680,28 +654,19 @@ public class ContextTests
     [Fact]
     public void Context_Dispose_ClosesLogFileProperly()
     {
-        // Create temporary log file path
-        var logFile = Path.GetTempFileName();
-        try
-        {
-            // Create and dispose context with log file
-            using (var context = Context.Create(["--log", logFile]))
-            {
-                context.WriteLine("Test message");
-            }
+        // Arrange: create a temporary log file path
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-            // Verify we can delete the log file (it's been closed)
-            File.Delete(logFile);
-            Assert.False(File.Exists(logFile));
-        }
-        finally
+        // Act: create and dispose context with log file
+        using (var context = Context.Create(["--log", logFile]))
         {
-            // Clean up log file if it still exists
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
+            context.WriteLine("Test message");
         }
+
+        // Assert: log file can be deleted (it's been closed by Dispose)
+        File.Delete(logFile);
+        Assert.False(File.Exists(logFile));
     }
 }
 

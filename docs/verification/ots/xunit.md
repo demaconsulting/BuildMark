@@ -23,6 +23,12 @@ The resulting TRX files are consumed by ReqStream to satisfy unit test requireme
 The matrix of operating systems (Windows, Ubuntu, macOS) and .NET versions (8, 9, 10)
 provides broad platform coverage evidence.
 
+### Test Scenarios
+
+- *xUnit test discovery and execution*: CI pipeline executes `dotnet test` across the
+  full OS and .NET version matrix (Windows, Ubuntu, macOS × .NET 8, 9, 10); expects zero
+  test failures and a non-empty TRX result file for each platform/version combination.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-xUnit**: CI pipeline test execution TRX evidence confirming that

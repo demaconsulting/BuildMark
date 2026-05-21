@@ -6,7 +6,7 @@ The `VersionComparable` class provides core semantic version comparison function
 It handles versions in the format `major.minor.patch[-pre-release]` and implements
 proper semantic version ordering rules with optimized performance for pre-release comparison.
 
-#### Structure
+#### Data Model
 
 | Property | Type | Description |
 | -------- | ---- | ----------- |
@@ -17,6 +17,21 @@ proper semantic version ordering rules with optimized performance for pre-releas
 | PreRelease | string? | Pre-release identifier (null for release versions) |
 | IsPreRelease | bool | Whether this is a pre-release version |
 | CompareVersion | string | Normalized comparison string (major.minor.patch[-pre-release]) |
+
+#### Key Methods
+
+- `Create(string version)` — Parses a `major.minor.patch[-pre-release]` string;
+  throws `ArgumentException` on invalid input
+- `TryCreate(string version)` — Parses a version string; returns `null` on invalid
+  input instead of throwing
+- `CompareTo(VersionComparable other)` — Implements `IComparable<VersionComparable>`
+  using numeric major/minor/patch comparison followed by SemVer pre-release ordering
+
+`Create` and `TryCreate` use a source-generated `Regex` pattern to validate and parse the
+input. Pre-release segments are split at construction time by `ParsePreReleaseSegments` into a
+cached `PreReleaseSegment[]` array so that repeated comparisons (`CompareTo`) avoid
+re-parsing the pre-release string. Operator overloads (`<`, `<=`, `>`, `>=`) delegate to
+`CompareTo`.
 
 #### Performance Optimization
 
@@ -93,3 +108,14 @@ This pattern matches:
 
 - Required: major.minor.patch numbers
 - Optional: hyphen followed by pre-release identifier
+
+#### Error Handling
+
+`Create(string version)` throws `ArgumentException` when the input string does not match
+the expected `major.minor.patch[-pre-release]` format. `TryCreate(string version)` returns
+`null` instead of throwing, allowing callers to test validity without exception handling.
+Comparison operations on a valid instance never fail.
+
+#### Interactions
+
+Consumed by `VersionSemantic`, `VersionInterval`, and `VersionIntervalSet` for range evaluation.

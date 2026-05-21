@@ -137,6 +137,6 @@ match identifiers defined in the ReqStream YAML files under `docs/reqstream/`.
 
 ## References
 
-- See the *BuildMark Software Design* document for implementation details of each unit.
-- See the *BuildMark Requirements* document for the full requirements specification.
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) —
+  compiled design, requirements, and compliance documents
 - See the BuildMark repository at <https://github.com/demaconsulting/BuildMark>.

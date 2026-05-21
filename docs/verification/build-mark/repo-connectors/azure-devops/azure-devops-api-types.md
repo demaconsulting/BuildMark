@@ -14,6 +14,14 @@ deserialized data.
 | ------------------------ | ------------------------------------------------------------ |
 | `MockHttpMessageHandler` | Provides JSON payloads whose structure matches the DTO types |
 
+##### Test Environment
+
+Tests use `MockHttpMessageHandler` to intercept HTTP calls. No real network access or Azure DevOps token is required.
+
+##### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 ##### Test Scenarios (via AzureDevOpsRestClientTests.cs)
 
 ###### AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags
@@ -22,7 +30,7 @@ deserialized data.
 
 **Expected**: Tag DTO fields are populated correctly.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOpsApiTypes`
+**Requirement coverage**: `BuildMark-AzureDevOps-ApiTypes`
 
 ###### AzureDevOpsRestClient_GetCommitsAsync_ValidResponse_ReturnsCommits
 
@@ -30,7 +38,7 @@ deserialized data.
 
 **Expected**: Commit DTO fields are populated correctly.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOpsApiTypes`
+**Requirement coverage**: `BuildMark-AzureDevOps-ApiTypes`
 
 ###### AzureDevOpsRestClient_GetWorkItemsAsync_ValidResponse_ReturnsWorkItems
 
@@ -38,18 +46,17 @@ deserialized data.
 
 **Expected**: Work item DTO fields are populated correctly.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOpsApiTypes`
+**Requirement coverage**: `BuildMark-AzureDevOps-ApiTypes`
 
-###### AzureDevOpsRestClient_GetWorkItemLinksAsync_ValidResponse_ReturnsWorkItemLinks
+###### AzureDevOpsRestClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
 
-**Scenario**: Work item links REST response is deserialized into work item link DTOs.
+**Scenario**: Pull requests REST response is deserialized into pull request DTOs.
 
-**Expected**: Work item link DTO fields are populated correctly.
+**Expected**: Pull request DTO fields are populated correctly.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOpsApiTypes`
+**Requirement coverage**: `BuildMark-AzureDevOps-ApiTypes`
 
 ##### Requirements Coverage
 
-- **BuildMark-RepoConnectors-AzureDevOpsApiTypes**: Verified indirectly through all
-  8 tests in `AzureDevOpsRestClientTests.cs` and all 10 tests in
-  `WorkItemMapperTests.cs`
+- **BuildMark-AzureDevOps-ApiTypes**: Verified indirectly through all 12 tests in
+  `AzureDevOpsRestClientTests.cs` and all 13 tests in `WorkItemMapperTests.cs`

@@ -1,6 +1,6 @@
 ### BuildMarkConfigReader
 
-#### Overview
+#### Purpose
 
 `BuildMarkConfigReader` is a static utility class responsible for reading and deserializing
 the optional `.buildmark.yaml` file from the repository root. It uses the YamlDotNet library's
@@ -10,7 +10,11 @@ to produce a strongly-typed `BuildMarkConfig` object.
 The method always returns a `ConfigurationLoadResult` and never throws. Parse errors and
 validation warnings are captured as `ConfigurationIssue` records within the result.
 
-#### Interface
+#### Data Model
+
+N/A — `BuildMarkConfigReader` is a static utility class with no instance state.
+
+#### Key Methods
 
 | Member            | Kind          | Description                                                               |
 |-------------------|---------------|---------------------------------------------------------------------------|
@@ -25,6 +29,12 @@ Looks for a `.buildmark.yaml` file at the supplied path (normally the repository
   `Config = null` and one or more `ConfigurationIssue` records describing each problem.
 - If the file is valid, returns a result with a fully populated `BuildMarkConfig` and an empty
   issues list.
+
+#### Error Handling
+
+`ReadAsync` never throws. All YAML parse errors and validation warnings are captured as
+`ConfigurationIssue` records within the returned `ConfigurationLoadResult`. This ensures
+that `Program` can always inspect issues via `ReportTo` regardless of the file content.
 
 #### Interactions
 

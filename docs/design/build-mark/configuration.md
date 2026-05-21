@@ -129,6 +129,21 @@ problem with its file path, line number, severity, and description.
 | `Label`        | Property | List of label values; the rule matches when any label is present  |
 | `WorkItemType` | Property | List of work-item type values; rule matches when any type matches |
 
+### Design
+
+`BuildMarkConfigReader.ReadAsync` is the subsystem's only entry point. It uses
+the YamlDotNet `YamlStream` representation model to parse the raw YAML content,
+then walks the resulting node tree manually to populate the strongly-typed
+configuration objects. Each node walk is guarded so that a missing or invalid
+node creates a `ConfigurationIssue` record rather than throwing an exception.
+
+All constructed objects — `BuildMarkConfig`, `ConnectorConfig`,
+`GitHubConnectorConfig`, `AzureDevOpsConnectorConfig`, `ReportConfig`,
+`SectionConfig`, `RuleConfig`, and `RuleMatchConfig` — are assembled in a single
+pass and returned wrapped in a `ConfigurationLoadResult`. `Program` calls
+`result.ReportTo(context)` to surface issues to the user and checks `HasErrors`
+before continuing to the connector and report-generation steps.
+
 ### Interactions
 
 | Unit / Subsystem           | Role                                                                          |

@@ -59,7 +59,6 @@ sections:
           Silent mode enables automated build pipelines to invoke BuildMark without
           cluttering their output logs when only the exit code or report file is needed.
         tests:
-          - BuildMark_SilentFlag_SuppressesOutput
           - Program_Run_WithSilentFlag_SuppressesOutput
 
       - id: BuildMark-Program-Log
@@ -68,7 +67,6 @@ sections:
           Log file support enables persistent capture of BuildMark output for audit trails
           and post-build analysis in automated environments.
         tests:
-          - BuildMark_LogParameter_IsAccepted
           - Program_Run_WithLogFlag_WritesToLogFile
 
       - id: BuildMark-Program-Results
@@ -77,7 +75,6 @@ sections:
           Writing results to standard test result formats (TRX or JUnit XML) enables
           integration with CI/CD platforms that process test result files.
         tests:
-          - BuildMark_ResultsParameter_IsAccepted
           - Program_Run_WithResultsFlag_WritesResultsFile
 
       - id: BuildMark-Program-BuildVersion
@@ -86,7 +83,6 @@ sections:
           Specifying the build version allows users to override or supplement version information
           from source control, enabling flexible version management strategies.
         tests:
-          - BuildMark_BuildVersionParameter_IsAccepted
           - Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
 
       - id: BuildMark-Program-Depth
@@ -95,8 +91,6 @@ sections:
           Configurable heading depth allows BuildMark reports to be embedded at any level
           within a larger document without disrupting the document hierarchy.
         tests:
-          - BuildMark_DepthParameter_IsAccepted
-          - BuildMark_Report_DepthTwo_UsesLevelTwoHeadings
           - Program_Run_WithDepthFlag_SetsHeadingDepth
 
       - id: BuildMark-Program-IncludeKnownIssues

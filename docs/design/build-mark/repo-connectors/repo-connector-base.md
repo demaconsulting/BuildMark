@@ -1,10 +1,33 @@
 ### IRepoConnector and RepoConnectorBase
 
-#### Overview
+#### Purpose
 
 `IRepoConnector` defines the contract that all repository connectors must satisfy.
 `RepoConnectorBase` is an abstract class implementing `IRepoConnector` and providing
 shared utilities used by concrete connectors.
+
+#### Data Model
+
+`IRepoConnector` is a pure interface with no instance state. `RepoConnectorBase` stores
+the routing rules and section definitions supplied via `Configure(rules, sections)`; these
+are held as internal fields accessible to subclasses via `HasRules` and `ApplyRules`.
+
+#### Key Methods
+
+- `Configure(rules, sections)` — Stores routing rules and section definitions on the
+  connector instance; called by `Program.ProcessBuildNotes` before the first
+  `GetBuildInformationAsync` call
+- `HasRules` — Internal property returning `true` when at least one rule has been
+  stored via `Configure`
+- `ApplyRules(allItems)` — Protected method routing items via `ItemRouter.Route`,
+  then assembling an ordered list of `(SectionId, SectionTitle, Items)` tuples
+  following configured section order
+- `FindVersionIndex(versions, targetVersion)` — Protected static method finding the
+  index of `targetVersion` in a `VersionTag` list using semantic `VersionComparable`
+  equality; returns `-1` if not found
+- `RunCommandAsync(command, args)` — Protected virtual method delegating shell commands
+  to `ProcessRunner.RunAsync`; `virtual` so test subclasses can override without
+  spawning real processes
 
 #### Interface
 
@@ -21,7 +44,7 @@ shared utilities used by concrete connectors.
 | Member                                   | Kind              | Description                                           |
 |------------------------------------------|-------------------|-------------------------------------------------------|
 | `Configure(rules, sections)`             | Public method     | Stores routing rules and section definitions          |
-| `HasRules`                               | Protected bool    | True when at least one rule has been configured       |
+| `HasRules`                               | Internal bool     | True when at least one rule has been configured       |
 | `ApplyRules(allItems)`                   | Protected method  | Routes items into sections using configured rules     |
 | `RunCommandAsync(command, args)`         | Protected virtual | Delegates shell commands to ProcessRunner             |
 | `FindVersionIndex(versions, target)`     | Protected static  | Locates version using semantic equality               |
@@ -34,7 +57,7 @@ by `Program.ProcessBuildNotes` after the connector is created, passing `Rules` a
 
 ##### `HasRules`
 
-Protected boolean property that returns `true` when at least one rule has been
+Internal boolean property that returns `true` when at least one rule has been
 stored via `Configure`. Concrete connectors use this in `GetBuildInformationAsync`
 to decide whether to call `ApplyRules` or use legacy categorization.
 
@@ -61,6 +84,13 @@ Returns the zero-based index if found, or -1 if no semantically equivalent versi
 The `RunCommandAsync` method accepts a command and a `params string[]` arguments
 array, and is `virtual` so that test subclasses can override it with mock
 implementations that return fixed strings without spawning real processes.
+
+#### Error Handling
+
+`RunCommandAsync` propagates `InvalidOperationException` from `ProcessRunner.RunAsync`
+when a shell command fails. `FindVersionIndex` returns `-1` rather than throwing when no
+matching version is found. Error handling for `GetBuildInformationAsync` is delegated to
+concrete implementations.
 
 #### Interactions
 

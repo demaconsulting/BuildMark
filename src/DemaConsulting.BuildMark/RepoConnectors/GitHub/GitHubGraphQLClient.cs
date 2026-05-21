@@ -175,7 +175,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }
@@ -246,7 +247,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }
@@ -323,7 +325,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }
@@ -397,7 +400,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }
@@ -481,7 +485,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }
@@ -561,7 +566,8 @@ internal sealed class GitHubGraphQLClient : IDisposable
         }
         catch
         {
-            // If GraphQL query fails, return empty list
+            // Intentional silent-fail: errors return an empty list rather than propagating
+            // to callers. If logging infrastructure is added in future, log the exception here.
             return [];
         }
     }

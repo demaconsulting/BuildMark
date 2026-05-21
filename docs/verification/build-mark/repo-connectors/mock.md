@@ -1,6 +1,6 @@
 ### Mock
 
-#### Verification Approach
+#### Verification Strategy
 
 The Mock sub-subsystem is verified through `MockTests.cs` (3 subsystem-level tests)
 and `MockRepoConnectorTests.cs` (11 unit tests). The subsystem tests confirm
@@ -12,6 +12,17 @@ described in the individual unit chapter.
 | Mock / Stub | Reason    |
 | ----------- | --------- |
 | None        | Pure mock |
+
+#### Test Environment
+
+N/A - standard test environment. The Mock sub-subsystem has no external dependencies;
+`MockRepoConnector` operates entirely in memory.
+
+#### Acceptance Criteria
+
+All 3 subsystem tests in `MockTests.cs` pass with zero failures. All
+`BuildMark-RepoConnectors-Mock` requirements have at least one test in the Requirements
+Coverage mapping.
 
 #### Test Scenarios (Subsystem-Level, MockTests.cs)
 

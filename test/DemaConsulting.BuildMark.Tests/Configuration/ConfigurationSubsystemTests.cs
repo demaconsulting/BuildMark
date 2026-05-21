@@ -20,6 +20,7 @@
 
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.Configuration;
 
@@ -39,9 +40,8 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_ReadAsync_ValidFile_ReturnsConfiguration()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml file
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -60,25 +60,17 @@ public class ConfigurationSubsystemTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act: read the configuration
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read the configuration
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: configuration is returned with expected structure
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("github", result.Config.Connector?.Type);
-            Assert.Equal("test-owner", result.Config.Connector?.GitHub?.Owner);
-            Assert.Equal("test-repo", result.Config.Connector?.GitHub?.Repo);
-            Assert.Single(result.Config.Sections);
-            Assert.Single(result.Config.Rules);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: configuration is returned with expected structure
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("github", result.Config.Connector?.Type);
+        Assert.Equal("test-owner", result.Config.Connector?.GitHub?.Owner);
+        Assert.Equal("test-repo", result.Config.Connector?.GitHub?.Repo);
+        Assert.Single(result.Config.Sections);
+        Assert.Single(result.Config.Rules);
     }
 
     /// <summary>
@@ -88,24 +80,15 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_ReadAsync_MissingFile_ReturnsEmptyResult()
     {
         // Arrange: create a temporary directory with no .buildmark.yaml file
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
+        using var tempDir = new TemporaryDirectory();
 
-        try
-        {
-            // Act: read configuration from a directory without the file
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read configuration from a directory without the file
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: result has null Config and no errors
-            Assert.Null(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Empty(result.Issues);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: result has null Config and no errors
+        Assert.Null(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Empty(result.Issues);
     }
 
     /// <summary>
@@ -115,30 +98,21 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_ReadAsync_MalformedFile_ReportsError()
     {
         // Arrange: create a temporary directory with a malformed .buildmark.yaml file
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             "connector:\n\ttype: github\n",
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act: read the malformed configuration
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read the malformed configuration
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: result contains errors and Config is null
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.NotEmpty(result.Issues);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: result contains errors and Config is null
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.NotEmpty(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -202,9 +176,8 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_Issues_ValidationError_ReportsAccurateLine()
     {
         // Arrange: create a YAML file where the unsupported key is on a known line number
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -214,22 +187,14 @@ public class ConfigurationSubsystemTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act: read the configuration
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read the configuration
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: the error is reported with the correct line number (3)
-            Assert.NotNull(result.Issues);
-            Assert.True(result.HasErrors);
-            var issue = result.Issues[0];
-            Assert.True(issue.Line == 3, $"Expected line 3 for 'unsupported-key' but got {issue.Line}");
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: the error is reported with the correct line number (3)
+        Assert.NotNull(result.Issues);
+        Assert.True(result.HasErrors);
+        var issue = result.Issues[0];
+        Assert.True(issue.Line == 3, $"Expected line 3 for 'unsupported-key' but got {issue.Line}");
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -243,9 +208,8 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml containing connector settings
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -258,24 +222,16 @@ public class ConfigurationSubsystemTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act: read the configuration
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read the configuration
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: connector settings are parsed correctly
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("github", result.Config.Connector?.Type);
-            Assert.Equal("acme-org", result.Config.Connector?.GitHub?.Owner);
-            Assert.Equal("my-project", result.Config.Connector?.GitHub?.Repo);
-            Assert.Equal("https://api.github.example.com", result.Config.Connector?.GitHub?.BaseUrl);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: connector settings are parsed correctly
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("github", result.Config.Connector?.Type);
+        Assert.Equal("acme-org", result.Config.Connector?.GitHub?.Owner);
+        Assert.Equal("my-project", result.Config.Connector?.GitHub?.Repo);
+        Assert.Equal("https://api.github.example.com", result.Config.Connector?.GitHub?.BaseUrl);
     }
 
     /// <summary>
@@ -285,9 +241,8 @@ public class ConfigurationSubsystemTests
     public async Task Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings()
     {
         // Arrange: create a temporary directory with a valid .buildmark.yaml containing Azure DevOps settings
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -301,24 +256,16 @@ public class ConfigurationSubsystemTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act: read the configuration
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act: read the configuration
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: Azure DevOps connector settings are parsed correctly
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("azure-devops", result.Config.Connector?.Type);
-            Assert.Equal("https://dev.azure.com/acme", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.Equal("acme", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.Equal("my-project", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.Equal("my-repo", result.Config.Connector?.AzureDevOps?.Repository);
-        }
-        finally
-        {
-            // Cleanup temporary directory
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: Azure DevOps connector settings are parsed correctly
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("azure-devops", result.Config.Connector?.Type);
+        Assert.Equal("https://dev.azure.com/acme", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+        Assert.Equal("acme", result.Config.Connector?.AzureDevOps?.Organization);
+        Assert.Equal("my-project", result.Config.Connector?.AzureDevOps?.Project);
+        Assert.Equal("my-repo", result.Config.Connector?.AzureDevOps?.Repository);
     }
 }

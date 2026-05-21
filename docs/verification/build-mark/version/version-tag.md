@@ -13,6 +13,14 @@ and error handling for invalid tags.
 | ----------- | ---------- |
 | None        | Pure logic |
 
+#### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### VersionTag_Create_ValidTag_ReturnsVersionTag

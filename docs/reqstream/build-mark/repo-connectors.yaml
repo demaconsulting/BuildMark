@@ -11,26 +11,37 @@
 sections:
   - title: RepoConnectors Subsystem Requirements
     requirements:
-      - id: BuildMark-RepoConnectors-ConnectorBase
+      - id: BuildMark-RepoConnectors-ConnectorInterface
         title: >-
-          The RepoConnectors subsystem shall provide a common interface and base class for all repository connectors.
+          The RepoConnectors subsystem shall provide a common interface for all repository connectors.
         justification: |
-          A shared interface and base class ensure that all connector implementations
-          are interchangeable and benefit from common utilities such as process
-          execution delegation and version-list search.
+          A shared interface ensures that all connector implementations are interchangeable,
+          enabling the factory and program to work with any connector implementation
+          without depending on concrete types.
         tests:
           - RepoConnectors_ConnectorBase_MockConnector_ImplementsInterface
           - RepoConnectors_ConnectorBase_GitHubConnector_ImplementsInterface
+        children:
+          - BuildMark-RepoConnectorBase-Interface
+          - BuildMark-RepoConnectorBase-RulesRouting
+          - BuildMark-RepoConnectorBase-FindVersionIndex
+
+      - id: BuildMark-RepoConnectors-ProcessRunner
+        title: >-
+          The RepoConnectors subsystem shall provide a process execution utility for running shell commands.
+        justification: |
+          Repository connectors rely on shell commands (git, gh CLI) to retrieve repository
+          information. A shared process-runner utility centralizes subprocess management,
+          ensuring consistent command execution and output handling across all connector
+          implementations.
+        tests:
           - RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
           - RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
           - RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
           - RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
           - RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
         children:
-          - BuildMark-RepoConnectorBase-Interface
           - BuildMark-RepoConnectorBase-CommandExecution
-          - BuildMark-RepoConnectorBase-RulesRouting
-          - BuildMark-RepoConnectorBase-FindVersionIndex
 
       - id: BuildMark-RepoConnectors-Factory
         title: The RepoConnectors subsystem shall provide a factory for creating the appropriate repository connector.

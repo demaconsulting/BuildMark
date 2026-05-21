@@ -1,5 +1,3 @@
-<!-- markdownlint-disable MD025 -->
-
 # Extended Item Controls
 
 BuildMark supports an optional `buildmark` code block embedded in GitHub and Azure DevOps issue and

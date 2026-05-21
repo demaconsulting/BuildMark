@@ -20,6 +20,7 @@
 
 using Xunit;
 
+// Disabled globally because ProgramTests redirect shared Console streams; must run serially.
 [assembly: CollectionBehavior(DisableTestParallelization = true)]
 
 

@@ -17,8 +17,7 @@ BuildMark is a .NET command-line tool that generates comprehensive markdown buil
 history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
 notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
-For detailed documentation, see the [User Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md).
-For command-line options, see the [CLI Reference](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md).
+For detailed documentation, see the [BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
 
 ## Features
 
@@ -151,6 +150,16 @@ buildmark --validate
 buildmark --validate --results validation-results.trx
 ```
 
+## Building
+
+```pwsh
+pwsh ./build.ps1
+```
+
+## User Guide
+
+The BuildMark User Guide is available on the [BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
+
 ## Configuration File
 
 BuildMark can be configured via a `.buildmark.yaml` file placed in the repository root, with
@@ -159,9 +168,6 @@ sections for connector settings, report sections, routing rules, and report opti
 When no configuration file is present, BuildMark applies built-in defaults that include
 Changes, Bugs Fixed, and Dependency Updates sections with pre-wired routing rules for
 common label and work-item patterns.
-
-For configuration details and examples, see the
-[Configuration Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/configuration.md).
 
 ### Authentication
 
@@ -174,7 +180,8 @@ from environment variables at runtime.
 `AZURE_DEVOPS_EXT_PAT`, then `SYSTEM_ACCESSTOKEN` (Azure Pipelines), then
 `az account get-access-token` (Azure CLI).
 
-For more detail see the [Authentication Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/introduction.md#with-github-token).
+The `token-variable` option in `.buildmark.yaml` can be used to override the automatic token
+resolution chain.
 
 ## Self Validation
 
@@ -210,19 +217,15 @@ Each test in the report proves:
 - **`BuildMark_KnownIssuesReporting`** - Known issues are correctly included when requested.
 - **`BuildMark_RulesRouting`** - Rules-based item routing assigns items to the correct report sections.
 
-See the [CLI Reference][cli-ref] for more details on the self-validation tests.
-
-[cli-ref]: https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/cli-reference.md#self-validation
-
 On validation failure the tool will exit with a non-zero exit code.
 
 ## Extended Item Controls
 
 BuildMark supports an optional `buildmark` code block in issue and pull request descriptions
 to control visibility, type classification, and affected-version ranges. Azure DevOps work items
-additionally support native custom fields for the same controls.
-
-For details, see the [Item Controls Guide](https://github.com/demaconsulting/BuildMark/blob/main/docs/user_guide/item-controls.md).
+additionally support native custom fields as an alternative mechanism for visibility and
+affected-versions controls. Note: type classification cannot be overridden via Azure DevOps
+custom fields; use a `buildmark` block in the item description instead.
 
 ## Report Format
 

@@ -1,6 +1,6 @@
 #### AzureDevOpsApiTypes
 
-##### Overview
+##### Purpose
 
 `AzureDevOpsApiTypes` is the collection of internal record types used by the
 Azure DevOps subsystem to represent REST API request and response payloads. These
@@ -18,7 +18,7 @@ process safely and predictably.
   `AzureDevOpsRestClient` can deserialize API responses without reflection
   workarounds or third-party JSON libraries
 
-##### Key Types
+##### Data Model
 
 All record types are defined as C# `record` types with init-only properties using
 conventional PascalCase property names. No `[JsonPropertyName]` attributes are
@@ -109,6 +109,24 @@ Fields: `workItems` (list of id references)
 Generic wrapper for paginated collection responses from the Azure DevOps REST API.
 
 Fields: `count`, `value` (list of `T`)
+
+###### `AzureDevOpsApiError`
+
+Error response body returned by the Azure DevOps REST API when a request fails.
+Used by `AzureDevOpsRestClient.TryReadAdoErrorMessageAsync` to extract a human-readable
+error message from non-success HTTP responses.
+
+Fields: `message`, `typeKey`
+
+##### Key Methods
+
+N/A — `AzureDevOpsApiTypes` is a collection of immutable record types used purely for JSON
+deserialization. No methods beyond C#-generated record members are defined.
+
+##### Error Handling
+
+N/A — These are immutable data record types used purely for JSON deserialization. No
+methods detect or propagate errors.
 
 ##### Interactions
 

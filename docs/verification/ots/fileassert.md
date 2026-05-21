@@ -23,6 +23,16 @@ dotnet fileassert --validate --results artifacts/fileassert-self-validation.trx
 
 The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 
+### Test Scenarios
+
+- *FileAssert self-validation*: CI pipeline executes
+  `dotnet fileassert --validate --results artifacts/fileassert-self-validation.trx`;
+  expects exit code 0 and a non-empty TRX file containing self-test results.
+- *FileAssert document assertions*: FileAssert is invoked for each generated document
+  collection (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide,
+  Verification); expects that each assertion set passes and a non-empty TRX file is
+  produced per collection.
+
 ### Requirements Coverage
 
 - **BuildMark-OTS-FileAssert**: CI pipeline self-validation TRX evidence from

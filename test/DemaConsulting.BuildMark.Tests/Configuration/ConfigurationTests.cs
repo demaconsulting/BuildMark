@@ -20,6 +20,7 @@
 
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.Configuration;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.Configuration;
 
@@ -35,23 +36,15 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
+        using var tempDir = new TemporaryDirectory();
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Empty(result.Issues);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Empty(result.Issues);
     }
 
     /// <summary>
@@ -61,9 +54,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -83,28 +75,21 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("github", result.Config.Connector?.Type);
-            Assert.Equal("example-owner", result.Config.Connector?.GitHub?.Owner);
-            Assert.Equal("hello-world", result.Config.Connector?.GitHub?.Repo);
-            Assert.Equal("https://api.github.com", result.Config.Connector?.GitHub?.BaseUrl);
-            Assert.Single(result.Config.Sections);
-            Assert.Equal("changes", result.Config.Sections[0].Id);
-            Assert.Single(result.Config.Rules);
-            Assert.Equal("changes", result.Config.Rules[0].Route);
-            Assert.Equal("feature", result.Config.Rules[0].Match?.Label[0]);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("github", result.Config.Connector?.Type);
+        Assert.Equal("example-owner", result.Config.Connector?.GitHub?.Owner);
+        Assert.Equal("hello-world", result.Config.Connector?.GitHub?.Repo);
+        Assert.Equal("https://api.github.com", result.Config.Connector?.GitHub?.BaseUrl);
+        Assert.Single(result.Config.Sections);
+        Assert.Equal("changes", result.Config.Sections[0].Id);
+        Assert.Single(result.Config.Rules);
+        Assert.Equal("changes", result.Config.Rules[0].Route);
+        Assert.Equal("feature", result.Config.Rules[0].Match?.Label[0]);
     }
 
     /// <summary>
@@ -114,9 +99,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_InvalidRepositoryValue_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -127,21 +111,14 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("owner/repo", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("owner/repo", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -151,29 +128,21 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             "connector:\n\ttype: github\n",
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("tab", result.Issues[0].Description, StringComparison.OrdinalIgnoreCase);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("tab", result.Issues[0].Description, StringComparison.OrdinalIgnoreCase);
     }
 
     /// <summary>
@@ -183,9 +152,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -202,24 +170,17 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("azure-devops", result.Config.Connector?.Type);
-            Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("azure-devops", result.Config.Connector?.Type);
+        Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+        Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+        Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
+        Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
     }
 
     /// <summary>
@@ -229,9 +190,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -248,23 +208,16 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
-            Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
-            Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
-            Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal("https://dev.azure.com/myorg", result.Config.Connector?.AzureDevOps?.OrganizationUrl);
+        Assert.Equal("myorg", result.Config.Connector?.AzureDevOps?.Organization);
+        Assert.Equal("myproject", result.Config.Connector?.AzureDevOps?.Project);
+        Assert.Equal("myrepo", result.Config.Connector?.AzureDevOps?.Repository);
     }
 
     /// <summary>
@@ -274,9 +227,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -293,20 +245,13 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal(@"myproject\myrepo", result.Config.Connector?.AzureDevOps?.AreaPath);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal(@"myproject\myrepo", result.Config.Connector?.AzureDevOps?.AreaPath);
     }
 
     /// <summary>
@@ -317,9 +262,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorEmptyAreaPath_ReturnsParsedConfiguration()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -336,20 +280,13 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert: AreaPath must be an empty string, not null, so that filtering is disabled
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.Equal(string.Empty, result.Config.Connector?.AzureDevOps?.AreaPath);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert: AreaPath must be an empty string, not null, so that filtering is disabled
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.Equal(string.Empty, result.Config.Connector?.AzureDevOps?.AreaPath);
     }
 
     /// <summary>
@@ -359,9 +296,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsNonScalarAreaPath_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -379,21 +315,14 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("Azure DevOps area-path must be a scalar string value", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("Azure DevOps area-path must be a scalar string value", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -403,9 +332,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsUnsupportedKey_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -416,21 +344,14 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("Unsupported Azure DevOps connector key", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("Unsupported Azure DevOps connector key", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -440,9 +361,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsNonMapping_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -452,21 +372,14 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("YAML mapping", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("YAML mapping", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -603,9 +516,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -616,23 +528,16 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.NotNull(result.Config);
-            Assert.False(result.HasErrors);
-            Assert.NotNull(result.Config.Report);
-            Assert.Equal("build-notes.md", result.Config.Report.File);
-            Assert.Equal(2, result.Config.Report.Depth);
-            Assert.True(result.Config.Report.IncludeKnownIssues);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.NotNull(result.Config);
+        Assert.False(result.HasErrors);
+        Assert.NotNull(result.Config.Report);
+        Assert.Equal("build-notes.md", result.Config.Report.File);
+        Assert.Equal(2, result.Config.Report.Depth);
+        Assert.True(result.Config.Report.IncludeKnownIssues);
     }
 
     /// <summary>
@@ -642,9 +547,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -653,20 +557,13 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Contains("positive integer", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Contains("positive integer", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -676,9 +573,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_GitHubEmptyTokenVariable_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -690,21 +586,14 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("token-variable", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("token-variable", result.Issues[0].Description);
     }
 
     /// <summary>
@@ -714,9 +603,8 @@ public class ConfigurationTests
     public async Task BuildMarkConfigReader_ReadAsync_AzureDevOpsEmptyTokenVariable_ReturnsErrorIssue()
     {
         // Arrange
-        var directory = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("n"));
-        Directory.CreateDirectory(directory);
-        var filePath = Path.Combine(directory, ".buildmark.yaml");
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
         await File.WriteAllTextAsync(
             filePath,
             """
@@ -730,20 +618,13 @@ public class ConfigurationTests
             """,
             TestContext.Current.CancellationToken);
 
-        try
-        {
-            // Act
-            var result = await BuildMarkConfigReader.ReadAsync(directory);
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
 
-            // Assert
-            Assert.Null(result.Config);
-            Assert.True(result.HasErrors);
-            Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
-            Assert.Contains("token-variable", result.Issues[0].Description);
-        }
-        finally
-        {
-            Directory.Delete(directory, recursive: true);
-        }
+        // Assert
+        Assert.Null(result.Config);
+        Assert.True(result.HasErrors);
+        Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
+        Assert.Contains("token-variable", result.Issues[0].Description);
     }
 }

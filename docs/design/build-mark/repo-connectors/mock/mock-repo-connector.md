@@ -1,6 +1,6 @@
 #### MockRepoConnector
 
-##### Overview
+##### Purpose
 
 `MockRepoConnector` is an in-memory implementation of `IRepoConnector` used for
 self-validation and unit testing. It returns a fixed, deterministic dataset
@@ -23,7 +23,7 @@ The connector holds hard-coded mappings used to build the `BuildInformation` res
 | `_openIssues`            | `List<string>`                            | IDs of issues that remain open               |
 | `_issueAffectedVersions` | `Dictionary<string, VersionIntervalSet>`  | Issue ID -> declared affected-versions range |
 
-##### Methods
+##### Key Methods
 
 ###### `GetBuildInformationAsync(version?) → BuildInformation`
 
@@ -44,7 +44,7 @@ collects all items and passes them to `ApplyRules` (inherited from `RepoConnecto
 to produce the `RoutedSections` list. If no rules are configured, the legacy
 categorization into `Changes` and `Bugs` is used.
 
-##### Error Conditions
+##### Error Handling
 
 `GetBuildInformationAsync` throws `InvalidOperationException` in the following scenarios:
 

@@ -34,6 +34,12 @@ The following topics are out of scope:
 - **Self-Validation** - Built-in qualification tests without external tooling
 - **Dependency Updates** - Built-in tracking of dependency changes from Dependabot and Renovate
 
+## References
+
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled user guide and documentation
+- [.NET SDK Download][dotnet-download]
+- [Continuous Compliance][continuous-compliance]
+
 # Continuous Compliance
 
 BuildMark follows the [Continuous Compliance][continuous-compliance] methodology, which ensures

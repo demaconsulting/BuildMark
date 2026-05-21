@@ -1,6 +1,6 @@
 ## Version
 
-### Verification Approach
+### Verification Strategy
 
 The Version subsystem is verified through `VersionTests.cs` (subsystem integration
 tests), plus dedicated unit test files for each version class. The subsystem tests
@@ -13,6 +13,16 @@ are described in the individual unit chapters.
 | Mock / Stub | Reason     |
 | ----------- | ---------- |
 | None        | Pure logic |
+
+### Test Environment
+
+N/A - standard test environment. `VersionTests.cs` contains pure logic tests with no
+external dependencies, network access, or file system requirements.
+
+### Acceptance Criteria
+
+All tests in `VersionTests.cs` pass with zero failures. All `BuildMark-Version-*`
+requirements have at least one test in the Requirements Coverage mapping.
 
 ### Test Scenarios
 
@@ -47,6 +57,14 @@ are described in the individual unit chapters.
 **Expected**: Returns a non-null `VersionInterval` instance.
 
 **Requirement coverage**: `BuildMark-Version-VersionInterval`
+
+#### VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
+
+**Scenario**: `VersionIntervalSet.Parse` is called with a single interval string.
+
+**Expected**: Returns a set containing exactly one `VersionInterval`.
+
+**Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
 
 #### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
 
@@ -94,4 +112,5 @@ are described in the individual unit chapters.
   Version_Subsystem_CreateAllVersionTypes_WorksCorrectly,
   Version_Subsystem_TagToComparableIntegration_WorksCorrectly
 - **BuildMark-Version-VersionInterval**: VersionInterval_Create_ValidInterval_ReturnsVersionInterval
+- **BuildMark-Version-VersionIntervalSet**: VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
 - **BuildMark-Version-VersionCommitTag**: VersionCommitTag_Constructor_ValidParameters_CreatesInstance

@@ -45,6 +45,32 @@ self-test.
 |-------------------------------------|--------|----------------------------------|
 | `GetBuildInformationAsync(version)` | Method | Fetch complete build information |
 
+### Design
+
+The RepoConnectors subsystem separates the connector contract, shared
+infrastructure, and concrete implementations into three layers:
+
+1. **Contract layer**: `IRepoConnector` defines the single public method all
+   connectors must implement. `RepoConnectorFactory` resolves the appropriate
+   concrete connector at runtime without the caller needing to know which
+   platform is in use.
+
+2. **Base layer**: `RepoConnectorBase` provides shared behavior inherited by
+   all production connectors — token resolution is handled in the concrete
+   classes, while `Configure`, `HasRules`, `ApplyRules`, `FindVersionIndex`, and
+   `RunCommandAsync` are provided by the base. `ItemControlsParser` and
+   `ItemControlsInfo` are shared utilities called by every connector to apply
+   buildmark block overrides per item. `ItemRouter` is the central routing
+   engine called by `RepoConnectorBase.ApplyRules` to distribute items into
+   configured report sections.
+
+3. **Implementation layer**: `GitHub`, `AzureDevOps`, and `Mock` child subsystems
+   each contain a connector that inherits from `RepoConnectorBase` together with
+   platform-specific client and type definitions. Each connector fetches platform
+   data, normalizes it into `ItemInfo` records, applies item-controls overrides,
+   calls `ApplyRules` when routing is configured, and returns a `BuildInformation`
+   record.
+
 ### Interactions
 
 | Unit / Subsystem             | Role                                                                   |

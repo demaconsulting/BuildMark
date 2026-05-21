@@ -33,3 +33,8 @@ This document is intended for:
 - Quality assurance teams reviewing code quality
 - Project stakeholders evaluating project health
 - Contributors understanding quality standards
+
+## References
+
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
+- [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=demaconsulting_BuildMark) — live code quality and security analysis

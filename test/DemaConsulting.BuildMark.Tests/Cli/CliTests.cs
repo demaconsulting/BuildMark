@@ -19,6 +19,7 @@
 // SOFTWARE.
 
 using DemaConsulting.BuildMark.Cli;
+using DemaConsulting.BuildMark.Utilities;
 
 namespace DemaConsulting.BuildMark.Tests.Cli;
 
@@ -151,29 +152,19 @@ public class CliTests
     public void Cli_LogFlag_CreatesLogFile()
     {
         // Arrange: create a temporary log file path
-        var logFile = Path.GetTempFileName();
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-        try
+        // Act: create context with --log argument and write a message
+        using (var context = Context.Create(["--log", logFile]))
         {
-            // Act: create context with --log argument and write a message
-            using (var context = Context.Create(["--log", logFile]))
-            {
-                context.WriteLine("Subsystem log test");
-            }
+            context.WriteLine("Subsystem log test");
+        }
 
-            // Assert: log file exists and contains the written message
-            Assert.True(File.Exists(logFile));
-            var logContent = File.ReadAllText(logFile);
-            Assert.Contains("Subsystem log test", logContent);
-        }
-        finally
-        {
-            // Clean up log file
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
-        }
+        // Assert: log file exists and contains the written message
+        Assert.True(File.Exists(logFile));
+        var logContent = File.ReadAllText(logFile);
+        Assert.Contains("Subsystem log test", logContent);
     }
 
     /// <summary>

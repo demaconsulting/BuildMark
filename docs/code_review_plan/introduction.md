@@ -31,3 +31,9 @@ This document is intended for:
 - Quality assurance teams validating review coverage
 - Project stakeholders reviewing compliance status
 - Auditors verifying that all required files have been reviewed
+
+## References
+
+- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
+- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) —
+  methodology for continuous compliance evidence generation

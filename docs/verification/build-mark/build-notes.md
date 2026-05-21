@@ -1,6 +1,6 @@
 ## BuildNotes
 
-### Verification Approach
+### Verification Strategy
 
 `BuildNotes` is the subsystem encompassing `BuildInformation`, `ItemInfo`, and `WebLink`. It is
 verified with dedicated subsystem tests in `BuildNotesTests.cs`. The subsystem uses
@@ -12,6 +12,17 @@ doubles are required.
 | Mock / Stub         | Reason                                                               |
 | ------------------- | -------------------------------------------------------------------- |
 | `MockRepoConnector` | Provides deterministic `BuildInformation` for subsystem-level tests. |
+
+### Test Environment
+
+N/A - standard test environment. `BuildNotesTests.cs` runs within the standard
+`dotnet test` host; no external services, live network, or special configuration
+are required.
+
+### Acceptance Criteria
+
+All tests in `BuildNotesTests.cs` pass with zero failures. All `BuildMark-BuildNotes-*`
+requirements have at least one test in the Requirements Coverage mapping.
 
 ### Test Scenarios
 

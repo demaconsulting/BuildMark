@@ -14,6 +14,7 @@ includes:
   - docs/reqstream/build-mark/utilities.yaml
   - docs/reqstream/build-mark/utilities/path-helpers.yaml
   - docs/reqstream/build-mark/utilities/process-runner.yaml
+  - docs/reqstream/build-mark/utilities/temporary-directory.yaml
   - docs/reqstream/build-mark/version.yaml
   - docs/reqstream/build-mark/repo-connectors.yaml
   - docs/reqstream/build-mark/repo-connectors/repo-connector-base.yaml

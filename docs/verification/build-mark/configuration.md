@@ -1,6 +1,6 @@
 ## Configuration
 
-### Verification Approach
+### Verification Strategy
 
 The Configuration subsystem is verified with dedicated subsystem tests in
 `ConfigurationSubsystemTests.cs`. Tests create temporary `.buildmark.yaml` files, call
@@ -9,9 +9,22 @@ is required; the real file system is used with temporary directories.
 
 ### Dependencies
 
-| Mock / Stub | Reason                                                               |
-| ----------- | -------------------------------------------------------------------- |
-| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
+| Mock / Stub | Reason                                                                                                    |
+| ----------- | --------------------------------------------------------------------------------------------------------- |
+| File system | Tests create temporary `.buildmark.yaml` files via `TemporaryDirectory` in the current working directory. |
+
+### Test Environment
+
+Tests create temporary `.buildmark.yaml` files through `TemporaryDirectory`, which
+creates a unique `tmp-*` subdirectory under the current working directory. Write
+access to the current working directory is required. No network access or external
+services are needed.
+
+### Acceptance Criteria
+
+All tests in `ConfigurationSubsystemTests.cs` pass with zero failures. All
+`BuildMark-Configuration-*` requirements have at least one test in the Requirements
+Coverage mapping.
 
 ### Test Scenarios
 

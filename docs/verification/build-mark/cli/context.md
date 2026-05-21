@@ -15,6 +15,14 @@ properties and exit codes, and verify output written to captured streams.
 `Context` has no dependencies on other tool units. All dependencies are real .NET BCL types;
 no mocking is needed at this level.
 
+#### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### Context_Create_EmptyArguments_CreatesValidContext

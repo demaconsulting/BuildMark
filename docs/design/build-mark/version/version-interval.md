@@ -1,6 +1,6 @@
 ### VersionInterval and VersionIntervalSet
 
-#### Overview
+#### Purpose
 
 `VersionInterval` represents a single mathematical version interval using
 inclusive or exclusive bounds, where either bound may be omitted to indicate
@@ -56,7 +56,7 @@ public record VersionIntervalSet(
 |-------------|-----------------------------------|-----------------------------------|
 | `Intervals` | `IReadOnlyList<VersionInterval>`  | Ordered list of parsed intervals  |
 
-#### Methods
+#### Key Methods
 
 ##### `VersionInterval.Parse(string text) → VersionInterval?`
 
@@ -150,6 +150,13 @@ Convenience overload for callers that already hold a parsed BuildMark
 | `[1.1.0,1.2.0)`            | One interval: `1.1.0` up to `1.2.0` (exclusive)   |
 | `(,1.0.1],[1.1.0,1.2.0)`   | Two intervals                                     |
 | `[3.0.0,)`                 | One interval: `3.0.0` and later                   |
+
+#### Error Handling
+
+`VersionInterval.Parse` returns `null` for malformed interval tokens rather than throwing.
+`VersionIntervalSet.Parse` silently discards tokens that do not parse successfully, returning
+a set containing only the valid intervals. `Contains(string version)` returns `false` if the
+candidate version string is not a valid semantic version, rather than propagating a parse error.
 
 #### Interactions
 

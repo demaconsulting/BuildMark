@@ -22,6 +22,7 @@ using DemaConsulting.BuildMark.BuildNotes;
 using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.Mock;
+using DemaConsulting.BuildMark.Utilities;
 using DemaConsulting.BuildMark.Version;
 
 namespace DemaConsulting.BuildMark.Tests;
@@ -173,46 +174,37 @@ public class ProgramTests
     public void Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues()
     {
         // Create temporary report file path
-        var reportFile = Path.GetTempFileName();
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
+
+        // Create context with report and include-known-issues flags
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
+            () => new MockRepoConnector());
+
+        // Verify IncludeKnownIssues property is set
+        Assert.True(context.IncludeKnownIssues);
+
+        // Capture console output
+        var originalOut = Console.Out;
+        using var writer = new StringWriter();
+        Console.SetOut(writer);
+
         try
         {
-            // Create context with report and include-known-issues flags
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
-                () => new MockRepoConnector());
+            // Run program
+            Program.Run(context);
 
-            // Verify IncludeKnownIssues property is set
+            // Verify report file was created
+            Assert.True(File.Exists(reportFile));
+
+            // Verify the context flag was set correctly
             Assert.True(context.IncludeKnownIssues);
-
-            // Capture console output
-            var originalOut = Console.Out;
-            using var writer = new StringWriter();
-            Console.SetOut(writer);
-
-            try
-            {
-                // Run program
-                Program.Run(context);
-
-                // Verify report file was created
-                Assert.True(File.Exists(reportFile));
-
-                // Verify the context flag was set correctly
-                Assert.True(context.IncludeKnownIssues);
-            }
-            finally
-            {
-                // Restore console output
-                Console.SetOut(originalOut);
-            }
         }
         finally
         {
-            // Clean up report file
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
+            // Restore console output
+            Console.SetOut(originalOut);
         }
     }
 
@@ -268,28 +260,20 @@ public class ProgramTests
     public void Program_Run_WithLogFlag_WritesToLogFile()
     {
         // Arrange: create a temporary log file path and context with --log flag
-        var logFile = Path.ChangeExtension(Path.GetTempFileName(), ".log");
-        try
-        {
-            // Dispose context before reading file so the log file handle is released
-            using (var context = Context.Create(["--log", logFile, "--help"]))
-            {
-                // Act: run the program (help output is written to log file via context)
-                Program.Run(context);
-            }
+        using var tempDir = new TemporaryDirectory();
+        var logFile = tempDir.GetFilePath("output.log");
 
-            // Assert: log file exists and contains output (checked after context is disposed)
-            Assert.True(File.Exists(logFile), "Log file should have been created");
-            var logContent = File.ReadAllText(logFile);
-            Assert.False(string.IsNullOrWhiteSpace(logContent), "Log file should contain output");
-        }
-        finally
+        // Dispose context before reading file so the log file handle is released
+        using (var context = Context.Create(["--log", logFile, "--help"]))
         {
-            if (File.Exists(logFile))
-            {
-                File.Delete(logFile);
-            }
+            // Act: run the program (help output is written to log file via context)
+            Program.Run(context);
         }
+
+        // Assert: log file exists and contains output (checked after context is disposed)
+        Assert.True(File.Exists(logFile), "Log file should have been created");
+        var logContent = File.ReadAllText(logFile);
+        Assert.False(string.IsNullOrWhiteSpace(logContent), "Log file should contain output");
     }
 
     /// <summary>
@@ -299,25 +283,17 @@ public class ProgramTests
     public void Program_Run_WithResultsFlag_WritesResultsFile()
     {
         // Arrange: create a temporary TRX results file path and context with --validate and --results flags
-        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".trx");
-        try
-        {
-            using var context = Context.Create(["--validate", "--results", resultsFile, "--silent"]);
+        using var tempDir = new TemporaryDirectory();
+        var resultsFile = tempDir.GetFilePath("results.trx");
 
-            // Act: run the program in validate mode
-            Program.Run(context);
+        using var context = Context.Create(["--validate", "--results", resultsFile, "--silent"]);
 
-            // Assert: results file was created by the validation run
-            Assert.Equal(0, context.ExitCode);
-            Assert.True(File.Exists(resultsFile), "Results file should have been created");
-        }
-        finally
-        {
-            if (File.Exists(resultsFile))
-            {
-                File.Delete(resultsFile);
-            }
-        }
+        // Act: run the program in validate mode
+        Program.Run(context);
+
+        // Assert: results file was created by the validation run
+        Assert.Equal(0, context.ExitCode);
+        Assert.True(File.Exists(resultsFile), "Results file should have been created");
     }
 
     /// <summary>
@@ -327,28 +303,20 @@ public class ProgramTests
     public void Program_Run_WithBuildVersionFlag_AcceptsBuildVersion()
     {
         // Arrange: create a temporary report file path and context with --build-version flag
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            using var context = Context.Create(
-                ["--build-version", "3.2.1", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        using var context = Context.Create(
+            ["--build-version", "3.2.1", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: program succeeds and the build version appears in the report
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("3.2.1", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: program succeeds and the build version appears in the report
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("3.2.1", content);
     }
 
     /// <summary>
@@ -358,28 +326,20 @@ public class ProgramTests
     public void Program_Run_WithDepthFlag_SetsHeadingDepth()
     {
         // Arrange: create a temporary report file path and context with --depth 3 flag
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            using var context = Context.Create(
-                ["--build-version", "1.0.0", "--report", reportFile, "--depth", "3", "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        using var context = Context.Create(
+            ["--build-version", "1.0.0", "--report", reportFile, "--depth", "3", "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report uses level-three heading for the title (depth 3 = ###)
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("### Build Report", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report uses level-three heading for the title (depth 3 = ###)
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("### Build Report", content);
     }
 
     /// <summary>

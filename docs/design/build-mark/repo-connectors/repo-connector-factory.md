@@ -1,11 +1,15 @@
 ### RepoConnectorFactory
 
-#### Overview
+#### Purpose
 
 `RepoConnectorFactory` is a static factory class that creates the appropriate
 `IRepoConnector` implementation based on the runtime environment.
 
-#### Methods
+#### Data Model
+
+N/A — `RepoConnectorFactory` is a static factory class with no instance state.
+
+#### Key Methods
 
 ##### `Create(ConnectorConfig? config) → IRepoConnector`
 
@@ -51,6 +55,13 @@ exercise the URL-based detection logic without requiring a real git process.
   returns a new `GitHubRepoConnector` initialized with `config?.GitHub`.
 - If `remoteUrl` is `null` or does not match any known host, defaults to a
   `GitHubRepoConnector` initialized with `config?.GitHub`.
+
+#### Error Handling
+
+`Create` never throws. If the git remote URL cannot be determined (e.g., git is unavailable),
+`ProcessRunner.TryRunAsync` returns `null` and the factory silently defaults to a
+`GitHubRepoConnector`. Connector type detection errors are suppressed to avoid failing
+tool startup on environment differences.
 
 #### Interactions
 

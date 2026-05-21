@@ -56,17 +56,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_VersionFlag_OutputsVersion()
     {
-        // Run the application with --version flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--version");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify version is output
         Assert.False(string.IsNullOrWhiteSpace(output));
         Assert.DoesNotContain("Error", output);
     }
@@ -77,17 +77,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_HelpFlag_OutputsUsageInformation()
     {
-        // Run the application with --help flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify usage information
         Assert.Contains("Usage: buildmark", output);
         Assert.Contains("Options:", output);
         Assert.Contains("--version", output);
@@ -100,7 +100,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_SilentFlag_SuppressesOutput()
     {
-        // Run the application with --silent and --help flags
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -108,10 +110,8 @@ public class IntegrationTests
             "--silent",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify no banner in output
         Assert.DoesNotContain("BuildMark version", output);
     }
 
@@ -121,17 +121,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_InvalidArgument_ShowsError()
     {
-        // Run the application with invalid argument
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--invalid-argument");
 
-        // Verify error exit code
+        // Assert:
         Assert.Equal(1, exitCode);
-
-        // Verify error message
         Assert.Contains("Error:", output);
         Assert.Contains("Unsupported argument", output);
     }
@@ -179,17 +179,17 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ValidateFlag_RunsSelfValidation()
     {
-        // Run the application with --validate flag
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
             _dllPath,
             "--validate");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify validation runs
         Assert.False(string.IsNullOrWhiteSpace(output));
     }
 
@@ -199,7 +199,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_LogParameter_IsAccepted()
     {
-        // Run the application with log parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -207,10 +209,8 @@ public class IntegrationTests
             "--log", "test.log",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -220,7 +220,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ReportParameter_IsAccepted()
     {
-        // Run the application with report parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -228,10 +230,8 @@ public class IntegrationTests
             "--report", "output.md",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -241,7 +241,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_DepthParameter_IsAccepted()
     {
-        // Run the application with depth parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -249,10 +251,8 @@ public class IntegrationTests
             "--depth", "2",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -262,7 +262,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_BuildVersionParameter_IsAccepted()
     {
-        // Run the application with build-version parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -270,10 +272,8 @@ public class IntegrationTests
             "--build-version", "1.0.0",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -283,7 +283,9 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_ResultsParameter_IsAccepted()
     {
-        // Run the application with results parameter
+        // Arrange: (no setup required)
+
+        // Act:
         var exitCode = Runner.Run(
             out var output,
             "dotnet",
@@ -291,10 +293,8 @@ public class IntegrationTests
             "--results", "results.trx",
             "--help");
 
-        // Verify success
+        // Assert:
         Assert.Equal(0, exitCode);
-
-        // Verify it's not an argument error
         Assert.DoesNotContain("Unsupported argument", output);
     }
 
@@ -305,31 +305,23 @@ public class IntegrationTests
     public void BuildMark_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report file contains markdown title and version information
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("# Build Report", content);
-            Assert.Contains("## Version Information", content);
-            Assert.Contains("2.0.0", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report file contains markdown title and version information
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("# Build Report", content);
+        Assert.Contains("## Version Information", content);
+        Assert.Contains("2.0.0", content);
     }
 
     /// <summary>
@@ -339,31 +331,23 @@ public class IntegrationTests
     public void BuildMark_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report contains changes and bug fixes sections with linked items
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("## Changes", content);
-            Assert.Contains("## Bugs Fixed", content);
-            Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report contains changes and bug fixes sections with linked items
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("## Changes", content);
+        Assert.Contains("## Bugs Fixed", content);
+        Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
     }
 
     /// <summary>
@@ -373,30 +357,22 @@ public class IntegrationTests
     public void BuildMark_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report identifies the previous version as the baseline of the version range
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("Previous Version", content);
-            Assert.Contains("ver-1.1.0", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report identifies the previous version as the baseline of the version range
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("Previous Version", content);
+        Assert.Contains("ver-1.1.0", content);
     }
 
     /// <summary>
@@ -407,31 +383,23 @@ public class IntegrationTests
     public void BuildMark_Report_BaselinePreRelease_SkipsSameCommitPredecessor()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with a connector that provides a pre-release where the immediate
-            // predecessor shares the same commit hash (should be skipped), leaving v1.1.0 as baseline
-            using var context = Context.Create(
-                ["--build-version", "1.2.0-beta.2", "--report", reportFile, "--silent"],
-                () => new PreReleaseSameCommitConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with a connector that provides a pre-release where the immediate
+        // predecessor shares the same commit hash (should be skipped), leaving v1.1.0 as baseline
+        using var context = Context.Create(
+            ["--build-version", "1.2.0-beta.2", "--report", reportFile, "--silent"],
+            () => new PreReleaseSameCommitConnector());
 
-            // Assert: report uses v1.1.0 as the baseline (same-commit predecessor was skipped)
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("v1.1.0", content);
-            Assert.Contains("v1.1.0...1.2.0-beta.2", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report uses v1.1.0 as the baseline (same-commit predecessor was skipped)
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("v1.1.0", content);
+        Assert.Contains("v1.1.0...1.2.0-beta.2", content);
     }
 
     /// <summary>
@@ -442,30 +410,22 @@ public class IntegrationTests
     public void BuildMark_Report_BaselineFirstRelease_GeneratesFromBeginningOfHistory()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with a connector that provides a first release with no baseline
-            using var context = Context.Create(
-                ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
-                () => new FirstReleaseConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with a connector that provides a first release with no baseline
+        using var context = Context.Create(
+            ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
+            () => new FirstReleaseConnector());
 
-            // Assert: report generates successfully and shows N/A for the missing baseline
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("1.0.0", content);
-            Assert.Contains("N/A", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report generates successfully and shows N/A for the missing baseline
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("1.0.0", content);
+        Assert.Contains("N/A", content);
     }
 
     /// <summary>
@@ -475,29 +435,21 @@ public class IntegrationTests
     public void BuildMark_Report_IncludesKnownIssues_WhenFlagIsSet()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector and include-known-issues flag
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector and include-known-issues flag
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--include-known-issues", "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report includes a known issues section
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("## Known Issues", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report includes a known issues section
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("## Known Issues", content);
     }
 
     /// <summary>
@@ -507,30 +459,22 @@ public class IntegrationTests
     public void BuildMark_Report_DepthTwo_UsesLevelTwoHeadings()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector and report depth 2
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--depth", "2", "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector and report depth 2
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--depth", "2", "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report uses level-two heading for the title and level-three for sections
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("## Build Report", content);
-            Assert.Contains("### Version Information", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report uses level-two heading for the title and level-three for sections
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("## Build Report", content);
+        Assert.Contains("### Version Information", content);
     }
 
     /// <summary>
@@ -539,6 +483,8 @@ public class IntegrationTests
     [Fact]
     public void BuildMark_LintFlag_IsAccepted()
     {
+        // Arrange: (no setup required)
+
         // Act: run the application with --lint flag
         var exitCode = Runner.Run(
             out var output,
@@ -558,30 +504,22 @@ public class IntegrationTests
     public void BuildMark_Report_ConsumesConfigurationFileDuringGeneration()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector (configuration loading executes as part of report generation)
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program which loads configuration before generating the report
-            Program.Run(context);
+        // Create context with mock connector (configuration loading executes as part of report generation)
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: tool succeeds and produces a report (configuration was loaded without error)
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.False(string.IsNullOrWhiteSpace(content));
-            Assert.Contains("# Build Report", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program which loads configuration before generating the report
+        Program.Run(context);
+
+        // Assert: tool succeeds and produces a report (configuration was loaded without error)
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.False(string.IsNullOrWhiteSpace(content));
+        Assert.Contains("# Build Report", content);
     }
 
     /// <summary>
@@ -591,30 +529,22 @@ public class IntegrationTests
     public void BuildMark_Report_UsesConnectorForBuildData()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector injected via connector factory
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector injected via connector factory
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report contains data sourced from the mock connector
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("Update documentation", content);
-            Assert.Contains("Fix bug in Y", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report contains data sourced from the mock connector
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("Update documentation", content);
+        Assert.Contains("Fix bug in Y", content);
     }
 
     /// <summary>
@@ -624,31 +554,23 @@ public class IntegrationTests
     public void BuildMark_Report_ContainsSectionDefinitions()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: report contains the expected section headings
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("## Version Information", content);
-            Assert.Contains("## Changes", content);
-            Assert.Contains("## Bugs Fixed", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report contains the expected section headings
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("## Version Information", content);
+        Assert.Contains("## Changes", content);
+        Assert.Contains("## Bugs Fixed", content);
     }
 
     /// <summary>
@@ -658,40 +580,32 @@ public class IntegrationTests
     public void BuildMark_Report_RoutesItemsToCorrectSections()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with mock connector (which provides items of different types)
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new MockRepoConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with mock connector (which provides items of different types)
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new MockRepoConnector());
 
-            // Assert: bug items appear in Bugs Fixed section; non-bug items appear in Changes section
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
-            var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
-            Assert.True(changesStart >= 0, "Report must contain Changes section");
-            Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
+        // Act: run the program
+        Program.Run(context);
 
-            // Bug-typed item "Fix bug in Y" should be in Bugs Fixed section
-            var bugsSection = content[bugsStart..];
-            Assert.Contains("Fix bug in Y", bugsSection);
+        // Assert: bug items appear in Bugs Fixed section; non-bug items appear in Changes section
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        var changesStart = content.IndexOf("## Changes", StringComparison.Ordinal);
+        var bugsStart = content.IndexOf("## Bugs Fixed", StringComparison.Ordinal);
+        Assert.True(changesStart >= 0, "Report must contain Changes section");
+        Assert.True(bugsStart >= 0, "Report must contain Bugs Fixed section");
 
-            // Non-bug item "Update documentation" should be in Changes section
-            var changesSection = content[changesStart..bugsStart];
-            Assert.Contains("Update documentation", changesSection);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Bug-typed item "Fix bug in Y" should be in Bugs Fixed section
+        var bugsSection = content[bugsStart..];
+        Assert.Contains("Fix bug in Y", bugsSection);
+
+        // Non-bug item "Update documentation" should be in Changes section
+        var changesSection = content[changesStart..bugsStart];
+        Assert.Contains("Update documentation", changesSection);
     }
 
     /// <summary>
@@ -862,41 +776,33 @@ public class IntegrationTests
     public void BuildMark_AzureDevOps_Report_GeneratesMarkdownWithVersionInformation()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Set up a mocked REST handler with a single version tag and commit
-            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
-                .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
-                .AddCommitsResponse(new MockAdoCommit("abc123"))
-                .AddPullRequestsResponse()
-                .AddWiqlResponse();
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            using var mockHttpClient = new HttpClient(mockHandler);
-            var adoConnector = CreateMockAdoConnector(mockHttpClient, "abc123");
+        // Set up a mocked REST handler with a single version tag and commit
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(new MockAdoTag("v1.0.0", "abc123"))
+            .AddCommitsResponse(new MockAdoCommit("abc123"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
 
-            // Create context with Azure DevOps connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
-                () => adoConnector);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var adoConnector = CreateMockAdoConnector(mockHttpClient, "abc123");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with Azure DevOps connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "1.0.0", "--report", reportFile, "--silent"],
+            () => adoConnector);
 
-            // Assert: report file contains markdown title and version information
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("# Build Report", content);
-            Assert.Contains("## Version Information", content);
-            Assert.Contains("1.0.0", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report file contains markdown title and version information
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("# Build Report", content);
+        Assert.Contains("## Version Information", content);
+        Assert.Contains("1.0.0", content);
     }
 
     /// <summary>
@@ -907,53 +813,45 @@ public class IntegrationTests
     public void BuildMark_AzureDevOps_Report_ContainsChangesAndBugFixesWithHyperlinks()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Set up mocked REST data with two versions, two pull requests, and linked work items
-            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
-                .AddTagsResponse(
-                    new MockAdoTag("v1.1.0", "commit3"),
-                    new MockAdoTag("v1.0.0", "commit1"))
-                .AddCommitsResponse(
-                    new MockAdoCommit("commit3"),
-                    new MockAdoCommit("commit2"),
-                    new MockAdoCommit("commit1"))
-                .AddPullRequestsResponse(
-                    new MockAdoPullRequest(101, "Add new feature", "completed", "commit3"),
-                    new MockAdoPullRequest(100, "Fix critical bug", "completed", "commit2"))
-                .AddPullRequestWorkItemsResponse("repo", 101, 201)
-                .AddPullRequestWorkItemsResponse("repo", 100, 200)
-                .AddWorkItemsResponse(
-                    new MockAdoWorkItem(201, "New feature work item", "User Story"),
-                    new MockAdoWorkItem(200, "Bug work item", "Bug"))
-                .AddWiqlResponse();
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            using var mockHttpClient = new HttpClient(mockHandler);
-            var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
+        // Set up mocked REST data with two versions, two pull requests, and linked work items
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v1.1.0", "commit3"),
+                new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit3"),
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse(
+                new MockAdoPullRequest(101, "Add new feature", "completed", "commit3"),
+                new MockAdoPullRequest(100, "Fix critical bug", "completed", "commit2"))
+            .AddPullRequestWorkItemsResponse("repo", 101, 201)
+            .AddPullRequestWorkItemsResponse("repo", 100, 200)
+            .AddWorkItemsResponse(
+                new MockAdoWorkItem(201, "New feature work item", "User Story"),
+                new MockAdoWorkItem(200, "Bug work item", "Bug"))
+            .AddWiqlResponse();
 
-            // Create context with Azure DevOps connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "1.1.0", "--report", reportFile, "--silent"],
-                () => adoConnector);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with Azure DevOps connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "1.1.0", "--report", reportFile, "--silent"],
+            () => adoConnector);
 
-            // Assert: report contains changes and bug fixes sections with linked items
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("## Changes", content);
-            Assert.Contains("## Bugs Fixed", content);
-            Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report contains changes and bug fixes sections with linked items
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("## Changes", content);
+        Assert.Contains("## Bugs Fixed", content);
+        Assert.Contains("](", content); // markdown hyperlink syntax [text](url)
     }
 
     /// <summary>
@@ -964,46 +862,38 @@ public class IntegrationTests
     public void BuildMark_AzureDevOps_Report_ShowsVersionRangeFromPreviousRelease()
     {
         // Arrange: create a temporary report file path
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Set up mocked REST data with three version tags so previous version selection is exercised
-            using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
-                .AddTagsResponse(
-                    new MockAdoTag("v2.0.0", "commit3"),
-                    new MockAdoTag("v1.1.0", "commit2"),
-                    new MockAdoTag("v1.0.0", "commit1"))
-                .AddCommitsResponse(
-                    new MockAdoCommit("commit3"),
-                    new MockAdoCommit("commit2"),
-                    new MockAdoCommit("commit1"))
-                .AddPullRequestsResponse()
-                .AddWiqlResponse();
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            using var mockHttpClient = new HttpClient(mockHandler);
-            var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
+        // Set up mocked REST data with three version tags so previous version selection is exercised
+        using var mockHandler = new MockAzureDevOpsHttpMessageHandler()
+            .AddTagsResponse(
+                new MockAdoTag("v2.0.0", "commit3"),
+                new MockAdoTag("v1.1.0", "commit2"),
+                new MockAdoTag("v1.0.0", "commit1"))
+            .AddCommitsResponse(
+                new MockAdoCommit("commit3"),
+                new MockAdoCommit("commit2"),
+                new MockAdoCommit("commit1"))
+            .AddPullRequestsResponse()
+            .AddWiqlResponse();
 
-            // Create context with Azure DevOps connector injected for deterministic output
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => adoConnector);
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var adoConnector = CreateMockAdoConnector(mockHttpClient, "commit3");
 
-            // Act: run the program
-            Program.Run(context);
+        // Create context with Azure DevOps connector injected for deterministic output
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => adoConnector);
 
-            // Assert: report identifies the previous version as the baseline of the version range
-            Assert.Equal(0, context.ExitCode);
-            var content = File.ReadAllText(reportFile);
-            Assert.Contains("Previous Version", content);
-            Assert.Contains("v1.1.0", content);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Act: run the program
+        Program.Run(context);
+
+        // Assert: report identifies the previous version as the baseline of the version range
+        Assert.Equal(0, context.ExitCode);
+        var content = File.ReadAllText(reportFile);
+        Assert.Contains("Previous Version", content);
+        Assert.Contains("v1.1.0", content);
     }
 
     /// <summary>
@@ -1013,31 +903,23 @@ public class IntegrationTests
     public void BuildMark_ResultsParameter_WritesTrxFile()
     {
         // Arrange: create a temporary TRX results file path
-        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".trx");
-        try
-        {
-            // Act: run the application with --validate and --results pointing to a TRX file
-            var exitCode = Runner.Run(
-                out _,
-                "dotnet",
-                _dllPath,
-                "--validate",
-                "--results", resultsFile,
-                "--silent");
+        using var tempDir = new TemporaryDirectory();
+        var resultsFile = tempDir.GetFilePath("results.trx");
 
-            // Assert: tool succeeds and writes a TRX file containing the TestRun XML element
-            Assert.Equal(0, exitCode);
-            Assert.True(File.Exists(resultsFile), "TRX results file should have been created");
-            var content = File.ReadAllText(resultsFile);
-            Assert.Contains("<TestRun", content);
-        }
-        finally
-        {
-            if (File.Exists(resultsFile))
-            {
-                File.Delete(resultsFile);
-            }
-        }
+        // Act: run the application with --validate and --results pointing to a TRX file
+        var exitCode = Runner.Run(
+            out _,
+            "dotnet",
+            _dllPath,
+            "--validate",
+            "--results", resultsFile,
+            "--silent");
+
+        // Assert: tool succeeds and writes a TRX file containing the TestRun XML element
+        Assert.Equal(0, exitCode);
+        Assert.True(File.Exists(resultsFile), "TRX results file should have been created");
+        var content = File.ReadAllText(resultsFile);
+        Assert.Contains("<TestRun", content);
     }
 
     /// <summary>
@@ -1047,31 +929,23 @@ public class IntegrationTests
     public void BuildMark_ResultsParameter_WritesJUnitFile()
     {
         // Arrange: create a temporary JUnit XML results file path
-        var resultsFile = Path.ChangeExtension(Path.GetTempFileName(), ".xml");
-        try
-        {
-            // Act: run the application with --validate and --results pointing to an XML file
-            var exitCode = Runner.Run(
-                out _,
-                "dotnet",
-                _dllPath,
-                "--validate",
-                "--results", resultsFile,
-                "--silent");
+        using var tempDir = new TemporaryDirectory();
+        var resultsFile = tempDir.GetFilePath("results.xml");
 
-            // Assert: tool succeeds and writes an XML file containing the testsuites element
-            Assert.Equal(0, exitCode);
-            Assert.True(File.Exists(resultsFile), "JUnit XML results file should have been created");
-            var content = File.ReadAllText(resultsFile);
-            Assert.Contains("<testsuites", content);
-        }
-        finally
-        {
-            if (File.Exists(resultsFile))
-            {
-                File.Delete(resultsFile);
-            }
-        }
+        // Act: run the application with --validate and --results pointing to an XML file
+        var exitCode = Runner.Run(
+            out _,
+            "dotnet",
+            _dllPath,
+            "--validate",
+            "--results", resultsFile,
+            "--silent");
+
+        // Assert: tool succeeds and writes an XML file containing the testsuites element
+        Assert.Equal(0, exitCode);
+        Assert.True(File.Exists(resultsFile), "JUnit XML results file should have been created");
+        var content = File.ReadAllText(resultsFile);
+        Assert.Contains("<testsuites", content);
     }
 
     /// <summary>
@@ -1081,33 +955,23 @@ public class IntegrationTests
     public async Task BuildMark_Config_ConnectorType_ReadFromConfigFile()
     {
         // Arrange: create a temporary directory containing a .buildmark.yaml with an explicit connector type
-        var tempDir = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
-        Directory.CreateDirectory(tempDir);
-        try
-        {
-            // Write a configuration file that explicitly selects the azure-devops connector type
-            var configContent = "connector:\n  type: azure-devops\n";
-            await File.WriteAllTextAsync(
-                Path.Combine(tempDir, ".buildmark.yaml"),
-                configContent,
-                TestContext.Current.CancellationToken);
+        using var tempDir = new TemporaryDirectory();
 
-            // Act: read configuration and create the connector through the factory
-            var loadResult = await BuildMarkConfigReader.ReadAsync(tempDir);
-            var connector = RepoConnectorFactory.Create(loadResult.Config?.Connector);
+        // Write a configuration file that explicitly selects the azure-devops connector type
+        var configContent = "connector:\n  type: azure-devops\n";
+        await File.WriteAllTextAsync(
+            tempDir.GetFilePath(".buildmark.yaml"),
+            configContent,
+            TestContext.Current.CancellationToken);
 
-            // Assert: configuration was parsed without errors and the factory created an Azure DevOps connector
-            Assert.False(loadResult.HasErrors, "Configuration file should load without errors");
-            Assert.NotNull(connector);
-            Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
-        }
-        finally
-        {
-            if (Directory.Exists(tempDir))
-            {
-                Directory.Delete(tempDir, recursive: true);
-            }
-        }
+        // Act: read configuration and create the connector through the factory
+        var loadResult = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+        var connector = RepoConnectorFactory.Create(loadResult.Config?.Connector);
+
+        // Assert: configuration was parsed without errors and the factory created an Azure DevOps connector
+        Assert.False(loadResult.HasErrors, "Configuration file should load without errors");
+        Assert.NotNull(connector);
+        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
     }
 
     /// <summary>
@@ -1138,28 +1002,20 @@ public class IntegrationTests
     /// <returns>The markdown report content string.</returns>
     private static string GenerateControlsMockReport()
     {
-        var reportFile = Path.GetTempFileName();
-        try
-        {
-            // Create context with controls mock connector
-            using var context = Context.Create(
-                ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
-                () => new ControlsMockConnector());
+        using var tempDir = new TemporaryDirectory();
+        var reportFile = tempDir.GetFilePath("report.md");
 
-            // Run the program
-            Program.Run(context);
+        // Create context with controls mock connector
+        using var context = Context.Create(
+            ["--build-version", "2.0.0", "--report", reportFile, "--silent"],
+            () => new ControlsMockConnector());
 
-            // Verify success and return content
-            Assert.Equal(0, context.ExitCode);
-            return File.ReadAllText(reportFile);
-        }
-        finally
-        {
-            if (File.Exists(reportFile))
-            {
-                File.Delete(reportFile);
-            }
-        }
+        // Run the program
+        Program.Run(context);
+
+        // Verify success and return content
+        Assert.Equal(0, context.ExitCode);
+        return File.ReadAllText(reportFile);
     }
 
     /// <summary>

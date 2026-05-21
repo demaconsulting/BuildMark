@@ -18,6 +18,32 @@ calls `BuildInformation.ToMarkdown` to write the final report file.
 | `ItemInfo`         | `BuildNotes/ItemInfo.cs`         | Single issue or pull request in the report       |
 | `WebLink`          | `BuildNotes/WebLink.cs`          | Hyperlink used for the full-changelog entry      |
 
+### Interfaces
+
+The primary interface consumed by `Program` is:
+
+| Member | Kind | Description |
+| --- | --- | --- |
+| `BuildInformation.ToMarkdown(depth, includeKnownIssues)` | Method | Renders assembled build data as markdown string |
+
+The data records `BuildInformation`, `ItemInfo`, and `WebLink` are the shared
+output types exposed to all connectors for assembly, and to `Program` and
+`SelfTest` for consumption.
+
+### Design
+
+The BuildNotes subsystem is a pure data and rendering layer. Connectors in the
+`RepoConnectors` subsystem assemble a `BuildInformation` record by populating its
+version tags and item lists (`Changes`, `Bugs`, `KnownIssues`, and optionally
+`RoutedSections`). `Program` then calls `BuildInformation.ToMarkdown` to convert
+the in-memory model into the final markdown report file.
+
+`ItemInfo` and `WebLink` are simple immutable records; their construction and
+consumption require no additional coordination. The rendering logic in
+`ToMarkdown` selects between routed and legacy output modes based on whether
+`RoutedSections` is populated, requiring no knowledge of which connector produced
+the data.
+
 ### Interactions
 
 | Unit / Subsystem    | Role                                                               |

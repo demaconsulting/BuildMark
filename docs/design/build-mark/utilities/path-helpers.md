@@ -1,6 +1,6 @@
 ### PathHelpers Design
 
-#### Overview
+#### Purpose
 
 `PathHelpers` is a static utility class that provides a safe path-combination method. It
 protects callers against path-traversal attacks by verifying the resolved combined path stays
@@ -8,7 +8,11 @@ within the base directory. Note that `Path.GetFullPath` normalizes `.`/`..` segm
 not resolve symlinks or reparse points, so this check guards against string-level traversal
 only.
 
-#### Class Structure
+#### Data Model
+
+N/A — `PathHelpers` is a static utility class with no instance state.
+
+#### Key Methods
 
 ##### SafePathCombine Method
 
@@ -30,7 +34,7 @@ the base directory.
    or `Path.AltDirectorySeparatorChar`, or is itself rooted (absolute), which would indicate
    the combined path escapes the base directory.
 
-#### Design Decisions
+**Implementation rationale:**
 
 - **`Path.GetRelativePath` for containment check**: Using `GetRelativePath` to verify
   containment handles root paths (e.g. `/`, `C:\`), platform case-sensitivity, and
@@ -44,6 +48,12 @@ the base directory.
   identifying `relativePath` as the problematic parameter, making debugging straightforward.
 - **No logging or error accumulation**: `SafePathCombine` is a pure utility method that throws
   on invalid input; it does not interact with the `Context` or any output mechanism.
+
+#### Error Handling
+
+`SafePathCombine` throws `ArgumentNullException` when either argument is `null` and
+`ArgumentException` (identifying `relativePath` as the problematic parameter) when the
+resolved combined path escapes the base directory. No other exceptions are thrown.
 
 #### Interactions
 

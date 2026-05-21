@@ -14,6 +14,14 @@ and from remote URL detection.
 | Environment variables    | Tests set/clear `GITHUB_ACTIONS` and `TF_BUILD` env vars |
 | Git remote URL (process) | Factory may invoke Git to detect the remote URL          |
 
+#### Test Environment
+
+Standard dotnet test host; no external dependencies or environment setup required.
+
+#### Acceptance Criteria
+
+All tests in the test class pass with no errors or warnings.
+
 #### Test Scenarios
 
 ##### RepoConnectorFactory_Create_ReturnsConnector

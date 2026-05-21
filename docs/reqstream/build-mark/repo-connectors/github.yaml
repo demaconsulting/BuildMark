@@ -34,3 +34,4 @@ sections:
           - BuildMark-GitHub-DescriptionBody
           - BuildMark-GitHub-GraphQLClient
           - BuildMark-GitHub-Rules
+          - BuildMark-GitHub-TokenVariable

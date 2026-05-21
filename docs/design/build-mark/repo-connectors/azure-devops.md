@@ -45,6 +45,31 @@ both buildmark code blocks in the work item description and Azure DevOps custom 
 (`Custom.Visibility`, `Custom.AffectedVersions`). Custom fields take precedence over
 buildmark blocks when both are present.
 
+#### Interfaces
+
+The AzureDevOps subsystem exposes `AzureDevOpsRepoConnector`, which implements
+`IRepoConnector`. All other types in the subsystem are internal.
+
+| Member | Kind | Description |
+| --- | --- | --- |
+| `AzureDevOpsRepoConnector(config)` | Constructor | Create the connector with optional configuration overrides |
+| `GetBuildInformationAsync(version)` | Method | Fetch complete build information from the Azure DevOps REST API |
+
+#### Design
+
+`AzureDevOpsRepoConnector` orchestrates the subsystem's data flow. It uses
+`AzureDevOpsRestClient` for all HTTPS communication, `AzureDevOpsApiTypes`
+records as serialization targets, and `WorkItemMapper` to transform raw work
+item responses into `ItemInfo` records.
+
+The connector calls `ItemControlsParser.Parse` on each work item description
+body and also reads `Custom.Visibility` and `Custom.AffectedVersions` custom
+fields directly. `WorkItemMapper` merges the two sources (custom fields take
+precedence) and returns the final `ItemInfo` record or `null` when the item
+should be excluded. When routing rules have been configured, the connector passes
+all collected items to `ApplyRules` (inherited from `RepoConnectorBase`) to
+populate `BuildInformation.RoutedSections`.
+
 #### Interactions
 
 | Unit / Subsystem              | Role                                                                      |
@@ -56,3 +81,13 @@ buildmark blocks when both are present.
 | `AzureDevOpsConnectorConfig`  | Supplies organization URL, project, and repository overrides              |
 | `ItemControlsParser`          | Parses buildmark blocks from work item description bodies                 |
 | `BuildInformation`            | The output record assembled and returned by `AzureDevOpsRepoConnector`    |
+
+#### Error Handling
+
+`AzureDevOpsRestClient` propagates HTTP errors and JSON deserialization failures as
+`InvalidOperationException`. The exception message includes the Azure DevOps error
+message read via `TryReadAdoErrorMessageAsync` when the response body contains an
+Azure DevOps error object; otherwise the raw HTTP status code is included.
+
+`AzureDevOpsRepoConnector` does not suppress these exceptions; a failed REST API call
+therefore aborts `GetBuildInformationAsync` and propagates the exception to the caller.
