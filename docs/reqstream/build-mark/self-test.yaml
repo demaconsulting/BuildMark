@@ -25,7 +25,7 @@ sections:
             title: The tool shall write self-validation results to a standard test result file when --results is provided.
             justification: |
               CI/CD pipelines and requirements traceability tools (such as ReqStream) consume
-              test result files in standard formats. By supporting both TRX (MSTest) and JUnit
+              test result files in standard formats. By supporting both TRX (VSTest) and JUnit
               XML output, the SelfTest subsystem enables self-validation results to be fed
               directly into pipeline tooling and traceability reports without additional
               conversion steps, satisfying audit trail requirements.
