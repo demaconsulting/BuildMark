@@ -29,8 +29,3 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
   (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide, Verification);
   FileAssert validates the generated HTML output; expects exit code 0 for each invocation
   and non-empty HTML files containing expected content markers.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-Pandoc**: CI pipeline document generation evidence from multiple
-  FileAssert TRX results confirming successful HTML conversion

@@ -142,7 +142,3 @@ All 15 tests in `ItemControlsParserTests.cs` pass with no errors or warnings.
 **Expected**: `AffectedVersions` is not set or is empty; no exception thrown.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-ItemControlsParser**: All 15 tests in `ItemControlsParserTests.cs`

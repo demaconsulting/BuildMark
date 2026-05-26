@@ -55,8 +55,3 @@ All tests in the test class pass with no errors or warnings.
 **Expected**: Pull request DTO fields are populated correctly.
 
 **Requirement coverage**: `BuildMark-AzureDevOps-ApiTypes`
-
-##### Requirements Coverage
-
-- **BuildMark-AzureDevOps-ApiTypes**: Verified indirectly through all 12 tests in
-  `AzureDevOpsRestClientTests.cs` and all 13 tests in `WorkItemMapperTests.cs`

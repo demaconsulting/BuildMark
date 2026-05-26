@@ -31,8 +31,3 @@ The resulting TRX file is consumed by ReqStream itself to satisfy the OTS requir
 - *ReqStream requirements enforcement*: CI pipeline executes ReqStream in enforcement
   mode (`--enforce`) against the project requirements YAML files and evidence TRX files;
   expects exit code 0 confirming all requirements are fully satisfied.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-ReqStream**: CI pipeline self-validation TRX evidence from
-  `artifacts/reqstream-self-validation.trx`

@@ -131,21 +131,3 @@ interval set.
 block value.
 
 **Requirement coverage**: `BuildMark-AzureDevOps-CustomFields`
-
-##### Requirements Coverage
-
-- **BuildMark-AzureDevOps-WorkItemMapper**: `WorkItemMapper_MapWorkItemToItemInfo_BugType_ReturnsBugItem`,
-  `WorkItemMapper_MapWorkItemToItemInfo_IssueType_ReturnsBugItem`,
-  `WorkItemMapper_MapWorkItemToItemInfo_UserStoryType_ReturnsFeatureItem`,
-  `WorkItemMapper_MapWorkItemToItemInfo_FeatureType_ReturnsFeatureItem`,
-  `WorkItemMapper_MapWorkItemToItemInfo_EpicType_ReturnsFeatureItem`,
-  `WorkItemMapper_MapWorkItemToItemInfo_TaskType_ReturnsTaskItem`,
-  `WorkItemMapper_IsWorkItemResolved_ResolvedState_ReturnsTrue`,
-  `WorkItemMapper_IsWorkItemResolved_ActiveState_ReturnsFalse`,
-  `WorkItemMapper_GetWorkItemTypeForRuleMatching_ReturnsWorkItemTypeName` in `WorkItemMapperTests.cs`
-- **BuildMark-AzureDevOps-SuppressRemovedWorkItems**:
-  `WorkItemMapper_MapWorkItemToItemInfo_RemovedState_ReturnsNull` in `WorkItemMapperTests.cs`
-- **BuildMark-AzureDevOps-CustomFields**:
-  `WorkItemMapper_ExtractItemControls_CustomVisibilityField_ReturnsMappedControls`,
-  `WorkItemMapper_ExtractItemControls_CustomAffectedVersionsField_ReturnsMappedVersionSet`,
-  `WorkItemMapper_ExtractItemControls_CustomFieldsTakePrecedenceOverBuildmarkBlock` in `WorkItemMapperTests.cs`

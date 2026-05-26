@@ -73,12 +73,3 @@ mapping.
 **Expected**: Baseline is the previous release tag.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**: GitHub_ImplementsInterface_ReturnsTrue
-- **BuildMark-RepoConnectors-GitHub**: GitHub_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  GitHub_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline,
-  GitHub_GetBuildInformation_WithPullRequests_GathersChanges,
-  GitHub_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues,
-  GitHub_GetBuildInformation_ReleaseVersion_SkipsPreReleases

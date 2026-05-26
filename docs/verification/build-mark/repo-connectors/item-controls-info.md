@@ -79,7 +79,3 @@ All tests in `ItemControlsTests.cs` and `ItemControlsParserTests.cs` that produc
 **Expected**: Returns `null` (no `ItemControlsInfo`).
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsInfo`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-ItemControlsInfo**: All 13 tests in `ItemControlsTests.cs`

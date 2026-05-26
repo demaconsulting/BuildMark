@@ -87,7 +87,3 @@ All 8 tests in `ItemRouterTests.cs` pass with no errors or warnings.
 **Expected**: Item is omitted from all sections.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemRouter`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-ItemRouter**: All 8 tests in `ItemRouterTests.cs`

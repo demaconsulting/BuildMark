@@ -225,10 +225,3 @@ range.
 **Expected**: Generated changelog link uses the Azure DevOps compare format.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
-
-##### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**:
-  AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
-- **BuildMark-RepoConnectors-AzureDevOps**: All remaining 24 tests in
-  `AzureDevOpsRepoConnectorTests.cs`

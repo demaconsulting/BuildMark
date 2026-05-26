@@ -129,18 +129,3 @@ populated, but no item ID that appears in `KnownIssues` also appears in any rout
 that known issues are excluded from the routing path and kept in their dedicated collection.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-##### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**: MockRepoConnector_ImplementsInterface
-- **BuildMark-RepoConnectors-Mock**: MockRepoConnector_Constructor_CreatesInstance,
-  MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion,
-  MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline,
-  MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation,
-  MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly,
-  MockRepoConnector_Configure_StoresRulesAndSections,
-  MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections,
-  MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections,
-  MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions,
-  MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue,
-  MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections

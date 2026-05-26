@@ -30,8 +30,3 @@ The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 - *SarifMark SARIF report generation*: CI pipeline uses SarifMark to process the CodeQL
   SARIF output and generate the code quality markdown report; expects exit code 0 and a
   non-empty markdown report.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-SarifMark**: CI pipeline self-validation TRX evidence from
-  `artifacts/sarifmark-self-validation.trx`

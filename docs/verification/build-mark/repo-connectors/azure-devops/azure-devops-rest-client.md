@@ -118,7 +118,3 @@ All tests in the test class pass with no errors or warnings.
 **Expected**: Returns an empty list without making any HTTP call.
 
 **Requirement coverage**: `BuildMark-AzureDevOps-RestClient`
-
-##### Requirements Coverage
-
-- **BuildMark-AzureDevOps-RestClient**: All 12 tests in `AzureDevOpsRestClientTests.cs`

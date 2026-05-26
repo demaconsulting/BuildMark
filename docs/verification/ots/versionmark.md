@@ -34,9 +34,3 @@ The resulting TRX files are consumed by ReqStream to satisfy the OTS requirement
 - *VersionMark operational use*: VersionMark is invoked in every CI job to capture and
   publish tool version information; expects exit code 0 and correct version output for
   each job.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-VersionMark**: CI pipeline self-validation TRX evidence from
-  `artifacts/versionmark-self-validation.trx` and
-  `artifacts/versionmark-self-validation-quality.trx`

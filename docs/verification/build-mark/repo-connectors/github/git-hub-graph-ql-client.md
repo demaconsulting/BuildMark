@@ -424,10 +424,3 @@ All tests in the test class pass with no errors or warnings.
 **Expected**: All pages are fetched and all release tag names are returned.
 
 **Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
-
-##### Requirements Coverage
-
-- **BuildMark-GitHub-GraphQLClient**: All 49 tests across the six
-  `GitHubGraphQLClient*Tests.cs` files
-- **BuildMark-GitHub-ErrorHandling**: HTTP error, invalid JSON, and exception tests
-  across all six `GitHubGraphQLClient*Tests.cs` files

@@ -23,8 +23,3 @@ The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 - *BuildMark self-validation*: CI pipeline executes
   `dotnet buildmark --validate --results artifacts/buildmark-self-validation.trx`;
   expects exit code 0 and a non-empty TRX file containing self-test results.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-BuildMark**: CI pipeline self-validation TRX evidence from
-  `artifacts/buildmark-self-validation.trx`

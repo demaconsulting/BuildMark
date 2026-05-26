@@ -46,8 +46,3 @@ All tests in the test class pass with no errors or warnings.
 **Expected**: Tag node DTOs contain `name` and target commit hash fields.
 
 **Requirement coverage**: `BuildMark-GitHub-GraphQLClient`
-
-##### Requirements Coverage
-
-- **BuildMark-GitHub-GraphQLClient**: Verified indirectly through all
-  49 tests in the `GitHubGraphQLClient*Tests.cs` files

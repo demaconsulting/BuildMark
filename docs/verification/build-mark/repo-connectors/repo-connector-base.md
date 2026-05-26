@@ -63,7 +63,3 @@ prefix but the same version as the search target.
 **Expected**: Returns `-1`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorBase`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-RepoConnectorBase**: All 5 tests in `RepoConnectorBaseTests.cs`

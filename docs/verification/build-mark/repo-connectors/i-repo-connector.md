@@ -73,13 +73,3 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 **Expected**: Returns `true`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**:
-  RepoConnectors_GitHubConnector_ImplementsInterface_ReturnsTrue,
-  RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue,
-  RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue,
-  GitHubRepoConnector_ImplementsInterface_ReturnsTrue,
-  MockRepoConnector_ImplementsInterface,
-  AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue

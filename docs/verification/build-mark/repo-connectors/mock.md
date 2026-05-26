@@ -48,9 +48,3 @@ mapping.
 **Expected**: Returns an empty `BuildInformation`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**: Mock_ImplementsInterface_ReturnsTrue
-- **BuildMark-RepoConnectors-Mock**: Mock_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  Mock_GetBuildInformation_WithNoData_ReturnsEmptyBuildInformation

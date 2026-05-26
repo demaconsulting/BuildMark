@@ -111,7 +111,3 @@ All 11 tests in `RepoConnectorFactoryTests.cs` pass with no errors or warnings.
 **Expected**: Factory defaults to returning a `GitHubRepoConnector`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-RepoConnectorFactory`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-RepoConnectorFactory**: All 11 tests in `RepoConnectorFactoryTests.cs`

@@ -65,11 +65,3 @@ Coverage mapping.
 **Expected**: Baseline is the previous release tag.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**: AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface
-- **BuildMark-RepoConnectors-AzureDevOps**: AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges,
-  AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues,
-  AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
