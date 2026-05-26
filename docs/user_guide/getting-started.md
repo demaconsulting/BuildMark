@@ -18,11 +18,11 @@ environment variable:
 
 ```bash
 # Using GH_TOKEN
-export GH_TOKEN=ghp_abc123...
+export GH_TOKEN=<your-github-token>
 buildmark --build-version v1.2.3 --report build-notes.md
 
 # Or using GITHUB_TOKEN
-export GITHUB_TOKEN=ghp_abc123...
+export GITHUB_TOKEN=<your-github-token>
 buildmark --build-version v1.2.3 --report build-notes.md
 ```
 
