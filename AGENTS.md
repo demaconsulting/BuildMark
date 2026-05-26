@@ -1,9 +1,8 @@
 # Project Overview
 
 - **project-name**: BuildMark
-- **organization**: TODO — organization name for document authorship (e.g., `DEMA Consulting`)
-- **project-tagline**: TODO — brief one-line description of what the project does
-  (e.g., `A .NET CLI tool for requirements traceability`)
+- **organization**: DEMA Consulting
+- **project-tagline**: Build notes generator for GitHub and Azure DevOps
 - **description**: Tool for generating Markdown build notes from repositories
 - **languages**: C#
 - **technologies**: DotNet, YamlDotNet, xUnit, GraphQL, Pandoc, WeasyPrint
