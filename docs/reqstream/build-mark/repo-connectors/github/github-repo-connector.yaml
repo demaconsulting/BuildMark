@@ -1,98 +1,97 @@
 ---
-# Software Unit Requirements for the GitHubRepoConnector Class
-#
-# The GitHubRepoConnector class connects to GitHub using the GraphQL API to
-# retrieve commits, releases, tags, pull requests, and issues, assembling them
-# into structured BuildInformation for report generation.
-#
-# NOTE: GraphQL client and description body requirements have been extracted to
-# github-graphql-client.yaml.
+# GitHubRepoConnector unit requirements
 
 sections:
-  - title: GitHubRepoConnector Unit Requirements
-    requirements:
-      - id: BuildMark-GitHub-ConnectorConfig
-        title: >-
-          The GitHubRepoConnector class shall accept an optional GitHubConnectorConfig to
-          override the repository owner, name, and API base URL.
-        justification: |
-          When a .buildmark.yaml file provides GitHub connector settings, the connector
-          must use the configured owner, repo, and optional GitHub Enterprise base URL
-          instead of auto-detecting them from the Git remote URL. CLI arguments remain
-          as a fallback when the config values are absent.
-        tests:
-          - GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+  - title: BuildMark Requirements
+    sections:
+      - title: RepoConnectors Requirements
+        sections:
+          - title: GitHub Requirements
+            sections:
+              - title: GitHubRepoConnector Requirements
+                requirements:
+                  - id: BuildMark-GitHub-ConnectorConfig
+                    title: >-
+                      The GitHubRepoConnector class shall accept an optional GitHubConnectorConfig to
+                      override the repository owner, name, and API base URL.
+                    justification: |
+                      When a .buildmark.yaml file provides GitHub connector settings, the connector
+                      must use the configured owner, repo, and optional GitHub Enterprise base URL
+                      instead of auto-detecting them from the Git remote URL. CLI arguments remain
+                      as a fallback when the config values are absent.
+                    tests:
+                      - GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
 
-      - id: BuildMark-GitHub-BuildInformation
-        title: The GitHubRepoConnector class shall retrieve build information from a GitHub repository.
-        justification: |
-          The primary purpose of the GitHubRepoConnector is to assemble BuildInformation
-          from GitHub repository data. It must correctly identify the current version tag,
-          the baseline (previous) version tag, and the changes between them, correctly
-          handling pre-release tags and version selection edge cases.
+                  - id: BuildMark-GitHub-BuildInformation
+                    title: The GitHubRepoConnector class shall retrieve build information from a GitHub repository.
+                    justification: |
+                      The primary purpose of the GitHubRepoConnector is to assemble BuildInformation
+                      from GitHub repository data. It must correctly identify the current version tag,
+                      the baseline (previous) version tag, and the changes between them, correctly
+                      handling pre-release tags and version selection edge cases.
 
-          Known-issues collection considers all issues (open and closed). When
-          affected-versions is declared the issue state is ignored; only the version range
-          check determines inclusion. This handles the LTS back-port gap scenario where a
-          bug is closed after being fixed in a newer release but was never back-ported.
-        tests:
-          - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
-          - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
-          - GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
-          - GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues
-          - GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
-          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
-          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
-          - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
-          - GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow
-          - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
-          - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
-          - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
-          - GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
-          - GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+                      Known-issues collection considers all issues (open and closed). When
+                      affected-versions is declared the issue state is ignored; only the version range
+                      check determines inclusion. This handles the LTS back-port gap scenario where a
+                      bug is closed after being fixed in a newer release but was never back-ported.
+                    tests:
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues
+                      - GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+                      - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
+                      - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
+                      - GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow
+                      - GitHubRepoConnector_ImplementsInterface_ReturnsTrue
+                      - GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
+                      - GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
+                      - GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+                      - GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
-      - id: BuildMark-GitHub-ItemControls
-        title: >-
-          The GitHubRepoConnector class shall apply item controls extracted from issue
-          and pull request description bodies to override visibility, type, and
-          affected-version metadata.
-        justification: |
-          The GitHub connector is responsible for translating raw GitHub data into the
-          BuildInformation model. Applying item controls at this layer ensures that
-          visibility and type overrides are consistently enforced regardless of labels,
-          and that affected-version data is captured and stored on each ItemInfo for
-          downstream use.
-        tests:
-          - GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
-          - GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
-          - GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
-          - GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+                  - id: BuildMark-GitHub-ItemControls
+                    title: >-
+                      The GitHubRepoConnector class shall apply item controls extracted from issue
+                      and pull request description bodies to override visibility, type, and
+                      affected-version metadata.
+                    justification: |
+                      The GitHub connector is responsible for translating raw GitHub data into the
+                      BuildInformation model. Applying item controls at this layer ensures that
+                      visibility and type overrides are consistently enforced regardless of labels,
+                      and that affected-version data is captured and stored on each ItemInfo for
+                      downstream use.
+                    tests:
+                      - GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+                      - GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+                      - GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+                      - GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
 
-      - id: BuildMark-GitHub-Rules
-        title: >-
-          The GitHubRepoConnector class shall apply configured routing rules and sections
-          to distribute assembled items into the appropriate report sections.
-        justification: |
-          When a .buildmark.yaml file provides routing rules and section definitions,
-          the connector must delegate to RepoConnectorBase.ApplyRules so that items are
-          distributed according to the operator-supplied rules rather than the default
-          label-derived categorization. This allows teams to customize which items
-          appear in which sections of the generated build notes.
-        tests:
-          - GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
-          - GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+                  - id: BuildMark-GitHub-Rules
+                    title: >-
+                      The GitHubRepoConnector class shall apply configured routing rules and sections
+                      to distribute assembled items into the appropriate report sections.
+                    justification: |
+                      When a .buildmark.yaml file provides routing rules and section definitions,
+                      the connector must delegate to RepoConnectorBase.ApplyRules so that items are
+                      distributed according to the operator-supplied rules rather than the default
+                      label-derived categorization. This allows teams to customize which items
+                      appear in which sections of the generated build notes.
+                    tests:
+                      - GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
-      - id: BuildMark-GitHub-TokenVariable
-        title: >-
-          The GitHubRepoConnector class shall use only the configured token variable when
-          TokenVariable is set, and shall throw InvalidOperationException when the variable
-          is absent or empty.
-        justification: |
-          When an operator explicitly names a token variable in the configuration, the
-          connector must not silently fall back to other credential sources. Strict
-          enforcement ensures that misconfigured environments produce clear error messages
-          rather than accidentally using a different token with unexpected permissions.
-        tests:
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+                  - id: BuildMark-GitHub-TokenVariable
+                    title: >-
+                      The GitHubRepoConnector class shall use only the configured token variable when
+                      TokenVariable is set, and shall throw InvalidOperationException when the variable
+                      is absent or empty.
+                    justification: |
+                      When an operator explicitly names a token variable in the configuration, the
+                      connector must not silently fall back to other credential sources. Strict
+                      enforcement ensures that misconfigured environments produce clear error messages
+                      rather than accidentally using a different token with unexpected permissions.
+                    tests:
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+                      - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

@@ -1,15 +1,17 @@
 ---
-title: BuildMark Trace Matrix
-subtitle: Requirements Traceability Matrix for the BuildMark Tool
-author: DEMA Consulting
-description: Requirements Traceability Matrix for the BuildMark Tool
+title: "BuildMark Trace Matrix"
+subtitle: "Markdown Build Notes Generation Tool"
+author: "DEMA Consulting"
+description: "Trace Matrix for BuildMark"
 lang: en-US
 keywords:
-  - BuildMark
-  - Trace Matrix
-  - Traceability
   - Requirements
-  - Testing
+  - Trace Matrix
+  - BuildMark
   - .NET
   - Command-Line Tool
+  - Git
+  - GitHub
+  - Traceability
+  - Testing
 ---

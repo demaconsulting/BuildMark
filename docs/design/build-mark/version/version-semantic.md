@@ -1,78 +1,75 @@
-### Version Semantic
+### VersionSemantic
 
 #### Purpose
 
-The `VersionSemantic` record type extends `VersionComparable` with semantic version metadata
-support. As a C# `record`, it provides structural equality by default - two `VersionSemantic`
-instances are equal when all their properties compare equal. It provides the full semantic
-version structure including build metadata while preserving comparison functionality.
+`VersionSemantic` is a record that extends version comparison with optional build metadata
+support. It wraps a `VersionComparable` and stores the `+metadata` component of a full
+semantic version string. Build metadata is preserved for display but excluded from all
+ordering comparisons, as specified by SemVer 2.0.0.
 
 #### Data Model
 
-| Property | Type | Description |
-| -------- | ---- | ----------- |
-| Comparable | VersionComparable | Core comparison logic and version components |
-| Metadata | string? | Build metadata (+metadata), or `null` when absent |
-| FullVersion | string | Complete version string (major.minor.patch\[-pre-release\]\[+metadata\]) |
+**Comparable**: `VersionComparable` — Core comparable portion of the version
+(`major.minor.patch[-pre-release]`); used for all ordering operations.
+
+**Metadata**: `string?` — Build metadata string (the portion after `+`), or `null` when no
+metadata is present.
+
+**FullVersion**: `string` — Derived property; returns `major.minor.patch[-pre-release]` when
+there is no metadata, or `major.minor.patch[-pre-release]+metadata` when metadata is present.
+
+**Major**: `int` — Delegated from `Comparable.Major`.
+
+**Minor**: `int` — Delegated from `Comparable.Minor`.
+
+**Patch**: `int` — Delegated from `Comparable.Patch`.
+
+**Numbers**: `string` — Delegated from `Comparable.Numbers`; returns `major.minor.patch`.
+
+**PreRelease**: `string` — Delegated from `Comparable.PreRelease`; returns empty string when
+no pre-release is present.
+
+**IsPreRelease**: `bool` — Delegated from `Comparable.IsPreRelease`.
+
+**CompareVersion**: `string` — Delegated from `Comparable.CompareVersion`; build metadata is
+excluded from this string per SemVer 2.0.0.
 
 #### Key Methods
 
-- `Create(string version)` — Parses a full semantic version string including optional
-  `+metadata`; throws `ArgumentException` on invalid input
-- `TryCreate(string version)` — Parses a full semantic version string; returns `null`
-  on invalid input instead of throwing
+**Create**: Parses a full semantic version string (including optional `+metadata`) and returns
+a `VersionSemantic`; throws `ArgumentException` on invalid input.
+
+- *Parameters*: `string versionString` — the version string to parse.
+- *Returns*: `VersionSemantic` — the parsed version.
+- *Preconditions*: Input is a non-null, non-whitespace string containing a valid
+  `major.minor.patch` triple.
+- *Postconditions*: Returns a valid `VersionSemantic`; throws `ArgumentException` on invalid
+  input.
+
+**TryCreate**: Parses a full semantic version string; returns `null` on invalid input instead
+of throwing.
+
+- *Parameters*: `string versionString` — the version string to parse.
+- *Returns*: `VersionSemantic?` — the parsed version, or `null` if the input is invalid.
+- *Preconditions*: None — null and whitespace inputs return `null`.
+- *Postconditions*: Returns a valid `VersionSemantic` or `null`; never throws.
 
 Both methods split the input on `+` (using `Split('+', 2)`) to separate the core version from
-optional build metadata, then delegate the core version part to `VersionComparable.TryCreate`.
-An empty metadata segment is normalized to `null`. Comparison operations delegate entirely to
-the wrapped `Comparable` instance; build metadata does not affect ordering per the SemVer
-specification.
-
-#### Delegated Properties
-
-For convenience, the following properties delegate to the `Comparable` instance:
-
-- `Major`, `Minor`, `Patch` - Version number components
-- `Numbers` - Core semantic numbers (major.minor.patch)
-- `PreRelease` - Pre-release identifier (`null` when no pre-release)
-- `IsPreRelease` - Whether this is a pre-release version
-- `CompareVersion` - Comparison string (excludes metadata)
-
-#### Comparison
-
-Comparison operations are performed on the `Comparable` instance, following
-semantic version rules where build metadata does not affect precedence.
-
-#### Factory Methods
-
-- `Create(string version)` - Creates instance, throws on invalid input
-- `TryCreate(string version)` - Returns null for invalid input
-
-##### TryCreate Parsing Algorithm
-
-1. Return `null` if the input is null or whitespace.
-2. Split on `+` using `Split('+', 2)` to separate the version string from optional build metadata.
-3. Normalize empty metadata to `null` (metadata is `null`, not an empty string, when absent).
-4. Delegate the version part to `VersionComparable.TryCreate`; return `null` if it returns `null`.
-5. Return a new `VersionSemantic(comparable, metadata)`.
-
-#### Example
-
-```csharp
-var version = VersionSemantic.Create("1.2.3-beta.1+build.123");
-// version.Major = 1
-// version.Comparable.Major = 1
-// version.Metadata = "build.123"
-// version.FullVersion = "1.2.3-beta.1+build.123"
-// version.CompareVersion = "1.2.3-beta.1"
-```
+optional build metadata. The core version part is forwarded to `VersionComparable.TryCreate`;
+an empty or absent metadata segment is normalized to `null`.
 
 #### Error Handling
 
-`Create(string version)` throws `ArgumentException` for invalid input. `TryCreate(string version)`
-returns `null` instead of throwing. Once constructed, property access and comparison operations
-cannot fail.
+`Create` throws `ArgumentException` when the input string does not match the semantic version
+format. `TryCreate` returns `null` instead of throwing. Once a valid instance is constructed,
+property access and delegation to `Comparable` cannot fail.
 
-#### Interactions
+#### Dependencies
 
-Consumed by `VersionTag` for version extraction from Git tag strings.
+- **VersionComparable** — wrapped as the `Comparable` property; provides all ordering and
+  comparison operations.
+
+#### Callers
+
+- **VersionTag** — creates a `VersionSemantic` during tag parsing and stores it as the
+  `Semantic` property.

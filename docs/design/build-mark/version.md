@@ -1,135 +1,82 @@
-## Version Subsystem Design
+## Version Subsystem
 
 ### Overview
 
-The Version subsystem provides comprehensive semantic version processing capabilities for BuildMark.
-It encapsulates all version-related functionality including parsing, comparison, validation, and version
-range operations, ensuring consistent semantic versioning behavior across all BuildMark components.
+The Version subsystem provides semantic version processing for BuildMark. It handles all
+version-related operations: parsing raw repository tag strings into structured semantic
+versions, comparing versions numerically, evaluating version range expressions, and
+associating parsed versions with their Git commit hashes for build boundary determination.
 
-### Architecture
+The subsystem boundary covers version representation and operations only — it does not
+interact with Git or remote APIs directly. All raw tag strings flow in from repository
+connector implementations.
 
-The Version subsystem is composed of six units:
+The subsystem contains six units:
 
-- `VersionComparable` (Unit) - core semantic version comparison and ordering engine
-- `VersionSemantic` (Unit) - semantic version parsing and validation
-- `VersionTag` (Unit) - repository version tag processing and extraction
-- `VersionInterval` (Unit) - version range representation and operations
-- `VersionIntervalSet` (Unit) - ordered collection of version intervals for range queries
-- `VersionCommitTag` (Unit) - version-to-commit association for build information
-
-### Version Type Hierarchy
-
-```text
-VersionTag (raw repository tag)
-    ↓ (extraction)
-VersionSemantic (parsed semantic version)
-    ↓ (normalization)
-VersionComparable (optimized comparison)
-    ↓ (range operations)
-VersionInterval / VersionIntervalSet (version ranges)
-    ↓ (build association)
-VersionCommitTag (version + commit hash)
-```
-
-### Design Principles
-
-#### Semantic Versioning Compliance
-
-All version processing substantially adheres to Semantic Versioning 2.0.0 (<https://semver.org/>).
-Pre-release identifiers are compared case-insensitively rather than using the ASCII
-case-sensitive sort defined by SemVer 2.0.0.
-
-#### Performance Optimization
-
-Version comparison operations are optimized for high-frequency usage in repository processing
-through construction-time parsing and cached segment arrays.
-
-#### Type Safety
-
-Each version type serves a specific purpose with clear boundaries:
-
-- **VersionTag**: Raw string from repository
-- **VersionSemantic**: Validated SemVer structure
-- **VersionComparable**: Optimized for comparison operations
-- **VersionInterval**: Range queries and filtering
-- **VersionCommitTag**: Build metadata association
+- **VersionComparable** — core integer-based semantic version comparison engine
+- **VersionSemantic** — full semantic version with optional build metadata
+- **VersionTag** — repository tag parsing and normalization
+- **VersionInterval** — single version interval model and parser
+- **VersionIntervalSet** — ordered set of version intervals for range queries
+- **VersionCommitTag** — version tag paired with a Git commit hash
 
 ### Interfaces
 
-The Version subsystem exposes all six unit types as public records or classes.
-The primary interface consumed by other subsystems is:
+**Version Processing API**: Public factory methods and record types exposed to the rest of
+BuildMark for tag parsing and version range evaluation.
 
-| Member | Kind | Description |
-| --- | --- | --- |
-| `VersionTag.Create(tag)` | Static method | Parse a repository tag; throws on invalid input |
-| `VersionTag.TryCreate(tag)` | Static method | Parse a repository tag; returns `null` on invalid input |
-| `VersionIntervalSet.Parse(text)` | Static method | Parse a comma-separated set of version intervals |
-| `VersionIntervalSet.Contains(version)` | Method | Test whether a version falls in any interval in the set |
-| `VersionComparable.Create(version)` | Static method | Parse semantic version for comparison; throws on invalid input |
-| `VersionComparable.TryCreate(version)` | Static method | Parse a semantic version; returns `null` on invalid input |
+- *Type*: In-process .NET public API.
+- *Role*: Provider (other subsystems consume this).
+- *Contract*: `VersionTag.Create(tag)` and `VersionTag.TryCreate(tag)` parse a repository
+  tag string; `VersionComparable.Create(version)` and `VersionComparable.TryCreate(version)`
+  parse a bare semantic version string; `VersionIntervalSet.Parse(text)` parses a
+  comma-separated bracket-bound range expression; `VersionIntervalSet.Contains(version)` tests
+  whether a version falls within any interval in the set.
+- *Constraints*: `Create` factory methods throw `ArgumentException` on invalid input; all
+  `TryCreate` and `Parse` methods return `null` or an empty set rather than throwing.
 
-### External Interfaces
+**Repository Tag Consumer**: Accepts raw tag strings from repo connector implementations.
 
-| Interface        | Direction  | Protocol / Format                         |
-|------------------|------------|-------------------------------------------|
-| Repository Tags  | Input      | String tags from GitHub/Git repositories  |
-| Version Parsing  | Processing | SemVer 2.0.0 compliant parsing            |
-| Version Compare  | Processing | IComparable<T> standard interface         |
-| Build Info       | Output     | VersionCommitTag records for build notes  |
+- *Type*: In-process .NET call.
+- *Role*: Consumer (this subsystem consumes strings provided by RepoConnectors).
+- *Contract*: String tag values forwarded to `VersionTag.TryCreate` or `VersionTag.Create`.
+  The parser accepts tags with arbitrary alphabetic or path-separator prefixes preceding a
+  `major.minor.patch` triple.
+- *Constraints*: Null or whitespace inputs return `null` from `TryCreate`; tags with no
+  recognizable `major.minor.patch` triple also return `null`.
 
-### Integration Points
+**Version Range Consumer**: Accepts interval expression strings from `ItemControlsParser`.
 
-#### Repository Connectors
-
-Version subsystem processes raw repository tags from GitHub and other sources,
-extracting semantic versions for build boundary determination.
-
-#### Build Notes
-
-Provides VersionCommitTag associations that link semantic versions to specific commit hashes for build information generation.
-
-#### Configuration
-
-Supports version range specifications in configuration files through VersionInterval processing.
-
-### Error Handling
-
-Version processing provides two parsing patterns:
-
-- `TryCreate()` factory methods return null for invalid input, enabling safe parsing without exceptions
-- `Create()` factory methods throw `ArgumentException` for invalid input, enabling fail-fast behavior
-- Malformed version ranges are rejected during parsing
-- Version comparison operations are guaranteed to be consistent and transitive
+- *Type*: In-process .NET call.
+- *Role*: Consumer (this subsystem consumes range strings provided by ItemControlsParser).
+- *Contract*: Comma-separated bracket-bound interval strings such as `(,1.0.1],[1.1.0,1.2.0)`
+  are parsed via `VersionIntervalSet.Parse`.
+- *Constraints*: Malformed interval tokens are silently discarded; the returned set contains
+  only the successfully parsed intervals.
 
 ### Design
 
-The units in the Version subsystem form a directed processing hierarchy. Raw
-repository tag strings flow in from connectors and pass through `VersionTag`,
-which strips tag prefixes and extracts a `VersionSemantic`. `VersionSemantic`
-wraps a `VersionComparable` that exposes numeric major/minor/patch fields and
-pre-release segments for sorting. `VersionCommitTag` pairs a `VersionTag` with
-its Git commit hash so that `BuildInformation` can record the exact commit at
-each version boundary.
+Raw repository tags enter the subsystem as strings from repo connector implementations.
+`VersionTag.TryCreate` applies a source-generated regex pattern that accepts an optional
+alphabetic or path prefix, extracts the `major.minor.patch` triple, and captures optional
+pre-release and build-metadata segments. The numbers and pre-release string are packaged
+into a `VersionComparable` record; the `VersionComparable` and optional metadata string are
+packaged into a `VersionSemantic` record; and the original tag string and the `VersionSemantic`
+are packaged into the returned `VersionTag` record.
 
-Version range expressions flow in from `ItemControlsParser` as text and are
-parsed by `VersionIntervalSet.Parse`, which delegates to `VersionInterval.Parse`
-for each token. `VersionInterval.Contains` tests a candidate version using
-`VersionComparable.TryCreate` for the bound comparisons.
+`VersionComparable` splits the pre-release string at construction time into a cached
+`PreReleaseSegment[]` array, avoiding repeated string parsing on every comparison. `CompareTo`
+compares major/minor/patch numerically, then falls back to the pre-release segment array for
+pre-release ordering per SemVer 2.0.0 (with case-insensitive text segment comparison by
+design). Comparison operator overloads (`<`, `<=`, `>`, `>=`) delegate to `CompareTo`.
 
-No unit in the subsystem holds mutable state; all types are records or
-effectively immutable classes instantiated via `Create`/`TryCreate` factory
-methods.
+Version range expressions enter via `VersionIntervalSet.Parse`, which walks the expression
+character by character, tracking bracket depth to distinguish commas that separate intervals
+from commas inside a single interval's bounds. Each extracted token is forwarded to
+`VersionInterval.Parse`, which reads the opening and closing bracket characters to determine
+inclusivity and splits the interior text on the first comma to obtain lower and upper bound
+strings. `VersionInterval.Contains` calls `VersionComparable.TryCreate` on each bound string
+at evaluation time and applies the inclusivity flags.
 
-### Performance Characteristics
-
-#### Version Comparison
-
-- **Construction**: O(n) where n is pre-release identifier count
-- **Comparison**: O(min(a,b)) where a,b are pre-release segment counts
-- **Memory**: Constant per-version overhead for parsed segments
-
-#### Version Range Operations
-
-- **Interval Creation**: O(1) for single ranges
-- **Set Operations**: O(n) where n is interval count
-- **Contains Checks**: O(n) because the current implementation performs a linear scan
+`VersionCommitTag` is a plain record pairing a `VersionTag` with a Git commit hash. It carries
+no logic; repo connectors construct it and `BuildInformation` consumes it.

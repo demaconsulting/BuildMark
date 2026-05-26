@@ -2,10 +2,10 @@
 
 #### Verification Approach
 
-`ItemControlsInfo` is a data model class with no dedicated test class. It is verified
-indirectly through `ItemControlsTests.cs` and `ItemControlsParserTests.cs`. The parser
-tests assert on the resulting `ItemControlsInfo` instances, confirming that visibility,
-type, and affected versions fields are populated correctly.
+`ItemControlsInfo` is a data model class with no dedicated test class. It is verified indirectly
+through `ItemControlsTests.cs` and `ItemControlsParserTests.cs`. The parser tests assert on the
+resulting `ItemControlsInfo` instances, confirming that visibility, type, and affected versions
+fields are populated correctly.
 
 #### Dependencies
 
@@ -19,9 +19,10 @@ Standard dotnet test host; no external dependencies or environment setup require
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+All tests in `ItemControlsTests.cs` and `ItemControlsParserTests.cs` that produce and assert on
+`ItemControlsInfo` instances pass with no errors or warnings.
 
-#### Test Scenarios (via ItemControlsTests.cs - 13 tests)
+#### Test Scenarios
 
 ##### ItemControls_Parse_WithVisibilityPublic_ReturnsPublicVisibility
 

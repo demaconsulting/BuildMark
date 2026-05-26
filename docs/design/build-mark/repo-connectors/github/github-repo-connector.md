@@ -2,172 +2,81 @@
 
 ##### Purpose
 
-`GitHubRepoConnector` is the production unit in the RepoConnectors/GitHub
-subsystem. It implements `RepoConnectorBase` and uses `GitHubGraphQLClient` to
-query the GitHub GraphQL API for issues, pull requests, version tags, and commits.
+`GitHubRepoConnector` is the production connector in the GitHub subsystem. It implements
+`RepoConnectorBase` and queries the GitHub GraphQL API via `GitHubGraphQLClient` to fetch issues,
+pull requests, version tags, and commits needed to construct a `BuildInformation` record.
 
-The unit reads the repository URL and current commit hash from Git, resolves the
-GitHub token from environment variables, and fetches all data needed to construct
-a `BuildInformation` record.
+The unit reads the repository URL and current commit hash from Git, resolves the GitHub token from
+environment variables or the `gh` CLI, and applies item-controls overrides from `buildmark` blocks
+embedded in issue and pull request description bodies before assembling the result.
 
 ##### Data Model
 
-###### Authentication
+**_config**: `GitHubConnectorConfig?` — Optional configuration supplying owner, repository name,
+GraphQL base URL, and token variable overrides. Received from `RepoConnectorFactory` at
+construction time.
 
-The connector resolves the GitHub token in two modes depending on whether `GitHubConnectorConfig.TokenVariable` is set.
+Authentication is resolved in two modes. In custom variable mode (when `_config.TokenVariable` is
+set), the named environment variable is read exclusively; missing or empty values throw
+`InvalidOperationException`. In default mode, the following sources are tried in order: (1)
+`GH_TOKEN` environment variable; (2) `GITHUB_TOKEN` environment variable; (3) output of `gh auth
+token`. If no token is found, `InvalidOperationException` is thrown.
 
-**Custom variable mode** (when `TokenVariable` is set):
-
-The connector reads the named environment variable exclusively and does not fall back
-to well-known names or the gh CLI:
-
-1. If the variable is not set (null), the connector throws `InvalidOperationException` with
-   a message identifying the missing variable.
-2. If the variable is set but empty, the connector throws `InvalidOperationException` with a
-   message identifying the empty variable.
-3. Otherwise the token value is used directly.
-
-**Default mode** (when `TokenVariable` is not set):
-
-1. `GH_TOKEN` environment variable
-2. `GITHUB_TOKEN` environment variable
-3. Output of `gh auth token` command
-
-If no token is found, the connector throws `InvalidOperationException`.
-
-###### Label Mapping
-
-GitHub issue and pull request labels are mapped to normalized types:
-
-| GitHub Labels                              | Normalized Type  |
-|--------------------------------------------|------------------|
-| `bug`, `defect`                            | `"bug"`          |
-| `feature`, `enhancement`                   | `"feature"`      |
-| `dependencies`, `renovate`, `dependabot`   | `"dependencies"` |
-| `internal`, `chore`                        | `"internal"`     |
-| `documentation`, `performance`, `security` | label name       |
-
-Items labelled as `"bug"` are placed in the `Bugs` list; all others go to `Changes`.
-
-When routing rules are configured via `.buildmark.yaml`, the label-derived categorization
-is overridden by `RepoConnectorBase.ApplyRules`, which delegates to `ItemRouter` to
-distribute all collected items into the configured report sections instead.
-
-###### GraphQL Response Types
-
-The `GitHubGraphQLClient` returns `PullRequestNode` and `IssueNode` records that
-must include the `body` field so the connector can pass description text to
-`ItemControlsParser`:
-
-**`PullRequestNode`** (updated to include `Body`):
-
-```csharp
-internal record PullRequestNode(
-    int? Number,
-    string? Title,
-    string? Url,
-    bool Merged,
-    PullRequestMergeCommit? MergeCommit,
-    string? HeadRefOid,
-    PullRequestLabelsConnection? Labels,
-    string? Body);
-```
-
-**`IssueNode`** (updated to include `Body`):
-
-```csharp
-internal record IssueNode(
-    int? Number,
-    string? Title,
-    string? Url,
-    string? State,
-    IssueLabelsConnection? Labels,
-    string? Body);
-```
-
-Both `GetPullRequestsAsync` and `GetAllIssuesAsync` must include `body` in their
-GraphQL field selections.
-
-###### Item Controls Override
-
-After the label-derived type is determined, the connector calls
-`ItemControlsParser.Parse(body)` on the description body of each issue and pull
-request. If the parser returns a non-null `ItemControlsInfo`, the following
-overrides are applied:
-
-1. **`visibility: internal`** - The item is excluded from all report sections,
-   regardless of its labels or type.
-2. **`visibility: public`** - The item is included in the report even if its
-   label-derived type is `"other"`.
-3. **`type: bug`** - The item is placed in the `Bugs` list regardless of labels.
-4. **`type: feature`** - The item is placed in the `Changes` list regardless of
-   labels.
-5. **`affected-versions`** - The parsed `VersionIntervalSet` is stored on the
-   `ItemInfo.AffectedVersions` property.
-
-When no `buildmark` block is present, the existing label-based rules apply
-unchanged.
+GitHub labels are mapped to normalized `ItemInfo.Type` values: `bug` and `defect` map to `"bug"`;
+`feature` and `enhancement` map to `"feature"`; `dependencies`, `renovate`, and `dependabot` map
+to `"dependencies"`; `internal` and `chore` map to `"internal"`; `documentation`, `performance`,
+and `security` are preserved as the label name; unlabeled items default to `"other"`.
 
 ##### Key Methods
 
-###### `GetBuildInformationAsync(Version? version) → BuildInformation`
+**GetBuildInformationAsync**: Main entry point; fetches all data required to assemble a
+`BuildInformation` record.
 
-Main entry point. Performs the following steps:
+- *Parameters*: `VersionTag? version` — optional target version; when omitted, the most recent
+  GitHub Release whose tag matches the current commit hash is used.
+- *Returns*: `Task<BuildInformation>` — fully populated build information record.
+- *Preconditions*: A resolvable GitHub token must be available in the environment.
+- *Postconditions*: Returns a `BuildInformation` record; throws `InvalidOperationException` on
+  authentication or version resolution failure.
 
-1. Get repository metadata (URL, branch, current commit hash) from Git.
-2. Determine the owner and repository name - from `GitHubConnectorConfig.Owner`
-   and `GitHubConnectorConfig.Repo` if provided, otherwise parsed from the Git
-   remote URL.
-3. Resolve the GitHub authentication token (see Authentication above).
-4. Create a `GitHubGraphQLClient` with the resolved token. If
-   `GitHubConnectorConfig.BaseUrl` is set, use that URL as the GraphQL endpoint
-   instead of the default `https://api.github.com/graphql` (supports GitHub
-   Enterprise).
-5. Fetch all tags, commits, releases, issues (with body), and pull requests (with
-   body) via GraphQL.
-6. If a version is provided explicitly, use it directly with the current commit
-   hash as the target. Otherwise, determine the target version from GitHub
-   Releases: use the most recent release whose tag matches the current commit
-   hash. Throws `InvalidOperationException` if no release matches.
-7. Determine the baseline version from GitHub Releases: find the highest release
-   version below the target (for full releases) or the most recent release with
-   a different commit hash (for pre-releases). Returns `null` baseline if no
-   prior release exists.
-8. Get all commits between the baseline and target.
-9. Collect changes and bugs from pull requests merged in the commit range,
-   applying item controls overrides from description bodies.
-10. Collect known issues from **all** issues (open and closed) by querying GitHub
-    with `states: [OPEN, CLOSED]` and applying item controls overrides from
-    description bodies. For each candidate bug:
-    - If `AffectedVersions` is declared, the bug is a known issue if and only if
-      `AffectedVersions.Contains(toVersion)` is true, regardless of open/closed
-      state. This covers closed bugs that were fixed in a later release but were
-      never back-ported to older branches (LTS back-port gap).
-    - If no `AffectedVersions` is declared, only open bugs are included.
-11. Sort all lists chronologically.
-12. If routing rules are configured, call `ApplyRules` (inherited from
-    `RepoConnectorBase`) to route all collected items into the configured report
-    sections and populate `BuildInformation.RoutedSections`. If no rules are
-    configured, items remain in the legacy `Changes`, `Bugs`, and `KnownIssues`
-    lists.
-13. Generate the full changelog URL from the baseline and target tags.
-14. Return the assembled `BuildInformation` record.
+Steps: (1) get repository URL, branch, and current commit hash from Git via `RunCommandAsync`
+(inherited from `RepoConnectorBase`); (2) determine owner and repository name from `_config` or
+by parsing the remote URL; (3) resolve the GitHub authentication token; (4) create a
+`GitHubGraphQLClient` with the resolved token, using `_config.BaseUrl` as the GraphQL endpoint
+when set (supports GitHub Enterprise Server); (5) fetch tags, releases, commits, pull requests
+(with `body`), and issues (with `body`) via GraphQL; (6) determine the target version — if a
+`version` argument is supplied, use it directly; otherwise use the most recent release whose tag
+matches the current commit hash (throws `InvalidOperationException` when no match is found); (7)
+determine the baseline version using `FindBaselineForRelease` or `FindBaselineForPreRelease`
+(both inherited from `RepoConnectorBase`); (8) collect changes from pull requests merged in the
+commit range, calling `ItemControlsParser.Parse` on each `body` and applying overrides; (9)
+collect known issues from all issues (`states: [OPEN, CLOSED]`), applying item-controls overrides;
+for each candidate bug, include it when `AffectedVersions.Contains(targetVersion)` if declared,
+or only when the issue is open otherwise (covers LTS back-port gaps for closed bugs with declared
+affected versions); (10) if routing rules are configured, call `ApplyRules` to populate
+`BuildInformation.RoutedSections`; otherwise use legacy `Changes`, `Bugs`, and `KnownIssues`
+lists; (11) generate the changelog URL; (12) return the assembled `BuildInformation`.
 
 ##### Error Handling
 
-`GetBuildInformationAsync` throws `InvalidOperationException` when no GitHub token can be
-resolved, when no release matches the current commit hash and no version is specified
-explicitly, or when a git command fails. These exceptions propagate to
-`Program.ProcessBuildNotes`, which catches them, writes an error message via
-`context.WriteError`, and returns early without generating a report.
+`GetBuildInformationAsync` throws `InvalidOperationException` when no GitHub token can be resolved,
+when no release matches the current commit hash and no version is specified explicitly, or when a
+git command fails. These exceptions propagate to `Program.ProcessBuildNotes`, which catches them,
+writes an error message via `context.WriteError`, and returns early without generating a report.
 
-##### Interactions
+##### Dependencies
 
-- `GitHubConnectorConfig` is received from `RepoConnectorFactory` and overrides
-  the owner, repository, and URL.
-- `GitHubGraphQLClient` executes GraphQL queries against the GitHub API.
-- `ProcessRunner` runs Git commands to get repository metadata.
-- `ItemRouter` routes assembled items into report sections.
-- `ItemControlsParser` parses buildmark blocks from issue and pull request
-  description bodies.
-- `BuildInformation` is the output record assembled from fetched data.
+- **RepoConnectorBase** — base class providing `Configure`, `HasRules`, `ApplyRules`,
+  `FindVersionIndex`, `FindBaselineForPreRelease`, `FindBaselineForRelease`, and `RunCommandAsync`.
+- **GitHubGraphQLClient** — executes GraphQL queries against the GitHub API.
+- **GitHubConnectorConfig** — supplies owner, repository, base URL, and token variable overrides.
+- **ItemControlsParser** — parses `buildmark` blocks from issue and pull request description
+  bodies.
+- **ProcessRunner** — used via `RunCommandAsync` to run Git commands.
+- **BuildInformation** — the output record assembled and returned by this unit.
+- **ItemInfo** — the normalized item representation stored in `BuildInformation`.
+
+##### Callers
+
+- **RepoConnectorFactory** — creates `GitHubRepoConnector` when the environment indicates GitHub
+  or as the default fallback.

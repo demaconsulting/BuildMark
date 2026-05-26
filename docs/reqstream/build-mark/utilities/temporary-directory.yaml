@@ -1,51 +1,50 @@
 ---
-# Software Unit Requirements for the TemporaryDirectory Class
-#
-# The TemporaryDirectory class provides a disposable temporary directory that
-# creates an isolated file-system location under Environment.CurrentDirectory,
-# offers safe path resolution via PathHelpers, and deletes all contents on disposal.
-
+# BuildMark TemporaryDirectory unit requirements
 sections:
-  - title: TemporaryDirectory Unit Requirements
-    requirements:
-      - id: BuildMark-TemporaryDirectory-Creation
-        title: The TemporaryDirectory class shall create a uniquely-named temporary directory on construction.
-        justification: |
-          Each instance must own a distinct directory so that concurrent or sequential
-          uses of TemporaryDirectory do not interfere with each other. Creating under
-          Environment.CurrentDirectory avoids the macOS /tmp → /private/tmp symlink
-          mismatch that can break path-containment checks.
-        tests:
-          - TemporaryDirectory_Constructor_CreatesDirectory
-          - TemporaryDirectory_Constructor_CreatesUniqueDirectories
+  - title: BuildMark Requirements
+    sections:
+      - title: Utilities Requirements
+        sections:
+          - title: TemporaryDirectory Requirements
+            requirements:
+              - id: BuildMark-TemporaryDirectory-Creation
+                title: The TemporaryDirectory class shall create a uniquely-named temporary directory on construction.
+                justification: |
+                  Each instance must own a distinct directory so that concurrent or sequential
+                  uses of TemporaryDirectory do not interfere with each other. Creating under
+                  Environment.CurrentDirectory avoids the macOS /tmp → /private/tmp symlink
+                  mismatch that can break path-containment checks.
+                tests:
+                  - TemporaryDirectory_Constructor_CreatesDirectory
+                  - TemporaryDirectory_Constructor_CreatesUniqueDirectories
 
-      - id: BuildMark-TemporaryDirectory-FilePath
-        title: The TemporaryDirectory class shall resolve relative paths and create intermediate directories via GetFilePath.
-        justification: |
-          Callers need a simple way to obtain a fully-qualified path for a file inside
-          the temporary directory without having to create parent directories themselves.
-          GetFilePath delegates path validation to PathHelpers.SafePathCombine and
-          creates any missing intermediate directories before returning the path.
-        tests:
-          - TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory
-          - TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories
+              - id: BuildMark-TemporaryDirectory-FilePath
+                title: The TemporaryDirectory class shall resolve relative paths and create intermediate directories via GetFilePath.
+                justification: |
+                  Callers need a simple way to obtain a fully-qualified path for a file inside
+                  the temporary directory without having to create parent directories themselves.
+                  GetFilePath delegates path validation to PathHelpers.SafePathCombine and
+                  creates any missing intermediate directories before returning the path.
+                tests:
+                  - TemporaryDirectory_GetFilePath_SimpleFile_ReturnsPathUnderDirectory
+                  - TemporaryDirectory_GetFilePath_NestedPath_CreatesIntermediateDirectories
 
-      - id: BuildMark-TemporaryDirectory-Traversal
-        title: The TemporaryDirectory class shall reject path-traversal attempts in GetFilePath.
-        justification: |
-          Path inputs supplied by callers must not be allowed to escape the temporary
-          directory. GetFilePath delegates to PathHelpers.SafePathCombine, which rejects
-          any relative path containing ".." segments or an absolute path override.
-        tests:
-          - TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException
+              - id: BuildMark-TemporaryDirectory-Traversal
+                title: The TemporaryDirectory class shall reject path-traversal attempts in GetFilePath.
+                justification: |
+                  Path inputs supplied by callers must not be allowed to escape the temporary
+                  directory. GetFilePath delegates to PathHelpers.SafePathCombine, which rejects
+                  any relative path containing ".." segments or an absolute path override.
+                tests:
+                  - TemporaryDirectory_GetFilePath_TraversalAttempt_ThrowsArgumentException
 
-      - id: BuildMark-TemporaryDirectory-Cleanup
-        title: The TemporaryDirectory class shall delete the directory and all its contents on disposal.
-        justification: |
-          Temporary directories must not accumulate on disk across runs. Dispose must
-          remove the directory tree and suppress I/O errors (IOException,
-          UnauthorizedAccessException) so that callers in using-statements are not
-          disrupted even when the directory has already been deleted externally.
-        tests:
-          - TemporaryDirectory_Dispose_DeletesDirectory
-          - TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow
+              - id: BuildMark-TemporaryDirectory-Cleanup
+                title: The TemporaryDirectory class shall delete the directory and all its contents on disposal.
+                justification: |
+                  Temporary directories must not accumulate on disk across runs. Dispose must
+                  remove the directory tree and suppress I/O errors (IOException,
+                  UnauthorizedAccessException) so that callers in using-statements are not
+                  disrupted even when the directory has already been deleted externally.
+                tests:
+                  - TemporaryDirectory_Dispose_DeletesDirectory
+                  - TemporaryDirectory_Dispose_AlreadyDeleted_DoesNotThrow

@@ -1,156 +1,43 @@
-<!-- markdownlint-disable MD025 -->
-
 # Introduction
 
-BuildMark is a .NET command-line tool that generates comprehensive markdown build notes reports from Git repository
-history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
-notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
+This guide describes how to install, configure, and use BuildMark.
 
 ## Purpose
 
-The purpose of this guide is to explain how to install, configure, and operate BuildMark to
-generate markdown build notes from Git repository history and connected issue-tracking systems.
+The purpose of this guide is to explain how to install, configure, and operate BuildMark to generate
+markdown build notes from Git repository history and connected issue-tracking systems.
+
+BuildMark is a .NET command-line tool that analyzes commits, pull requests, and issues from GitHub
+and Azure DevOps repositories to produce human-readable markdown build notes. It is designed for
+integration into CI/CD pipelines and release documentation workflows.
+
+Key capabilities include:
+
+- **Git Integration** — analyzes repository history, tags, and branches
+- **Issue Tracking** — extracts changes and bug fixes from GitHub and Azure DevOps
+- **Configurable Routing** — routes items into custom report sections by label or work-item type
+- **CI/CD Ready** — designed for automation in GitHub Actions and Azure Pipelines
+- **Multi-Platform** — runs on Windows, Linux, and macOS with .NET 8, 9, and 10
+- **Self-Validation** — built-in qualification tests for use in regulated environments
 
 ## Scope
 
-This guide covers installation, basic usage, GitHub and Azure DevOps integration, configuration,
-and common use cases for BuildMark. It is intended for developers and CI/CD engineers who want to
-automate build notes generation as part of their release workflow.
+This guide covers installation prerequisites and setup in *Installation*, first-run workflows and
+common command examples in *Getting Started*, the `.buildmark.yaml` configuration file reference in
+*Configuration*, command-line option reference in *Command-Line Options*, item visibility and
+version targeting controls in *Item Visibility and Version Controls*, and CI/CD integration,
+report format, version selection rules, best practices, and troubleshooting in *Common Use Cases*.
+It is intended for developers and CI/CD engineers who want to automate build notes generation as
+part of their release workflow. A .NET SDK (version 8.0, 9.0, or 10.0) is required.
 
 The following topics are out of scope:
 
 - Internal implementation details
 - Contributing to BuildMark development
 
-## Key Features
-
-- **Git Integration** - Analyze Git repository history, tags, and branches
-- **Markdown Reports** - Generate structured build notes from repository data
-- **Issue Tracking** - Extract changes and bug fixes from GitHub and Azure DevOps
-- **Configurable Routing** - Route items into custom report sections by label or work-item type
-- **Customizable Output** - Configure report depth, sections, and known-issue inclusion
-- **CI/CD Ready** - Automate build notes generation in GitHub Actions and Azure Pipelines
-- **Multi-Platform** - Windows, Linux, and macOS with .NET 8, 9, and 10
-- **Self-Validation** - Built-in qualification tests without external tooling
-- **Dependency Updates** - Built-in tracking of dependency changes from Dependabot and Renovate
-
 ## References
 
-- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled user guide and documentation
-- [.NET SDK Download][dotnet-download]
-- [Continuous Compliance][continuous-compliance]
-
-# Continuous Compliance
-
-BuildMark follows the [Continuous Compliance][continuous-compliance] methodology, which ensures
-compliance evidence is generated automatically on every CI run.
-
-## Key Practices
-
-- **Requirements Traceability**: Every requirement is linked to passing tests, and a trace matrix is
-  auto-generated on each release
-- **Linting Enforcement**: markdownlint, cspell, and yamllint are enforced before any build proceeds
-- **Automated Audit Documentation**: Each release ships with generated requirements, justifications,
-  trace matrix, and quality reports
-- **CodeQL and SonarCloud**: Security and quality analysis runs on every build
-
-# Installation
-
-## Prerequisites
-
-- [.NET SDK][dotnet-download] 8.0, 9.0, or 10.0
-
-## Global Installation
-
-Install BuildMark as a global .NET tool for system-wide access:
-
-```bash
-dotnet tool install --global DemaConsulting.BuildMark
-```
-
-Verify the installation:
-
-```bash
-buildmark --version
-```
-
-## Local Installation
-
-For team projects, install BuildMark as a local tool to ensure version consistency:
-
-```bash
-# Create tool manifest if it doesn't exist
-dotnet new tool-manifest
-
-# Install the tool
-dotnet tool install DemaConsulting.BuildMark
-```
-
-Run the locally installed tool:
-
-```bash
-dotnet buildmark --version
-```
-
-## Update
-
-To update to the latest version:
-
-```bash
-# Global installation
-dotnet tool update --global DemaConsulting.BuildMark
-
-# Local installation
-dotnet tool update DemaConsulting.BuildMark
-```
-
-# Getting Started
-
-## Basic Usage
-
-The most basic usage requires specifying a build version and report file:
-
-```bash
-buildmark --build-version v1.2.3 --report build-notes.md
-```
-
-This will analyze the Git repository in the current directory, find the previous version tag, and generate a
-markdown report with all changes, bug fixes, and other relevant information.
-
-## With GitHub Token
-
-For accessing private repositories or to avoid GitHub API rate limits, provide a GitHub token:
-
-```bash
-# Using environment variable
-export GH_TOKEN=ghp_abc123...
-buildmark --build-version v1.2.3 --report build-notes.md
-
-# Or using GITHUB_TOKEN
-export GITHUB_TOKEN=ghp_abc123...
-buildmark --build-version v1.2.3 --report build-notes.md
-```
-
-## With Azure DevOps Token
-
-For Azure DevOps repositories, provide a Personal Access Token (PAT):
-
-```bash
-# Using Personal Access Token
-export AZURE_DEVOPS_PAT=your-pat-token...
-buildmark --build-version v1.2.3 --report build-notes.md
-```
-
-In Azure Pipelines, the pipeline service connection token is picked up automatically from
-`SYSTEM_ACCESSTOKEN` when you grant the pipeline permission to access it.
-
-## Including Known Issues
-
-To include known issues in the report:
-
-```bash
-buildmark --build-version v1.2.3 --report build-notes.md --include-known-issues
-```
-
-[dotnet-download]: https://dotnet.microsoft.com/download
-[continuous-compliance]: https://github.com/demaconsulting/ContinuousCompliance
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled user guide
+  and documentation
+- [.NET SDK](https://dotnet.microsoft.com/download)
+- [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance)

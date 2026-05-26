@@ -2,11 +2,11 @@
 
 ### Verification Strategy
 
-The RepoConnectors subsystem is verified through `RepoConnectorsTests.cs`, which
-contains 33 subsystem-level integration tests. These tests exercise the connector
-factory, the GitHub connector, the Azure DevOps connector, and the Mock connector
-through the full `GetBuildInformationAsync` pipeline using mock HTTP data. Individual
-unit tests for sub-components are described in the unit-level chapters.
+The RepoConnectors subsystem is verified through `RepoConnectorsTests.cs`, which contains 33
+subsystem-level integration tests. These tests exercise the connector factory, the GitHub connector,
+the Azure DevOps connector, and the Mock connector through the full `GetBuildInformationAsync`
+pipeline using mock HTTP data. Individual unit tests for sub-components are described in the
+unit-level chapters.
 
 ### Dependencies
 
@@ -18,15 +18,15 @@ unit tests for sub-components are described in the unit-level chapters.
 
 ### Test Environment
 
-No external network access is required; all HTTP calls to the GitHub GraphQL API and
-Azure DevOps REST API are intercepted by `MockHttpMessageHandler`. Tests run within
-the standard `dotnet test` host.
+No external network access is required; all HTTP calls to the GitHub GraphQL API and Azure DevOps
+REST API are intercepted by `MockHttpMessageHandler`. Tests run within the standard `dotnet test`
+host.
 
 ### Acceptance Criteria
 
 All 33 integration tests in `RepoConnectorsTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-*` requirements have at least one test in the Requirements
-Coverage mapping.
+`BuildMark-RepoConnectors-*` requirements have at least one test in the Requirements Coverage
+mapping.
 
 ### Test Scenarios
 
@@ -312,8 +312,20 @@ Coverage mapping.
   RepoConnectors_ItemControls_AffectedVersions_ReturnsIntervalSet,
   RepoConnectors_ItemControls_HiddenBlock_ReturnsControls,
   RepoConnectors_ItemControls_NoBlock_ReturnsNull
-- **BuildMark-RepoConnectors-GitHub**: Multiple GitHub connector tests
-- **BuildMark-RepoConnectors-AzureDevOps**: Multiple Azure DevOps connector tests
+- **BuildMark-RepoConnectors-GitHub**: RepoConnectors_GitHubConnector_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
+  RepoConnectors_GitHubConnector_GetBuildInformation_WithMultipleVersions_SelectsCorrectBaseline,
+  RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges,
+  RepoConnectors_GitHubConnector_GetBuildInformation_WithOpenIssues_IdentifiesKnownIssues,
+  RepoConnectors_GitHubConnector_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+- **BuildMark-RepoConnectors-AzureDevOps**: RepoConnectors_AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
+  RepoConnectors_AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges,
+  RepoConnectors_AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues,
+  RepoConnectors_AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
 - **BuildMark-RepoConnectors-Mock**: RepoConnectors_MockConnector_Constructor_CreatesInstance,
   RepoConnectors_MockConnector_GetBuildInformation_ReturnsExpectedVersion,
   RepoConnectors_MockConnector_GetBuildInformation_ReturnsCompleteInformation
+- **BuildMark-Utilities-ProcessRunner**: RepoConnectors_ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput,
+  RepoConnectors_ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull,
+  RepoConnectors_ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull,
+  RepoConnectors_ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput,
+  RepoConnectors_ProcessRunner_RunAsync_WithFailingCommand_ThrowsException

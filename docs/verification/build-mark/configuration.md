@@ -1,120 +1,70 @@
 ## Configuration
 
-### Verification Strategy
+### Verification Approach
 
-The Configuration subsystem is verified with dedicated subsystem tests in
-`ConfigurationSubsystemTests.cs`. Tests create temporary `.buildmark.yaml` files, call
-`BuildMarkConfigReader.ReadAsync`, and assert on the returned `ConfigurationLoadResult`. No mocking
-is required; the real file system is used with temporary directories.
-
-### Dependencies
-
-| Mock / Stub | Reason                                                                                                    |
-| ----------- | --------------------------------------------------------------------------------------------------------- |
-| File system | Tests create temporary `.buildmark.yaml` files via `TemporaryDirectory` in the current working directory. |
+The Configuration subsystem is verified with dedicated subsystem-level integration tests in
+`ConfigurationSubsystemTests.cs`. Tests exercise the full subsystem boundary by creating temporary
+`.buildmark.yaml` files on the real file system, invoking `BuildMarkConfigReader.ReadAsync`, and
+asserting on the returned `ConfigurationLoadResult`. No mocking is required; the real file system
+is used with temporary directories managed by `TemporaryDirectory`. Error-reporting behavior is
+verified by constructing `ConfigurationLoadResult` instances directly with controlled
+`ConfigurationIssue` entries and calling `ReportTo` on a silent `Context`.
 
 ### Test Environment
 
-Tests create temporary `.buildmark.yaml` files through `TemporaryDirectory`, which
-creates a unique `tmp-*` subdirectory under the current working directory. Write
-access to the current working directory is required. No network access or external
-services are needed.
+Tests create temporary directories via `TemporaryDirectory`, which produces unique `tmp-*`
+subdirectories under the current working directory. Write access to the current working directory
+is required. No network access or external services are needed.
 
 ### Acceptance Criteria
 
-All tests in `ConfigurationSubsystemTests.cs` pass with zero failures. All
-`BuildMark-Configuration-*` requirements have at least one test in the Requirements
-Coverage mapping.
+- All tests in `ConfigurationSubsystemTests.cs` pass with zero failures.
+- All `BuildMark-Configuration-*` requirements have at least one test mapped in the requirements
+  traceability matrix.
 
 ### Test Scenarios
 
-#### Configuration_ReadAsync_ValidFile_ReturnsConfiguration
+**Configuration_ReadAsync_ValidFile_ReturnsConfiguration**: A valid `.buildmark.yaml` containing a
+GitHub connector, one section, and one routing rule is written to a temporary directory and read
+via `BuildMarkConfigReader.ReadAsync`. The result must be non-null, free of errors, and correctly
+reflect the connector type, owner, repo, section id, and rule route. This scenario is tested by
+`Configuration_ReadAsync_ValidFile_ReturnsConfiguration`.
 
-**Scenario**: A valid `.buildmark.yaml` containing a GitHub connector, one section, and one rule
-is written to a temp directory; `BuildMarkConfigReader.ReadAsync` is called.
+**Configuration_ReadAsync_MissingFile_ReturnsEmptyResult**: `BuildMarkConfigReader.ReadAsync` is
+called on a temporary directory containing no `.buildmark.yaml`. The result must have a null
+`Config`, `HasErrors` false, and an empty `Issues` collection. This scenario is tested by
+`Configuration_ReadAsync_MissingFile_ReturnsEmptyResult`.
 
-**Expected**: Result has no errors; `Config.Connector.Type` is `"github"`;
-`Config.Connector.GitHub.Owner` is `"test-owner"`; one section and one rule are parsed.
+**Configuration_ReadAsync_MalformedFile_ReportsError**: A `.buildmark.yaml` containing a tab
+character (invalid YAML) is written to a temporary directory and read via
+`BuildMarkConfigReader.ReadAsync`. The result must have a null `Config`, `HasErrors` true, and at
+least one `Error`-severity issue. This scenario is tested by
+`Configuration_ReadAsync_MalformedFile_ReportsError`.
 
-**Requirement coverage**: `BuildMark-Configuration-Read`.
+**Configuration_Issues_ErrorIssue_SetsExitCode**: A `ConfigurationLoadResult` carrying one
+`Error`-severity `ConfigurationIssue` is created and `ReportTo` is called on a silent `Context`.
+The context exit code must be set to 1, confirming that error issues are escalated correctly. This
+scenario is tested by `Configuration_Issues_ErrorIssue_SetsExitCode`.
 
-#### Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
+**Configuration_Issues_WarningIssue_DoesNotSetExitCode**: A `ConfigurationLoadResult` carrying one
+`Warning`-severity `ConfigurationIssue` is created and `ReportTo` is called on a silent `Context`.
+The context exit code must remain 0, confirming that warning issues do not fail the process. This
+scenario is tested by `Configuration_Issues_WarningIssue_DoesNotSetExitCode`.
 
-**Scenario**: `BuildMarkConfigReader.ReadAsync` is called on a temp directory containing no
-`.buildmark.yaml`.
+**Configuration_Issues_ValidationError_ReportsAccurateLine**: A `.buildmark.yaml` with an
+unsupported key placed on line 3 is written and read via `BuildMarkConfigReader.ReadAsync`. The
+resulting issue must report `Line` equal to 3, confirming that 1-based line numbers are preserved
+through the YAML parser. This scenario is tested by
+`Configuration_Issues_ValidationError_ReportsAccurateLine`.
 
-**Expected**: `Config` is null; `HasErrors` is false; `Issues` is empty.
+**Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings**: A `.buildmark.yaml` with a
+GitHub connector block containing owner, repo, and base-url fields is written and read via
+`BuildMarkConfigReader.ReadAsync`. The connector type, owner, repo, and base URL must all be parsed
+correctly into the `ConnectorConfig` model. This scenario is tested by
+`Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings`.
 
-**Requirement coverage**: `BuildMark-Configuration-Read`.
-
-#### Configuration_ReadAsync_MalformedFile_ReportsError
-
-**Scenario**: A `.buildmark.yaml` with a tab character (malformed YAML) is written;
-`BuildMarkConfigReader.ReadAsync` is called.
-
-**Expected**: `Config` is null; `HasErrors` is true; `Issues` contains at least one entry with
-`Error` severity.
-
-**Requirement coverage**: `BuildMark-Configuration-Read`.
-
-#### Configuration_Issues_ErrorIssue_SetsExitCode
-
-**Scenario**: A `ConfigurationLoadResult` containing one `Error`-severity `ConfigurationIssue` is
-created; `ReportTo(context)` is called on a silent context.
-
-**Expected**: `context.ExitCode` equals 1.
-
-**Requirement coverage**: `BuildMark-Configuration-Issues`.
-
-#### Configuration_Issues_WarningIssue_DoesNotSetExitCode
-
-**Scenario**: A `ConfigurationLoadResult` containing one `Warning`-severity `ConfigurationIssue`
-is created; `ReportTo(context)` is called on a silent context.
-
-**Expected**: `context.ExitCode` remains 0.
-
-**Requirement coverage**: `BuildMark-Configuration-Issues`.
-
-#### Configuration_Issues_ValidationError_ReportsAccurateLine
-
-**Scenario**: A `.buildmark.yaml` with an unsupported key on line 3 is written;
-`BuildMarkConfigReader.ReadAsync` is called.
-
-**Expected**: The resulting issue reports `Line` equal to 3.
-
-**Requirement coverage**: `BuildMark-Configuration-Issues`.
-
-#### Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
-
-**Scenario**: A `.buildmark.yaml` with a GitHub connector block (owner, repo, base-url) is
-written; `BuildMarkConfigReader.ReadAsync` is called.
-
-**Expected**: `Config.Connector.Type` is `"github"`; `GitHub.Owner`, `GitHub.Repo`, and
-`GitHub.BaseUrl` match the file values.
-
-**Requirement coverage**: `BuildMark-Configuration-ConnectorConfig`.
-
-#### Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
-
-**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block (url, organization,
-project, repository) is written; `BuildMarkConfigReader.ReadAsync` is called.
-
-**Expected**: `Config.Connector.Type` is `"azure-devops"`; `AzureDevOps.OrganizationUrl`,
-`AzureDevOps.Organization`, `AzureDevOps.Project`, and `AzureDevOps.Repository` match the file
-values.
-
-**Requirement coverage**: `BuildMark-Configuration-ConnectorConfig`.
-
-### Requirements Coverage
-
-- **`BuildMark-Configuration-Read`**:
-  - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
-  - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
-  - Configuration_ReadAsync_MalformedFile_ReportsError
-- **`BuildMark-Configuration-Issues`**:
-  - Configuration_Issues_ErrorIssue_SetsExitCode
-  - Configuration_Issues_WarningIssue_DoesNotSetExitCode
-  - Configuration_Issues_ValidationError_ReportsAccurateLine
-- **`BuildMark-Configuration-ConnectorConfig`**:
-  - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
-  - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
+**Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings**: A `.buildmark.yaml` with an
+Azure DevOps connector block containing url, organization, project, and repository fields is written
+and read via `BuildMarkConfigReader.ReadAsync`. All Azure DevOps connector fields must be parsed
+correctly into the `ConnectorConfig` model. This scenario is tested by
+`Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings`.

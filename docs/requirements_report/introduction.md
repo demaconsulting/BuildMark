@@ -1,22 +1,22 @@
 # Introduction
 
-This document contains the requirements trace matrix for the BuildMark project.
+This document provides the requirements Trace Matrix for BuildMark,
+mapping each requirement to its corresponding test evidence.
 
 ## Purpose
 
-The trace matrix links requirements to their corresponding test cases, ensuring complete
-test coverage and traceability from requirements to implementation.
+To demonstrate that every requirement is covered by at least one passing test,
+providing compliance evidence for BuildMark.
 
 ## Scope
 
-This document covers all requirements defined in `docs/reqstream/` for BuildMark and their
-corresponding test evidence from unit, integration, and self-validation test runs.
+This document covers all requirements in `docs/reqstream/` and their test evidence.
 
 ## Test Sources
 
 Requirements traceability in BuildMark uses two types of tests:
 
-- **Unit and Integration Tests**: Standard MSTest tests that verify code functionality
+- **Unit and Integration Tests**: Standard xUnit tests that verify code functionality
 - **Self-Validation Tests**: Built-in validation tests run via `buildmark --validate --results`
 
 To generate complete traceability reports, both test result files must be included:

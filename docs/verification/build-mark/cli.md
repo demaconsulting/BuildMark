@@ -1,204 +1,91 @@
 ## Cli
 
-### Verification Strategy
+### Verification Approach
 
-The Cli subsystem is verified through `CliTests.cs`, which exercises the `Context`
-class directly by constructing instances with various argument combinations and
-asserting on the resulting property values. Each test targets a specific flag or
-argument combination and validates correct parsing behavior, including error conditions
-and output behavior.
-
-### Dependencies
-
-| Mock / Stub          | Reason                                                             |
-| -------------------- | ------------------------------------------------------------------ |
-| `StringWriter`       | Captures context output for assertion without console side effects |
-| In-process arguments | Passed directly to `Context` constructor instead of `args[]`       |
+The Cli subsystem is verified through `CliTests.cs` (subsystem-level) and `ContextTests.cs`
+(unit-level). `CliTests.cs` exercises the `Context` class directly by constructing instances with
+various argument combinations and asserting on the resulting property values. Each test targets a
+specific flag or argument combination and validates correct parsing behavior, including error
+conditions and output behavior. `StringWriter` captures context output for assertion without console
+side effects, and arguments are passed directly to the `Context` constructor rather than through
+`args[]`.
 
 ### Test Environment
 
-N/A - standard test environment. `CliTests.cs` runs within the standard `dotnet test`
-host; no external services, live network, or file system side effects beyond an
-in-process `StringWriter` are required.
+N/A - standard test environment. Both `CliTests.cs` and `ContextTests.cs` run within the standard
+`dotnet test` host; no external services, live network, or file system side effects beyond an
+in-process `StringWriter` and temporary log files are required.
 
 ### Acceptance Criteria
 
-All tests in `CliTests.cs` pass with zero failures. All `BuildMark-Cli-*` and referenced
-`BuildMark-Program-*` requirements have at least one test in the Requirements Coverage
-mapping.
+- All tests in `CliTests.cs` pass with zero failures.
+- All `BuildMark-Cli-*` and referenced `BuildMark-Program-*` requirements have at least one
+  test in the subsystem test file.
 
 ### Test Scenarios
 
-#### Cli_Context_EmptyArguments_CreatesValidContext
+**Cli_Context_EmptyArguments_CreatesValidContext**: Verifies that a `Context` created with no
+arguments initializes successfully with all flags defaulting to false.
+This scenario is tested by `Cli_Context_EmptyArguments_CreatesValidContext`.
 
-**Scenario**: A `Context` is created with no arguments.
+**Cli_VersionFlag_SetsProperty**: Verifies that constructing a context with `--version` sets the
+`Version` property to true. This scenario is tested by `Cli_VersionFlag_SetsProperty`.
 
-**Expected**: Context is created without error; all flags default to false.
+**Cli_HelpFlag_SetsProperty**: Verifies that constructing a context with `--help` sets the `Help`
+property to true. This scenario is tested by `Cli_HelpFlag_SetsProperty`.
 
-**Requirement coverage**: `BuildMark-Cli-Context`
+**Cli_SilentFlag_SetsProperty**: Verifies that constructing a context with `--silent` sets the
+`Silent` property to true. This scenario is tested by `Cli_SilentFlag_SetsProperty`.
 
-#### Cli_VersionFlag_SetsProperty
+**Cli_SilentFlag_SuppressesConsoleOutput**: Verifies that a context created with `--silent` does
+not write to the console when a write is performed, confirming output suppression.
+This scenario is tested by `Cli_SilentFlag_SuppressesConsoleOutput`.
 
-**Scenario**: Context is created with `--version` argument.
+**Cli_BuildVersionFlag_SetsProperty**: Verifies that `--build-version 1.2.3` sets the
+`BuildVersion` property to `"1.2.3"`. This scenario is tested by
+`Cli_BuildVersionFlag_SetsProperty`.
 
-**Expected**: `Version` property is `true`.
+**Cli_ReportFlags_SetProperties**: Verifies that `--report output.md --depth 3
+--include-known-issues` sets `ReportFile` to `"output.md"`, `Depth` to 3, and `IncludeKnownIssues`
+to true. This scenario is tested by `Cli_ReportFlags_SetProperties`.
 
-**Requirement coverage**: `BuildMark-Program-Version`
+**Cli_LogFlag_CreatesLogFile**: Verifies that `--log path.log` sets the `Log` property and creates
+the log file at the specified path.
+This scenario is tested by `Cli_LogFlag_CreatesLogFile`.
 
-#### Cli_HelpFlag_SetsProperty
+**Cli_ValidateFlag_SetsProperty**: Verifies that `--validate` sets the `Validate` property to
+true. This scenario is tested by `Cli_ValidateFlag_SetsProperty`.
 
-**Scenario**: Context is created with `--help` argument.
+**Cli_ResultsFlag_SetsProperty**: Verifies that `--results results.trx` sets `ResultsFile` to
+`"results.trx"`. This scenario is tested by `Cli_ResultsFlag_SetsProperty`.
 
-**Expected**: `Help` property is `true`.
+**Cli_ResultFlag_SetsProperty**: Verifies that the `--result` alias sets `ResultsFile` to
+`"results.trx"` identically to `--results`.
+This scenario is tested by `Cli_ResultFlag_SetsProperty`.
 
-**Requirement coverage**: `BuildMark-Program-Help`
+**Cli_ErrorOutput_WritesToStderr**: Verifies that `context.WriteError` writes the error message
+to the standard error stream. This scenario is tested by `Cli_ErrorOutput_WritesToStderr`.
 
-#### Cli_SilentFlag_SetsProperty
+**Cli_InvalidArgument_ThrowsException**: Verifies that an unrecognized argument causes an
+`ArgumentException` containing "Unsupported argument '--unsupported'".
+This scenario is tested by `Cli_InvalidArgument_ThrowsException`.
 
-**Scenario**: Context is created with `--silent` argument.
+**Cli_MissingArgumentValue_ThrowsException**: Verifies that `--build-version` without a following
+value causes an `ArgumentException` containing the missing-value message.
+This scenario is tested by `Cli_MissingArgumentValue_ThrowsException`.
 
-**Expected**: `Silent` property is `true`.
+**Cli_ExitCode_DefaultsToZero**: Verifies that a freshly created context has `ExitCode` of 0
+before any errors are written.
+This scenario is tested by `Cli_ExitCode_DefaultsToZero`.
 
-**Requirement coverage**: `BuildMark-Program-Silent`
+**Cli_WriteError_SetsExitCodeToOne**: Verifies that calling `context.WriteError` sets `ExitCode`
+to 1. This scenario is tested by `Cli_WriteError_SetsExitCodeToOne`.
 
-#### Cli_SilentFlag_SuppressesConsoleOutput
+**Cli_VersionShortFlag_SetsProperty**: Verifies that the `-v` short argument sets the `Version`
+property to true. This scenario is tested by `Cli_VersionShortFlag_SetsProperty`.
 
-**Scenario**: Context is created with `--silent` argument and a write is performed.
+**Cli_HelpShortFlags_SetProperty**: Verifies that `-h` and `-?` short arguments set the `Help`
+property to true. This scenario is tested by `Cli_HelpShortFlags_SetProperty`.
 
-**Expected**: Output is suppressed; nothing is written to console.
-
-**Requirement coverage**: `BuildMark-Program-Silent`
-
-#### Cli_BuildVersionFlag_SetsProperty
-
-**Scenario**: Context is created with `--build-version 1.2.3` argument.
-
-**Expected**: `BuildVersion` property equals `"1.2.3"`.
-
-**Requirement coverage**: `BuildMark-Program-BuildVersion`
-
-#### Cli_ReportFlags_SetProperties
-
-**Scenario**: Context is created with `["--report", "output.md", "--depth", "3",
-"--include-known-issues"]`.
-
-**Expected**: `ReportFile` equals `"output.md"`; `Depth` equals 3; `IncludeKnownIssues` is true.
-
-**Requirement coverage**: `BuildMark-Program-Report`, `BuildMark-Program-Depth`
-
-#### Cli_LogFlag_CreatesLogFile
-
-**Scenario**: Context is created with `--log path.log` argument.
-
-**Expected**: `Log` property is set; log file is created at the specified path.
-
-**Requirement coverage**: `BuildMark-Program-Log`
-
-#### Cli_ValidateFlag_SetsProperty
-
-**Scenario**: Context is created with `--validate` argument.
-
-**Expected**: `Validate` property is `true`.
-
-**Requirement coverage**: `BuildMark-Program-Validate`
-
-#### Cli_ResultsFlag_SetsProperty
-
-**Scenario**: Context is created with `["--results", "results.trx"]`.
-
-**Expected**: `ResultsFile` property equals `"results.trx"`.
-
-**Requirement coverage**: `BuildMark-Program-Results`
-
-#### Cli_ResultFlag_SetsProperty
-
-**Scenario**: Context is created with `["--result", "results.trx"]` (alias).
-
-**Expected**: `ResultsFile` property equals `"results.trx"`.
-
-**Requirement coverage**: `BuildMark-Program-Results`
-
-#### Cli_ErrorOutput_WritesToStderr
-
-**Scenario**: `context.WriteError` is called with an error message.
-
-**Expected**: The message `"Subsystem error test"` appears in the standard error stream.
-
-**Requirement coverage**: `BuildMark-Program-ErrorHandling`
-
-#### Cli_InvalidArgument_ThrowsException
-
-**Scenario**: Context is created with `["--unsupported"]`.
-
-**Expected**: `ArgumentException` is thrown with a message containing
-`"Unsupported argument '--unsupported'"`.
-
-**Requirement coverage**: `BuildMark-Cli-Context`
-
-#### Cli_MissingArgumentValue_ThrowsException
-
-**Scenario**: Context is created with `["--build-version"]` (value missing).
-
-**Expected**: `ArgumentException` is thrown with a message containing
-`"--build-version requires a version argument"`.
-
-**Requirement coverage**: `BuildMark-Cli-Context`
-
-#### Cli_ExitCode_DefaultsToZero
-
-**Scenario**: Context is created; `ExitCode` property is read without any errors.
-
-**Expected**: `ExitCode` is 0.
-
-**Requirement coverage**: `BuildMark-Cli-Context`
-
-#### Cli_WriteError_SetsExitCodeToOne
-
-**Scenario**: `context.WriteError` is called.
-
-**Expected**: `ExitCode` is 1 after the call.
-
-**Requirement coverage**: `BuildMark-Program-ErrorHandling`
-
-#### Cli_VersionShortFlag_SetsProperty
-
-**Scenario**: Context is created with `-v` short argument.
-
-**Expected**: `Version` property is `true`.
-
-**Requirement coverage**: `BuildMark-Program-Version`
-
-#### Cli_HelpShortFlags_SetProperty
-
-**Scenario**: Context is created with `-h` or `-?` short arguments.
-
-**Expected**: `Help` property is `true`.
-
-**Requirement coverage**: `BuildMark-Program-Help`
-
-#### Cli_LintFlag_SetsProperty
-
-**Scenario**: Context is created with `--lint` argument.
-
-**Expected**: `Lint` property is `true`.
-
-**Requirement coverage**: `BuildMark-Program-Lint`
-
-### Requirements Coverage
-
-- **BuildMark-Cli-Context**: Cli_Context_EmptyArguments_CreatesValidContext,
-  Cli_InvalidArgument_ThrowsException, Cli_MissingArgumentValue_ThrowsException,
-  Cli_ExitCode_DefaultsToZero
-- **BuildMark-Program-Version**: Cli_VersionFlag_SetsProperty, Cli_VersionShortFlag_SetsProperty
-- **BuildMark-Program-Help**: Cli_HelpFlag_SetsProperty, Cli_HelpShortFlags_SetProperty
-- **BuildMark-Program-Silent**: Cli_SilentFlag_SetsProperty,
-  Cli_SilentFlag_SuppressesConsoleOutput
-- **BuildMark-Program-BuildVersion**: Cli_BuildVersionFlag_SetsProperty
-- **BuildMark-Program-Report**: Cli_ReportFlags_SetProperties
-- **BuildMark-Program-Depth**: Cli_ReportFlags_SetProperties
-- **BuildMark-Program-Log**: Cli_LogFlag_CreatesLogFile
-- **BuildMark-Program-Validate**: Cli_ValidateFlag_SetsProperty
-- **BuildMark-Program-Results**: Cli_ResultsFlag_SetsProperty, Cli_ResultFlag_SetsProperty
-- **BuildMark-Program-Lint**: Cli_LintFlag_SetsProperty
-- **BuildMark-Program-ErrorHandling**: Cli_ErrorOutput_WritesToStderr,
-  Cli_WriteError_SetsExitCodeToOne
+**Cli_LintFlag_SetsProperty**: Verifies that `--lint` sets the `Lint` property to true.
+This scenario is tested by `Cli_LintFlag_SetsProperty`.

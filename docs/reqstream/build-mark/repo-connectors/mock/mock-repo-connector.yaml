@@ -1,34 +1,36 @@
 ---
-# Software Unit Requirements for the MockRepoConnector Class
-#
-# MockRepoConnector is an in-memory repository connector used for
-# deterministic testing. It provides fixed build information covering
-# multiple versions, change types, and known issues.
+# MockRepoConnector unit requirements
 
 sections:
-  - title: MockRepoConnector Unit Requirements
-    requirements:
-      - id: BuildMark-MockRepoConnector-Deterministic
-        title: The MockRepoConnector class shall return deterministic build information for testing.
-        justification: |
-          Tests that exercise the report generation and self-validation logic must run
-          without external dependencies. The MockRepoConnector provides a fixed,
-          predictable dataset so tests can assert exact outcomes.
+  - title: BuildMark Requirements
+    sections:
+      - title: RepoConnectors Requirements
+        sections:
+          - title: Mock Requirements
+            sections:
+              - title: MockRepoConnector Requirements
+                requirements:
+                  - id: BuildMark-MockRepoConnector-Deterministic
+                    title: The MockRepoConnector class shall return deterministic build information for testing.
+                    justification: |
+                      Tests that exercise the report generation and self-validation logic must run
+                      without external dependencies. The MockRepoConnector provides a fixed,
+                      predictable dataset so tests can assert exact outcomes.
 
-          The dataset includes a closed bug (issue 7) that carries an affected-versions
-          range, allowing tests to verify that the known-issues collection applies the
-          correct two-tier rule: version-range check for bugs with affected-versions, and
-          open/closed status fallback for bugs without.
-        tests:
-          - MockRepoConnector_Constructor_CreatesInstance
-          - MockRepoConnector_ImplementsInterface
-          - MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion
-          - MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
-          - MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline
-          - MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly
-          - MockRepoConnector_Configure_StoresRulesAndSections
-          - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
-          - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections
-          - MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
-          - MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
-          - MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections
+                      The dataset includes a closed bug (issue 7) that carries an affected-versions
+                      range, allowing tests to verify that the known-issues collection applies the
+                      correct two-tier rule: version-range check for bugs with affected-versions, and
+                      open/closed status fallback for bugs without.
+                    tests:
+                      - MockRepoConnector_Constructor_CreatesInstance
+                      - MockRepoConnector_ImplementsInterface
+                      - MockRepoConnector_GetBuildInformationAsync_ReturnsExpectedVersion
+                      - MockRepoConnector_GetBuildInformationAsync_ReturnsCompleteInformation
+                      - MockRepoConnector_GetBuildInformationAsync_WithValidVersionFromTags_ReturnsCorrectBaseline
+                      - MockRepoConnector_GetBuildInformationAsync_CategorizesChangesCorrectly
+                      - MockRepoConnector_Configure_StoresRulesAndSections
+                      - MockRepoConnector_GetBuildInformationAsync_WithRules_ReturnsRoutedSections
+                      - MockRepoConnector_GetBuildInformationAsync_WithoutRules_ReturnsNullRoutedSections
+                      - MockRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+                      - MockRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+                      - MockRepoConnector_GetBuildInformationAsync_WithRulesAndKnownIssues_KnownIssuesNotInRoutedSections

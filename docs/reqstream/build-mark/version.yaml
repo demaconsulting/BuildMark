@@ -1,4 +1,5 @@
 ---
+# BuildMark Version subsystem requirements
 includes:
   - version/version-comparable.yaml
   - version/version-semantic.yaml
@@ -8,47 +9,49 @@ includes:
   - version/version-commit-tag.yaml
 
 sections:
-  - title: Version Subsystem Requirements
-    requirements:
-      - id: BuildMark-Version-Subsystem
-        title: >-
-          Version subsystem shall provide semantic version processing capabilities
-          for BuildMark operations.
-        justification: |
-          The Version subsystem encapsulates all version-related functionality including
-          parsing, comparison, validation, and version range operations. This subsystem
-          ensures consistent semantic versioning behavior across all BuildMark components
-          and provides the foundation for repository version tag processing and build
-          information generation.
-        tests:
-          - Version_Subsystem_CreateAllVersionTypes_WorksCorrectly
-          - Version_Subsystem_TagToComparableIntegration_WorksCorrectly
-        children:
-          - BuildMark-VersionComparable-Comparison
-          - BuildMark-VersionComparable-PreReleaseComparison
-          - BuildMark-VersionComparable-Creation
-          - BuildMark-VersionSemantic-FullVersion
-          - BuildMark-VersionTag-Formats
-          - BuildMark-VersionTag-Equality
-          - BuildMark-VersionInterval-Parse
-          - BuildMark-VersionInterval-Contains
-          - BuildMark-VersionIntervalSet-Parse
-          - BuildMark-VersionIntervalSet-Contains
-          - BuildMark-VersionCommitTag-Record
+  - title: BuildMark Requirements
+    sections:
+      - title: Version Requirements
+        requirements:
+          - id: BuildMark-Version-Subsystem
+            title: >-
+              Version subsystem shall provide semantic version processing capabilities
+              for BuildMark operations.
+            justification: |
+              The Version subsystem encapsulates all version-related functionality including
+              parsing, comparison, validation, and version range operations. This subsystem
+              ensures consistent semantic versioning behavior across all BuildMark components
+              and provides the foundation for repository version tag processing and build
+              information generation.
+            tests:
+              - Version_Subsystem_CreateAllVersionTypes_WorksCorrectly
+              - Version_Subsystem_TagToComparableIntegration_WorksCorrectly
+            children:
+              - BuildMark-VersionComparable-Comparison
+              - BuildMark-VersionComparable-PreReleaseComparison
+              - BuildMark-VersionComparable-Creation
+              - BuildMark-VersionSemantic-FullVersion
+              - BuildMark-VersionTag-Formats
+              - BuildMark-VersionTag-Equality
+              - BuildMark-VersionInterval-Parse
+              - BuildMark-VersionInterval-Contains
+              - BuildMark-VersionIntervalSet-Parse
+              - BuildMark-VersionIntervalSet-Contains
+              - BuildMark-VersionCommitTag-Record
 
-      - id: BuildMark-Version-SemanticVersioning
-        title: >-
-          Version subsystem shall comply with Semantic Versioning 2.0.0 specification
-          for all version processing operations, except that text pre-release identifiers
-          are compared case-insensitively as documented in BuildMark-VersionComparable-PreReleaseComparison.
-        justification: |
-          Compliance with SemVer 2.0.0 ensures consistent and predictable version
-          comparison behavior that aligns with industry standards and developer
-          expectations. This is critical for proper dependency resolution and
-          version range operations.
-        tests:
-          - Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly
-        children:
-          - BuildMark-VersionComparable-Comparison
-          - BuildMark-VersionComparable-PreReleaseComparison
-          - BuildMark-VersionSemantic-FullVersion
+          - id: BuildMark-Version-SemanticVersioning
+            title: >-
+              Version subsystem shall comply with Semantic Versioning 2.0.0 specification
+              for all version processing operations, except that text pre-release identifiers
+              are compared case-insensitively as documented in BuildMark-VersionComparable-PreReleaseComparison.
+            justification: |
+              Compliance with SemVer 2.0.0 ensures consistent and predictable version
+              comparison behavior that aligns with industry standards and developer
+              expectations. This is critical for proper dependency resolution and
+              version range operations.
+            tests:
+              - Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly
+            children:
+              - BuildMark-VersionComparable-Comparison
+              - BuildMark-VersionComparable-PreReleaseComparison
+              - BuildMark-VersionSemantic-FullVersion

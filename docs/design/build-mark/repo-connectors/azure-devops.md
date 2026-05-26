@@ -1,93 +1,52 @@
-### AzureDevOps Subsystem
+### AzureDevOps
 
 #### Overview
 
-The AzureDevOps subsystem groups the units responsible for querying the Azure DevOps
-REST API. It sits within the RepoConnectors subsystem and provides the production
-connector used when the repository host is Azure DevOps.
+The AzureDevOps subsystem groups the units responsible for querying the Azure DevOps REST API. It
+sits within the RepoConnectors subsystem and provides the production connector used when the
+repository host is Azure DevOps Services or Azure DevOps Server.
 
-#### Units
+The subsystem contains the following units:
 
-- `AzureDevOpsRepoConnector` - `RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs` -
-  implements `IRepoConnector` for Azure DevOps.
-- `AzureDevOpsRestClient` - `RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs` -
-  issues paginated REST API requests.
-- `AzureDevOpsApiTypes` - `RepoConnectors/AzureDevOps/AzureDevOpsApiTypes.cs` -
-  provides record types for REST API request and response data.
-- `WorkItemMapper` - `RepoConnectors/AzureDevOps/WorkItemMapper.cs` -
-  maps Azure DevOps work items to `ItemInfo` objects.
-
-##### `AzureDevOpsRepoConnector`
-
-The primary production connector. Resolves the repository URL, organization, and project
-from the environment or configuration, creates an `AzureDevOpsRestClient`, fetches all
-required data via REST APIs, applies item-controls overrides from buildmark blocks and
-custom fields, calls `ItemRouter` to assign items to sections, and assembles the
-`BuildInformation` record.
-
-##### `AzureDevOpsRestClient`
-
-Handles HTTPS communication with the Azure DevOps REST API endpoint. Supports paginated
-requests and authenticates via a `Basic` or `Bearer` authorization header. Supports both
-cloud (`dev.azure.com`) and on-premises Azure DevOps Server instances via configurable
-organization URL.
-
-##### `AzureDevOpsApiTypes`
-
-Internal C# records that mirror the REST API response types returned by Azure DevOps.
-Used as the deserialization target for responses from `AzureDevOpsRestClient`.
-
-##### `WorkItemMapper`
-
-Maps `AzureDevOpsWorkItem` records from the REST API into `ItemInfo` records for the
-`BuildInformation` model. Extracts visibility, type, and affected-version controls from
-both buildmark code blocks in the work item description and Azure DevOps custom fields
-(`Custom.Visibility`, `Custom.AffectedVersions`). Custom fields take precedence over
-buildmark blocks when both are present.
+- `AzureDevOpsRepoConnector` — implements `IRepoConnector` for Azure DevOps; orchestrates
+  authentication, REST API calls, and assembly of the `BuildInformation` record.
+- `AzureDevOpsRestClient` — issues paginated HTTP requests to the Azure DevOps REST API and
+  deserializes responses into typed records.
+- `AzureDevOpsApiTypes` — C# record definitions that mirror Azure DevOps REST API request and
+  response payloads; used as deserialization targets by `AzureDevOpsRestClient`.
+- `WorkItemMapper` — maps `AzureDevOpsWorkItem` records into `ItemInfo` records, merging
+  `buildmark` block overrides with Azure DevOps custom fields.
 
 #### Interfaces
 
-The AzureDevOps subsystem exposes `AzureDevOpsRepoConnector`, which implements
-`IRepoConnector`. All other types in the subsystem are internal.
+**AzureDevOpsRepoConnector**: The production `IRepoConnector` implementation for Azure DevOps
+repositories. All other types in the subsystem are internal.
 
-| Member | Kind | Description |
-| --- | --- | --- |
-| `AzureDevOpsRepoConnector(config)` | Constructor | Create the connector with optional configuration overrides |
-| `GetBuildInformationAsync(version)` | Method | Fetch complete build information from the Azure DevOps REST API |
+- *Type*: In-process .NET public API.
+- *Role*: Provider — exposed to `RepoConnectorFactory` and callers of `IRepoConnector`.
+- *Contract*: Constructor `AzureDevOpsRepoConnector(AzureDevOpsConnectorConfig?)` accepts optional
+  configuration overrides; `GetBuildInformationAsync(VersionTag? version)` fetches complete build
+  information from the Azure DevOps REST API and returns a `BuildInformation` record.
+- *Constraints*: Requires a valid Azure DevOps authentication token resolvable from environment
+  variables or the `az` CLI; throws `InvalidOperationException` when no token is found or when the
+  remote URL cannot be parsed.
 
 #### Design
 
-`AzureDevOpsRepoConnector` orchestrates the subsystem's data flow. It uses
-`AzureDevOpsRestClient` for all HTTPS communication, `AzureDevOpsApiTypes`
-records as serialization targets, and `WorkItemMapper` to transform raw work
-item responses into `ItemInfo` records.
+`AzureDevOpsRepoConnector` orchestrates the subsystem's data flow:
 
-The connector calls `ItemControlsParser.Parse` on each work item description
-body and also reads `Custom.Visibility` and `Custom.AffectedVersions` custom
-fields directly. `WorkItemMapper` merges the two sources (custom fields take
-precedence) and returns the final `ItemInfo` record or `null` when the item
-should be excluded. When routing rules have been configured, the connector passes
-all collected items to `ApplyRules` (inherited from `RepoConnectorBase`) to
-populate `BuildInformation.RoutedSections`.
-
-#### Interactions
-
-| Unit / Subsystem              | Role                                                                      |
-|-------------------------------|---------------------------------------------------------------------------|
-| `IRepoConnector`              | Interface implemented by `AzureDevOpsRepoConnector`                       |
-| `RepoConnectorBase`           | Base class for `AzureDevOpsRepoConnector`                                 |
-| `ItemRouter`                  | Called by `AzureDevOpsRepoConnector` to assign items to sections          |
-| `ProcessRunner`               | Used (via `RepoConnectorBase`) to run Git and az CLI commands             |
-| `AzureDevOpsConnectorConfig`  | Supplies organization URL, project, and repository overrides              |
-| `ItemControlsParser`          | Parses buildmark blocks from work item description bodies                 |
-| `BuildInformation`            | The output record assembled and returned by `AzureDevOpsRepoConnector`    |
-
-#### Error Handling
-
-`AzureDevOpsRestClient` propagates HTTP errors and JSON deserialization failures as
-`InvalidOperationException`. The exception message includes the Azure DevOps error
-message read via `TryReadAdoErrorMessageAsync` when the response body contains an
-Azure DevOps error object; otherwise the raw HTTP status code is included.
-
-`AzureDevOpsRepoConnector` does not suppress these exceptions; a failed REST API call
-therefore aborts `GetBuildInformationAsync` and propagates the exception to the caller.
+1. Read the git remote URL and current commit hash via `RunCommandAsync` (inherited from
+   `RepoConnectorBase`).
+2. Determine the organization URL, project, and repository name from `AzureDevOpsConnectorConfig`
+   or by parsing the remote URL.
+3. Resolve an Azure DevOps authentication token (PAT or Entra ID Bearer token).
+4. Create an `AzureDevOpsRestClient` and fetch tags, commits, pull requests, and work items via
+   the REST API, using `AzureDevOpsApiTypes` records as deserialization targets.
+5. Call `WorkItemMapper.MapWorkItemToItemInfo` for each work item, which internally calls
+   `ItemControlsParser.Parse` on each description and merges the result with `Custom.Visibility`
+   and `Custom.AffectedVersions` custom fields (custom fields take precedence).
+6. Collect changes and known issues; if routing rules are configured, call `ApplyRules` (inherited
+   from `RepoConnectorBase`) to distribute all items into the configured sections and populate
+   `BuildInformation.RoutedSections`. If no rules are configured, items remain in the legacy
+   `Changes`, `Bugs`, and `KnownIssues` lists.
+7. Return the assembled `BuildInformation` record.

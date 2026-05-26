@@ -1,60 +1,63 @@
 ---
-# Version Comparable Requirements
-
+# BuildMark VersionComparable unit requirements
 sections:
-  - title: VersionComparable Requirements
-    requirements:
-      - id: BuildMark-VersionComparable-Comparison
-        title: >-
-          VersionComparable shall provide analytical comparison of semantic
-          versions with integer comparison for major.minor.patch components.
-        justification: |
-          Proper version ordering requires analytical comparison (1.2.3 < 1.11.2)
-          rather than lexicographic comparison. Using integer comparison ensures
-          correct ordering regardless of the number of digits in version components.
-        tests:
-          - VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
-          - VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
-          - VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
-          - VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
-          - VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
-          - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
-          - VersionComparable_Operators_LessThan_WorksCorrectly
-          - VersionComparable_Operators_GreaterThan_WorksCorrectly
-          - VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
-          - VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
+  - title: BuildMark Requirements
+    sections:
+      - title: Version Requirements
+        sections:
+          - title: VersionComparable Requirements
+            requirements:
+              - id: BuildMark-VersionComparable-Comparison
+                title: >-
+                  VersionComparable shall provide analytical comparison of semantic
+                  versions with integer comparison for major.minor.patch components.
+                justification: |
+                  Proper version ordering requires analytical comparison (1.2.3 < 1.11.2)
+                  rather than lexicographic comparison. Using integer comparison ensures
+                  correct ordering regardless of the number of digits in version components.
+                tests:
+                  - VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
+                  - VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
+                  - VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
+                  - VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
+                  - VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
+                  - VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
+                  - VersionComparable_Operators_LessThan_WorksCorrectly
+                  - VersionComparable_Operators_GreaterThan_WorksCorrectly
+                  - VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
+                  - VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
 
-      - id: BuildMark-VersionComparable-PreReleaseComparison
-        title: >-
-          VersionComparable shall correctly order pre-release versions according
-          to Semantic Versioning specification, with the intentional deviation that
-          text identifiers are compared case-insensitively.
-        justification: |
-          Pre-release versions must be ordered correctly per SemVer specification
-          to ensure proper dependency resolution and version range operations.
-          This includes handling complex pre-release identifiers with mixed
-          numeric and text components. Text identifiers are compared
-          case-insensitively as a deliberate design choice; SemVer 2.0.0
-          specifies case-sensitive ASCII sort order, but case-insensitive
-          comparison is more practical for typical repository tag naming
-          conventions.
-        tests:
-          - VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
-          - VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
-          - VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
-          - VersionComparable_CompareTo_ShorterPreRelease_IsLess
-          - VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
+              - id: BuildMark-VersionComparable-PreReleaseComparison
+                title: >-
+                  VersionComparable shall correctly order pre-release versions according
+                  to Semantic Versioning specification, with the intentional deviation that
+                  text identifiers are compared case-insensitively.
+                justification: |
+                  Pre-release versions must be ordered correctly per SemVer specification
+                  to ensure proper dependency resolution and version range operations.
+                  This includes handling complex pre-release identifiers with mixed
+                  numeric and text components. Text identifiers are compared
+                  case-insensitively as a deliberate design choice; SemVer 2.0.0
+                  specifies case-sensitive ASCII sort order, but case-insensitive
+                  comparison is more practical for typical repository tag naming
+                  conventions.
+                tests:
+                  - VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
+                  - VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
+                  - VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
+                  - VersionComparable_CompareTo_ShorterPreRelease_IsLess
+                  - VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
 
-      - id: BuildMark-VersionComparable-Creation
-        title: >-
-          VersionComparable shall be constructible from a version string and shall
-          reject inputs that do not represent a valid semantic version.
-        justification: |
-          Callers must be able to create VersionComparable instances from repository tag
-          strings and user-supplied version values, and must receive a clear error or a
-          null result when the input is not a valid version, so that invalid version data
-          does not propagate silently through version comparisons.
-        tests:
-          - VersionComparable_Create_ValidVersion_ReturnsInstance
-          - VersionComparable_TryCreate_InvalidVersion_ReturnsNull
-          - VersionComparable_Create_InvalidVersion_ThrowsArgumentException
+              - id: BuildMark-VersionComparable-Creation
+                title: >-
+                  VersionComparable shall be constructible from a version string and shall
+                  reject inputs that do not represent a valid semantic version.
+                justification: |
+                  Callers must be able to create VersionComparable instances from repository tag
+                  strings and user-supplied version values, and must receive a clear error or a
+                  null result when the input is not a valid version, so that invalid version data
+                  does not propagate silently through version comparisons.
+                tests:
+                  - VersionComparable_Create_ValidVersion_ReturnsInstance
+                  - VersionComparable_TryCreate_InvalidVersion_ReturnsNull
+                  - VersionComparable_Create_InvalidVersion_ThrowsArgumentException

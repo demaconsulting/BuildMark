@@ -2,10 +2,10 @@
 
 #### Verification Approach
 
-`RepoConnectorBase` is tested through `RepoConnectorBaseTests.cs`, which contains
-5 unit tests. The tests exercise `Configure` (storing rules and sections and setting
-`HasRules`), `ApplyRules` (routing items to sections), and `FindVersionIndex` (locating
-a version tag in a list, including cross-prefix equality).
+`RepoConnectorBase` is tested through `RepoConnectorBaseTests.cs`, which contains 5 unit tests.
+The tests exercise `Configure` (storing rules and sections and setting `HasRules`), `ApplyRules`
+(routing items to sections), and `FindVersionIndex` (locating a version tag in a list, including
+cross-prefix equality).
 
 #### Dependencies
 
@@ -19,7 +19,7 @@ Standard dotnet test host; no external dependencies or environment setup require
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+All 5 tests in `RepoConnectorBaseTests.cs` pass with no errors or warnings.
 
 #### Test Scenarios
 
@@ -49,8 +49,8 @@ All tests in the test class pass with no errors or warnings.
 
 ##### RepoConnectorBase_FindVersionIndex_DifferentPrefixSameVersion_ReturnsCorrectIndex
 
-**Scenario**: `FindVersionIndex` is called with a tag list containing a tag with a
-different prefix but the same version as the search target.
+**Scenario**: `FindVersionIndex` is called with a tag list containing a tag with a different
+prefix but the same version as the search target.
 
 **Expected**: The index of the matching tag is returned.
 

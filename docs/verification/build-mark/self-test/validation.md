@@ -5,81 +5,42 @@
 `Validation` is verified with dedicated unit tests in `ValidationTests.cs`. Tests construct a
 `Context` with controlled arguments, call `Validation.Run`, and assert on the created results
 files, console error output, and exit code. `MockRepoConnector` is provided as the connector
-factory; no further mocking is required.
-
-#### Dependencies
-
-| Mock / Stub         | Reason                                                                |
-| ------------------- | --------------------------------------------------------------------- |
-| `MockRepoConnector` | Supplies connector factory so self-check runs without network access. |
+factory so the self-check runs without network access; no further mocking is required.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. `ValidationTests.cs` runs within the standard `dotnet test` host.
+Tests create temporary result files using `TemporaryDirectory`; write access to the current working
+directory is required. No network access or external API calls are made.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All tests in `ValidationTests.cs` pass with zero failures.
+- TRX output, JUnit XML output, unsupported-format error, invalid-path error, and
+  no-results-file paths are all covered.
 
 #### Test Scenarios
 
-##### Validation_Run_WithTrxResultsFile_WritesTrxFile
+**Validation_Run_WithTrxResultsFile_WritesTrxFile**: Verifies that `Validation.Run` with
+`--validate --results <tmp>/results.trx` creates a `.trx` file whose content contains `TestRun`
+and `BuildMark Self-Validation`, confirming TRX results output.
+This scenario is tested by `Validation_Run_WithTrxResultsFile_WritesTrxFile`.
 
-**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.trx`; console
-output is captured.
+**Validation_Run_WithXmlResultsFile_WritesJUnitFile**: Verifies that `Validation.Run` with
+`--validate --results <tmp>/results.xml` creates an `.xml` file whose content contains
+`testsuites` and `BuildMark Self-Validation`, confirming JUnit XML results output.
+This scenario is tested by `Validation_Run_WithXmlResultsFile_WritesJUnitFile`.
 
-**Expected**: `results.trx` is created; its content contains `TestRun` and
-`BuildMark Self-Validation`.
+**Validation_Run_WithUnsupportedResultsFileExtension_ShowsError**: Verifies that supplying a
+`.json` results file path causes an error message containing "Unsupported results file format"
+on stderr and sets the exit code to 1.
+This scenario is tested by `Validation_Run_WithUnsupportedResultsFileExtension_ShowsError`.
 
-**Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-TrxOutput`.
+**Validation_Run_WithInvalidResultsFilePath_ShowsError**: Verifies that supplying an
+inaccessible results file path causes an error message containing "Failed to write results file"
+on stderr and sets the exit code to 1.
+This scenario is tested by `Validation_Run_WithInvalidResultsFilePath_ShowsError`.
 
-##### Validation_Run_WithXmlResultsFile_WritesJUnitFile
-
-**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.xml`; console
-output is captured.
-
-**Expected**: `results.xml` is created; its content contains `testsuites` and
-`BuildMark Self-Validation`.
-
-**Requirement coverage**: `BuildMark-Validation-Run`, `BuildMark-Validation-JUnitOutput`.
-
-##### Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
-
-**Scenario**: `Validation.Run` is called with `--validate --results <tmp>/results.json`
-(unsupported extension); console error is captured.
-
-**Expected**: Console error contains `"Unsupported results file format"`; exit code is 1.
-
-**Requirement coverage**: `BuildMark-Validation-TrxOutput`, `BuildMark-Validation-JUnitOutput`.
-
-##### Validation_Run_WithInvalidResultsFilePath_ShowsError
-
-**Scenario**: `Validation.Run` is called with
-`--validate --results /invalid_path_that_does_not_exist/results.trx`; console error is captured.
-
-**Expected**: Console error contains `"Failed to write results file"`; exit code is 1.
-
-**Requirement coverage**: `BuildMark-Validation-TrxOutput`.
-
-##### Validation_Run_WithoutResultsFile_CompletesSuccessfully
-
-**Scenario**: `Validation.Run` is called with `--validate --silent`; no `--results` argument is
-supplied.
-
-**Expected**: Validation completes without error; exit code is 0.
-
-**Requirement coverage**: `BuildMark-Validation-Run`.
-
-#### Requirements Coverage
-
-- **`BuildMark-Validation-Run`**:
-  - Validation_Run_WithTrxResultsFile_WritesTrxFile
-  - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-  - Validation_Run_WithoutResultsFile_CompletesSuccessfully
-- **`BuildMark-Validation-TrxOutput`**:
-  - Validation_Run_WithTrxResultsFile_WritesTrxFile
-  - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
-  - Validation_Run_WithInvalidResultsFilePath_ShowsError
-- **`BuildMark-Validation-JUnitOutput`**:
-  - Validation_Run_WithXmlResultsFile_WritesJUnitFile
-  - Validation_Run_WithUnsupportedResultsFileExtension_ShowsError
+**Validation_Run_WithoutResultsFile_CompletesSuccessfully**: Verifies that when no `--results`
+argument is supplied, validation completes without error and the exit code is 0.
+This scenario is tested by `Validation_Run_WithoutResultsFile_CompletesSuccessfully`.

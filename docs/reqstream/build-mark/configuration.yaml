@@ -1,229 +1,223 @@
 ---
-# Configuration Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the BuildMark Configuration subsystem
-# - The Configuration subsystem spans BuildMarkConfig.cs, BuildMarkConfigReader.cs,
-#   ConfigurationLoadResult.cs, ConfigurationIssue.cs, ConnectorConfig.cs,
-#   GitHubConnectorConfig.cs, AzureDevOpsConnectorConfig.cs, SectionConfig.cs,
-#   and RuleConfig.cs
-# - Subsystem requirements describe the externally visible configuration behavior
+# Configuration subsystem requirements
 
 sections:
-  - title: Configuration Subsystem Requirements
-    requirements:
-      - id: BuildMark-Configuration-Read
-        title: >-
-          The Configuration subsystem shall read the optional .buildmark.yaml file and
-          return a ConfigurationLoadResult.
-        justification: |
-          The subsystem must always return a result object regardless of whether the
-          file is present or malformed, so that callers can inspect issues without
-          special-casing null returns.
-        tests:
-          - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
-          - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
-          - Configuration_ReadAsync_MalformedFile_ReportsError
-        children:
-          - BuildMark-ConfigReader-ReadAsync
-          - BuildMark-ConfigReader-MissingFile
-          - BuildMark-ConfigReader-MalformedFile
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        requirements:
+          - id: BuildMark-Configuration-Read
+            title: >-
+              The Configuration subsystem shall read the optional .buildmark.yaml file and
+              return a ConfigurationLoadResult.
+            justification: |
+              The subsystem must always return a result object regardless of whether the
+              file is present or malformed, so that callers can inspect issues without
+              special-casing null returns.
+            tests:
+              - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
+              - Configuration_ReadAsync_MissingFile_ReturnsEmptyResult
+              - Configuration_ReadAsync_MalformedFile_ReportsError
+            children:
+              - BuildMark-ConfigReader-ReadAsync
+              - BuildMark-ConfigReader-MissingFile
+              - BuildMark-ConfigReader-MalformedFile
 
-      - id: BuildMark-Configuration-Issues
-        title: >-
-          The Configuration subsystem shall surface parse errors and validation warnings
-          through ConfigurationLoadResult with location, severity, and description.
-        justification: |
-          Providing structured issue reports with file path, line number, severity, and
-          description allows the tool to give precise, actionable feedback when a
-          configuration file contains errors.
-        tests:
-          - Configuration_Issues_ErrorIssue_SetsExitCode
-          - Configuration_Issues_WarningIssue_DoesNotSetExitCode
-          - Configuration_Issues_ValidationError_ReportsAccurateLine
-        children:
-          - BuildMark-ConfigLoadResult-ReportTo
+          - id: BuildMark-Configuration-Issues
+            title: >-
+              The Configuration subsystem shall surface parse errors and validation warnings
+              through ConfigurationLoadResult with location, severity, and description.
+            justification: |
+              Providing structured issue reports with file path, line number, severity, and
+              description allows the tool to give precise, actionable feedback when a
+              configuration file contains errors.
+            tests:
+              - Configuration_Issues_ErrorIssue_SetsExitCode
+              - Configuration_Issues_WarningIssue_DoesNotSetExitCode
+              - Configuration_Issues_ValidationError_ReportsAccurateLine
+            children:
+              - BuildMark-ConfigLoadResult-ReportTo
 
-      - id: BuildMark-Configuration-ConnectorConfig
-        title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
-        justification: |
-          The ConnectorConfig envelope carries a type discriminator and per-connector
-          settings objects (GitHubConnectorConfig, AzureDevOpsConnectorConfig). Correct
-          deserialization ensures the factory receives the right settings for the
-          selected connector.
-        tests:
-          - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
-          - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
-        children:
-          - BuildMark-GitHubConnectorConfig-Properties
-          - BuildMark-AzureDevOpsConnectorConfig-Properties
+          - id: BuildMark-Configuration-ConnectorConfig
+            title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
+            justification: |
+              The ConnectorConfig envelope carries a type discriminator and per-connector
+              settings objects (GitHubConnectorConfig, AzureDevOpsConnectorConfig). Correct
+              deserialization ensures the factory receives the right settings for the
+              selected connector.
+            tests:
+              - Configuration_ConnectorConfig_ValidFile_ParsesConnectorSettings
+              - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
+            children:
+              - BuildMark-GitHubConnectorConfig-Properties
+              - BuildMark-AzureDevOpsConnectorConfig-Properties
+        sections:
+          - title: BuildMarkConfigReader Requirements
+            requirements:
+              - id: BuildMark-ConfigReader-ReadAsync
+                title: >-
+                  BuildMarkConfigReader shall always return a configuration load result regardless
+                  of whether the file is present or contains parse errors.
+                justification: |
+                  Callers must always receive a result object rather than null or an exception
+                  so that subsequent steps (issue reporting, connector creation) are uniform
+                  regardless of file presence or parse errors.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
-  - title: BuildMarkConfigReader Unit Requirements
-    requirements:
-      - id: BuildMark-ConfigReader-ReadAsync
-        title: >-
-          BuildMarkConfigReader shall always return a configuration load result regardless
-          of whether the file is present or contains parse errors.
-        justification: |
-          Callers must always receive a result object rather than null or an exception
-          so that subsequent steps (issue reporting, connector creation) are uniform
-          regardless of file presence or parse errors.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+              - id: BuildMark-ConfigReader-MissingFile
+                title: >-
+                  BuildMarkConfigReader shall return an empty configuration result when
+                  the .buildmark.yaml file is absent.
+                justification: |
+                  An absent configuration file is the normal case for repositories that have
+                  not yet adopted .buildmark.yaml. The tool must continue working with defaults.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
 
-      - id: BuildMark-ConfigReader-MissingFile
-        title: >-
-          BuildMarkConfigReader shall return an empty configuration result when
-          the .buildmark.yaml file is absent.
-        justification: |
-          An absent configuration file is the normal case for repositories that have
-          not yet adopted .buildmark.yaml. The tool must continue working with defaults.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
+              - id: BuildMark-ConfigReader-MalformedFile
+                title: >-
+                  BuildMarkConfigReader shall return an error result with actionable messages
+                  when the configuration file cannot be parsed.
+                justification: |
+                  A malformed configuration file should produce actionable error messages rather
+                  than a silent failure or an unhandled exception.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
 
-      - id: BuildMark-ConfigReader-MalformedFile
-        title: >-
-          BuildMarkConfigReader shall return an error result with actionable messages
-          when the configuration file cannot be parsed.
-        justification: |
-          A malformed configuration file should produce actionable error messages rather
-          than a silent failure or an unhandled exception.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
+          - title: ConfigurationLoadResult Requirements
+            requirements:
+              - id: BuildMark-ConfigLoadResult-ReportTo
+                title: >-
+                  ConfigurationLoadResult shall report all configuration issues to the user
+                  and signal an error exit code when any issue has error severity.
+                justification: |
+                  Centralizing issue reporting in the result object ensures consistent
+                  formatting and exit-code behavior across both the --lint path and the
+                  normal build path.
+                tests:
+                  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
 
-  - title: ConfigurationLoadResult Unit Requirements
-    requirements:
-      - id: BuildMark-ConfigLoadResult-ReportTo
-        title: >-
-          ConfigurationLoadResult shall report all configuration issues to the user
-          and signal an error exit code when any issue has error severity.
-        justification: |
-          Centralizing issue reporting in the result object ensures consistent
-          formatting and exit-code behavior across both the --lint path and the
-          normal build path.
-        tests:
-          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+          - title: GitHubConnectorConfig Requirements
+            requirements:
+              - id: BuildMark-GitHubConnectorConfig-Properties
+                title: >-
+                  GitHubConnectorConfig shall expose Owner, Repo, and BaseUrl properties that
+                  override the corresponding auto-detected values in GitHubRepoConnector.
+                justification: |
+                  Teams using GitHub Enterprise or repositories where auto-detection is unreliable
+                  need a way to specify the owner, repository name, and API base URL explicitly
+                  in the configuration file.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
 
-  - title: GitHubConnectorConfig Unit Requirements
-    requirements:
-      - id: BuildMark-GitHubConnectorConfig-Properties
-        title: >-
-          GitHubConnectorConfig shall expose Owner, Repo, and BaseUrl properties that
-          override the corresponding auto-detected values in GitHubRepoConnector.
-        justification: |
-          Teams using GitHub Enterprise or repositories where auto-detection is unreliable
-          need a way to specify the owner, repository name, and API base URL explicitly
-          in the configuration file.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+              - id: BuildMark-GitHubConnectorConfig-TokenVariable
+                title: >-
+                  GitHubConnectorConfig shall expose a TokenVariable property that specifies the
+                  name of the environment variable holding the GitHub access token.
+                justification: |
+                  Teams that store their GitHub access token in a non-standard environment variable
+                  need a way to tell the connector which variable to read. When TokenVariable is set,
+                  the connector must use only that variable and must not fall back to well-known names
+                  or the gh CLI, so that the operator retains full control over credential sourcing.
+                tests:
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
 
-      - id: BuildMark-GitHubConnectorConfig-TokenVariable
-        title: >-
-          GitHubConnectorConfig shall expose a TokenVariable property that specifies the
-          name of the environment variable holding the GitHub access token.
-        justification: |
-          Teams that store their GitHub access token in a non-standard environment variable
-          need a way to tell the connector which variable to read. When TokenVariable is set,
-          the connector must use only that variable and must not fall back to well-known names
-          or the gh CLI, so that the operator retains full control over credential sourcing.
-        tests:
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
-          - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+          - title: AzureDevOpsConnectorConfig Requirements
+            requirements:
+              - id: BuildMark-AzureDevOpsConnectorConfig-Properties
+                title: >-
+                  AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization, Project, and
+                  Repository properties that override the corresponding auto-detected
+                  values in AzureDevOpsRepoConnector.
+                justification: |
+                  Teams using Azure DevOps where auto-detection from the Git remote URL is
+                  unreliable need a way to specify the organization URL, optional organization
+                  name, project, and repository name explicitly in the configuration file.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
-  - title: AzureDevOpsConnectorConfig Unit Requirements
-    requirements:
-      - id: BuildMark-AzureDevOpsConnectorConfig-Properties
-        title: >-
-          AzureDevOpsConnectorConfig shall expose OrganizationUrl, Organization, Project, and
-          Repository properties that override the corresponding auto-detected
-          values in AzureDevOpsRepoConnector.
-        justification: |
-          Teams using Azure DevOps where auto-detection from the Git remote URL is
-          unreliable need a way to specify the organization URL, optional organization
-          name, project, and repository name explicitly in the configuration file.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+              - id: BuildMark-AzureDevOpsConnectorConfig-TokenVariable
+                title: >-
+                  AzureDevOpsConnectorConfig shall expose a TokenVariable property that specifies
+                  the name of the environment variable holding the Azure DevOps access token.
+                justification: |
+                  Teams that store their Azure DevOps access token in a non-standard environment
+                  variable need a way to tell the connector which variable to read. When TokenVariable
+                  is set, the connector must use only that variable and must not fall back to well-known
+                  names or the az CLI, so that the operator retains full control over credential sourcing.
+                tests:
+                  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+                  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+                  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
 
-      - id: BuildMark-AzureDevOpsConnectorConfig-TokenVariable
-        title: >-
-          AzureDevOpsConnectorConfig shall expose a TokenVariable property that specifies
-          the name of the environment variable holding the Azure DevOps access token.
-        justification: |
-          Teams that store their Azure DevOps access token in a non-standard environment
-          variable need a way to tell the connector which variable to read. When TokenVariable
-          is set, the connector must use only that variable and must not fall back to well-known
-          names or the az CLI, so that the operator retains full control over credential sourcing.
-        tests:
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+          - title: ReportConfig Requirements
+            requirements:
+              - id: BuildMark-ReportConfig-Properties
+                title: >-
+                  ReportConfig shall expose File, Depth, and IncludeKnownIssues properties
+                  that override the corresponding default report output settings.
+                justification: |
+                  Teams that want to control the report output file path, heading depth, or
+                  inclusion of known issues need a way to specify these settings explicitly
+                  in the configuration file via the report: key.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
+                  - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
 
-  - title: ReportConfig Unit Requirements
-    requirements:
-      - id: BuildMark-ReportConfig-Properties
-        title: >-
-          ReportConfig shall expose File, Depth, and IncludeKnownIssues properties
-          that override the corresponding default report output settings.
-        justification: |
-          Teams that want to control the report output file path, heading depth, or
-          inclusion of known issues need a way to specify these settings explicitly
-          in the configuration file via the report: key.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
-          - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue
+          - title: ConnectorConfig Requirements
+            requirements:
+              - id: BuildMark-ConnectorConfig-Properties
+                title: >-
+                  ConnectorConfig shall expose Type, GitHub, and AzureDevOps properties
+                  that select and configure the active repository connector.
+                justification: |
+                  The ConnectorConfig envelope carries a type discriminator and per-connector
+                  settings so the factory can instantiate and configure the correct connector
+                  without inspecting multiple top-level keys.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+                  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
 
-  - title: ConnectorConfig Unit Requirements
-    requirements:
-      - id: BuildMark-ConnectorConfig-Properties
-        title: >-
-          ConnectorConfig shall expose Type, GitHub, and AzureDevOps properties
-          that select and configure the active repository connector.
-        justification: |
-          The ConnectorConfig envelope carries a type discriminator and per-connector
-          settings so the factory can instantiate and configure the correct connector
-          without inspecting multiple top-level keys.
-        tests:
-          - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
-          - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+          - title: ConfigurationIssue Requirements
+            requirements:
+              - id: BuildMark-ConfigurationIssue-Record
+                title: >-
+                  ConfigurationIssue shall record the file path, line number, severity,
+                  and description of a single configuration parse or validation problem.
+                justification: |
+                  Structured issue records allow the tool to report precise, actionable
+                  feedback about configuration problems without losing location context
+                  when multiple issues are present in the same file.
+                tests:
+                  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+                  - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+                  - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
 
-  - title: ConfigurationIssue Unit Requirements
-    requirements:
-      - id: BuildMark-ConfigurationIssue-Record
-        title: >-
-          ConfigurationIssue shall record the file path, line number, severity,
-          and description of a single configuration parse or validation problem.
-        justification: |
-          Structured issue records allow the tool to report precise, actionable
-          feedback about configuration problems without losing location context
-          when multiple issues are present in the same file.
-        tests:
-          - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
-          - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
-          - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+          - title: SectionConfig Requirements
+            requirements:
+              - id: BuildMark-SectionConfig-Properties
+                title: >-
+                  SectionConfig shall expose Id and Title properties that define one
+                  named report section for item routing.
+                justification: |
+                  Report sections must have a stable machine-readable identifier (Id) for
+                  routing rules to reference and a human-readable display title for the
+                  generated markdown output.
+                tests:
+                  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
 
-  - title: SectionConfig Unit Requirements
-    requirements:
-      - id: BuildMark-SectionConfig-Properties
-        title: >-
-          SectionConfig shall expose Id and Title properties that define one
-          named report section for item routing.
-        justification: |
-          Report sections must have a stable machine-readable identifier (Id) for
-          routing rules to reference and a human-readable display title for the
-          generated markdown output.
-        tests:
-          - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
-
-  - title: RuleConfig Unit Requirements
-    requirements:
-      - id: BuildMark-RuleConfig-Properties
-        title: >-
-          RuleConfig shall expose Match and Route properties that define one
-          item-routing rule for the ItemRouter.
-        justification: |
-          Routing rules must specify match conditions (label or work-item type)
-          and a destination section identifier so that ItemRouter can correctly
-          categorize items without embedding routing logic in connector code.
-        tests:
-          - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+          - title: RuleConfig Requirements
+            requirements:
+              - id: BuildMark-RuleConfig-Properties
+                title: >-
+                  RuleConfig shall expose Match and Route properties that define one
+                  item-routing rule for the ItemRouter.
+                justification: |
+                  Routing rules must specify match conditions (label or work-item type)
+                  and a destination section identifier so that ItemRouter can correctly
+                  categorize items without embedding routing logic in connector code.
+                tests:
+                  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

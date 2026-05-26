@@ -2,10 +2,10 @@
 
 #### Verification Approach
 
-`RepoConnectorFactory` is tested through `RepoConnectorFactoryTests.cs`, which contains
-11 unit tests. The tests cover connector creation from default settings, from explicit
-connector type configuration, from environment variables (GitHub Actions, Azure DevOps),
-and from remote URL detection.
+`RepoConnectorFactory` is tested through `RepoConnectorFactoryTests.cs`, which contains 11 unit
+tests. The tests cover connector creation from default settings, from explicit connector type
+configuration, from environment variables (GitHub Actions, Azure DevOps), and from remote URL
+detection.
 
 #### Dependencies
 
@@ -20,7 +20,7 @@ Standard dotnet test host; no external dependencies or environment setup require
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+All 11 tests in `RepoConnectorFactoryTests.cs` pass with no errors or warnings.
 
 #### Test Scenarios
 
@@ -114,5 +114,4 @@ All tests in the test class pass with no errors or warnings.
 
 #### Requirements Coverage
 
-- **BuildMark-RepoConnectors-RepoConnectorFactory**: All 11 tests in
-  `RepoConnectorFactoryTests.cs`
+- **BuildMark-RepoConnectors-RepoConnectorFactory**: All 11 tests in `RepoConnectorFactoryTests.cs`

@@ -1,11 +1,10 @@
 ---
-resource-path:
-  - docs/user_guide
-  - docs/template
-
+resource-path: [docs/user_guide, docs/template]
 input-files:
   - docs/user_guide/title.txt
   - docs/user_guide/introduction.md
+  - docs/user_guide/installation.md
+  - docs/user_guide/getting-started.md
   - docs/user_guide/configuration.md
   - docs/user_guide/cli-reference.md
   - docs/user_guide/item-controls.md

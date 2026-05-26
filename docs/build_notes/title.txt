@@ -1,14 +1,13 @@
 ---
-title: BuildMark Tool
-subtitle: Build Notes
-author: DEMA Consulting
-description: Build notes for the BuildMark Tool
+title: "BuildMark Build Notes"
+subtitle: "Markdown Build Notes Generation Tool"
+author: "DEMA Consulting"
+description: "Build Notes for BuildMark"
 lang: en-US
 keywords:
-  - BuildMark
   - Build Notes
+  - BuildMark
   - Release Notes
   - C#
   - .NET
-  - Documentation
 ---

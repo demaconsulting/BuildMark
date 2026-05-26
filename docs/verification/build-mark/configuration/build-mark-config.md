@@ -2,41 +2,23 @@
 
 #### Verification Approach
 
-`BuildMarkConfig` is verified with dedicated unit tests in `ConfigurationTests.cs`. The test
-`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
-`BuildMarkConfig.CreateDefault()` and asserts on the returned sections and routing rules. No
-mocking is required.
-
-#### Dependencies
-
-| Mock / Stub | Reason          |
-| ----------- | --------------- |
-| None        | No mocks needed |
+`BuildMarkConfig` is a data model unit with no external dependencies. It is verified with unit
+tests in `ConfigurationTests.cs` that call `BuildMarkConfig.CreateDefault()` and assert on the
+returned sections and routing rules. No mocking or file system access is required.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All unit tests in `ConfigurationTests.cs` targeting `BuildMarkConfig` pass with zero failures.
 
 #### Test Scenarios
 
-##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
-
-**Scenario**: `BuildMarkConfig.CreateDefault()` is called.
-
-**Expected**: The result contains 3 sections (`changes`, `bugs-fixed`, `dependency-updates`) with
-correct titles; 6 rules are present with correct routes and match conditions; the final catch-all
-rule has a null match.
-
-**Requirement coverage**: `BuildMark-SectionConfig-Properties`,
-`BuildMark-RuleConfig-Properties`.
-
-#### Requirements Coverage
-
-- **`BuildMark-SectionConfig-Properties`**:
-  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
-- **`BuildMark-RuleConfig-Properties`**:
-  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+**BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection**: `BuildMarkConfig.CreateDefault()`
+is called and the returned configuration is inspected for correctness. Three sections with ids
+`changes`, `bugs-fixed`, and `dependency-updates` and their corresponding titles must be present;
+six routing rules must exist with correct routes, label conditions, work-item-type conditions, and
+a null match on the final catch-all rule that routes to `changes`. This scenario is tested by
+`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection`.

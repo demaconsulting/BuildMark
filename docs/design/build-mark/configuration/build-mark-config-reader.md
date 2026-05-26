@@ -5,10 +5,9 @@
 `BuildMarkConfigReader` is a static utility class responsible for reading and deserializing
 the optional `.buildmark.yaml` file from the repository root. It uses the YamlDotNet library's
 representation model (`YamlStream`) to parse YAML content, then walks the resulting node tree
-to produce a strongly-typed `BuildMarkConfig` object.
-
-The method always returns a `ConfigurationLoadResult` and never throws. Parse errors and
-validation warnings are captured as `ConfigurationIssue` records within the result.
+to produce a strongly-typed `BuildMarkConfig` object. The class always returns a
+`ConfigurationLoadResult` and never throws; parse errors and validation warnings are captured
+as `ConfigurationIssue` records within the result.
 
 #### Data Model
 
@@ -16,31 +15,47 @@ N/A — `BuildMarkConfigReader` is a static utility class with no instance state
 
 #### Key Methods
 
-| Member            | Kind          | Description                                                               |
-|-------------------|---------------|---------------------------------------------------------------------------|
-| `ReadAsync(path)` | Static method | Reads and deserializes `.buildmark.yaml`; always returns a load result    |
+**ReadAsync(path)**: Reads and deserializes the `.buildmark.yaml` file at the given path.
 
-##### `ReadAsync(string path) → Task<ConfigurationLoadResult>`
+- *Parameters*: `string path` — a repository root directory or a direct `.buildmark.yaml` file
+  path.
+- *Returns*: `Task<ConfigurationLoadResult>` — always returns a result; never throws.
+- *Preconditions*: `path` must be a valid file system path string (either an existing directory
+  or a file path).
+- *Postconditions*: If the file is absent, `Config = null` and `Issues` is empty. If parsing
+  fails, `Config = null` and `Issues` contains one or more `Error`-severity records. If the file
+  is valid, `Config` is a fully populated `BuildMarkConfig` and `Issues` contains any warnings
+  collected during the walk.
 
-Looks for a `.buildmark.yaml` file at the supplied path (normally the repository root):
-
-- If the file is absent, returns a result with `Config = null` and an empty issues list.
-- If the file is present but contains YAML errors or invalid values, returns a result with
-  `Config = null` and one or more `ConfigurationIssue` records describing each problem.
-- If the file is valid, returns a result with a fully populated `BuildMarkConfig` and an empty
-  issues list.
+Resolves `path` to the `.buildmark.yaml` file via `ResolveFilePath` (appending `.buildmark.yaml`
+when `path` is a directory). Reads file content asynchronously, then passes it to
+`YamlStream.Load`. An empty or comment-only file returns a result with a default
+`BuildMarkConfig` and no issues. On a `YamlException`, the exception's start position and
+message are captured as an `Error`-severity `ConfigurationIssue` and a `null`-config result is
+returned. For a successful parse, `ParseDocument` dispatches each top-level YAML key to a
+dedicated private parser that populates the corresponding data record; unrecognized keys and
+invalid node types produce `Error`-severity issues. If any errors were collected, `Config` is
+returned as `null`.
 
 #### Error Handling
 
-`ReadAsync` never throws. All YAML parse errors and validation warnings are captured as
-`ConfigurationIssue` records within the returned `ConfigurationLoadResult`. This ensures
-that `Program` can always inspect issues via `ReportTo` regardless of the file content.
+`ReadAsync` never throws. All `YamlException` parse errors are caught and converted to
+`ConfigurationIssue` records with `Severity = Error`. Node-walk failures — including invalid
+node types and unsupported configuration keys — also produce `Error`-severity issues. When any
+error-severity issue is present, `Config` is `null` in the returned result.
 
-#### Interactions
+#### Dependencies
 
-| Unit / Subsystem          | Role                                                                       |
-|---------------------------|----------------------------------------------------------------------------|
-| `BuildMarkConfig`         | Produced by `ReadAsync` when parsing succeeds                              |
-| `ConfigurationLoadResult` | Always returned by `ReadAsync`, carries config and any issues              |
-| `ConfigurationIssue`      | Created for each parse error or validation warning encountered             |
-| `Program`                 | Calls `ReadAsync(Environment.CurrentDirectory)` via `LoadConfiguration()`  |
+- **YamlDotNet** — provides `YamlStream`, `YamlDocument`, `YamlMappingNode`,
+  `YamlSequenceNode`, `YamlScalarNode`, and `YamlException` used for YAML parsing.
+- **BuildMarkConfig** — produced and returned when parsing succeeds.
+- **ConfigurationLoadResult** — always returned as the result of `ReadAsync`.
+- **ConfigurationIssue** — created for each parse error or validation warning.
+- **ConnectorConfig** — produced by the connector YAML block parser.
+- **ReportConfig** — produced by the report YAML block parser.
+- **SectionConfig** — produced by the sections YAML sequence parser.
+- **RuleConfig** — produced by the rules YAML sequence parser.
+
+#### Callers
+
+- **Program** — calls `ReadAsync(Environment.CurrentDirectory)` via `LoadConfiguration()`.

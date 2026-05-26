@@ -1,70 +1,51 @@
-### GitHub Subsystem
+### GitHub
 
 #### Overview
 
-The GitHub subsystem groups the units responsible for querying the GitHub
-GraphQL API. It sits within the RepoConnectors subsystem and provides the
-production connector used when the repository host is GitHub or GitHub Enterprise.
+The GitHub subsystem groups the units responsible for querying the GitHub GraphQL API. It sits
+within the RepoConnectors subsystem and provides the production connector used when the repository
+host is GitHub or GitHub Enterprise Server.
 
-#### Units
+The subsystem contains the following units:
 
-- `GitHubRepoConnector` - `RepoConnectors/GitHub/GitHubRepoConnector.cs` -
-  implements `IRepoConnector` for GitHub.
-- `GitHubGraphQLClient` - `RepoConnectors/GitHub/GitHubGraphQLClient.cs` -
-  issues paginated GraphQL queries.
-- `GitHubGraphQLTypes` - `RepoConnectors/GitHub/GitHubGraphQLTypes.cs` -
-  provides record types for GraphQL request and response data.
-
-##### `GitHubRepoConnector`
-
-The primary production connector. Resolves the repository URL and GitHub token from
-the environment, creates a `GitHubGraphQLClient`, fetches all required data via
-GraphQL, applies item-controls overrides, calls `ItemRouter` to assign items to
-sections, and assembles the `BuildInformation` record.
-
-##### `GitHubGraphQLClient`
-
-Handles HTTPS communication with the GitHub GraphQL endpoint. Supports paginated
-queries and authenticates via an `Authorization: bearer <token>` header. Also
-supports GitHub Enterprise by accepting an alternative base URL.
-
-##### `GitHubGraphQLTypes`
-
-Internal C# records that mirror the GraphQL schema types returned by GitHub. Used
-as the deserialization target for responses from `GitHubGraphQLClient`.
+- `GitHubRepoConnector` — implements `IRepoConnector` for GitHub; orchestrates authentication,
+  GraphQL queries, and assembly of the `BuildInformation` record.
+- `GitHubGraphQLClient` — issues paginated GraphQL requests to the GitHub API and deserializes
+  responses into typed records; implements `IDisposable` and owns its `HttpClient`.
+- `GitHubGraphQLTypes` — C# record definitions that mirror GitHub GraphQL request and response
+  payloads; used as deserialization targets by `GitHubGraphQLClient`.
 
 #### Interfaces
 
-The GitHub subsystem exposes `GitHubRepoConnector`, which implements
-`IRepoConnector`. All other types in the subsystem are internal.
+**GitHubRepoConnector**: The production `IRepoConnector` implementation for GitHub repositories.
+All other types in the subsystem are internal.
 
-| Member | Kind | Description |
-| --- | --- | --- |
-| `GitHubRepoConnector(config)` | Constructor | Create the connector with optional configuration overrides |
-| `GetBuildInformationAsync(version)` | Method | Fetch complete build information from the GitHub GraphQL API |
+- *Type*: In-process .NET public API.
+- *Role*: Provider — exposed to `RepoConnectorFactory` and callers of `IRepoConnector`.
+- *Contract*: Constructor `GitHubRepoConnector(GitHubConnectorConfig?)` accepts optional
+  configuration overrides; `GetBuildInformationAsync(VersionTag? version)` fetches complete build
+  information from the GitHub GraphQL API and returns a `BuildInformation` record.
+- *Constraints*: Requires a valid GitHub authentication token resolvable from environment variables
+  or the `gh` CLI; throws `InvalidOperationException` when no token is found or when no release
+  matches the current commit hash and no version is supplied.
 
 #### Design
 
-`GitHubRepoConnector` orchestrates the subsystem's data flow. It uses
-`GitHubGraphQLClient` for all HTTPS communication, `GitHubGraphQLTypes` records
-as GraphQL deserialization targets, and `ItemControlsParser` to extract buildmark
-block overrides from issue and pull request description bodies.
+`GitHubRepoConnector` orchestrates the subsystem's data flow:
 
-The connector calls `ItemControlsParser.Parse` on the `body` field of each issue
-and pull request. If a non-null `ItemControlsInfo` is returned, the connector
-applies visibility, type, and affected-versions overrides before adding the item
-to the appropriate list. When routing rules have been configured, the connector
-passes all collected items to `ApplyRules` (inherited from `RepoConnectorBase`)
-to populate `BuildInformation.RoutedSections`.
-
-#### Interactions
-
-| Unit / Subsystem        | Role                                                              |
-|-------------------------|-------------------------------------------------------------------|
-| `IRepoConnector`        | Interface implemented by `GitHubRepoConnector`                    |
-| `RepoConnectorBase`     | Base class for `GitHubRepoConnector`                              |
-| `ItemRouter`            | Called by `GitHubRepoConnector` to assign items to sections       |
-| `ProcessRunner`         | Used (via `RepoConnectorBase`) to run Git and gh CLI commands     |
-| `GitHubConnectorConfig` | Supplies owner, repo, and base-URL overrides                      |
-| `ItemControlsParser`    | Parses buildmark blocks from issue and PR description bodies      |
-| `BuildInformation`      | The output record assembled and returned by `GitHubRepoConnector` |
+1. Read the git remote URL and current commit hash via `RunCommandAsync` (inherited from
+   `RepoConnectorBase`).
+2. Determine the owner and repository name from `GitHubConnectorConfig` or by parsing the remote
+   URL.
+3. Resolve a GitHub authentication token (`GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`).
+4. Create a `GitHubGraphQLClient` with the resolved token, using `GitHubConnectorConfig.BaseUrl`
+   as the GraphQL endpoint when set (supports GitHub Enterprise Server); fetch tags, releases,
+   commits, pull requests (with `body`), and issues (with `body`) via GraphQL, using
+   `GitHubGraphQLTypes` records as deserialization targets.
+5. Call `ItemControlsParser.Parse` on the `body` of each pull request and issue; apply visibility,
+   type, and affected-version overrides from the returned `ItemControlsInfo`.
+6. Collect changes and known issues; if routing rules are configured, call `ApplyRules` (inherited
+   from `RepoConnectorBase`) to distribute all items into the configured sections and populate
+   `BuildInformation.RoutedSections`. If no rules are configured, items remain in the legacy
+   `Changes`, `Bugs`, and `KnownIssues` lists.
+7. Return the assembled `BuildInformation` record.

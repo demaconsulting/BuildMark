@@ -2,53 +2,60 @@
 
 ### Overview
 
-The BuildNotes subsystem holds the output data model shared by all connectors and
-by `Program`. It defines the records that represent a build's version tags,
-changed items, bugs, and known issues, together with the logic to render them as
-a markdown report.
+The BuildNotes subsystem holds the shared output data model consumed by all repository
+connectors and by `Program`. It defines the records that represent a build's version tags,
+changed items, bugs, and known issues, together with the logic to render them as a markdown
+report.
 
-All connectors produce a `BuildInformation` record from these types, and `Program`
-calls `BuildInformation.ToMarkdown` to write the final report file.
+The subsystem boundaries include only the data records and the rendering method — it does not
+fetch data from any repository or perform any I/O. Repository connectors populate the records;
+`Program` drives rendering.
 
-### Units
+The subsystem contains three units:
 
-| Unit               | File                             | Responsibility                                   |
-|--------------------|----------------------------------|--------------------------------------------------|
-| `BuildInformation` | `BuildNotes/BuildInformation.cs` | Top-level build data model and markdown renderer |
-| `ItemInfo`         | `BuildNotes/ItemInfo.cs`         | Single issue or pull request in the report       |
-| `WebLink`          | `BuildNotes/WebLink.cs`          | Hyperlink used for the full-changelog entry      |
+- **`BuildInformation`** (`BuildNotes/BuildInformation.cs`) — top-level build data model and
+  markdown renderer
+- **`ItemInfo`** (`BuildNotes/ItemInfo.cs`) — a single issue or pull request entry in the
+  build report
+- **`WebLink`** (`BuildNotes/WebLink.cs`) — a hyperlink for the full-changelog entry
 
 ### Interfaces
 
-The primary interface consumed by `Program` is:
+**`BuildInformation.ToMarkdown`**: Primary rendering interface consumed by `Program`.
 
-| Member | Kind | Description |
-| --- | --- | --- |
-| `BuildInformation.ToMarkdown(depth, includeKnownIssues)` | Method | Renders assembled build data as markdown string |
+- *Type*: In-process .NET method
+- *Role*: Provider — the BuildNotes subsystem exposes this method for consumers.
+- *Contract*: `ToMarkdown(int headingDepth = 1, bool includeKnownIssues = false) → string`;
+  returns a fully formatted markdown string from the assembled build data.
+- *Constraints*: Callers must populate all required record fields before calling. The method
+  does not throw under normal operation.
 
-The data records `BuildInformation`, `ItemInfo`, and `WebLink` are the shared
-output types exposed to all connectors for assembly, and to `Program` and
-`SelfTest` for consumption.
+**`BuildInformation`, `ItemInfo`, `WebLink` record types**: Shared data types for construction
+by connectors and consumption by `Program` and `SelfTest`.
+
+- *Type*: In-process .NET record types
+- *Role*: Provider — the subsystem exposes these types for construction and consumption.
+- *Contract*: Immutable C# records; all fields are set at construction time. `RoutedSections`
+  on `BuildInformation` is an optional init-only property populated after construction.
+- *Constraints*: Records carry no invariant validation; callers are responsible for providing
+  valid field values.
 
 ### Design
 
-The BuildNotes subsystem is a pure data and rendering layer. Connectors in the
-`RepoConnectors` subsystem assemble a `BuildInformation` record by populating its
-version tags and item lists (`Changes`, `Bugs`, `KnownIssues`, and optionally
-`RoutedSections`). `Program` then calls `BuildInformation.ToMarkdown` to convert
-the in-memory model into the final markdown report file.
+The BuildNotes subsystem is a pure data and rendering layer. Connectors in the RepoConnectors
+subsystem assemble a `BuildInformation` record by populating its version tags and item lists
+(`Changes`, `Bugs`, `KnownIssues`, and optionally `RoutedSections`). `Program` then calls
+`BuildInformation.ToMarkdown` to convert the in-memory model into the final markdown report
+file.
 
-`ItemInfo` and `WebLink` are simple immutable records; their construction and
-consumption require no additional coordination. The rendering logic in
-`ToMarkdown` selects between routed and legacy output modes based on whether
-`RoutedSections` is populated, requiring no knowledge of which connector produced
-the data.
+`ItemInfo` and `WebLink` are simple immutable records; their construction and consumption
+require no additional coordination. The rendering logic in `ToMarkdown` selects between routed
+and legacy output modes based on whether `RoutedSections` is populated, requiring no knowledge
+of which connector produced the data.
 
-### Interactions
+`Validation` (SelfTest subsystem) also creates `BuildInformation` records during self-tests
+using `MockRepoConnector` (RepoConnectors/Mock subsystem) to verify that the rendering logic
+produces correct output.
 
-| Unit / Subsystem    | Role                                                               |
-|---------------------|--------------------------------------------------------------------|
-| `Version`           | Supplies the version types used by `VersionCommitTag`              |
-| `RepoConnectors`    | Connectors construct and populate `BuildInformation` records       |
-| `Program`           | Calls `BuildInformation.ToMarkdown` to produce the report file     |
-| `SelfTest`          | `Validation` creates `BuildInformation` records during self-tests  |
+The subsystem has no dependencies on other BuildMark subsystems beyond the Version subsystem,
+which provides the `VersionCommitTag` and `VersionIntervalSet` types used in the records.

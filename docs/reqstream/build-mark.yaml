@@ -1,6 +1,7 @@
 ---
+# BuildMark system-level requirements
 sections:
-  - title: BuildMark System Requirements
+  - title: BuildMark Requirements
     sections:
       - title: Command-Line Interface
         requirements:

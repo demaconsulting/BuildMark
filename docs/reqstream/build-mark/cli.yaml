@@ -1,180 +1,176 @@
 ---
-# Cli Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the BuildMark Cli subsystem
-# - The Cli subsystem spans Context.cs (command-line argument parsing and I/O)
-# - Subsystem requirements describe the externally visible command-line interface behavior
-
+# BuildMark Cli subsystem requirements
 sections:
-  - title: Cli Subsystem Requirements
-    requirements:
-      - id: BuildMark-Cli-Context
-        title: The Cli subsystem shall parse command-line arguments and manage program I/O state for the tool.
-        justification: |
-          Provides a standardized approach to command-line argument parsing and output
-          handling across all DEMA Consulting DotNet Tools. All parsed flags and output
-          channels must be accessible through a single, consistent entry point so that
-          the rest of the tool can read user intent without re-parsing.
-        tests:
-          - Cli_Context_EmptyArguments_CreatesValidContext
-          - Cli_VersionFlag_SetsProperty
-          - Cli_SilentFlag_SetsProperty
-          - Cli_LogFlag_CreatesLogFile
-          - Cli_InvalidArgument_ThrowsException
-        children:
-          - BuildMark-Context-ArgumentParsing
-          - BuildMark-Context-InvalidArgs
-          - BuildMark-Context-Output
-          - BuildMark-Context-Silent
-          - BuildMark-Context-ErrorOutput
-          - BuildMark-Context-ExitCode
+  - title: BuildMark Requirements
+    sections:
+      - title: Cli Requirements
+        requirements:
+          - id: BuildMark-Cli-Context
+            title: The Cli subsystem shall parse command-line arguments and manage program I/O state for the tool.
+            justification: |
+              Provides a standardized approach to command-line argument parsing and output
+              handling across all DEMA Consulting DotNet Tools. All parsed flags and output
+              channels must be accessible through a single, consistent entry point so that
+              the rest of the tool can read user intent without re-parsing.
+            tests:
+              - Cli_Context_EmptyArguments_CreatesValidContext
+              - Cli_VersionFlag_SetsProperty
+              - Cli_SilentFlag_SetsProperty
+              - Cli_LogFlag_CreatesLogFile
+              - Cli_InvalidArgument_ThrowsException
+            children:
+              - BuildMark-Context-ArgumentParsing
+              - BuildMark-Context-InvalidArgs
+              - BuildMark-Context-Output
+              - BuildMark-Context-Silent
+              - BuildMark-Context-ErrorOutput
+              - BuildMark-Context-ExitCode
 
-      - id: BuildMark-Cli-Version
-        title: The Cli subsystem shall support -v and --version flags to signal version display.
-        justification: |
-          Users need to quickly identify the version of the tool they are using for
-          troubleshooting and compatibility verification.
-        tests:
-          - Cli_VersionFlag_SetsProperty
-          - Cli_VersionShortFlag_SetsProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Version
+            title: The Cli subsystem shall support -v and --version flags to signal version display.
+            justification: |
+              Users need to quickly identify the version of the tool they are using for
+              troubleshooting and compatibility verification.
+            tests:
+              - Cli_VersionFlag_SetsProperty
+              - Cli_VersionShortFlag_SetsProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Help
-        title: The Cli subsystem shall support -?, -h, and --help flags to signal help display.
-        justification: |
-          Users need access to command-line usage documentation without requiring
-          external resources.
-        tests:
-          - Cli_HelpFlag_SetsProperty
-          - Cli_HelpShortFlags_SetProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Help
+            title: The Cli subsystem shall support -?, -h, and --help flags to signal help display.
+            justification: |
+              Users need access to command-line usage documentation without requiring
+              external resources.
+            tests:
+              - Cli_HelpFlag_SetsProperty
+              - Cli_HelpShortFlags_SetProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Silent
-        title: The Cli subsystem shall support --silent flag to suppress console output.
-        justification: |
-          Enables automated scripts and CI/CD pipelines to run the tool without
-          cluttering output logs when only the exit code is needed.
-        tests:
-          - Cli_SilentFlag_SetsProperty
-          - Cli_SilentFlag_SuppressesConsoleOutput
-        children:
-          - BuildMark-Context-Silent
+          - id: BuildMark-Cli-Silent
+            title: The Cli subsystem shall support --silent flag to suppress console output.
+            justification: |
+              Enables automated scripts and CI/CD pipelines to run the tool without
+              cluttering output logs when only the exit code is needed.
+            tests:
+              - Cli_SilentFlag_SetsProperty
+              - Cli_SilentFlag_SuppressesConsoleOutput
+            children:
+              - BuildMark-Context-Silent
 
-      - id: BuildMark-Cli-BuildVersion
-        title: The Cli subsystem shall support --build-version flag to specify the build version.
-        justification: |
-          Allows users to override or supplement version information from source control,
-          enabling flexible version management strategies and supporting scenarios where
-          version numbers are determined externally.
-        tests:
-          - Cli_BuildVersionFlag_SetsProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-BuildVersion
+            title: The Cli subsystem shall support --build-version flag to specify the build version.
+            justification: |
+              Allows users to override or supplement version information from source control,
+              enabling flexible version management strategies and supporting scenarios where
+              version numbers are determined externally.
+            tests:
+              - Cli_BuildVersionFlag_SetsProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-ReportFile
-        title: The Cli subsystem shall support --report flag to specify the report output file path.
-        justification: |
-          Enables users to direct build notes output to a specific file, supporting
-          flexible integration into CI/CD pipelines and documentation workflows.
-        tests:
-          - Cli_ReportFlags_SetProperties
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-ReportFile
+            title: The Cli subsystem shall support --report flag to specify the report output file path.
+            justification: |
+              Enables users to direct build notes output to a specific file, supporting
+              flexible integration into CI/CD pipelines and documentation workflows.
+            tests:
+              - Cli_ReportFlags_SetProperties
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Depth
-        title: The Cli subsystem shall support --depth flag to configure the markdown heading depth.
-        justification: |
-          Allows users to embed the generated report at any heading level within a larger
-          markdown document, ensuring proper document hierarchy in compound documents.
-        tests:
-          - Cli_ReportFlags_SetProperties
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Depth
+            title: The Cli subsystem shall support --depth flag to configure the markdown heading depth.
+            justification: |
+              Allows users to embed the generated report at any heading level within a larger
+              markdown document, ensuring proper document hierarchy in compound documents.
+            tests:
+              - Cli_ReportFlags_SetProperties
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-IncludeKnownIssues
-        title: The Cli subsystem shall support --include-known-issues flag to include known issues in the report.
-        justification: |
-          Provides users control over whether known issues are included in generated build
-          notes, enabling comprehensive release documentation when needed.
-        tests:
-          - Cli_ReportFlags_SetProperties
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-IncludeKnownIssues
+            title: The Cli subsystem shall support --include-known-issues flag to include known issues in the report.
+            justification: |
+              Provides users control over whether known issues are included in generated build
+              notes, enabling comprehensive release documentation when needed.
+            tests:
+              - Cli_ReportFlags_SetProperties
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Log
-        title: The Cli subsystem shall support --log flag to write output to a log file.
-        justification: |
-          Provides persistent logging for debugging and audit trails. Log files enable
-          post-run inspection of tool output without requiring console capture.
-        tests:
-          - Cli_LogFlag_CreatesLogFile
-        children:
-          - BuildMark-Context-Output
+          - id: BuildMark-Cli-Log
+            title: The Cli subsystem shall support --log flag to write output to a log file.
+            justification: |
+              Provides persistent logging for debugging and audit trails. Log files enable
+              post-run inspection of tool output without requiring console capture.
+            tests:
+              - Cli_LogFlag_CreatesLogFile
+            children:
+              - BuildMark-Context-Output
 
-      - id: BuildMark-Cli-Validate
-        title: The Cli subsystem shall support --validate flag to signal self-validation.
-        justification: |
-          Provides a built-in mechanism to verify the tool is functioning correctly
-          in the deployment environment.
-        tests:
-          - Cli_ValidateFlag_SetsProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Validate
+            title: The Cli subsystem shall support --validate flag to signal self-validation.
+            justification: |
+              Provides a built-in mechanism to verify the tool is functioning correctly
+              in the deployment environment.
+            tests:
+              - Cli_ValidateFlag_SetsProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Lint
-        title: The Cli subsystem shall support --lint flag to signal configuration linting.
-        justification: |
-          Allows users to validate the .buildmark.yaml configuration file without running
-          a full build, providing early feedback on configuration errors.
-        tests:
-          - Cli_LintFlag_SetsProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Lint
+            title: The Cli subsystem shall support --lint flag to signal configuration linting.
+            justification: |
+              Allows users to validate the .buildmark.yaml configuration file without running
+              a full build, providing early feedback on configuration errors.
+            tests:
+              - Cli_LintFlag_SetsProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-Results
-        title: >-
-          The Cli subsystem shall support --results (and --result alias) flag to
-          specify a test results output file.
-        justification: |
-          Enables integration with CI/CD systems that expect standard test result formats
-          (TRX or JUnit XML).
-        tests:
-          - Cli_ResultsFlag_SetsProperty
-          - Cli_ResultFlag_SetsProperty
-        children:
-          - BuildMark-Context-ArgumentParsing
+          - id: BuildMark-Cli-Results
+            title: >-
+              The Cli subsystem shall support --results (and --result alias) flag to
+              specify a test results output file.
+            justification: |
+              Enables integration with CI/CD systems that expect standard test result formats
+              (TRX or JUnit XML).
+            tests:
+              - Cli_ResultsFlag_SetsProperty
+              - Cli_ResultFlag_SetsProperty
+            children:
+              - BuildMark-Context-ArgumentParsing
 
-      - id: BuildMark-Cli-ErrorOutput
-        title: The Cli subsystem shall write error messages to stderr.
-        justification: |
-          Error messages must be written to stderr so they remain visible to the user
-          without polluting stdout, which consumers may pipe or redirect for data capture.
-        tests:
-          - Cli_ErrorOutput_WritesToStderr
-        children:
-          - BuildMark-Context-ErrorOutput
+          - id: BuildMark-Cli-ErrorOutput
+            title: The Cli subsystem shall write error messages to stderr.
+            justification: |
+              Error messages must be written to stderr so they remain visible to the user
+              without polluting stdout, which consumers may pipe or redirect for data capture.
+            tests:
+              - Cli_ErrorOutput_WritesToStderr
+            children:
+              - BuildMark-Context-ErrorOutput
 
-      - id: BuildMark-Cli-InvalidArgs
-        title: The Cli subsystem shall reject unknown or malformed command-line arguments with a descriptive error.
-        justification: |
-          Providing clear feedback for invalid arguments helps users quickly correct
-          mistakes and prevents silent misconfiguration in automated workflows.
-        tests:
-          - Cli_InvalidArgument_ThrowsException
-          - Cli_MissingArgumentValue_ThrowsException
-        children:
-          - BuildMark-Context-InvalidArgs
+          - id: BuildMark-Cli-InvalidArgs
+            title: The Cli subsystem shall reject unknown or malformed command-line arguments with a descriptive error.
+            justification: |
+              Providing clear feedback for invalid arguments helps users quickly correct
+              mistakes and prevents silent misconfiguration in automated workflows.
+            tests:
+              - Cli_InvalidArgument_ThrowsException
+              - Cli_MissingArgumentValue_ThrowsException
+            children:
+              - BuildMark-Context-InvalidArgs
 
-      - id: BuildMark-Cli-ExitCode
-        title: The Cli subsystem shall return appropriate exit codes.
-        justification: |
-          Standard exit codes enable build automation systems and scripts to detect success
-          or failure conditions programmatically.
-        tests:
-          - Cli_ExitCode_DefaultsToZero
-          - Cli_WriteError_SetsExitCodeToOne
-        children:
-          - BuildMark-Context-ExitCode
+          - id: BuildMark-Cli-ExitCode
+            title: The Cli subsystem shall return appropriate exit codes.
+            justification: |
+              Standard exit codes enable build automation systems and scripts to detect success
+              or failure conditions programmatically.
+            tests:
+              - Cli_ExitCode_DefaultsToZero
+              - Cli_WriteError_SetsExitCodeToOne
+            children:
+              - BuildMark-Context-ExitCode

@@ -2,117 +2,95 @@
 
 #### Verification Approach
 
-`AzureDevOpsConnectorConfig` is verified through `ConfigurationTests.cs`. Tests write
-`.buildmark.yaml` files with Azure DevOps connector blocks and assert that `OrganizationUrl`,
-`Organization`, `Project`, `Repository`, and `AreaPath` properties are correctly parsed, including
-alias key support. No mocking is required.
-
-#### Dependencies
-
-| Mock / Stub | Reason                                                               |
-| ----------- | -------------------------------------------------------------------- |
-| File system | Tests create temporary `.buildmark.yaml` files in `Path.GetTempPath` |
+`AzureDevOpsConnectorConfig` is verified through `ConfigurationTests.cs` and the
+`AzureDevOpsRepoConnector` integration tests. The `ConfigurationTests.cs` tests write
+`.buildmark.yaml` files with Azure DevOps connector blocks and call `BuildMarkConfigReader.ReadAsync`,
+asserting that `OrganizationUrl`, `Organization`, `Project`, `Repository`, `AreaPath`, and
+`TokenVariable` are correctly parsed, including alias key support and empty/non-scalar area-path
+edge cases. Integration tests in the RepoConnectors test suite verify that the `AreaPath` property
+is applied correctly to WIQL queries at runtime. The real file system is used via
+`TemporaryDirectory`; no mocking is required for the configuration parsing tests.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+Tests write temporary `.buildmark.yaml` files to directories created by `TemporaryDirectory`.
+Write access to the current working directory is required. Integration tests that verify `AreaPath`
+runtime behavior use a mock HTTP client to capture WIQL requests; no real Azure DevOps endpoint is
+needed.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All unit tests in `ConfigurationTests.cs` targeting `AzureDevOpsConnectorConfig` pass with zero
+  failures.
+- All `AzureDevOpsRepoConnector` area-path integration tests pass with zero failures.
 
 #### Test Scenarios
 
-##### BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
+**BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration**: A
+`.buildmark.yaml` with canonical Azure DevOps connector keys (organization, repository) is written
+and read via `BuildMarkConfigReader.ReadAsync`; `Config.Connector.AzureDevOps` is inspected. All
+fields (`OrganizationUrl`, `Organization`, `Project`, `Repository`) must match the values written
+to the file. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration`.
 
-**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block using canonical keys
-(`organization`, `repository`) is written; `BuildMarkConfigReader.ReadAsync` is called;
-`Config.Connector.AzureDevOps` is inspected.
+**BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration**: A
+`.buildmark.yaml` with Azure DevOps connector alias keys (`org`, `repo`) is written and read via
+`BuildMarkConfigReader.ReadAsync`; all fields must be populated correctly from the alias keys,
+confirming alias support is equivalent to canonical keys. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration`.
 
-**Expected**: `OrganizationUrl` equals `"https://dev.azure.com/myorg"`; `Organization` equals
-`"myorg"`; `Project` equals `"myproject"`; `Repository` equals `"myrepo"`.
+**BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration**: A
+`.buildmark.yaml` with an Azure DevOps connector block containing an `area-path` scalar value is
+written and read via `BuildMarkConfigReader.ReadAsync`. The `AreaPath` property must equal the
+configured path string. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration`.
 
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+**BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorEmptyAreaPath_ReturnsParsedConfiguration**: A
+`.buildmark.yaml` with `azure-devops.area-path: ""` is written and read via
+`BuildMarkConfigReader.ReadAsync`. The `AreaPath` property must equal `string.Empty` (not `null`),
+confirming that an explicit empty value is preserved to allow area-path filtering to be disabled
+at runtime. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorEmptyAreaPath_ReturnsParsedConfiguration`.
 
-##### BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
+**BuildMarkConfigReader_ReadAsync_AzureDevOpsNonScalarAreaPath_ReturnsErrorIssue**: A
+`.buildmark.yaml` with `azure-devops.area-path` set to a YAML sequence instead of a scalar string
+is written and read via `BuildMarkConfigReader.ReadAsync`. The result must have a null `Config`,
+`HasErrors` true, and an issue description containing
+`"Azure DevOps area-path must be a scalar string value"`. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_AzureDevOpsNonScalarAreaPath_ReturnsErrorIssue`.
 
-**Scenario**: A `.buildmark.yaml` with Azure DevOps connector using alias keys (`org`, `repo`) is
-written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.AzureDevOps` is inspected.
+**BuildMarkConfigReader_ReadAsync_AzureDevOpsEmptyTokenVariable_ReturnsErrorIssue**: A
+`.buildmark.yaml` with `azure-devops.token-variable: ""` is written and read via
+`BuildMarkConfigReader.ReadAsync`. The result must have a null `Config`, `HasErrors` true, and an
+issue description containing `"token-variable"`, confirming that an empty token-variable is
+rejected. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_AzureDevOpsEmptyTokenVariable_ReturnsErrorIssue`.
 
-**Expected**: `OrganizationUrl`, `Organization`, `Project`, and `Repository` are all populated
-correctly from the alias keys.
+**AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath**: A
+connector is created with `AreaPath` set to `"MyProject\\MyRepo"` and
+`GetBuildInformationAsync` is called; the captured WIQL request body is inspected. The request
+body must contain `System.AreaPath` and the configured area path value, confirming that known-issue
+queries are scoped to the specified area. This scenario is tested by
+`AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath`.
 
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
+**AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject**: A
+connector is created with no `AreaPath` configured and `GetBuildInformationAsync` is called; the
+captured WIQL request body is inspected. The request body must contain `System.AreaPath` scoped to
+the parsed project name, confirming that the default area path is the project name rather than the
+repository name. This scenario is tested by
+`AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject`.
 
-##### BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration
+**AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter**: A
+connector is created with `AreaPath` set to an empty string and `GetBuildInformationAsync` is
+called; the captured WIQL request body is inspected. The request body must not contain
+`System.AreaPath`, confirming that an empty area path disables area-path filtering and produces a
+project-wide query. This scenario is tested by
+`AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter`.
 
-**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block containing `area-path` is
-written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.AzureDevOps` is inspected.
-
-**Expected**: `AreaPath` equals the configured area path string.
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-##### BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorEmptyAreaPath_ReturnsParsedConfiguration
-
-**Scenario**: A `.buildmark.yaml` with an Azure DevOps connector block containing `area-path: ""`
-is written; `BuildMarkConfigReader.ReadAsync` is called; `Config.Connector.AzureDevOps` is inspected.
-
-**Expected**: `AreaPath` equals `string.Empty` (not `null`), confirming that an explicit empty
-value is preserved and will disable area-path filtering at runtime.
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
-
-**Scenario**: A connector is created with `AreaPath` set to `"MyProject\\MyRepo"`;
-`GetBuildInformationAsync` is called; the captured WIQL request body is inspected.
-
-**Expected**: The WIQL request body contains `System.AreaPath` and the configured area path value,
-confirming that known-issues queries are scoped to the specified area.
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject
-
-**Scenario**: A connector is created with no `AreaPath` configured; the git origin URL resolves to
-project `project`; `GetBuildInformationAsync` is called; the captured WIQL request body is inspected.
-
-**Expected**: The WIQL request body contains `System.AreaPath` scoped to `project`, confirming that
-the default area path is the parsed project name (not the repository name).
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter
-
-**Scenario**: A connector is created with `AreaPath` set to an empty string;
-`GetBuildInformationAsync` is called; the captured WIQL request body is inspected.
-
-**Expected**: The WIQL request body does not contain `System.AreaPath`, confirming that an empty
-area path disables area-path filtering and produces a project-wide query.
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-##### AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage
-
-**Scenario**: A connector is created with `AreaPath` set to a path that does not exist in ADO;
-the mock WIQL endpoint returns HTTP 400 with an ADO-style JSON error body; `GetBuildInformationAsync`
-is called.
-
-**Expected**: An `InvalidOperationException` is thrown and its message contains the ADO error
-description from the 400 response body, so the user receives a meaningful diagnostic rather than
-a generic HTTP failure.
-
-**Requirement coverage**: `BuildMark-AzureDevOpsConnectorConfig-Properties`.
-
-#### Requirements Coverage
-
-- **`BuildMark-AzureDevOpsConnectorConfig-Properties`**:
-  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration
-  - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAliases_ReturnsParsedConfiguration
-  - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorAreaPath_ReturnsParsedConfiguration
-  - BuildMarkConfigReader_ReadAsync_AzureDevOpsConnectorEmptyAreaPath_ReturnsParsedConfiguration
-  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithAreaPath_ScopesWiqlQueryToAreaPath
-  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithoutAreaPath_DefaultsToProject
-  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithEmptyAreaPath_DisablesAreaPathFilter
-  - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage
+**AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage**:
+A connector is created with `AreaPath` set to a non-existent path; the mock WIQL endpoint returns
+HTTP 400 with an ADO-style JSON error body; `GetBuildInformationAsync` is called. An
+`InvalidOperationException` must be thrown and its message must contain the ADO error description
+from the 400 response body, so the user receives a meaningful diagnostic. This scenario is tested
+by
+`AzureDevOpsRepoConnector_GetBuildInformationAsync_WithInvalidAreaPath_ThrowsWithAdoErrorMessage`.

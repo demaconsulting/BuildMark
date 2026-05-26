@@ -1,13 +1,12 @@
 ---
-title: BuildMark Review Plan
-subtitle: File Review Plan for the BuildMark Tool
+title: BuildMark Code Review Plan
+subtitle: Markdown Build Notes Generation Tool
 author: DEMA Consulting
-description: File Review Plan for the BuildMark Tool
+description: Code Review Plan for BuildMark
 lang: en-US
 keywords:
+  - Code Review
   - BuildMark
-  - Review Plan
-  - File Reviews
   - .NET
   - Tool
 ---

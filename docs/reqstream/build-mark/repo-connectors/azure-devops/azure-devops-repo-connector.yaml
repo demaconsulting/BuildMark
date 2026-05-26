@@ -1,106 +1,104 @@
 ---
-# Software Unit Requirements for the AzureDevOpsRepoConnector Class
-#
-# The AzureDevOpsRepoConnector class connects to Azure DevOps using the REST API
-# to retrieve commits, tags, pull requests, and work items, assembling them into
-# structured BuildInformation for report generation.
-#
-# NOTE: REST client requirements have been extracted to azure-devops-rest-client.yaml.
-# NOTE: Work item mapper and custom fields requirements have been extracted to
-# work-item-mapper.yaml.
+# AzureDevOpsRepoConnector unit requirements
 
 sections:
-  - title: AzureDevOps Unit Requirements
-    requirements:
-      - id: BuildMark-AzureDevOps-UrlParsing
-        title: >-
-          The AzureDevOpsRepoConnector class shall parse organization URL, project, and repository
-          from Azure DevOps Services and on-premises Azure DevOps Server git remote URLs.
-        justification: |
-          The connector must support both cloud Azure DevOps Services (dev.azure.com,
-          visualstudio.com) and on-premises Azure DevOps Server instances. A unified URL
-          parser using the _git path segment anchor handles all HTTPS URL formats, while
-          SSH URLs use the git@ssh.dev.azure.com:v3 format.
-        tests:
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComHttps_ReturnsCorrectComponents
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComWithGitSuffix_StripsGitSuffix
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_VisualStudioComHttps_ReturnsCorrectComponents
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremServer_ReturnsCorrectComponents
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithPort_ReturnsCorrectComponents
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithGitSuffix_StripsGitSuffix
-          - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_UnsupportedFormat_ThrowsArgumentException
+  - title: BuildMark Requirements
+    sections:
+      - title: RepoConnectors Requirements
+        sections:
+          - title: AzureDevOps Requirements
+            sections:
+              - title: AzureDevOpsRepoConnector Requirements
+                requirements:
+                  - id: BuildMark-AzureDevOps-UrlParsing
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall parse organization URL, project, and repository
+                      from Azure DevOps Services and on-premises Azure DevOps Server git remote URLs.
+                    justification: |
+                      The connector must support both cloud Azure DevOps Services (dev.azure.com,
+                      visualstudio.com) and on-premises Azure DevOps Server instances. A unified URL
+                      parser using the _git path segment anchor handles all HTTPS URL formats, while
+                      SSH URLs use the git@ssh.dev.azure.com:v3 format.
+                    tests:
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComHttps_ReturnsCorrectComponents
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComWithGitSuffix_StripsGitSuffix
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_VisualStudioComHttps_ReturnsCorrectComponents
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremServer_ReturnsCorrectComponents
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithPort_ReturnsCorrectComponents
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithGitSuffix_StripsGitSuffix
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_UnsupportedFormat_ThrowsArgumentException
 
-      - id: BuildMark-AzureDevOps-ConnectorConfig
-        title: >-
-          The AzureDevOpsRepoConnector class shall accept an optional AzureDevOpsConnectorConfig
-          to override the organization URL, project, and repository name.
-        justification: |
-          When a .buildmark.yaml file provides Azure DevOps connector settings, the connector
-          must use the configured organization URL, project, and repository name instead of
-          auto-detecting them from the Git remote URL.
-        tests:
-          - AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
+                  - id: BuildMark-AzureDevOps-ConnectorConfig
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall accept an optional AzureDevOpsConnectorConfig
+                      to override the organization URL, project, and repository name.
+                    justification: |
+                      When a .buildmark.yaml file provides Azure DevOps connector settings, the connector
+                      must use the configured organization URL, project, and repository name instead of
+                      auto-detecting them from the Git remote URL.
+                    tests:
+                      - AzureDevOpsRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
 
-      - id: BuildMark-AzureDevOps-BuildInformation
-        title: The AzureDevOpsRepoConnector class shall retrieve build information from an Azure DevOps repository.
-        justification: |
-          The primary purpose of the AzureDevOpsRepoConnector is to assemble BuildInformation
-          from Azure DevOps repository data using the REST API, correctly identifying the current
-          version tag, the baseline (previous) version tag, and the changes between them.
+                  - id: BuildMark-AzureDevOps-BuildInformation
+                    title: The AzureDevOpsRepoConnector class shall retrieve build information from an Azure DevOps repository.
+                    justification: |
+                      The primary purpose of the AzureDevOpsRepoConnector is to assemble BuildInformation
+                      from Azure DevOps repository data using the REST API, correctly identifying the current
+                      version tag, the baseline (previous) version tag, and the changes between them.
 
-          Known-issues collection queries all bugs regardless of state. When affected-versions
-          is declared the item state is ignored; only the version range check determines
-          inclusion. This handles the LTS back-port gap scenario where a bug is resolved after
-          being fixed in a newer release but was never back-ported to an older branch.
-        tests:
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersion
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenWorkItems_IdentifiesKnownIssues
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
-          - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
+                      Known-issues collection queries all bugs regardless of state. When affected-versions
+                      is declared the item state is ignored; only the version range check determines
+                      inclusion. This handles the LTS back-port gap scenario where a bug is resolved after
+                      being fixed in a newer release but was never back-ported to an older branch.
+                    tests:
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersion
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithOpenWorkItems_IdentifiesKnownIssues
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
+                      - AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
-      - id: BuildMark-AzureDevOps-ItemControls
-        title: >-
-          The AzureDevOpsRepoConnector class shall apply item controls extracted from work item
-          description bodies to override visibility, type, and affected-version metadata.
-        justification: |
-          The Azure DevOps connector must translate raw Azure DevOps data into the BuildInformation
-          model. Applying item controls at this layer ensures that visibility and type overrides from
-          buildmark code blocks in work item descriptions are consistently enforced.
-        tests:
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
+                  - id: BuildMark-AzureDevOps-ItemControls
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall apply item controls extracted from work item
+                      description bodies to override visibility, type, and affected-version metadata.
+                    justification: |
+                      The Azure DevOps connector must translate raw Azure DevOps data into the BuildInformation
+                      model. Applying item controls at this layer ensures that visibility and type overrides from
+                      buildmark code blocks in work item descriptions are consistently enforced.
+                    tests:
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
 
-      - id: BuildMark-AzureDevOps-Rules
-        title: >-
-          The AzureDevOpsRepoConnector class shall apply configured routing rules and sections
-          to distribute assembled items into the appropriate report sections.
-        justification: |
-          When a .buildmark.yaml file provides routing rules and section definitions,
-          the connector must delegate to RepoConnectorBase.ApplyRules so that items are
-          distributed according to the operator-supplied rules, supporting work-item-type
-          matching for Azure DevOps work items.
-        tests:
-          - AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
+                  - id: BuildMark-AzureDevOps-Rules
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall apply configured routing rules and sections
+                      to distribute assembled items into the appropriate report sections.
+                    justification: |
+                      When a .buildmark.yaml file provides routing rules and section definitions,
+                      the connector must delegate to RepoConnectorBase.ApplyRules so that items are
+                      distributed according to the operator-supplied rules, supporting work-item-type
+                      matching for Azure DevOps work items.
+                    tests:
+                      - AzureDevOpsRepoConnector_Configure_WithRules_HasRulesReturnsTrue
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
-      - id: BuildMark-AzureDevOps-TokenVariable
-        title: >-
-          The AzureDevOpsRepoConnector class shall use only the configured token variable when
-          TokenVariable is set, and shall throw InvalidOperationException when the variable
-          is absent or empty.
-        justification: |
-          When an operator explicitly names a token variable in the configuration, the
-          connector must not silently fall back to other credential sources. Strict
-          enforcement ensures that misconfigured environments produce clear error messages
-          rather than accidentally using a different token with unexpected permissions.
-        tests:
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
-          - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException
+                  - id: BuildMark-AzureDevOps-TokenVariable
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall use only the configured token variable when
+                      TokenVariable is set, and shall throw InvalidOperationException when the variable
+                      is absent or empty.
+                    justification: |
+                      When an operator explicitly names a token variable in the configuration, the
+                      connector must not silently fall back to other credential sources. Strict
+                      enforcement ensures that misconfigured environments produce clear error messages
+                      rather than accidentally using a different token with unexpected permissions.
+                    tests:
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+                      - AzureDevOpsRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

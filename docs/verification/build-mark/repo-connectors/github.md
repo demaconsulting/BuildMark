@@ -2,10 +2,10 @@
 
 #### Verification Strategy
 
-The GitHub sub-subsystem is verified through `GitHubTests.cs` (6 subsystem-level
-tests), `GitHubRepoConnectorTests.cs` (22 unit tests), and 5 `GitHubGraphQLClient*Tests.cs`
-files (41 tests). The subsystem tests exercise the full GitHub data pipeline through
-mock HTTP responses. The unit tests are described in the individual unit chapters.
+The GitHub sub-subsystem is verified through `GitHubTests.cs` (6 subsystem-level tests),
+`GitHubRepoConnectorTests.cs` (25 unit tests), and six `GitHubGraphQLClient*Tests.cs` files
+(49 tests). The subsystem tests exercise the full GitHub data pipeline through mock HTTP responses.
+The unit tests are described in the individual unit chapters.
 
 #### Dependencies
 
@@ -15,14 +15,14 @@ mock HTTP responses. The unit tests are described in the individual unit chapter
 
 #### Test Environment
 
-N/A - standard test environment. All HTTP calls to the GitHub GraphQL API are
-intercepted by `MockHttpMessageHandler`; no live network access is required.
+N/A - standard test environment. All HTTP calls to the GitHub GraphQL API are intercepted by
+`MockHttpMessageHandler`; no live network access is required.
 
 #### Acceptance Criteria
 
 All 6 subsystem tests in `GitHubTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-GitHub` requirements have at least one test in the
-Requirements Coverage mapping.
+`BuildMark-RepoConnectors-GitHub` requirements have at least one test in the Requirements Coverage
+mapping.
 
 #### Test Scenarios (Subsystem-Level, GitHubTests.cs)
 

@@ -2,98 +2,53 @@
 
 #### Verification Approach
 
-`PathHelpers` is a pure utility class. It is verified through dedicated unit tests in
-`PathHelpersTests.cs`, which contains 7 tests covering valid path combination, null
-argument rejection, path traversal prevention (double-dots), absolute path rejection,
-and acceptance of valid dot-prefixed directory names such as `"..data"`.
-
-#### Dependencies
-
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Pure logic |
+`PathHelpers` is a pure logic unit with no dependencies to mock or stub. It is verified through
+`PathHelpersTests.cs`, which contains 7 unit tests covering valid path combination, null argument
+rejection, path-traversal prevention, absolute path rejection, and acceptance of valid dot-prefixed
+names such as `"..data"`.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. No external dependencies or environment setup required.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All 7 tests in `PathHelpersTests.cs` pass with zero failures.
 
 #### Test Scenarios
 
-##### PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly
+**PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly**: This scenario verifies that
+`SafePathCombine` accepts a valid base path and relative path and returns
+`Path.Combine(basePath, relativePath)`. This scenario is tested by
+`PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly`.
 
-**Scenario**: `PathHelpers.SafePathCombine` is called with a valid base path and a
-relative path.
+**PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException**: This scenario verifies
+that a `null` base path is rejected so callers receive a clear contract violation with
+`ParamName` set to `"basePath"`. This scenario is tested by
+`PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException`.
 
-**Expected**: Returns `Path.Combine(basePath, relativePath)`.
+**PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException**: This scenario
+verifies that a `null` relative path is rejected so callers receive a clear contract violation with
+`ParamName` set to `"relativePath"`. This scenario is tested by
+`PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException`.
 
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
+**PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException**: This
+scenario verifies that a traversal attempt such as `"../etc/passwd"` is rejected to prevent access
+outside the intended base path. The expected outcome is an `ArgumentException` containing
+`"Invalid path component"`. This scenario is tested by
+`PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException`.
 
-##### PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException
+**PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException**: This scenario verifies
+that traversal segments embedded within a longer relative path are also rejected. The expected
+outcome is an `ArgumentException` containing `"Invalid path component"`. This scenario is tested by
+`PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException`.
 
-**Scenario**: `PathHelpers.SafePathCombine` is called with a `null` base path.
+**PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException**: This scenario verifies that
+an absolute path supplied as the relative argument is rejected so the caller cannot escape the base
+path. The expected outcome is an `ArgumentException` containing `"Invalid path component"`. This
+scenario is tested by `PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException`.
 
-**Expected**: `ArgumentNullException` is thrown with `ParamName` equal to `"basePath"`.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-##### PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException
-
-**Scenario**: `PathHelpers.SafePathCombine` is called with a `null` relative path.
-
-**Expected**: `ArgumentNullException` is thrown with `ParamName` equal to
-`"relativePath"`.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-##### PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException
-
-**Scenario**: `PathHelpers.SafePathCombine` is called with `"../etc/passwd"` as the
-relative path.
-
-**Expected**: `ArgumentException` is thrown with a message containing
-`"Invalid path component"`.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-##### PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException
-
-**Scenario**: `PathHelpers.SafePathCombine` is called with `"subfolder/../../../etc/passwd"`.
-
-**Expected**: `ArgumentException` is thrown with a message containing
-`"Invalid path component"`.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-##### PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException
-
-**Scenario**: `PathHelpers.SafePathCombine` is called with an absolute path as the
-relative argument.
-
-**Expected**: `ArgumentException` is thrown with a message containing
-`"Invalid path component"`.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-##### PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly
-
-**Scenario**: `PathHelpers.SafePathCombine` is called with `"..data/file.txt"` (a valid
-directory name that begins with dots but is not a traversal component).
-
-**Expected**: Returns `Path.Combine(basePath, "..data/file.txt")` without error.
-
-**Requirement coverage**: `BuildMark-Utilities-PathHelpers`
-
-#### Requirements Coverage
-
-- **BuildMark-Utilities-PathHelpers**:
-  PathHelpers_SafePathCombine_ValidPaths_CombinesCorrectly,
-  PathHelpers_SafePathCombine_NullBasePath_ThrowsArgumentNullException,
-  PathHelpers_SafePathCombine_NullRelativePath_ThrowsArgumentNullException,
-  PathHelpers_SafePathCombine_PathTraversalWithDoubleDots_ThrowsArgumentException,
-  PathHelpers_SafePathCombine_DoubleDotsInMiddle_ThrowsArgumentException,
-  PathHelpers_SafePathCombine_AbsolutePath_ThrowsArgumentException,
-  PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly
+**PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly**: This scenario verifies
+that a valid dot-prefixed directory name such as `"..data/file.txt"` is accepted when it is not a
+traversal component. The expected outcome is successful combination without an exception. This
+scenario is tested by `PathHelpers_SafePathCombine_PathStartingWithDots_CombinesCorrectly`.
