@@ -20,8 +20,8 @@ N/A - standard test environment. The Mock sub-subsystem has no external dependen
 #### Acceptance Criteria
 
 All 3 subsystem tests in `MockTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-Mock` requirements have at least one test in the Requirements Coverage
-mapping.
+`BuildMark-RepoConnectors-Mock` requirements have at least one test traced in the ReqStream trace
+matrix.
 
 #### Test Scenarios (Subsystem-Level, MockTests.cs)
 

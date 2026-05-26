@@ -3,7 +3,7 @@
 #### Verification Approach
 
 The Azure DevOps sub-subsystem is verified through `AzureDevOpsTests.cs` (5 subsystem-level tests),
-`AzureDevOpsRepoConnectorTests.cs` (25 unit tests), `AzureDevOpsRestClientTests.cs` (12 unit tests),
+`AzureDevOpsRepoConnectorTests.cs` (32 unit tests), `AzureDevOpsRestClientTests.cs` (12 unit tests),
 and `WorkItemMapperTests.cs` (13 unit tests). The subsystem tests exercise the full Azure DevOps data
 pipeline through mock HTTP responses. The unit tests are described in the individual unit chapters.
 
@@ -21,8 +21,8 @@ N/A - standard test environment. All HTTP calls to the Azure DevOps REST API are
 #### Acceptance Criteria
 
 All 5 subsystem tests in `AzureDevOpsTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-AzureDevOps` requirements have at least one test in the Requirements
-Coverage mapping.
+`BuildMark-RepoConnectors-AzureDevOps` requirements have at least one test traced in the ReqStream
+trace matrix.
 
 #### Test Scenarios (Subsystem-Level, AzureDevOpsTests.cs)
 

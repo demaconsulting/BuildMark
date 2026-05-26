@@ -25,8 +25,8 @@ host.
 ### Acceptance Criteria
 
 All 33 integration tests in `RepoConnectorsTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-*` requirements have at least one test in the Requirements Coverage
-mapping.
+`BuildMark-RepoConnectors-*` requirements have at least one test traced in the ReqStream trace
+matrix.
 
 ### Test Scenarios
 
