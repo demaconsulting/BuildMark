@@ -2,77 +2,77 @@
 
 ### Overview
 
-The Utilities subsystem provides the shared helper classes used across the
-BuildMark system:
+The Utilities subsystem provides the shared helper classes used across the BuildMark system. It
+encapsulates safe path combination, external process execution, and disposable temporary directory
+management so that the rest of the system can delegate these cross-cutting concerns to a single,
+well-tested location.
 
-- `PathHelpers` for safe path combination with traversal prevention
-- `ProcessRunner` for executing external shell commands
-- `TemporaryDirectory` for disposable temporary directory management
+Version parsing, comparison, tag handling, and interval logic are implemented in the separate Version
+subsystem.
 
-Version parsing, comparison, tag handling, and interval logic are implemented in
-the separate `Version` subsystem.
+The subsystem contains three units:
 
-### Units
-
-| Unit                 | File                               | Responsibility                    |
-|----------------------|------------------------------------|-----------------------------------|
-| `PathHelpers`        | `Utilities/PathHelpers.cs`         | Safe path combination             |
-| `ProcessRunner`      | `Utilities/ProcessRunner.cs`       | External process execution        |
-| `TemporaryDirectory` | `Utilities/TemporaryDirectory.cs`  | Disposable temporary directory    |
+- **`PathHelpers`** (`Utilities/PathHelpers.cs`) — safe path combination with traversal prevention
+- **`ProcessRunner`** (`Utilities/ProcessRunner.cs`) — async wrapper for executing external shell commands
+- **`TemporaryDirectory`** (`Utilities/TemporaryDirectory.cs`) — disposable temporary directory management
 
 ### Interfaces
 
-`PathHelpers` exposes the following static method:
+**`PathHelpers.SafePathCombine`**: Safely combines a base path with a relative path, consumed by
+`TemporaryDirectory` and any unit that writes to user-supplied paths.
 
-| Member                            | Kind   | Description                                     |
-|-----------------------------------|--------|-------------------------------------------------|
-| `SafePathCombine(base, relative)` | Method | Safely combine a base path with a relative path |
+- *Type*: In-process .NET static method
+- *Role*: Provider — exposes safe path combination to other units
+- *Contract*: `SafePathCombine(string basePath, string relativePath) → string`; returns the combined path
+  if the result stays within the base directory.
+- *Constraints*: Throws `ArgumentNullException` for null inputs; throws `ArgumentException` when the
+  combined path escapes the base directory.
 
-`ProcessRunner` exposes the following static methods:
+**`ProcessRunner.RunAsync`**: Runs an external process and returns its stdout, consumed by
+`RepoConnectorBase` and any unit that needs to execute CLI commands.
 
-| Member                                  | Kind   | Description                                             |
-|-----------------------------------------|--------|---------------------------------------------------------|
-| `RunAsync(command, params arguments)`   | Method | Run a process and return stdout; throws on failure      |
-| `TryRunAsync(command, params arguments)`| Method | Run a process and return stdout, or null on any failure |
+- *Type*: In-process .NET static async method
+- *Role*: Provider — exposes process execution to connector units
+- *Contract*: `RunAsync(string command, params string[] arguments) → Task<string>`; captures stdout and
+  returns the trimmed output string.
+- *Constraints*: Throws `InvalidOperationException` on non-zero exit code or missing command.
 
-`TemporaryDirectory` exposes the following members:
+**`ProcessRunner.TryRunAsync`**: Runs an external process and returns its stdout or null on any failure.
 
-| Member                         | Kind        | Description                                                  |
-|--------------------------------|-------------|--------------------------------------------------------------|
-| `TemporaryDirectory()`         | Constructor | Creates a uniquely-named directory under `CurrentDirectory`  |
-| `DirectoryPath`                | Property    | Absolute path to the temporary directory on disk             |
-| `GetFilePath(relativePath)`    | Method      | Resolve a relative path, creating intermediate directories   |
-| `Dispose()`                    | Method      | Delete the directory and all contents; suppress I/O errors   |
+- *Type*: In-process .NET static async method
+- *Role*: Provider — exposes fault-tolerant process execution
+- *Contract*: `TryRunAsync(string command, params string[] arguments) → Task<string?>`; returns stdout on
+  success or `null` on any failure.
+- *Constraints*: Never throws; all exceptions are caught and `null` is returned.
+
+**`TemporaryDirectory`**: Creates a disposable temporary directory, consumed by `Validation` and any unit
+that needs isolated scratch space.
+
+- *Type*: In-process .NET instance class implementing `IDisposable`
+- *Role*: Provider — exposes temporary directory lifecycle management
+- *Contract*: Constructor creates the directory; `GetFilePath(string relativePath)` returns a validated
+  path within it; `Dispose()` deletes the directory and all contents.
+- *Constraints*: `GetFilePath` throws `ArgumentException` if `relativePath` escapes the directory
+  boundary. `Dispose` suppresses `IOException` and `UnauthorizedAccessException`.
 
 ### Design
 
-The Utilities subsystem contains three units. `PathHelpers` and `ProcessRunner` are
-stateless; `TemporaryDirectory` is instance-based and manages directory lifetime:
+The three units are independent of each other except that `TemporaryDirectory` depends on
+`PathHelpers.SafePathCombine` for path validation in `GetFilePath`.
 
-- `PathHelpers.SafePathCombine` is a pure function that combines a base path and
-  a relative path, normalizes both to absolute form, and rejects the result if the
-  combined path escapes the base directory. It is consumed by any unit that needs
-  to write output files to user-supplied paths safely.
+`PathHelpers.SafePathCombine` is a pure function that normalizes both the base path and the candidate path
+to absolute form with `Path.GetFullPath`, then computes `Path.GetRelativePath(absoluteBase,
+absoluteCombined)` and rejects the input if the result escapes the base directory. Using `GetRelativePath`
+for the containment check handles root paths, platform case-sensitivity, and directory-separator
+normalization natively.
 
-- `ProcessRunner.RunAsync` and `TryRunAsync` are async wrappers over
-  `System.Diagnostics.Process` that capture stdout and return it as a trimmed
-  string. On Windows, commands are routed through `cmd /c` to handle `.cmd`
-  and `.bat` scripts; on other platforms they are invoked directly. All connector
-  and factory code that needs to run Git, `gh`, or `az` CLI commands delegates
-  to `ProcessRunner` via `RepoConnectorBase.RunCommandAsync`.
+`ProcessRunner.RunAsync` and `TryRunAsync` are async wrappers over `System.Diagnostics.Process`. On
+Windows, non-empty commands are routed through `cmd /c` so that `.cmd` and `.bat` scripts (such as the
+Azure CLI `az.cmd`) are resolved correctly. All connector and factory code that needs to run Git, `gh`, or
+`az` CLI commands delegates to `ProcessRunner` via `RepoConnectorBase.RunCommandAsync`.
 
-- `TemporaryDirectory` creates a uniquely-named directory under
-  `Environment.CurrentDirectory` on construction and deletes it recursively on
-  disposal. `GetFilePath` delegates path validation to `PathHelpers.SafePathCombine`
-  before creating any missing intermediate directories, ensuring all paths remain
-  within the temporary directory.
-
-### Interactions
-
-`PathHelpers` and `ProcessRunner` have no dependencies on other BuildMark
-subsystems. `TemporaryDirectory` depends on `PathHelpers.SafePathCombine` for
-path validation in `GetFilePath`. All three units are consumed by any subsystem
-that needs safe path combination, external process execution, or temporary directory
-management.
-
-Version-specific consumers should use the separate `Version` subsystem.
+`TemporaryDirectory` creates a uniquely-named directory under `Environment.CurrentDirectory` on
+construction. Using `Environment.CurrentDirectory` avoids the macOS `/tmp` → `/private/tmp` symlink
+mismatch that can cause path-containment checks to fail. `GetFilePath` delegates path validation to
+`PathHelpers.SafePathCombine` before creating any missing intermediate directories, ensuring all paths
+remain within the temporary directory.

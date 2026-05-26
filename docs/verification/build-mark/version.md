@@ -1,116 +1,66 @@
 ## Version
 
-### Verification Strategy
+### Verification Approach
 
-The Version subsystem is verified through `VersionTests.cs` (subsystem integration
-tests), plus dedicated unit test files for each version class. The subsystem tests
-exercise the interaction between version types - creating `VersionTag` instances,
-extracting `VersionComparable`, and comparing via `VersionInterval`. The unit tests
-are described in the individual unit chapters.
-
-### Dependencies
-
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Pure logic |
+The Version subsystem is verified through `VersionTests.cs` with 8 integration tests. The tests
+exercise all version type factory methods and constructors, semantic versioning precedence ordering,
+and cross-type integration between `VersionTag` and `VersionComparable`. No mocks or stubs are
+required — all version types are pure logic with no external dependencies.
 
 ### Test Environment
 
-N/A - standard test environment. `VersionTests.cs` contains pure logic tests with no
+N/A - standard test environment. All tests in `VersionTests.cs` are pure logic tests with no
 external dependencies, network access, or file system requirements.
 
 ### Acceptance Criteria
 
-All tests in `VersionTests.cs` pass with zero failures. All `BuildMark-Version-*`
-requirements have at least one test in the Requirements Coverage mapping.
+- All 8 tests in `VersionTests.cs` pass with zero failures.
+- All `BuildMark-Version-*` requirements have at least one test in the ReqStream trace matrix.
 
 ### Test Scenarios
 
-#### VersionComparable_Create_ValidVersions_ReturnsVersionComparable
+**VersionComparable_Create_ValidVersions_ReturnsVersionComparable**: Verifies that
+`VersionComparable.Create` accepts valid version strings — a simple `major.minor.patch` version, a
+pre-release version, and a complex pre-release — returning a non-null `VersionComparable` instance
+for each input.
+This scenario is tested by `VersionComparable_Create_ValidVersions_ReturnsVersionComparable`.
 
-**Scenario**: `VersionComparable.Create` is called with a valid version string.
+**VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic**: Verifies that
+`VersionSemantic.Create` accepts a simple version, a version with build metadata, and a complex
+version combining pre-release and build metadata, returning a non-null `VersionSemantic` instance
+for each input.
+This scenario is tested by `VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic`.
 
-**Expected**: Returns a non-null `VersionComparable` instance.
+**VersionTag_Create_ValidTag_ReturnsVersionTag**: Verifies that `VersionTag.Create` correctly parses
+a plain version string, a `v`-prefixed version, and a release-prefixed pre-release tag, returning a
+non-null `VersionTag` instance for each input.
+This scenario is tested by `VersionTag_Create_ValidTag_ReturnsVersionTag`.
 
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
+**VersionInterval_Create_ValidInterval_ReturnsVersionInterval**: Verifies that `VersionInterval` can
+be constructed with fully-inclusive bounds, fully-exclusive bounds, and mixed lower/upper bounds,
+returning a non-null instance for each construction.
+This scenario is tested by `VersionInterval_Create_ValidInterval_ReturnsVersionInterval`.
 
-#### VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic
+**VersionCommitTag_Constructor_ValidParameters_CreatesInstance**: Verifies that `VersionCommitTag`
+constructed with a `VersionTag` and a commit hash string exposes the supplied values through its
+`VersionTag` and `CommitHash` properties.
+This scenario is tested by `VersionCommitTag_Constructor_ValidParameters_CreatesInstance`.
 
-**Scenario**: `VersionSemantic.Create` is called with a valid semantic version string.
+**Version_Subsystem_CreateAllVersionTypes_WorksCorrectly**: Verifies that all version type factory
+methods and constructors — `VersionComparable.Create`, `VersionSemantic.Create`,
+`VersionTag.Create`, `new VersionInterval`, and `new VersionCommitTag` — can be invoked in
+sequence without error, and that the resulting instances expose the supplied values through their
+properties.
+This scenario is tested by `Version_Subsystem_CreateAllVersionTypes_WorksCorrectly`.
 
-**Expected**: Returns a non-null `VersionSemantic` instance.
+**Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly**: Verifies that a sequence of
+`VersionComparable` instances representing the SemVer 2.0.0 precedence chain
+`1.0.0-alpha < 1.0.0-alpha.1 < 1.0.0-alpha.beta < 1.0.0-beta < 1.0.0-beta.2 < 1.0.0` produces a
+negative value from `CompareTo` for each adjacent pair, confirming correct precedence ordering.
+This scenario is tested by `Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly`.
 
-**Requirement coverage**: `BuildMark-Version-VersionSemantic`
-
-#### VersionTag_Create_ValidTag_ReturnsVersionTag
-
-**Scenario**: `VersionTag.Create` is called with a valid tag string.
-
-**Expected**: Returns a non-null `VersionTag` instance.
-
-**Requirement coverage**: `BuildMark-Version-VersionTag`
-
-#### VersionInterval_Create_ValidInterval_ReturnsVersionInterval
-
-**Scenario**: `VersionInterval.Parse` is called with a valid interval string.
-
-**Expected**: Returns a non-null `VersionInterval` instance.
-
-**Requirement coverage**: `BuildMark-Version-VersionInterval`
-
-#### VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
-
-**Scenario**: `VersionIntervalSet.Parse` is called with a single interval string.
-
-**Expected**: Returns a set containing exactly one `VersionInterval`.
-
-**Requirement coverage**: `BuildMark-Version-VersionIntervalSet`
-
-#### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
-
-**Scenario**: `VersionCommitTag` is constructed with a valid tag and commit hash.
-
-**Expected**: Instance is created with the provided tag and commit hash properties set.
-
-**Requirement coverage**: `BuildMark-Version-VersionCommitTag`
-
-#### Version_Subsystem_CreateAllVersionTypes_WorksCorrectly
-
-**Scenario**: All version type factory methods are invoked in sequence.
-
-**Expected**: All instances are created without error.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`, `BuildMark-Version-VersionSemantic`,
-`BuildMark-Version-VersionTag`
-
-#### Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly
-
-**Scenario**: Version strings from the semver specification are parsed and compared.
-
-**Expected**: Ordering follows the semver specification.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`, `BuildMark-Version-VersionSemantic`
-
-#### Version_Subsystem_TagToComparableIntegration_WorksCorrectly
-
-**Scenario**: A `VersionTag` is created and its comparable representation is extracted.
-
-**Expected**: The `VersionComparable` extracted from the tag matches the expected version.
-
-**Requirement coverage**: `BuildMark-Version-VersionTag`, `BuildMark-Version-VersionComparable`
-
-### Requirements Coverage
-
-- **BuildMark-Version-VersionComparable**: VersionComparable_Create_ValidVersions_ReturnsVersionComparable,
-  Version_Subsystem_CreateAllVersionTypes_WorksCorrectly,
-  Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly,
-  Version_Subsystem_TagToComparableIntegration_WorksCorrectly
-- **BuildMark-Version-VersionSemantic**: VersionSemantic_Create_ValidSemanticVersion_ReturnsVersionSemantic,
-  Version_Subsystem_CreateAllVersionTypes_WorksCorrectly,
-  Version_Subsystem_SemanticVersioningCompliance_WorksCorrectly
-- **BuildMark-Version-VersionTag**: VersionTag_Create_ValidTag_ReturnsVersionTag,
-  Version_Subsystem_CreateAllVersionTypes_WorksCorrectly,
-  Version_Subsystem_TagToComparableIntegration_WorksCorrectly
-- **BuildMark-Version-VersionInterval**: VersionInterval_Create_ValidInterval_ReturnsVersionInterval
-- **BuildMark-Version-VersionIntervalSet**: VersionIntervalSet_Parse_SingleInterval_ReturnsOneInterval
-- **BuildMark-Version-VersionCommitTag**: VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+**Version_Subsystem_TagToComparableIntegration_WorksCorrectly**: Verifies that `VersionTag`
+instances created from prefix forms `v1.2.3`, `VER2.0.0-rc.1`, and `release-1.5.0` each yield a
+`VersionComparable` via `Semantic.Comparable`, and that the ordering
+`1.2.3 < 1.5.0 < 2.0.0-rc.1` holds, confirming correct tag-to-comparable integration.
+This scenario is tested by `Version_Subsystem_TagToComparableIntegration_WorksCorrectly`.

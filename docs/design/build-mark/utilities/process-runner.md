@@ -2,10 +2,10 @@
 
 #### Purpose
 
-`ProcessRunner` is a static helper class in the Utilities subsystem that executes
-external shell commands and captures their standard output. It provides two public
-methods: `RunAsync`, which throws on failure, and `TryRunAsync`, which returns
-`null` on failure.
+`ProcessRunner` is a static helper class in the Utilities subsystem that executes external shell commands
+and captures their standard output. It provides two public methods: `RunAsync`, which throws on failure,
+and `TryRunAsync`, which returns `null` on failure. A private helper `CreateStartInfo` encapsulates
+platform-specific process configuration.
 
 #### Data Model
 
@@ -13,51 +13,53 @@ N/A — `ProcessRunner` is a static utility class with no instance state.
 
 #### Key Methods
 
-##### `RunAsync(command, params arguments) → string`
+**`RunAsync`**: Starts the specified process, captures stdout and stderr asynchronously, waits for exit,
+and returns the trimmed stdout string.
 
-Starts the specified process, captures stdout and stderr asynchronously, waits for
-exit, and returns the trimmed stdout string. Throws `InvalidOperationException` if
-the process exits with a non-zero exit code or if the command is not found (wraps
-`Win32Exception` into `InvalidOperationException` with a descriptive message).
+- *Parameters*: `string command` — the executable or script name; `params string[] arguments` — arguments
+  added individually to `ProcessStartInfo.ArgumentList` for correct quoting.
+- *Returns*: `Task<string>` — the trimmed stdout string on success.
+- *Preconditions*: `command` is a valid executable name or path.
+- *Postconditions*: Returns trimmed stdout if the process exits with code zero.
 
-The `arguments` parameter is a `params string[]` array. Each argument is added to
-the `ProcessStartInfo.ArgumentList` collection so that the Process class handles
-argument quoting correctly, rather than concatenating into a single string.
+Throws `InvalidOperationException` if the process exits with a non-zero exit code or if the command is
+not found (wraps `Win32Exception` into `InvalidOperationException` with a descriptive message).
 
-##### `TryRunAsync(command, params arguments) → string?`
+**`TryRunAsync`**: Executes the process and returns the stdout string if the exit code is zero, or `null`
+if the process fails or throws any exception.
 
-Executes the process and returns the stdout string if the exit code is zero, or
-`null` if the process fails or throws any exception. This method never propagates
-exceptions to its callers.
+- *Parameters*: `string command` — the executable or script name; `params string[] arguments` — arguments
+  added individually to `ProcessStartInfo.ArgumentList`.
+- *Returns*: `Task<string?>` — trimmed stdout on success, or `null` on any failure.
+- *Preconditions*: None — any command string is accepted.
+- *Postconditions*: Never throws; all exceptions are caught internally.
 
-The `arguments` parameter is a `params string[]` array, matching the signature of
-`RunAsync`.
+**`CreateStartInfo`** (private): Creates a `ProcessStartInfo` for the given command.
 
-##### `CreateStartInfo(command, arguments) → ProcessStartInfo`
+- *Parameters*: `string command` — the executable or script name; `string[] arguments` — the arguments
+  array.
+- *Returns*: `ProcessStartInfo` — configured with redirected stdout and stderr, no shell execution.
 
-Private helper method that creates a `ProcessStartInfo` for the given command.
-
-On Windows, non-empty commands are routed through `cmd /c` so that `.cmd` and
-`.bat` scripts (such as the Azure CLI `az.cmd`) are resolved correctly by the
-Windows command interpreter. The command and all arguments are added to
-`ProcessStartInfo.ArgumentList` for correct quoting. On non-Windows platforms,
-the command is invoked directly without a shell wrapper.
-
-Empty or whitespace-only commands are not routed through `cmd /c`, preserving the
-exception behavior for invalid commands.
+On Windows, non-empty commands are routed through `cmd /c` so that `.cmd` and `.bat` scripts (such as the
+Azure CLI `az.cmd`) are resolved correctly by the Windows command interpreter. The command and all
+arguments are added to `ProcessStartInfo.ArgumentList` for correct quoting. On non-Windows platforms, the
+command is invoked directly without a shell wrapper. Empty or whitespace-only commands are not routed
+through `cmd /c`, preserving the exception behavior for invalid commands.
 
 #### Error Handling
 
-`RunAsync` throws `InvalidOperationException` when the process exits with a non-zero exit
-code or when the command is not found (wrapping `Win32Exception` with a descriptive message).
-`TryRunAsync` catches all exceptions and returns `null` on any failure, never propagating
-exceptions to callers.
+`RunAsync` throws `InvalidOperationException` when the process exits with a non-zero exit code or when
+the command is not found (wrapping `Win32Exception` with a descriptive message). `TryRunAsync` catches all
+exceptions and returns `null` on any failure, never propagating exceptions to callers.
 
-#### Interactions
+#### Dependencies
 
-| Unit / Subsystem              | Role                                                                   |
-|-------------------------------|------------------------------------------------------------------------|
-| `RepoConnectorBase`           | Delegates `RunCommandAsync` to `ProcessRunner.RunAsync`                |
-| `RepoConnectorFactory`        | Uses `TryRunAsync` to inspect the git remote URL                       |
-| `GitHubRepoConnector`         | Calls `RunCommandAsync` (via base) for git and gh CLI commands         |
-| `AzureDevOpsRepoConnector`    | Calls `RunCommandAsync` (via base) for git and az CLI commands         |
+N/A — `ProcessRunner` depends only on the .NET BCL (`System.Diagnostics.Process`,
+`System.Runtime.InteropServices.RuntimeInformation`, `System.ComponentModel.Win32Exception`).
+
+#### Callers
+
+- **`RepoConnectorBase`** — delegates `RunCommandAsync` to `ProcessRunner.RunAsync`
+- **`RepoConnectorFactory`** — uses `TryRunAsync` to inspect the git remote URL
+- **`GitHubRepoConnector`** — calls `RunCommandAsync` (via base) for git and gh CLI commands
+- **`AzureDevOpsRepoConnector`** — calls `RunCommandAsync` (via base) for git and az CLI commands

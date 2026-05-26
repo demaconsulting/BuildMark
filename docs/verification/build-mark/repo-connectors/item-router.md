@@ -2,10 +2,9 @@
 
 #### Verification Approach
 
-`ItemRouter` is tested through `ItemRouterTests.cs`, which contains 8 unit tests.
-The tests cover matching rules (with and without a match block), suppression rules,
-type-based matching, label-based matching (case-insensitive), routing to new sections,
-and default section fallback.
+`ItemRouter` is tested through `ItemRouterTests.cs`, which contains 8 unit tests. The tests cover
+matching rules (with and without a match block), suppression rules, type-based matching, label-based
+matching (case-insensitive), routing to new sections, and default section fallback.
 
 #### Dependencies
 
@@ -21,7 +20,7 @@ Standard dotnet test host; no external dependencies or environment setup require
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+All 8 tests in `ItemRouterTests.cs` pass with no errors or warnings.
 
 #### Test Scenarios
 
@@ -88,7 +87,3 @@ All tests in the test class pass with no errors or warnings.
 **Expected**: Item is omitted from all sections.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemRouter`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-ItemRouter**: All 8 tests in `ItemRouterTests.cs`

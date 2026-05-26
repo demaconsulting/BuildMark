@@ -2,117 +2,133 @@
 
 ### Purpose
 
-`Program` is the top-level unit of BuildMark. It owns the application entry point,
-creates the `Context` object from command-line arguments, and dispatches execution
-to the appropriate handler based on the parsed flags.
+`Program` is the top-level unit of BuildMark. It owns the application entry point, creates
+the `Context` object from command-line arguments, and dispatches execution to the appropriate
+handler based on the parsed flags.
 
-The unit exposes a private entry point `Main`, which is called by the .NET runtime,
-and a public method `Run`, which accepts an existing `Context` and performs the main
-execution logic. `Run` is exposed separately so that integration tests can inject a
-pre-configured `Context` without repeating argument parsing.
+The unit exposes a private entry point `Main`, which is called by the .NET runtime, and a
+public method `Run`, which accepts an existing `Context` and performs the main execution
+logic. `Run` is exposed separately so that integration tests can inject a pre-configured
+`Context` without repeating argument parsing.
 
 ### Data Model
 
-`Program` exposes a single static property:
-
-| Property  | Type     | Description                                    |
-|-----------|----------|------------------------------------------------|
-| `Version` | `string` | The tool version read from assembly attributes |
-
-The version is resolved at startup by inspecting `AssemblyInformationalVersionAttribute`
-first, then falling back to `assembly.GetName().Version`, and finally defaulting to
-`"0.0.0"` if neither attribute is present.
+**Version**: `string` — The tool version string, resolved from
+`AssemblyInformationalVersionAttribute` (preferred; includes pre-release labels and build
+metadata), then `assembly.GetName().Version`, and finally `"0.0.0"` when neither attribute
+is present.
 
 ### Key Methods
 
-#### `Main(string[] args) → int`
+**Main(string[] args) → int**: Application entry point, declared `private static`.
 
-The application entry point (declared `private static`). It creates a `Context` from
-the supplied command-line arguments and delegates to `Run`. Any `ArgumentException`
-or `InvalidOperationException` is caught, written directly to `Console.Error` (no
-`Context` object exists yet at this level), and results in an exit code of 1. Any
-other exception is re-thrown after logging so the runtime can report an unhandled
-exception.
+- *Parameters*: `string[] args` — command-line arguments from the runtime.
+- *Returns*: `int` — exit code; 0 for success, 1 for failure.
+- *Preconditions*: Called by the .NET runtime on startup.
+- *Postconditions*: Returns an exit code and terminates the process.
 
-#### `Run(Context context) → void`
+Creates a `Context` from the supplied arguments and delegates to `Run`. `ArgumentException`
+and `InvalidOperationException` are caught, written to `Console.Error`, and yield exit code
 
-Executes the main program logic against an already-constructed `Context`. The
-method applies the following priority order:
+1. Any other exception is re-thrown after logging to generate runtime event logs.
 
-1. If `context.Version` is set, print the version string and return.
-2. Print the application banner (version and copyright).
-3. If `context.Help` is set, print the usage message and return.
-4. If `context.Validate` is set, delegate to `Validation.Run(context)` and return.
-5. If `context.Lint` is set, call `LoadConfiguration()`, call
-   `result.ReportTo(context)`, and return.
-6. Otherwise, call `ProcessBuildNotes(context)` to generate the build report.
+**Run(Context context) → void**: Executes program logic against an already-constructed
+`Context`.
 
-The exit code is managed through `context.ExitCode` rather than as a return value.
+- *Parameters*: `Context context` — pre-constructed context with parsed flags and output
+  methods.
+- *Returns*: void; side effects include writing to `context` and setting `context.ExitCode`.
+- *Preconditions*: `context` is non-null and fully initialized.
+- *Postconditions*: One execution path has completed; `context.ExitCode` reflects the outcome.
 
-#### `ProcessBuildNotes(Context context)`
+Applies a priority dispatch order: (1) if `context.Version` is set, print the version string
+and return; (2) print the application banner; (3) if `context.Help` is set, print the usage
+message and return; (4) if `context.Validate` is set, delegate to `Validation.Run(context)`
+and return; (5) if `context.Lint` is set, call `LoadConfiguration()`, call
+`result.ReportTo(context)`, and return; (6) otherwise, call `ProcessBuildNotes(context)`.
 
-Calls `BuildMarkConfigReader.ReadAsync` to load the optional `.buildmark.yaml`
-file, then calls `result.ReportTo(context)` to surface any configuration issues.
-If errors occurred, the method returns early. Otherwise:
+**ProcessBuildNotes(Context context)**: Loads configuration and generates the build report.
 
-1. **Effective configuration**: derives `effectiveConfig` as `loadResult.Config ??
-   BuildMarkConfig.CreateDefault()`. When no `.buildmark.yaml` file is present (i.e.,
-   `loadResult.Config` is `null`), `BuildMarkConfig.CreateDefault()` supplies built-in
-   section and rule definitions so the tool functions without any configuration file.
-2. **Effective option resolution**: derives `effectiveReportFile` from `context.ReportFile` if set,
-   or from `effectiveConfig.Report?.File` as fallback; derives `effectiveReportDepth` from
-   `context.Depth` if set, or `effectiveConfig.Report?.Depth`, defaulting to 1; derives
-   `effectiveIncludeKnownIssues` from `context.IncludeKnownIssues` OR
-   `effectiveConfig.Report?.IncludeKnownIssues`.
-3. **ConnectorFactory injection**: if `context.ConnectorFactory` is non-null it is invoked directly
-   (test injection path); otherwise `RepoConnectorFactory.Create(effectiveConfig.Connector)` is used.
-4. **Configuration step**: when the production factory path is used and the connector implements
-   `RepoConnectorBase`, calls `configurableConnector.Configure(effectiveConfig.Rules,
-   effectiveConfig.Sections)`.
-5. Parses `context.BuildVersion` using `VersionTag.Create`; on `ArgumentException`,
-   writes an error and returns early.
-6. Calls `connector.GetBuildInformationAsync(buildVersion)` synchronously; on
-   `InvalidOperationException`, writes an error and returns early.
-7. Writes a build summary to the context output.
-8. If `effectiveReportFile` is non-null, renders the markdown and writes it to that path.
-   Any file-system exception during write is caught, reported via `context.WriteError`, and
-   execution continues - the method does not propagate the exception. This graceful-degradation
-   choice ensures that a report-write failure does not obscure the build summary already written
-   to the console and allows the exit code to reflect only semantic errors rather than I/O
-   failures outside the tool's control.
+- *Parameters*: `Context context` — context for reading flags and writing output.
+- *Returns*: void.
+- *Preconditions*: `context` is non-null; must be called after banner has been printed.
+- *Postconditions*: Report file written (if `--report` is set); exit code set on any error.
 
-#### `PrintBanner(Context context)`
+Steps: (1) calls `LoadConfiguration()` and surfaces issues via `result.ReportTo(context)`;
+returns early on errors; (2) derives `effectiveConfig` as
+`loadResult.Config ?? BuildMarkConfig.CreateDefault()`; (3) resolves effective report options
+by preferring CLI arguments over configuration values; (4) creates the connector via
+`context.ConnectorFactory` (test injection path) or `RepoConnectorFactory.Create`, then calls
+`configurableConnector.Configure(rules, sections)` when using the production factory;
+(5) parses `context.BuildVersion` via `VersionTag.Create`, returning early on
+`ArgumentException`; (6) calls `connector.GetBuildInformationAsync` synchronously, returning
+early on `InvalidOperationException`; (7) writes a build summary to `context`; (8) if
+`effectiveReportFile` is set, renders markdown and writes to file — file-system exceptions are
+caught and reported via `context.WriteError` without propagating.
 
-Writes the application name, version, and copyright notice to the context output.
+**PrintBanner(Context context)**: Writes the application name, version, and copyright notice
+to `context`.
+
+- *Parameters*: `Context context` — output target.
+- *Returns*: void.
+- *Preconditions*: None.
+- *Postconditions*: Banner lines written to context output.
+
 Called unconditionally after the version-flag check in `Run`.
 
-#### `PrintHelp(Context context)`
+**PrintHelp(Context context)**: Writes the full usage message to `context`.
 
-Writes the full usage message (command syntax, options list) to the context output.
+- *Parameters*: `Context context` — output target.
+- *Returns*: void.
+- *Preconditions*: None.
+- *Postconditions*: Usage message written to context output.
+
 Called when any of the `-?`, `-h`, or `--help` flags is set.
 
-#### `LoadConfiguration() → ConfigurationLoadResult`
+**LoadConfiguration() → ConfigurationLoadResult**: Synchronously loads the optional
+repository configuration.
 
-Synchronously invokes `BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory)`.
-Called from both the lint branch of `Run` and from `ProcessBuildNotes` to keep the
-async-to-sync bridging in one place.
+- *Parameters*: None.
+- *Returns*: `ConfigurationLoadResult` — config (may be `null` if absent) and any issues.
+- *Preconditions*: `Environment.CurrentDirectory` is accessible.
+- *Postconditions*: Returns a fully populated `ConfigurationLoadResult`.
+
+Synchronously invokes `BuildMarkConfigReader.ReadAsync(Environment.CurrentDirectory)` via
+`GetAwaiter().GetResult()`. Called from both the lint branch of `Run` and from
+`ProcessBuildNotes` to keep the async-to-sync bridging in one place.
 
 ### Error Handling
 
 `Main` catches `ArgumentException` and `InvalidOperationException` from `Context`
-construction and writes them directly to `Console.Error`, returning exit code `1`. Any
-other exception is re-thrown. `ProcessBuildNotes` catches file-system exceptions during
-report writing and reports them via `context.WriteError` without propagating the exception;
+construction and writes them directly to `Console.Error`, returning exit code 1. Any other
+exception is re-thrown. `ProcessBuildNotes` catches file-system exceptions during report
+writing and reports them via `context.WriteError` without propagating;
 `InvalidOperationException` from `connector.GetBuildInformationAsync` is caught, reported,
-and causes early return.
+and causes early return. The graceful-degradation choice for file-system exceptions ensures
+that a report-write failure does not obscure the build summary already written to the console
+and allows the exit code to reflect only semantic errors.
 
-### Interactions
+### Dependencies
 
-| Unit / Subsystem         | Role                                                                            |
-|--------------------------|---------------------------------------------------------------------------------|
-| `Context`                | Provides parsed flags, arguments, and output methods                            |
-| `Validation`             | Executes self-validation when `--validate` flag is set                          |
-| `BuildMarkConfigReader`  | Called in `Run` (for `--lint`) and `ProcessBuildNotes` to read `.buildmark.yaml`|
-| `ConfigurationLoadResult`| Returned by `BuildMarkConfigReader`; `ReportTo(context)` called immediately     |
-| `RepoConnectorFactory`   | Creates the connector via `Create(result.Config?.Connector)`                    |
-| `BuildInformation`       | Returned by the connector; converted to markdown via `ToMarkdown`               |
+- **Context** — provides parsed CLI flags, output methods, and exit code tracking
+  (Cli subsystem)
+- **Validation** — executes self-validation when `--validate` flag is set (SelfTest
+  subsystem)
+- **BuildMarkConfigReader** — reads and parses the optional `.buildmark.yaml` file
+  (Configuration subsystem)
+- **ConfigurationLoadResult** — holds configuration and parse issues; `ReportTo(context)`
+  surfaces issues to the user
+- **BuildMarkConfig** — carries effective configuration; `CreateDefault()` supplies
+  built-in defaults when no config file is present
+- **RepoConnectorFactory** — creates the connector from configuration (RepoConnectors
+  subsystem)
+- **RepoConnectorBase** — used for optional routing configuration when no factory is
+  injected
+- **BuildInformation** — returned by the connector; `ToMarkdown` renders the report
+  (BuildNotes subsystem)
+- **VersionTag** — parses the `--build-version` argument (Version subsystem)
+
+### Callers
+
+N/A — entry point, called by the .NET runtime. `Run` is also invoked directly by integration
+tests via `Context.Create(args, connectorFactory)`.

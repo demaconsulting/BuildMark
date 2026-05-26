@@ -4,295 +4,144 @@
 
 `BuildInformation` is verified with dedicated unit tests in `BuildInformationTests.cs`. Tests
 construct `BuildInformation` instances either directly or via `MockRepoConnector`, invoke
-`ToMarkdown`, and assert on the rendered output. `NSubstitute` is used in a small number of tests
-to simulate connector error conditions; `MockRepoConnector` is used for the remaining tests. No
-further mocking is needed.
-
-#### Dependencies
-
-| Mock / Stub | Reason |
-| --- | --- |
-| `MockRepoConnector` | Supplies deterministic `BuildInformation` instances for rendering tests. |
-| `NSubstitute` (`IRepoConnector`) | Simulates error conditions that `MockRepoConnector` cannot reproduce. |
+`ToMarkdown`, and assert on the rendered output. `MockRepoConnector` supplies deterministic
+`BuildInformation` instances for rendering tests. `NSubstitute` is used in a small number of tests
+to simulate connector error conditions that `MockRepoConnector` cannot reproduce (for example,
+`InvalidOperationException` on missing tags). No further mocking is needed.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. `BuildInformationTests.cs` runs within the standard `dotnet test`
+host; no external services or environment setup beyond a `MockRepoConnector` instance are required.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All tests in `BuildInformationTests.cs` pass with zero failures.
+- Both success and error paths of `GetBuildInformationAsync` and `ToMarkdown` are covered.
 
 #### Test Scenarios
 
-##### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags
-
-**Scenario**: A substitute connector is configured to throw `InvalidOperationException` with the
-message "No tags found"; `GetBuildInformationAsync()` is called without a version argument.
-
-**Expected**: `InvalidOperationException` is thrown; message contains "No tags found".
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag
-
-**Scenario**: A substitute connector is configured to throw `InvalidOperationException` with the
-message "does not match any tag"; `GetBuildInformationAsync()` is called.
-
-**Expected**: `InvalidOperationException` is thrown; message contains "does not match any tag".
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.1.0"))` is called.
-
-**Expected**: `CurrentVersionTag.VersionTag.Tag` equals `"v2.1.0"`; commit hash is
-`"current123hash456"`; `BaselineVersionTag.VersionTag.Tag` equals `"v2.0.0"`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag
-
-**Scenario**: A substitute connector returns a `BuildInformation` where `CurrentVersionTag` is
-`v2.0.0`; `GetBuildInformationAsync()` is called.
-
-**Expected**: Returned `BuildInformation.CurrentVersionTag.VersionTag.Tag` equals `"v2.0.0"`;
-`BaselineVersionTag.VersionTag.Tag` equals `"ver-1.1.0"`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0-beta.1"))` is
-called.
-
-**Expected**: `CurrentVersionTag.VersionTag.Tag` equals `"v2.0.0-beta.1"`;
-`BaselineVersionTag.VersionTag.Tag` equals `"v2.0.0"`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"))` is called.
-
-**Expected**: `CurrentVersionTag.VersionTag.Tag` equals `"v2.0.0"`;
-`BaselineVersionTag.VersionTag.Tag` equals `"ver-1.1.0"` (pre-releases are skipped).
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"))` is
-called.
-
-**Expected**: `Changes` contains 2 items (ids `"1"` and `"#13"`); `Bugs` is empty; `KnownIssues`
-contains 2 items (ids `"4"` and `"6"`).
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("ver-1.1.0"))` is
-called.
-
-**Expected**: `Changes` are ordered by `Index`; the item with `Index` 10 precedes the item with
-`Index` 13.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v2.0.0"))` is called.
-
-**Expected**: `Changes` contains 1 item; `Bugs` contains 1 item (id `"2"`, title `"Fix bug in Y"`).
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly
-
-**Scenario**: `MockRepoConnector.GetBuildInformationAsync(VersionTag.Create("v1.0.0"))` is called.
-
-**Expected**: `BaselineVersionTag` is null; `CurrentVersionTag.VersionTag.Tag` equals `"v1.0.0"`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
-
-**Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` without any optional
-arguments.
-
-**Expected**: Markdown contains `# Build Report`, `## Version Information`, `## Changes`,
-`## Bugs Fixed`, `v2.0.0`, and `ver-1.1.0`; `## Known Issues` is absent.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
-
-**Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on `BuildInformation` for `v2.0.0`.
-
-**Expected**: Markdown contains `## Known Issues`, `Known bug A`, and `Known bug C`; `Known bug B`
-is absent.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
-
-**Scenario**: `ToMarkdown(headingDepth: 3)` is called on `BuildInformation` for `v2.0.0`.
-
-**Expected**: Top-level heading is `### Build Report`; sub-headings are `#### Version Information`,
-`#### Changes`, and `#### Bugs Fixed`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
-
-**Scenario**: A `BuildInformation` with an empty `Changes` list is rendered via `ToMarkdown()`.
-
-**Expected**: The Changes section contains `- N/A`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
-
-**Scenario**: A `BuildInformation` with an empty `Bugs` list is rendered via `ToMarkdown()`.
-
-**Expected**: The Bugs Fixed section contains `- N/A`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_IncludesIssueLinks
-
-**Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` which has items with
-GitHub URLs.
-
-**Expected**: Markdown contains formatted links such as
-`- [3](https://github.com/example/repo/issues/3)` and
-`- [2](https://github.com/example/repo/issues/2)`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
-
-**Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v1.0.0` (no baseline).
-
-**Expected**: Version Information section contains `| **Previous Version** | N/A |` and
-`| **Previous Commit Hash** | N/A |`.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
-
-**Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v2.0.0` which has a changelog
-link.
-
-**Expected**: Markdown contains `## Full Changelog`, the text `See the full changelog at`, and the
+**BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags**: Verifies that when the
+connector throws `InvalidOperationException` with "No tags found", calling
+`GetBuildInformationAsync()` propagates the exception.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags`.
+
+**BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag**: Verifies
+that when the connector throws with "does not match any tag", the exception propagates unchanged.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag`.
+
+**BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion**: Verifies that calling with
+`VersionTag.Create("v2.1.0")` returns a `BuildInformation` with `CurrentVersionTag.VersionTag.Tag`
+equal to `"v2.1.0"` and `BaselineVersionTag.VersionTag.Tag` equal to `"v2.0.0"`.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion`.
+
+**BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag**: Verifies that
+when the current commit matches the latest tag `v2.0.0`, the returned baseline is `ver-1.1.0`.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag`.
+
+**BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag**: Verifies that a
+pre-release version `v2.0.0-beta.1` uses the preceding release tag `v2.0.0` as its baseline.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag`.
+
+**BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases**: Verifies that a release
+version `v2.0.0` skips pre-release tags and selects `ver-1.1.0` as the baseline.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases`.
+
+**BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly**: Verifies that for
+`ver-1.1.0`, `Changes` contains 2 items (ids `"1"` and `"#13"`), `Bugs` is empty, and
+`KnownIssues` contains 2 items (ids `"4"` and `"6"`).
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly`.
+
+**BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex**: Verifies that `Changes` items
+for `ver-1.1.0` are sorted by `Index` in ascending order, with `Index` 10 preceding `Index` 13.
+This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex`.
+
+**BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues**: Verifies that for
+`v2.0.0`, items labelled as bugs appear in `Bugs` (id `"2"`, title `"Fix bug in Y"`) and not in
+`Changes`. This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues`.
+
+**BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly**: Verifies that the
+first release `v1.0.0` returns `BaselineVersionTag` as null with `CurrentVersionTag.VersionTag.Tag`
+equal to `"v1.0.0"`. This scenario is tested by
+`BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly`.
+
+**BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults**: Verifies that `ToMarkdown()`
+on `v2.0.0` produces the expected section headings and version strings, and that `## Known Issues`
+is absent by default. This scenario is tested by
+`BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults`.
+
+**BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested**: Verifies that
+`ToMarkdown(includeKnownIssues: true)` on `v2.0.0` includes `Known bug A` and `Known bug C` while
+excluding `Known bug B`. This scenario is tested by
+`BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested`.
+
+**BuildInformation_ToMarkdown_RespectsCustomHeadingDepth**: Verifies that
+`ToMarkdown(headingDepth: 3)` uses `### Build Report` as the top heading and
+`#### Version Information`, `#### Changes`, `#### Bugs Fixed` as sub-headings.
+This scenario is tested by `BuildInformation_ToMarkdown_RespectsCustomHeadingDepth`.
+
+**BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges**: Verifies that a `BuildInformation`
+with an empty `Changes` list renders `- N/A` in the Changes section.
+This scenario is tested by `BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges`.
+
+**BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs**: Verifies that a `BuildInformation` with
+an empty `Bugs` list renders `- N/A` in the Bugs Fixed section.
+This scenario is tested by `BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs`.
+
+**BuildInformation_ToMarkdown_IncludesIssueLinks**: Verifies that items with GitHub URLs are
+rendered as formatted links such as `- [3](https://github.com/example/repo/issues/3)`.
+This scenario is tested by `BuildInformation_ToMarkdown_IncludesIssueLinks`.
+
+**BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA**: Verifies that `v1.0.0` (no baseline)
+renders `| **Previous Version** | N/A |` and `| **Previous Commit Hash** | N/A |` in the version
+information table. This scenario is tested by
+`BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA`.
+
+**BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent**: Verifies that when a
+changelog link is present, rendering produces a `## Full Changelog` section with the comparison
 URL containing `ver-1.1.0...v2.0.0`.
+This scenario is tested by `BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent`.
 
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
+**BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline**: Verifies that `v1.0.0` (no
+baseline) does not produce a `## Full Changelog` section.
+This scenario is tested by `BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline`.
 
-##### BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
+**BuildInformation_ToMarkdown_UsesBulletLists**: Verifies that Changes, Bugs Fixed, and Known
+Issues sections each use `- [` bullet format with no markdown table notation.
+This scenario is tested by `BuildInformation_ToMarkdown_UsesBulletLists`.
 
-**Scenario**: `ToMarkdown()` is called on `BuildInformation` for `v1.0.0` (no baseline version).
+**BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections**: Verifies that when
+`RoutedSections` is populated with custom sections (e.g., Features, Bugs), `ToMarkdown()` renders
+those headings instead of the default `## Changes` and `## Bugs Fixed`.
+This scenario is tested by
+`BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections`.
 
-**Expected**: Markdown does not contain `## Full Changelog`.
+**BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections**: Verifies that when
+`RoutedSections` is null, the default `## Changes` and `## Bugs Fixed` headings are rendered.
+This scenario is tested by
+`BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections`.
 
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
+**BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection**: Verifies
+that when both `RoutedSections` and `KnownIssues` are populated, `ToMarkdown(includeKnownIssues: true)`
+renders the routed section headings and also appends `## Known Issues`.
+This scenario is tested by
+`BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection`.
 
-##### BuildInformation_ToMarkdown_UsesBulletLists
+**BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection**:
+Verifies that `ToMarkdown(includeKnownIssues: false)` suppresses the Known Issues section even
+when `RoutedSections` and `KnownIssues` are populated.
+This scenario is tested by
+`BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection`.
 
-**Scenario**: `ToMarkdown(includeKnownIssues: true)` is called on `BuildInformation` for `v2.0.0`.
-
-**Expected**: Changes, Bugs Fixed, and Known Issues sections each use `- [` bullet format; no
-markdown table notation (`| :-: | :---------- |`) is present in those sections.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### VersionCommitTag_Constructor_StoresVersionAndHash
-
-**Scenario**: A `VersionCommitTag` is constructed with a `VersionTag` and a commit hash string.
-
-**Expected**: `VersionTag` property equals the supplied tag; `CommitHash` equals the supplied hash
-string.
-
-**Requirement coverage**: `BuildMark-BuildInformation-Markdown`.
-
-##### WebLink_Constructor_StoresTextAndUrl
-
-**Scenario**: A `WebLink` is constructed with display text and a target URL.
-
-**Expected**: `LinkText` property equals the supplied text; `TargetUrl` property equals the
-supplied URL.
-
-**Requirement coverage**: `BuildMark-WebLink-Record`.
-
-##### BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
-
-**Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list containing
-two custom sections (Features, Bugs); `ToMarkdown()` is called.
-
-**Expected**: Markdown contains `## Features` and `## Bugs` headings with their respective items;
-`## Changes` and `## Bugs Fixed` are absent.
-
-**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
-
-##### BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
-
-**Scenario**: A `BuildInformation` is constructed with `RoutedSections` left as null;
-`ToMarkdown()` is called.
-
-**Expected**: Markdown contains the default `## Changes` and `## Bugs Fixed` headings.
-
-**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
-
-##### BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection
-
-**Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list and a
-non-empty `KnownIssues` list; `ToMarkdown(includeKnownIssues: true)` is called.
-
-**Expected**: Markdown contains the routed section headings (e.g. `## Features`) and also contains
-a `## Known Issues` section appearing after all routed sections.
-
-**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
-
-##### BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection
-
-**Scenario**: A `BuildInformation` is constructed with a populated `RoutedSections` list and a
-non-empty `KnownIssues` list; `ToMarkdown(includeKnownIssues: false)` is called.
-
-**Expected**: Markdown does not contain a `## Known Issues` section or any known-issue item text,
-confirming the flag is respected in routed mode as well as legacy mode.
-
-**Requirement coverage**: `BuildMark-BuildInformation-RoutedSections`.
-
-#### Requirements Coverage
-
-- **`BuildMark-BuildInformation-Markdown`**:
-  - BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndNoTags
-  - BuildInformation_GetBuildInformationAsync_ThrowsWhenNoVersionAndCommitDoesNotMatchTag
-  - BuildInformation_GetBuildInformationAsync_WorksWithExplicitVersion
-  - BuildInformation_GetBuildInformationAsync_WorksWhenCurrentCommitMatchesLatestTag
-  - BuildInformation_GetBuildInformationAsync_PreReleaseUsesPreviousTag
-  - BuildInformation_GetBuildInformationAsync_ReleaseSkipsPreReleases
-  - BuildInformation_GetBuildInformationAsync_CollectsIssuesCorrectly
-  - BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex
-  - BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues
-  - BuildInformation_GetBuildInformationAsync_HandlesFirstReleaseCorrectly
-  - BuildInformation_ToMarkdown_GeneratesCorrectMarkdownWithDefaults
-  - BuildInformation_ToMarkdown_IncludesKnownIssuesWhenRequested
-  - BuildInformation_ToMarkdown_RespectsCustomHeadingDepth
-  - BuildInformation_ToMarkdown_DisplaysNAForEmptyChanges
-  - BuildInformation_ToMarkdown_DisplaysNAForEmptyBugs
-  - BuildInformation_ToMarkdown_IncludesIssueLinks
-  - BuildInformation_ToMarkdown_HandlesFirstReleaseWithNA
-  - BuildInformation_ToMarkdown_IncludesFullChangelogWhenLinkPresent
-  - BuildInformation_ToMarkdown_ExcludesFullChangelogWhenNoBaseline
-  - BuildInformation_ToMarkdown_UsesBulletLists
-  - VersionCommitTag_Constructor_StoresVersionAndHash
-- **`BuildMark-WebLink-Record`**:
-  - WebLink_Constructor_StoresTextAndUrl
-- **`BuildMark-BuildInformation-RoutedSections`**:
-  - BuildInformation_ToMarkdown_WithRoutedSections_RendersCustomSections
-  - BuildInformation_ToMarkdown_WithoutRoutedSections_RendersDefaultSections
-  - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssues_RendersKnownIssuesSection
-  - BuildInformation_ToMarkdown_WithRoutedSectionsAndKnownIssuesFlagFalse_DoesNotRenderKnownIssuesSection
+**VersionCommitTag_Constructor_StoresVersionAndHash**: Verifies that constructing a
+`VersionCommitTag` stores the supplied `VersionTag` and commit hash string in the corresponding
+properties. This scenario is tested by `VersionCommitTag_Constructor_StoresVersionAndHash`.

@@ -2,40 +2,24 @@
 
 #### Verification Approach
 
-`RuleConfig` is verified through `ConfigurationTests.cs`. The test
-`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
-`BuildMarkConfig.CreateDefault()` and asserts on the `Route` and `Match` properties of the
-returned rules. No mocking is required.
-
-#### Dependencies
-
-| Mock / Stub | Reason          |
-| ----------- | --------------- |
-| None        | No mocks needed |
+`RuleConfig` is a data model unit with no external dependencies. It is verified through
+`ConfigurationTests.cs` via `BuildMarkConfig.CreateDefault()`, which constructs a `RuleConfig`
+collection and allows `Route` and `Match` properties to be asserted. No mocking is required.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All unit tests in `ConfigurationTests.cs` that inspect `RuleConfig` instances pass with zero
+  failures.
 
 #### Test Scenarios
 
-##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
-
-**Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Rules` collection is
-inspected.
-
-**Expected**: Six rules are present; the first three rules have `dependency-updates`,
-`bugs-fixed`, and `bugs-fixed` as routes with appropriate label and work-item-type match
-conditions; the fourth and fifth rules have `suppressed` routes; the sixth rule has `changes` as
-route with a null match.
-
-**Requirement coverage**: `BuildMark-RuleConfig-Properties`.
-
-#### Requirements Coverage
-
-- **`BuildMark-RuleConfig-Properties`**:
-  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+**BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection**: `BuildMarkConfig.CreateDefault()`
+is called and the returned `Rules` collection is inspected. Six rules must be present; the first
+three rules must have routes `dependency-updates`, `bugs-fixed`, and `bugs-fixed` with appropriate
+label and work-item-type match conditions; the fourth and fifth rules must have `suppressed` routes;
+the sixth rule must have route `changes` with a null `Match`, confirming the catch-all rule. This
+scenario is tested by `BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection`.

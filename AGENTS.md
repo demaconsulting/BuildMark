@@ -1,6 +1,8 @@
 # Project Overview
 
-- **name**: BuildMark
+- **project-name**: BuildMark
+- **organization**: DEMA Consulting
+- **project-tagline**: Build notes generator for GitHub and Azure DevOps
 - **description**: Tool for generating Markdown build notes from repositories
 - **languages**: C#
 - **technologies**: DotNet, YamlDotNet, xUnit, GraphQL, Pandoc, WeasyPrint
@@ -24,6 +26,11 @@
 └── test/
     └── DemaConsulting.BuildMark.Tests/
 ```
+
+# Language and Spelling (ALL Agents)
+
+Always use **US English** spelling in all output (code, comments, documentation,
+commit messages, and reports).
 
 # Reference Template
 
@@ -70,7 +77,6 @@ from `.github/standards/`. Use this matrix to determine which to load:
 - **Verification docs**: `software-items.md`, `verification-documentation.md`, `technical-documentation.md`
 - **Review configuration**: `software-items.md`, `reviewmark-usage.md`
 - **Any documentation**: `technical-documentation.md`
-- **Structural audit**: `template-sync` agent
 
 Load only the standards relevant to your specific task scope.
 
@@ -85,6 +91,7 @@ Delegate to specialized agents only for specific scenarios:
 - **Formal feature implementation** (complex, multi-step) → Call the implementation agent
 - **Formal bug resolution** (complex debugging, systematic fixes) → Call the implementation agent
 - **Formal reviews** (compliance verification, detailed analysis) → Call the formal-review agent
+- **Structural audit**: (repository layout vs. template) → Call the template-sync agent
 
 # Agent Reporting (Specialized Agents Must Follow)
 

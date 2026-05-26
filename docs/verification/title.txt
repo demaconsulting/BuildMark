@@ -1,8 +1,8 @@
 ---
 title: BuildMark Verification Design Document
-subtitle: Build Notes Generation Tool
+subtitle: Markdown Build Notes Generation Tool
 author: DEMA Consulting
-description: Verification design document for BuildMark
+description: Verification Design Document for BuildMark
 lang: en-US
 keywords:
   - BuildMark

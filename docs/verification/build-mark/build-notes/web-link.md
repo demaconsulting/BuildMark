@@ -6,32 +6,18 @@
 `BuildInformationTests.cs` that constructs a `WebLink` directly and asserts on its properties.
 No mocking is required.
 
-#### Dependencies
-
-| Mock / Stub | Reason          |
-| ----------- | --------------- |
-| None        | No mocks needed |
-
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. `BuildInformationTests.cs` runs within the standard `dotnet test`
+host; no external dependencies or environment setup are required.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All `WebLink`-related tests in `BuildInformationTests.cs` pass with zero failures.
+- Both `LinkText` and `TargetUrl` properties are verified.
 
 #### Test Scenarios
 
-##### WebLink_Constructor_StoresTextAndUrl
-
-**Scenario**: A `WebLink` is constructed with display text `"v1.0.0...v2.0.0"` and a GitHub
-compare URL.
-
-**Expected**: `LinkText` equals `"v1.0.0...v2.0.0"`; `TargetUrl` equals the supplied URL.
-
-**Requirement coverage**: `BuildMark-WebLink-Record`.
-
-#### Requirements Coverage
-
-- **`BuildMark-WebLink-Record`**:
-  - WebLink_Constructor_StoresTextAndUrl
+**WebLink_Constructor_StoresTextAndUrl**: Verifies that a `WebLink` constructed with display text
+`"v1.0.0...v2.0.0"` and a GitHub compare URL stores the values in `LinkText` and `TargetUrl`
+properties respectively. This scenario is tested by `WebLink_Constructor_StoresTextAndUrl`.

@@ -2,117 +2,83 @@
 
 ##### Purpose
 
-`WorkItemMapper` maps `AzureDevOpsWorkItem` records from the Azure DevOps REST API
-into `ItemInfo` records for the `BuildInformation` model. It centralizes work item
-type normalization, state-based filtering, and item-controls extraction from both
-buildmark code blocks in work item description bodies and Azure DevOps custom fields.
+`WorkItemMapper` maps `AzureDevOpsWorkItem` records from the Azure DevOps REST API into `ItemInfo`
+records for the `BuildInformation` model. It centralizes work item type normalization, state-based
+filtering, and item-controls extraction from both `buildmark` code blocks in work item description
+bodies and Azure DevOps custom fields (`Custom.Visibility`, `Custom.AffectedVersions`). Custom
+fields take precedence over `buildmark` block values when both are present.
 
 ##### Data Model
 
-###### Work Item Type Mapping
-
-Azure DevOps work item types are mapped to normalized types for the `ItemInfo` model:
-
-| Azure DevOps Work Item Types        | Normalized Type |
-|-------------------------------------|-----------------|
-| `Bug`, `Issue`                      | `"bug"`         |
-| `User Story`, `Feature`, `Epic`     | `"feature"`     |
-| `Task`, `Test Case`, etc.           | work item type  |
-
-###### Work Item State Filtering
-
-When identifying known issues, only work items in an unresolved state are included.
-The following state values are treated as resolved and excluded from known-issues
-reporting:
-
-- `Resolved`
-- `Closed`
-- `Done`
-
-The following state values are **suppressed** entirely from all sections of build
-notes (both changes and known issues). `MapWorkItemToItemInfo` returns `null` for
-these states before any other processing:
-
-- `Removed`
-
-All other state values (e.g. `Active`, `New`, `In Progress`) are treated as
-unresolved and included in known-issues reporting.
-
-###### Item Controls Extraction
-
-Item controls are extracted from two sources and merged:
-
-1. **Buildmark blocks** - `ItemControlsParser.Parse(description)` is called on the
-   `System.Description` field of the work item. The resulting `ItemControlsInfo`
-   provides `Visibility`, `Type`, and `AffectedVersions` overrides from embedded
-   YAML blocks in the description body.
-2. **Custom fields** - The `Custom.Visibility` and `Custom.AffectedVersions` fields
-   in the work item's fields dictionary are read directly.
-
-**Precedence**: custom fields take priority over buildmark blocks when both are
-present for the same control. If a custom field value is non-null, it supersedes
-the corresponding value from the buildmark block.
+N/A — `WorkItemMapper` is a static utility class with no instance state.
 
 ##### Key Methods
 
-###### `MapWorkItemToItemInfo(workItem)`
+**MapWorkItemToItemInfo**: Maps a single `AzureDevOpsWorkItem` to an `ItemInfo` record, returning
+`null` when the work item should be excluded.
 
-Maps a single `AzureDevOpsWorkItem` to an `ItemInfo` record.
+- *Parameters*: `AzureDevOpsWorkItem workItem` — the work item to map.
+- *Returns*: `ItemInfo?` — a populated record, or `null` when the work item is in a suppressed
+  state or has `visibility: internal`.
+- *Preconditions*: `workItem` must be non-null.
+- *Postconditions*: Returns `null` for suppressed states (e.g. `Removed`) and for
+  `visibility: internal`; never throws for absent dictionary keys.
 
-Steps:
+Steps: (1) read `System.State`; return `null` immediately if the state is in the suppressed set
+(`Removed`); (2) read `System.Title` and `System.WorkItemType`; (3) apply work item type mapping
+(`Bug`/`Issue` → `"bug"`; `User Story`/`Feature`/`Epic` → `"feature"`; others preserved as-is);
+(4) call `ExtractItemControls` to obtain overrides; (5) return `null` if controls specify
+`visibility: internal`; (6) apply type override if controls specify one; (7) construct and return
+the `ItemInfo` record.
 
-1. Read `System.State` from the work item's fields dictionary. If the state is in the
-   suppressed-states set (e.g. `Removed`), return `null` immediately.
-2. Read `System.Title` and `System.WorkItemType` from the work item's fields dictionary.
-3. Apply work item type mapping to determine the normalized type.
-4. Call `ExtractItemControls(workItem)` to obtain any item controls overrides.
-5. If item controls specify a visibility of `internal`, return `null` to signal that
-   the item should be excluded. Items with `visibility: public` (or no visibility
-   override) are included normally; there is no separate "force include" logic.
-6. If item controls specify a type override, apply it to the normalized type.
-7. Construct and return the `ItemInfo` record with the title, url, type, and
-   affected versions.
+**IsWorkItemResolved**: Checks whether a work item's state is one of the known resolved states.
 
-###### `IsWorkItemResolved(workItem)`
+- *Parameters*: `AzureDevOpsWorkItem workItem` — the work item to check.
+- *Returns*: `bool` — `true` when `System.State` is `Resolved`, `Closed`, or `Done`; `false`
+  otherwise.
 
-Checks whether a work item's state is one of the known resolved states
-(`Resolved`, `Closed`, `Done`).
+Used by `AzureDevOpsRepoConnector` to filter resolved bugs from known-issues reporting when no
+`AffectedVersions` is declared.
 
-Returns `true` if the work item is resolved; `false` otherwise. Used by
-`AzureDevOpsRepoConnector` to filter out resolved work items when collecting
-known issues.
+**GetWorkItemTypeForRuleMatching**: Returns the raw `System.WorkItemType` value from the work item
+fields dictionary for use in routing rule matching.
 
-###### `GetWorkItemTypeForRuleMatching(workItem)`
+- *Parameters*: `AzureDevOpsWorkItem workItem` — the work item to inspect.
+- *Returns*: `string?` — the raw Azure DevOps work item type string (e.g. `Bug`, `User Story`).
 
-Returns the work item type string used for routing rule matching. This is the raw
-`System.WorkItemType` value from the work item's fields dictionary, allowing routing
-rules in `.buildmark.yaml` to match on Azure DevOps-native work item type names.
+Allows routing rules in `.buildmark.yaml` to match on Azure DevOps-native work item type names
+rather than the normalized type.
 
-###### `ExtractItemControls(workItem)`
+**ExtractItemControls**: Merges item controls from `buildmark` blocks and Azure DevOps custom
+fields into a single `ItemControlsInfo?` record.
 
-Combines item controls from both buildmark blocks and custom fields into a single
-`ItemControlsInfo?` record.
+- *Parameters*: `AzureDevOpsWorkItem workItem` — the work item whose controls to extract.
+- *Returns*: `ItemControlsInfo?` — merged controls, or `null` when neither source provides any
+  recognized values.
 
-Steps:
-
-1. Call `ItemControlsParser.Parse(description)` on `System.Description`.
-2. Read `Custom.Visibility` and `Custom.AffectedVersions` from the fields dictionary.
-3. If custom fields are present, override the corresponding values from the buildmark
-   block result.
-4. Return the merged `ItemControlsInfo`, or `null` if no controls were found.
+Steps: (1) call `ItemControlsParser.Parse(System.Description)`; (2) read `Custom.Visibility` and
+`Custom.AffectedVersions` from the fields dictionary; (3) override the corresponding `buildmark`
+block values with the custom field values when both are present; (4) return the merged
+`ItemControlsInfo`, or `null` if no controls were found.
 
 ##### Error Handling
 
-`MapWorkItemToItemInfo` returns `null` rather than throwing when a work item should be
-excluded (suppressed state or `visibility: internal`). Missing or unexpected field values
-are handled defensively; no exceptions are thrown for absent dictionary keys.
+`MapWorkItemToItemInfo` returns `null` rather than throwing when a work item should be excluded
+(suppressed state or `visibility: internal`). Missing or unexpected field values in the work item's
+`Fields` dictionary are handled defensively; no exceptions are thrown for absent keys.
 
-##### Interactions
+##### Dependencies
 
-- `AzureDevOpsRepoConnector` calls `WorkItemMapper` to convert REST API work item
-  records into `ItemInfo` records.
-- `ItemControlsParser` is called by `WorkItemMapper` to parse buildmark blocks
-  from work item description bodies.
-- `AzureDevOpsApiTypes` provides the `AzureDevOpsWorkItem` type that `WorkItemMapper`
-  receives as input.
-- `BuildInformation` consumes the `ItemInfo` records produced by `WorkItemMapper`.
+- **AzureDevOpsApiTypes** — provides the `AzureDevOpsWorkItem` input type.
+- **ItemControlsParser** — called by `ExtractItemControls` to parse `buildmark` blocks from work
+  item descriptions.
+- **ItemControlsInfo** — the record type returned by `ItemControlsParser.Parse` and used within
+  `ExtractItemControls`.
+- **ItemInfo** — the output record type populated by `MapWorkItemToItemInfo`.
+- **VersionIntervalSet** — held by `ItemControlsInfo.AffectedVersions` and stored on the returned
+  `ItemInfo`.
+
+##### Callers
+
+- **AzureDevOpsRepoConnector** — calls `MapWorkItemToItemInfo`, `IsWorkItemResolved`, and
+  `GetWorkItemTypeForRuleMatching` when processing REST API work item responses.

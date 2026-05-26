@@ -1,40 +1,26 @@
 # Introduction
 
-This document contains the code quality analysis report for the BuildMark project.
+This document records the static analysis results for BuildMark.
 
 ## Purpose
 
-This report serves as evidence that the BuildMark codebase maintains good quality
-standards. It provides a comprehensive analysis of code quality metrics, including
-quality gate status, code issues, security hot spots, technical debt, and code coverage.
+To provide evidence that BuildMark has been analyzed for code quality issues
+and that any findings have been reviewed and resolved or accepted.
 
 ## Scope
 
-This code quality report covers:
+Covers static analysis of all source code in `src/` for BuildMark.
+Test code is excluded from static analysis requirements.
+
+The analysis includes:
 
 - Quality gate status and conditions
 - Code issues categorized by type and severity
-- Security hot spots requiring review
+- Security hotspots requiring review
 - Technical debt assessment
 - Code coverage and duplication metrics
 
-## Analysis Source
-
-This report contains quality analysis results captured at the time this version of BuildMark
-was built. It serves as evidence that the code maintains good quality standards and provides
-transparency about the project's code health. The analysis includes results from various
-quality tools run during the build process.
-
-## Audience
-
-This document is intended for:
-
-- Software developers working on BuildMark
-- Quality assurance teams reviewing code quality
-- Project stakeholders evaluating project health
-- Contributors understanding quality standards
-
 ## References
 
-- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
 - [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=demaconsulting_BuildMark) — live code quality and security analysis

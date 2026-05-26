@@ -1,12 +1,11 @@
 ### Azure DevOps
 
-#### Verification Strategy
+#### Verification Approach
 
-The Azure DevOps sub-subsystem is verified through `AzureDevOpsTests.cs` (5 subsystem-
-level tests), `AzureDevOpsRepoConnectorTests.cs` (32 unit tests),
-`AzureDevOpsRestClientTests.cs` (12 unit tests), and `WorkItemMapperTests.cs` (13 unit
-tests). The subsystem tests exercise the full Azure DevOps data pipeline through mock
-HTTP responses. The unit tests are described in the individual unit chapters.
+The Azure DevOps sub-subsystem is verified through `AzureDevOpsTests.cs` (5 subsystem-level tests),
+`AzureDevOpsRepoConnectorTests.cs` (32 unit tests), `AzureDevOpsRestClientTests.cs` (12 unit tests),
+and `WorkItemMapperTests.cs` (13 unit tests). The subsystem tests exercise the full Azure DevOps data
+pipeline through mock HTTP responses. The unit tests are described in the individual unit chapters.
 
 #### Dependencies
 
@@ -16,14 +15,14 @@ HTTP responses. The unit tests are described in the individual unit chapters.
 
 #### Test Environment
 
-N/A - standard test environment. All HTTP calls to the Azure DevOps REST API are
-intercepted by `MockHttpMessageHandler`; no live network access is required.
+N/A - standard test environment. All HTTP calls to the Azure DevOps REST API are intercepted by
+`MockHttpMessageHandler`; no live network access is required.
 
 #### Acceptance Criteria
 
 All 5 subsystem tests in `AzureDevOpsTests.cs` pass with zero failures. All
-`BuildMark-AzureDevOps-SubSystem` requirements have at least one test in the
-Requirements Coverage mapping.
+`BuildMark-RepoConnectors-AzureDevOps` requirements have at least one test traced in the ReqStream
+trace matrix.
 
 #### Test Scenarios (Subsystem-Level, AzureDevOpsTests.cs)
 
@@ -33,7 +32,7 @@ Requirements Coverage mapping.
 
 **Expected**: Implements the interface.
 
-**Requirement coverage**: `BuildMark-AzureDevOps-SubSystem`
+**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
 
 ##### AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
 
@@ -41,7 +40,7 @@ Requirements Coverage mapping.
 
 **Expected**: Returns valid `BuildInformation` with correct fields.
 
-**Requirement coverage**: `BuildMark-AzureDevOps-SubSystem`
+**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
 ##### AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
 
@@ -49,7 +48,7 @@ Requirements Coverage mapping.
 
 **Expected**: Work items appear in `BuildInformation.Changes`.
 
-**Requirement coverage**: `BuildMark-AzureDevOps-SubSystem`
+**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
 ##### AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
 
@@ -57,7 +56,7 @@ Requirements Coverage mapping.
 
 **Expected**: Bugs appear in `BuildInformation.KnownIssues`.
 
-**Requirement coverage**: `BuildMark-AzureDevOps-SubSystem`
+**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
 ##### AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
 
@@ -65,12 +64,4 @@ Requirements Coverage mapping.
 
 **Expected**: Baseline is the previous release tag.
 
-**Requirement coverage**: `BuildMark-AzureDevOps-SubSystem`
-
-#### Requirements Coverage
-
-- **BuildMark-AzureDevOps-SubSystem**: AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface,
-  AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges,
-  AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues,
-  AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`

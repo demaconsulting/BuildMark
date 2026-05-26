@@ -1,25 +1,24 @@
 ---
-# Software Unit Requirements for the ProcessRunner Class
-#
-# ProcessRunner provides static helpers for running external processes
-# (such as git and gh CLI) and capturing their output. It exposes both
-# a throwing variant (RunAsync) and a non-throwing variant (TryRunAsync).
-
+# BuildMark ProcessRunner unit requirements
 sections:
-  - title: ProcessRunner Unit Requirements
-    requirements:
-      - id: BuildMark-ProcessRunner-RunAsync
-        title: The ProcessRunner class shall execute external commands and return their output.
-        justification: |
-          Repository connectors need to run git and gh CLI commands to discover the
-          repository URL, current branch, current commit hash, and authentication
-          tokens. A centralized process runner ensures consistent error handling and
-          output capture across all callers.
-        tests:
-          - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
-          - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
-          - ProcessRunner_TryRunAsync_WithException_ReturnsNull
-          - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
-          - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
-          - ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException
+  - title: BuildMark Requirements
+    sections:
+      - title: Utilities Requirements
+        sections:
+          - title: ProcessRunner Requirements
+            requirements:
+              - id: BuildMark-ProcessRunner-RunAsync
+                title: The ProcessRunner class shall execute external commands and return their output.
+                justification: |
+                  Repository connectors need to run git and gh CLI commands to discover the
+                  repository URL, current branch, current commit hash, and authentication
+                  tokens. A centralized process runner ensures consistent error handling and
+                  output capture across all callers.
+                tests:
+                  - ProcessRunner_TryRunAsync_WithValidCommand_ReturnsOutput
+                  - ProcessRunner_TryRunAsync_WithInvalidCommand_ReturnsNull
+                  - ProcessRunner_TryRunAsync_WithNonZeroExitCode_ReturnsNull
+                  - ProcessRunner_TryRunAsync_WithException_ReturnsNull
+                  - ProcessRunner_RunAsync_WithValidCommand_ReturnsOutput
+                  - ProcessRunner_RunAsync_WithFailingCommand_ThrowsException
+                  - ProcessRunner_RunAsync_WithNonexistentCommand_ThrowsDescriptiveException

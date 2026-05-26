@@ -1,8 +1,8 @@
 # build.ps1
 #
 # PURPOSE:
-#   Unified cross-platform build script (replaces build.bat and build.sh).
-#   Builds the solution in Release configuration and runs all unit tests.
+#   Unified cross-platform build script for BuildMark.
+#   Restores dependencies, builds the solution in Release configuration, and runs all unit tests.
 #
 # EXTENSION POINTS:
 #   Search for "[PROJECT-SPECIFIC]" comments to find the designated locations
@@ -12,18 +12,26 @@
 #   Only modify this file to add project-specific operations at the designated
 #   [PROJECT-SPECIFIC] extension points.
 
-$ErrorActionPreference = 'Stop'
+$buildError = $false
 
-Write-Host "Building project..."
-dotnet build --configuration Release
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+Write-Host "Restoring dependencies..."
+dotnet restore
+if ($LASTEXITCODE -ne 0) { $buildError = $true }
+
+Write-Host "Building..."
+dotnet build --no-restore --configuration Release
+if ($LASTEXITCODE -ne 0) { $buildError = $true }
 
 # [PROJECT-SPECIFIC] Add additional build steps here.
 
 Write-Host "Running unit tests..."
-dotnet test --configuration Release
-if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+dotnet test --no-build --configuration Release --logger trx --results-directory artifacts/tests
+if ($LASTEXITCODE -ne 0) { $buildError = $true }
 
 # [PROJECT-SPECIFIC] Add additional test or post-build steps here.
 
-Write-Host "Build and tests completed successfully!"
+if (-not $buildError) {
+    Write-Host "Build and tests completed successfully!"
+}
+
+exit ($buildError ? 1 : 0)

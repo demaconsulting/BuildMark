@@ -1,38 +1,35 @@
 ---
-# AzureDevOps Sub-Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the BuildMark AzureDevOps sub-subsystem
-# - The AzureDevOps sub-subsystem provides the production connector used when
-#   the repository host is Azure DevOps (cloud or on-premises)
-# - Sub-subsystem requirements describe the externally visible contract
-#   satisfied by the units beneath this sub-subsystem
+# AzureDevOps subsystem requirements
 
 sections:
-  - title: AzureDevOps Sub-Subsystem Requirements
-    requirements:
-      - id: BuildMark-AzureDevOps-SubSystem
-        title: >-
-          The AzureDevOps sub-subsystem shall implement the IRepoConnector interface
-          for Azure DevOps repositories.
-        justification: |
-          Generating build notes from Azure DevOps repositories requires a dedicated sub-subsystem
-          that can authenticate to the Azure DevOps REST API, retrieve commits, tags, pull
-          requests, and work items, apply item-controls overrides from buildmark blocks and
-          custom fields, and assemble them into structured build information.
-        tests:
-          - AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface
-          - AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
-          - AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
-          - AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
-          - AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
-        children:
-          - BuildMark-AzureDevOps-UrlParsing
-          - BuildMark-AzureDevOps-ConnectorConfig
-          - BuildMark-AzureDevOps-BuildInformation
-          - BuildMark-AzureDevOps-ItemControls
-          - BuildMark-AzureDevOps-CustomFields
-          - BuildMark-AzureDevOps-Rules
-          - BuildMark-AzureDevOps-RestClient
-          - BuildMark-AzureDevOps-WorkItemMapper
-          - BuildMark-AzureDevOps-TokenVariable
+  - title: BuildMark Requirements
+    sections:
+      - title: RepoConnectors Requirements
+        sections:
+          - title: AzureDevOps Requirements
+            requirements:
+              - id: BuildMark-AzureDevOps-SubSystem
+                title: >-
+                  The AzureDevOps sub-subsystem shall implement the IRepoConnector interface
+                  for Azure DevOps repositories.
+                justification: |
+                  Generating build notes from Azure DevOps repositories requires a dedicated sub-subsystem
+                  that can authenticate to the Azure DevOps REST API, retrieve commits, tags, pull
+                  requests, and work items, apply item-controls overrides from buildmark blocks and
+                  custom fields, and assemble them into structured build information.
+                tests:
+                  - AzureDevOps_IRepoConnector_ConnectorInstance_ImplementsInterface
+                  - AzureDevOps_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
+                  - AzureDevOps_GetBuildInformation_WithPullRequests_GathersChanges
+                  - AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
+                  - AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
+                children:
+                  - BuildMark-AzureDevOps-UrlParsing
+                  - BuildMark-AzureDevOps-ConnectorConfig
+                  - BuildMark-AzureDevOps-BuildInformation
+                  - BuildMark-AzureDevOps-ItemControls
+                  - BuildMark-AzureDevOps-CustomFields
+                  - BuildMark-AzureDevOps-Rules
+                  - BuildMark-AzureDevOps-RestClient
+                  - BuildMark-AzureDevOps-WorkItemMapper
+                  - BuildMark-AzureDevOps-TokenVariable

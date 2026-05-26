@@ -2,45 +2,55 @@
 
 #### Purpose
 
-`ConfigurationLoadResult` is an immutable record that carries the output of
+`ConfigurationLoadResult` is an immutable positional record that carries the output of
 `BuildMarkConfigReader.ReadAsync`. It holds the parsed configuration (or `null` if parsing
-failed) together with an ordered list of issues found during parsing.
-
-`Program` calls `result.ReportTo(context)` immediately after reading the configuration to
-surface any issues to the user and set the exit code when errors are present.
+failed or the file was absent) together with an ordered list of issues found during parsing.
+`Program` calls `result.ReportTo(context)` immediately after reading configuration to surface
+all issues to the user and set the process exit code when errors are present.
 
 #### Data Model
 
-| Member              | Kind     | Description                                              |
-|---------------------|----------|----------------------------------------------------------|
-| `Config`            | Property | Parsed `BuildMarkConfig`; `null` if parsing failed       |
-| `Issues`            | Property | Ordered list of `ConfigurationIssue` objects             |
-| `HasErrors`         | Property | `true` when any issue has `Severity` of `Error`          |
-| `ReportTo(context)` | Method   | Writes all issues to `Context`; sets exit code on errors |
+**Config**: `BuildMarkConfig?` — Parsed configuration; `null` when parsing failed or the file
+was absent.
 
-##### ReportTo Overview
+**Issues**: `IReadOnlyList<ConfigurationIssue>` — Ordered list of issues encountered during
+parsing; empty when none were found.
 
-Iterates `Issues` and writes each one to the context output. If any issue has severity
-`Error`, sets `context.ExitCode` to 1.
+**HasErrors**: `bool` — Computed property; `true` when any entry in `Issues` has
+`Severity == Error`.
 
 #### Key Methods
 
-##### `ReportTo(Context context)`
+**ReportTo(context)**: Writes all configuration issues to the supplied context and sets the
+process exit code to `1` if any error-severity issue is present.
 
-Iterates `Issues` and writes each one to the context output. Issues with `Error` severity
-are written via `context.WriteError`, which sets the exit code to `1`. Non-error issues are
-written via `context.WriteLine`. Does not throw exceptions.
+- *Parameters*: `Context context` — the CLI context that receives issue messages and holds the
+  exit code.
+- *Returns*: `void`.
+- *Preconditions*: `context` must not be null.
+- *Postconditions*: Each issue is written to `context` using `context.WriteError` for
+  error-severity issues and `context.WriteLine` for warnings. Calling `context.WriteError`
+  sets the context's internal error flag, causing `context.ExitCode` to return `1`. Does not
+  throw exceptions.
+
+Each issue is formatted as `{FilePath}:{Line}: {Severity}: {Description}` before being written
+to the context.
 
 #### Error Handling
 
-N/A — `ConfigurationLoadResult` is an immutable record. `ReportTo(context)` writes issues
-to the context output and may set the exit code to `1`, but does not throw exceptions.
+N/A — `ConfigurationLoadResult` is an immutable record. `ReportTo` writes issues and may
+indirectly set the process exit code to `1` via `context.WriteError` but does not throw
+exceptions.
 
-#### Interactions
+#### Dependencies
 
-| Unit / Subsystem        | Role                                                                    |
-|-------------------------|-------------------------------------------------------------------------|
-| `BuildMarkConfigReader` | Produces `ConfigurationLoadResult` from `ReadAsync`                     |
-| `BuildMarkConfig`       | Held by the `Config` property when parsing succeeds                     |
-| `ConfigurationIssue`    | Each issue in the `Issues` list                                         |
-| `Program`               | Calls `ReportTo(context)` and checks `HasErrors` before proceeding      |
+- **BuildMarkConfig** — held by `Config` when parsing succeeds.
+- **ConfigurationIssue** — each entry in the `Issues` list.
+- **Context** — consumed by `ReportTo` to write issue messages and set the exit code.
+
+#### Callers
+
+- **BuildMarkConfigReader** — creates `ConfigurationLoadResult` instances and returns them from
+  `ReadAsync`.
+- **Program** — calls `ReportTo(context)` and checks `HasErrors` before proceeding to connector
+  selection and report generation.

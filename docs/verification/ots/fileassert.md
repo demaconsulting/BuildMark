@@ -32,8 +32,3 @@ The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
   collection (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide,
   Verification); expects that each assertion set passes and a non-empty TRX file is
   produced per collection.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-FileAssert**: CI pipeline self-validation TRX evidence from
-  `artifacts/fileassert-self-validation.trx`

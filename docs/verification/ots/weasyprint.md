@@ -30,8 +30,3 @@ FileAssert TRX files (`fileassert-build-notes.trx`, `fileassert-code-quality.trx
   (Build Notes, Code Quality, Review Plan, Review Report, Design, User Guide, Verification);
   FileAssert validates the generated PDF output; expects exit code 0 for each invocation
   and non-empty PDF files confirmed by FileAssert to contain expected content and metadata.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-WeasyPrint**: CI pipeline document generation evidence from multiple
-  FileAssert TRX results confirming successful PDF rendering

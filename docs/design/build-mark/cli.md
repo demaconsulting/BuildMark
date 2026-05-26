@@ -2,54 +2,41 @@
 
 ### Overview
 
-The Cli subsystem provides the command-line interface layer for BuildMark. It
-parses arguments supplied by the user, routes output to the console or a log file,
-and exposes the parsed state to the rest of the system via the `Context` object.
+The Cli subsystem provides the command-line interface layer for BuildMark. It parses arguments
+supplied by the user, routes output to the console or a log file, and exposes the parsed state to
+the rest of the system via the `Context` object.
 
-The subsystem has no dependencies on other BuildMark subsystems. All other
-subsystems receive a `Context` from the caller rather than creating one themselves.
+The subsystem contains one unit:
 
-### Units
+- **`Context`** (`Cli/Context.cs`) — argument parsing, output routing, and exit-code tracking
 
-| Unit      | File             | Responsibility                              |
-|-----------|------------------|---------------------------------------------|
-| `Context` | `Cli/Context.cs` | Argument parsing, output routing, exit code |
+The Cli subsystem has no dependencies on other BuildMark subsystems. All other subsystems receive a
+`Context` from the caller rather than creating one themselves.
 
 ### Interfaces
 
-`Context` exposes the following outward-facing interface consumed by `Program`:
+**`Context.Create`**: Factory method for constructing a `Context` from command-line arguments.
 
-| Member                | Kind     | Description                                        |
-|-----------------------|----------|----------------------------------------------------|
-| `Create(args)`        | Method   | Factory: parse arguments and return a `Context`    |
-| `Version`             | Property | Set when `--version` / `-v` flag is present        |
-| `Help`                | Property | Set when `--help` / `-h` / `-?` flag is present    |
-| `Silent`              | Property | Set when `--silent` flag is present                |
-| `Validate`            | Property | Set when `--validate` flag is present              |
-| `Lint`                | Property | Set when `--lint` flag is present                  |
-| `BuildVersion`        | Property | Value of `--build-version` argument                |
-| `ReportFile`          | Property | Value of `--report` argument                       |
-| `Depth`               | Property | Value of `--depth`/`--report-depth`; range 1–6     |
-| `IncludeKnownIssues`  | Property | Set when `--include-known-issues` flag is present  |
-| `ResultsFile`         | Property | Value of `--results` / `--result` argument         |
-| `ConnectorFactory`    | Property | Optional factory for dependency injection in tests |
-| `ExitCode`            | Property | Returns 0 unless `WriteError` has been called      |
-| `WriteLine(message)`  | Method   | Writes a line to console (if not silent) and log   |
-| `WriteError(message)` | Method   | Writes an error line and sets exit code to 1       |
-| `Dispose()`           | Method   | Closes the log file if one was opened              |
+- *Type*: In-process .NET static method
+- *Role*: Provider — the Cli subsystem exposes this factory for `Program`.
+- *Contract*: `Create(string[] args) → Context` and `Create(string[] args, Func<IRepoConnector>?) → Context`;
+  parses the argument array, opens any specified log file, and returns a fully initialized `Context`.
+- *Constraints*: Throws `ArgumentException` for invalid or unrecognized flags; throws
+  `InvalidOperationException` if the log file cannot be opened.
 
-> `Create(args)` throws `ArgumentException` for invalid or malformed arguments.
+**`Context` output and control methods**: Instance methods consumed by all subsystems for writing
+output and tracking errors.
+
+- *Type*: In-process .NET instance methods
+- *Role*: Provider
+- *Contract*: `WriteLine(message)` writes to console and log; `WriteError(message)` writes to standard
+  error and sets `ExitCode` to 1; `Dispose()` flushes and closes the log file.
+- *Constraints*: `Context` implements `IDisposable`; callers must dispose after use.
 
 ### Design
 
-The Cli subsystem contains a single unit (`Context`), so there is no inter-unit
-collaboration to describe. `Context.Create` parses the argument array and opens
-the optional log file. The resulting `Context` object is then passed by `Program`
-to every other subsystem that needs to write output, read flags, or set the exit
-code. No other subsystem creates a `Context`; all output and exit-code management
-flows through the single instance created at startup.
-
-### Interactions
-
-The Cli subsystem has no dependencies on other BuildMark subsystems. `Program`
-creates a `Context` and passes it to other subsystems as needed.
+The Cli subsystem contains a single unit (`Context`), so there is no inter-unit collaboration to
+describe. `Context.Create` parses the argument array using the private `ArgumentParser` nested class
+and opens the optional log file. The resulting `Context` object is passed by `Program` to every other
+subsystem that needs to write output, read flags, or set the exit code. No other subsystem creates a
+`Context`; all output and exit-code management flows through the single instance created at startup.

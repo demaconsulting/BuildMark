@@ -1,47 +1,47 @@
 ---
-# Software Unit Requirements for the VersionInterval Class
-#
-# VersionInterval represents a single mathematical version interval with inclusive
-# or exclusive bounds (either of which may be null for an unbounded range).
-
+# BuildMark VersionInterval unit requirements
 sections:
-  - title: VersionInterval Unit Requirements
-    requirements:
-      - id: BuildMark-VersionInterval-Parse
-        title: >-
-          The VersionInterval class shall parse a single interval token using standard
-          mathematical interval notation, tolerating unrecognized input without failing
-          the parse of the enclosing interval set.
-        justification: |
-          Tolerating malformed interval tokens allows the enclosing interval set to
-          silently discard them rather than failing the entire parse, making the feature
-          resilient to minor user errors in the buildmark block.
-        tests:
-          - VersionInterval_Parse_InclusiveLower_IsInclusive
-          - VersionInterval_Parse_ExclusiveLower_IsExclusive
-          - VersionInterval_Parse_InclusiveUpper_IsInclusive
-          - VersionInterval_Parse_ExclusiveUpper_IsExclusive
-          - VersionInterval_Parse_UnboundedLower_HasNullLowerBound
-          - VersionInterval_Parse_UnboundedUpper_HasNullUpperBound
-          - VersionInterval_Parse_BothBoundsPresent_ReturnsInterval
-          - VersionInterval_Parse_InvalidFormat_ReturnsNull
+  - title: BuildMark Requirements
+    sections:
+      - title: Version Requirements
+        sections:
+          - title: VersionInterval Requirements
+            requirements:
+              - id: BuildMark-VersionInterval-Parse
+                title: >-
+                  The VersionInterval class shall parse a single interval token using standard
+                  mathematical interval notation, tolerating unrecognized input without failing
+                  the parse of the enclosing interval set.
+                justification: |
+                  Tolerating malformed interval tokens allows the enclosing interval set to
+                  silently discard them rather than failing the entire parse, making the feature
+                  resilient to minor user errors in the buildmark block.
+                tests:
+                  - VersionInterval_Parse_InclusiveLower_IsInclusive
+                  - VersionInterval_Parse_ExclusiveLower_IsExclusive
+                  - VersionInterval_Parse_InclusiveUpper_IsInclusive
+                  - VersionInterval_Parse_ExclusiveUpper_IsExclusive
+                  - VersionInterval_Parse_UnboundedLower_HasNullLowerBound
+                  - VersionInterval_Parse_UnboundedUpper_HasNullUpperBound
+                  - VersionInterval_Parse_BothBoundsPresent_ReturnsInterval
+                  - VersionInterval_Parse_InvalidFormat_ReturnsNull
 
-      - id: BuildMark-VersionInterval-Contains
-        title: >-
-          The VersionInterval class shall determine whether a candidate version falls
-          inside the interval.
-        justification: |
-          Callers need to evaluate whether a release version is included by an
-          affected-version interval. The class must accept version values in the
-          forms used throughout the tool — raw strings, parsed comparable versions,
-          and repository tag objects — so that callers are not forced to convert
-          before querying.
-        tests:
-          - VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue
-          - VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse
-          - VersionInterval_Contains_StringEqualToInclusiveUpper_ReturnsTrue
-          - VersionInterval_Contains_StringEqualToExclusiveUpper_ReturnsFalse
-          - VersionInterval_Contains_StringInsideUnboundedInterval_ReturnsTrue
-          - VersionInterval_Contains_StringOutsideInterval_ReturnsFalse
-          - VersionInterval_Contains_Version_DelegatesToSemanticVersion
-          - VersionInterval_Contains_VersionComparable_HandlesPreRelease
+              - id: BuildMark-VersionInterval-Contains
+                title: >-
+                  The VersionInterval class shall determine whether a candidate version falls
+                  inside the interval.
+                justification: |
+                  Callers need to evaluate whether a release version is included by an
+                  affected-version interval. The class must accept version values in the
+                  forms used throughout the tool — raw strings, parsed comparable versions,
+                  and repository tag objects — so that callers are not forced to convert
+                  before querying.
+                tests:
+                  - VersionInterval_Contains_StringEqualToInclusiveLower_ReturnsTrue
+                  - VersionInterval_Contains_StringEqualToExclusiveLower_ReturnsFalse
+                  - VersionInterval_Contains_StringEqualToInclusiveUpper_ReturnsTrue
+                  - VersionInterval_Contains_StringEqualToExclusiveUpper_ReturnsFalse
+                  - VersionInterval_Contains_StringInsideUnboundedInterval_ReturnsTrue
+                  - VersionInterval_Contains_StringOutsideInterval_ReturnsFalse
+                  - VersionInterval_Contains_Version_DelegatesToSemanticVersion
+                  - VersionInterval_Contains_VersionComparable_HandlesPreRelease

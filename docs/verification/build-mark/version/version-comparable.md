@@ -2,235 +2,131 @@
 
 #### Verification Approach
 
-`VersionComparable` is tested through `VersionComparableTests.cs`, which contains
-26 unit tests. The tests cover creation (valid, invalid, null, empty), comparison
-operators, and numeric-vs-lexicographic pre-release ordering rules that follow the
-Semantic Versioning specification.
-
-#### Dependencies
-
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Pure logic |
+`VersionComparable` is a pure logic unit with no external dependencies, so no mocks or stubs are
+needed. The unit is exercised through `VersionComparableTests.cs`, which contains 26 unit tests
+covering creation through `Create` and `TryCreate`, invalid, null, and empty input handling, the
+four comparison operators, and Semantic Versioning pre-release ordering rules.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. No external dependencies or environment setup required.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All 26 tests in `VersionComparableTests.cs` pass with zero failures.
 
 #### Test Scenarios
 
-##### VersionComparable_Create_ValidVersion_ReturnsInstance
-
-**Scenario**: `VersionComparable.Create` is called with a valid version string.
-
-**Expected**: Returns a non-null instance.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Create_SimpleVersion_ParsesVersion
-
-**Scenario**: `VersionComparable.Create` is called with a simple `major.minor.patch` string.
-
-**Expected**: Major, minor, and patch properties reflect parsed values.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Create_PreReleaseVersion_ParsesVersion
-
-**Scenario**: `VersionComparable.Create` is called with a pre-release version string.
-
-**Expected**: Pre-release identifiers are parsed correctly.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_TryCreate_InvalidVersion_ReturnsNull
-
-**Scenario**: `VersionComparable.TryCreate` is called with an invalid version string.
-
-**Expected**: Returns `null`.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_TryCreate_NullInput_ReturnsNull
-
-**Scenario**: `VersionComparable.TryCreate` is called with a `null` argument.
-
-**Expected**: Returns `null`.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_TryCreate_EmptyInput_ReturnsNull
-
-**Scenario**: `VersionComparable.TryCreate` is called with an empty string.
-
-**Expected**: Returns `null`.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Create_InvalidVersion_ThrowsArgumentException
-
-**Scenario**: `VersionComparable.Create` is called with an invalid version string.
-
-**Expected**: `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero
-
-**Scenario**: Two instances with identical major.minor.patch are compared.
-
-**Expected**: `CompareTo` returns 0.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder
-
-**Scenario**: Two instances with different major versions are compared.
-
-**Expected**: Higher major version compares as greater.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder
-
-**Scenario**: Two instances with different minor versions are compared.
-
-**Expected**: Higher minor version compares as greater.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder
-
-**Scenario**: Two instances with different patch versions are compared.
-
-**Expected**: Higher patch version compares as greater.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder
-
-**Scenario**: A pre-release version is compared to its release counterpart.
-
-**Expected**: Pre-release is less than release per semver rules.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder
-
-**Scenario**: Two pre-release versions with non-numeric identifiers are compared.
-
-**Expected**: Comparison follows lexicographic order.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Operators_LessThan_WorksCorrectly
-
-**Scenario**: The `<` operator is applied to two version instances.
-
-**Expected**: Returns the correct boolean result.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Operators_GreaterThan_WorksCorrectly
-
-**Scenario**: The `>` operator is applied to two version instances.
-
-**Expected**: Returns the correct boolean result.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Operators_LessThanOrEqual_WorksCorrectly
-
-**Scenario**: The `<=` operator is applied to two version instances.
-
-**Expected**: Returns the correct boolean result.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly
-
-**Scenario**: The `>=` operator is applied to two version instances.
-
-**Expected**: Returns the correct boolean result.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder
-
-**Scenario**: A series of semver-compliant versions is compared.
-
-**Expected**: Ordering matches the semver specification.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_NumericComparison_CorrectOrdering
-
-**Scenario**: Numeric pre-release identifiers are compared.
-
-**Expected**: Numeric comparison is used (11 > 9).
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering
-
-**Scenario**: Release version `1.0.0` is compared to `1.0.0-alpha`.
-
-**Expected**: Release is greater than pre-release.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_PreReleaseLexicographic_CorrectOrdering
-
-**Scenario**: Pre-release identifiers with alphabetic content are compared.
-
-**Expected**: Lexicographic ordering is applied.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically
-
-**Scenario**: Pre-release identifiers that are purely numeric are compared.
-
-**Expected**: Numeric comparison is used.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering
-
-**Scenario**: Pre-release versions are compared following all semver rules.
-
-**Expected**: Ordering matches semver 2.0.0 specification section 11.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess
-
-**Scenario**: A numeric pre-release identifier is compared to a non-numeric one.
-
-**Expected**: Numeric identifier has lower precedence.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_ShorterPreRelease_IsLess
-
-**Scenario**: Two pre-release versions with different numbers of identifiers are compared.
-
-**Expected**: Shorter pre-release is less than longer when all common fields are equal.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-##### VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering
-
-**Scenario**: Complex multi-identifier pre-release versions are compared.
-
-**Expected**: Correct ordering following semver field-by-field rules.
-
-**Requirement coverage**: `BuildMark-Version-VersionComparable`
-
-#### Requirements Coverage
-
-- **BuildMark-Version-VersionComparable**: All 26 tests in `VersionComparableTests.cs`
+**VersionComparable_Create_ValidVersion_ReturnsInstance**: This scenario verifies that creating a
+comparable version from a valid version string succeeds and returns a non-null instance. This
+scenario is tested by `VersionComparable_Create_ValidVersion_ReturnsInstance`.
+
+**VersionComparable_Create_SimpleVersion_ParsesVersion**: This scenario verifies that a simple
+`major.minor.patch` version string is parsed into the expected numeric properties so later
+comparisons use the correct values. This scenario is tested by
+`VersionComparable_Create_SimpleVersion_ParsesVersion`.
+
+**VersionComparable_Create_PreReleaseVersion_ParsesVersion**: This scenario verifies that a
+pre-release version string is parsed correctly so pre-release identifiers participate in ordering as
+intended. This scenario is tested by `VersionComparable_Create_PreReleaseVersion_ParsesVersion`.
+
+**VersionComparable_TryCreate_InvalidVersion_ReturnsNull**: This scenario verifies that
+`TryCreate` rejects an invalid version string without throwing and reports the failure with a null
+result. This scenario is tested by `VersionComparable_TryCreate_InvalidVersion_ReturnsNull`.
+
+**VersionComparable_TryCreate_NullInput_ReturnsNull**: This scenario verifies that `TryCreate`
+handles a null input safely and returns null instead of creating an invalid instance. This scenario
+is tested by `VersionComparable_TryCreate_NullInput_ReturnsNull`.
+
+**VersionComparable_TryCreate_EmptyInput_ReturnsNull**: This scenario verifies that `TryCreate`
+rejects an empty version string and returns null so empty input does not enter comparison logic.
+This scenario is tested by `VersionComparable_TryCreate_EmptyInput_ReturnsNull`.
+
+**VersionComparable_Create_InvalidVersion_ThrowsArgumentException**: This scenario verifies that
+`Create` fails fast for an invalid version string by throwing `ArgumentException`, which protects
+callers that require a valid instance. This scenario is tested by
+`VersionComparable_Create_InvalidVersion_ThrowsArgumentException`.
+
+**VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero**: This scenario verifies that two
+versions with the same major, minor, and patch values compare as equal so equality checks remain
+stable. This scenario is tested by
+`VersionComparable_CompareTo_SameMajorMinorPatch_ReturnsZero`.
+
+**VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder**: This scenario verifies that a
+higher major version compares as greater, which is the highest-priority numeric ordering rule.
+This scenario is tested by `VersionComparable_CompareTo_DifferentMajor_ReturnsCorrectOrder`.
+
+**VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder**: This scenario verifies that a
+higher minor version compares as greater when the major version matches, preserving expected semver
+ordering. This scenario is tested by `VersionComparable_CompareTo_DifferentMinor_ReturnsCorrectOrder`.
+
+**VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder**: This scenario verifies that a
+higher patch version compares as greater when major and minor values match. This scenario is tested
+by `VersionComparable_CompareTo_DifferentPatch_ReturnsCorrectOrder`.
+
+**VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder**: This scenario verifies
+that a pre-release version sorts before the corresponding release version, which is a core Semantic
+Versioning rule. This scenario is tested by
+`VersionComparable_CompareTo_PreReleaseVsRelease_ReturnsCorrectOrder`.
+
+**VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder**: This scenario
+verifies that non-numeric pre-release identifiers are compared lexicographically so alphabetic
+labels sort correctly. This scenario is tested by
+`VersionComparable_CompareTo_PreReleaseVersions_ReturnsLexicographicOrder`.
+
+**VersionComparable_Operators_LessThan_WorksCorrectly**: This scenario verifies that the `<`
+operator returns the expected boolean result so callers can use natural relational syntax. This
+scenario is tested by `VersionComparable_Operators_LessThan_WorksCorrectly`.
+
+**VersionComparable_Operators_GreaterThan_WorksCorrectly**: This scenario verifies that the `>`
+operator returns the expected boolean result for comparable versions. This scenario is tested by
+`VersionComparable_Operators_GreaterThan_WorksCorrectly`.
+
+**VersionComparable_Operators_LessThanOrEqual_WorksCorrectly**: This scenario verifies that the
+`<=` operator returns the expected boolean result for equal and lower versions. This scenario is
+tested by `VersionComparable_Operators_LessThanOrEqual_WorksCorrectly`.
+
+**VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly**: This scenario verifies that the
+`>=` operator returns the expected boolean result for equal and greater versions. This scenario is
+tested by `VersionComparable_Operators_GreaterThanOrEqual_WorksCorrectly`.
+
+**VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder**: This scenario verifies that
+an ordered series of semantic versions follows the precedence rules defined by the specification.
+This scenario is tested by `VersionComparable_CompareTo_SemanticVersions_ReturnsCorrectOrder`.
+
+**VersionComparable_CompareTo_NumericComparison_CorrectOrdering**: This scenario verifies that
+numeric pre-release identifiers are compared numerically rather than lexicographically, so `11`
+sorts after `9`. This scenario is tested by
+`VersionComparable_CompareTo_NumericComparison_CorrectOrdering`.
+
+**VersionComparable_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering**: This scenario
+verifies the inverse release-versus-pre-release comparison and confirms the release version has
+higher precedence. This scenario is tested by
+`VersionComparable_CompareTo_ReleaseGreaterThanPreRelease_CorrectOrdering`.
+
+**VersionComparable_CompareTo_PreReleaseLexicographic_CorrectOrdering**: This scenario verifies
+that alphabetic pre-release identifiers use lexicographic ordering when compared to one another.
+This scenario is tested by `VersionComparable_CompareTo_PreReleaseLexicographic_CorrectOrdering`.
+
+**VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically**: This scenario verifies that
+purely numeric pre-release identifiers use integer comparison so numeric precedence is preserved.
+This scenario is tested by `VersionComparable_CompareTo_PreReleaseNumeric_ComparesNumerically`.
+
+**VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering**: This scenario verifies that
+full pre-release precedence matches Semantic Versioning 2.0.0 section 11 for representative
+examples. This scenario is tested by
+`VersionComparable_CompareTo_PreReleaseSemVerRules_CorrectOrdering`.
+
+**VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess**: This scenario verifies that a
+numeric pre-release identifier has lower precedence than a non-numeric identifier at the same
+position. This scenario is tested by
+`VersionComparable_CompareTo_NumericVsNonNumeric_NumericIsLess`.
+
+**VersionComparable_CompareTo_ShorterPreRelease_IsLess**: This scenario verifies that when common
+pre-release identifiers are equal, the shorter identifier list has lower precedence. This scenario
+is tested by `VersionComparable_CompareTo_ShorterPreRelease_IsLess`.
+
+**VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering**: This scenario verifies that
+multi-part pre-release identifiers are compared field by field so complex semantic versions sort
+correctly. This scenario is tested by
+`VersionComparable_CompareTo_ComplexPreRelease_CorrectOrdering`.

@@ -2,11 +2,10 @@
 
 #### Verification Approach
 
-`ItemControlsParser` is tested through `ItemControlsParserTests.cs`, which contains
-15 unit tests. The tests cover parsing `null` and empty descriptions, descriptions
-with no block, and descriptions containing a buildmark block with various field
-combinations (visibility, type, affected-versions, hidden). Unknown keys and
-unrecognized values are tested for graceful ignorance.
+`ItemControlsParser` is tested through `ItemControlsParserTests.cs`, which contains 15 unit tests.
+The tests cover parsing `null` and empty descriptions, descriptions with no block, and descriptions
+containing a buildmark block with various field combinations (visibility, type, affected-versions,
+hidden). Unknown keys and unrecognized values are tested for graceful ignorance.
 
 #### Dependencies
 
@@ -20,7 +19,7 @@ Standard dotnet test host; no external dependencies or environment setup require
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+All 15 tests in `ItemControlsParserTests.cs` pass with no errors or warnings.
 
 #### Test Scenarios
 
@@ -42,8 +41,7 @@ All tests in the test class pass with no errors or warnings.
 
 ##### ItemControlsParser_Parse_WithNoBlock_ReturnsNull
 
-**Scenario**: `ItemControlsParser.Parse` is called with text that contains no
-buildmark block.
+**Scenario**: `ItemControlsParser.Parse` is called with text that contains no buildmark block.
 
 **Expected**: Returns `null`.
 
@@ -144,8 +142,3 @@ buildmark block.
 **Expected**: `AffectedVersions` is not set or is empty; no exception thrown.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-ItemControlsParser`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-ItemControlsParser**: All 15 tests in
-  `ItemControlsParserTests.cs`

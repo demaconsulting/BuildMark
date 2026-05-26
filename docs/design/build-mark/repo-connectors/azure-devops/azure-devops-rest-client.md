@@ -2,143 +2,110 @@
 
 ##### Purpose
 
-`AzureDevOpsRestClient` is the Azure DevOps subsystem unit responsible for issuing
-paginated REST API requests to the Azure DevOps API and translating the responses
-into typed records for connector consumption. `AzureDevOpsRepoConnector` delegates
-all Azure DevOps API communication to this client.
+`AzureDevOpsRestClient` is the unit responsible for issuing paginated HTTP requests to the Azure
+DevOps REST API and deserializing responses into typed `AzureDevOpsApiTypes` records for
+consumption by `AzureDevOpsRepoConnector`. All Azure DevOps API communication is delegated to
+this client.
 
-##### Authentication
+The client supports both Basic authentication (PAT) and Bearer authentication (Entra ID access
+token). It uses `System.Net.Http.Json` extension methods with a shared `JsonSerializerOptions`
+instance (`PropertyNamingPolicy = JsonNamingPolicy.CamelCase`,
+`NumberHandling = JsonNumberHandling.AllowReadingFromString`) to deserialize API responses without
+per-property attributes. The sole exception is `AzureDevOpsWorkItem.Fields`, which is deserialized
+as a `Dictionary<string, object?>` preserving dotted field reference keys verbatim.
 
-The client authenticates using either:
-
-- **Basic authentication** - the PAT is supplied as the password field of a `Basic`
-  authorization header (with an empty username), which is the standard Azure DevOps
-  PAT authentication scheme.
-- **Bearer authentication** - an Entra ID (Azure AD) access token is supplied as a
-  `Bearer` authorization header, used when authenticating via `az account get-access-token`
-  or the `SYSTEM_ACCESSTOKEN` Azure Pipelines variable with OAuth scope.
-
-The authentication scheme is selected automatically based on the token source
-resolved by `AzureDevOpsRepoConnector`.
-
-##### JSON Deserialization
-
-The client uses `System.Net.Http.Json` extension methods (part of the .NET runtime) to
-deserialize Azure DevOps REST API responses. Specifically, each HTTP response body is
-decoded by calling `HttpContent.ReadFromJsonAsync<T>()` with a shared
-`JsonSerializerOptions` instance configured with
-`PropertyNamingPolicy = JsonNamingPolicy.CamelCase` and
-`NumberHandling = JsonNumberHandling.AllowReadingFromString`. The camelCase policy
-matches the camelCase field names returned by the Azure DevOps API without requiring
-per-property `[JsonPropertyName]` attributes on the response records. The
-`AllowReadingFromString` setting handles numeric fields (such as work item IDs) that
-the API may return as JSON string values rather than JSON numbers.
-
-The sole exception is the `AzureDevOpsWorkItem.Fields` dictionary - its keys are
-Azure DevOps field reference names (e.g. `System.WorkItemType`, `Custom.Visibility`)
-and are preserved as-is without any naming transformation.
+When a request returns an HTTP error response, the internal helper `TryReadAdoErrorMessageAsync`
+attempts to deserialize the response body as `AzureDevOpsApiError` and extracts the `message`
+field to include in the thrown `InvalidOperationException`, providing a human-readable description
+instead of a raw HTTP status code.
 
 ##### Data Model
 
-`AzureDevOpsRestClient` holds a single `HttpClient` instance configured with the
-organization URL as the base address and the resolved authentication header (Basic for
-PAT tokens, Bearer for Entra ID tokens).
+**_httpClient**: `HttpClient` — HTTP client configured with the organization URL as the base
+address and an `Authorization` header set to either `Basic {base64(pat)}` for PAT tokens or
+`Bearer {token}` for Entra ID tokens.
 
 ##### Key Methods
 
-The client provides the following methods for retrieving the repository data needed
-to build a `BuildInformation` record:
+**GetRepositoryAsync**: Fetches repository metadata for the specified repository name.
 
-###### `GetRepositoryAsync(repository)`
-
-Fetches repository metadata for the specified repository.
+- *Parameters*: `string repository` — repository name.
+- *Returns*: `Task<AzureDevOpsRepository>` — repository record containing `Id`, `Name`, and
+  `RemoteUrl`.
+- *Postconditions*: Throws `InvalidOperationException` on HTTP failure or when deserialization
+  returns null.
 
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{repository}?api-version=6.0`
 
-Returns an `AzureDevOpsRepository` record containing the repository id, name, and
-remote URL. Throws when the request is unsuccessful (including HTTP 404).
+**GetTagsAsync**: Fetches all tag references for the specified repository, resolving annotated tags
+to their commit SHA.
 
-###### `GetTagsAsync(repositoryId)`
+- *Parameters*: `string repositoryId` — repository identifier.
+- *Returns*: `Task<List<AzureDevOpsRef>>` — list of tag references; `AzureDevOpsRef.CommitId`
+  returns `PeeledObjectId ?? ObjectId`.
 
-Fetches all tag references for the specified repository.
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&peelTags=true
+&api-version=6.0`
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/refs?filter=tags&peelTags=true&api-version=6.0`
+**GetCommitsAsync**: Fetches the complete paginated commit history for the repository.
 
-Returns a list of `AzureDevOpsRef` records, each containing the full reference name
-(e.g. `refs/tags/v1.0.0`), the object SHA it points to, and for annotated tags the
-peeled commit SHA. The `peelTags=true` query parameter instructs the API to resolve
-annotated tag objects to their underlying commit SHA, which is returned in the
-`peeledObjectId` field.
-
-###### `GetCommitsAsync(repositoryId)`
-
-Fetches the complete paginated commit history for the repository.
+- *Parameters*: `string repositoryId` — repository identifier.
+- *Returns*: `Task<List<AzureDevOpsCommit>>` — all commits across all pages.
 
 Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/commits?api-version=6.0`
+Paginates using `$top` and `$skip` query parameters.
 
-Returns a list of `AzureDevOpsCommit` records. Automatically paginates using
-`$top` and `$skip` query parameters to retrieve all pages.
+**GetPullRequestsAsync**: Fetches all pull requests with the specified status for the repository.
 
-###### `GetPullRequestsAsync(repositoryId, status)`
+- *Parameters*: `string repositoryId` — repository identifier; `string status` — filter value
+  (e.g. `all`, `completed`).
+- *Returns*: `Task<List<AzureDevOpsPullRequest>>` — all pull requests across all pages.
 
-Fetches all pull requests with the specified status for the repository. Supports
-`all`, `active`, `completed`, and `abandoned` status values.
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests?
+searchCriteria.status={status}&api-version=6.0`. Paginates using `$top` and `$skip`.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests?searchCriteria.status={status}&api-version=6.0`
+**GetPullRequestWorkItemsAsync**: Fetches work item id references linked to a specific pull
+request.
 
-Returns a list of `AzureDevOpsPullRequest` records. Automatically paginates using
-`$top` and `$skip` query parameters to retrieve all pages.
+- *Parameters*: `string repositoryId` — repository identifier; `int pullRequestId` — pull request
+  number.
+- *Returns*: `Task<List<AzureDevOpsWorkItemRef>>` — list of linked work item references.
 
-###### `GetPullRequestWorkItemsAsync(repositoryId, pullRequestId)`
+Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests/{prId}/
+workitems?api-version=6.0`
 
-Fetches the work items linked to a specific pull request.
+**GetWorkItemsAsync**: Batch-fetches work item details for a list of work item IDs. Splits
+requests into batches of 200 IDs as required by the Azure DevOps API.
 
-Endpoint: `GET /{organization}/{project}/_apis/git/repositories/{id}/pullrequests/{prId}/workitems?api-version=6.0`
-
-Returns a list of work item id references from the
-`AzureDevOpsCollectionResponse<WorkItemRef>`.
-
-###### `GetWorkItemsAsync(workItemIds)`
-
-Batch-fetches work item details for a list of work item ids. Splits requests into
-batches of 200 ids as required by the Azure DevOps API.
+- *Parameters*: `IEnumerable<int> workItemIds` — work item IDs to fetch.
+- *Returns*: `Task<List<AzureDevOpsWorkItem>>` — work items with all fields expanded.
 
 Endpoint: `GET /{organization}/{project}/_apis/wit/workitems?ids={ids}&$expand=all&api-version=6.0`
 
-Returns a list of `AzureDevOpsWorkItem` records with all fields expanded.
+**QueryWorkItemsAsync**: Executes a WIQL query and returns matching work item id references.
 
-###### `QueryWorkItemsAsync(wiql)`
-
-Executes a WIQL (Work Item Query Language) query and returns the matching work item
-id references.
+- *Parameters*: `string wiql` — the WIQL query string.
+- *Returns*: `Task<AzureDevOpsWorkItemQuery>` — result containing the list of matching work item
+  references.
 
 Endpoint: `POST /{organization}/{project}/_apis/wit/wiql?api-version=6.0`
 
-Returns an `AzureDevOpsWorkItemQuery` record containing the list of matching work
-item id references.
-
 ##### Error Handling
 
-HTTP and deserialization errors from the underlying `HttpClient` are propagated to
-`AzureDevOpsRepoConnector`. Network failures, authentication errors (HTTP 401/403), and
-malformed JSON responses result in exceptions that propagate up to
-`Program.ProcessBuildNotes`.
+HTTP and deserialization errors from `HttpClient` propagate to `AzureDevOpsRepoConnector` as
+exceptions. `GetRepositoryAsync` additionally throws `InvalidOperationException` when
+deserialization succeeds but returns null (guard against an unexpected empty response). When an
+error response body is present and parses as `AzureDevOpsApiError`, the `message` field is
+included in the `InvalidOperationException` message for human-readable diagnostics.
 
-`GetRepositoryAsync` additionally throws `InvalidOperationException` when the HTTP
-response is successful but JSON deserialization returns `null` (the `result ?? throw`
-pattern). This guards against a response body that is valid JSON but does not
-deserialize into the expected `AzureDevOpsRepository` record.
+##### Dependencies
 
-When an HTTP error response includes a JSON body in the Azure DevOps error format, the
-internal `TryReadAdoErrorMessageAsync` helper deserializes the body into an
-`AzureDevOpsApiError` record and extracts the `message` field to include in the thrown
-`InvalidOperationException`. This provides a human-readable error description (e.g.,
-`"The area path does not exist."`) rather than a raw HTTP status code.
+- **AzureDevOpsApiTypes** — provides the record types used as serialization and deserialization
+  targets.
+- **System.Net.Http.Json** — runtime extension methods used to call `ReadFromJsonAsync<T>` on
+  HTTP response content.
 
-##### Interactions
+##### Callers
 
-- `AzureDevOpsRepoConnector` creates and calls `AzureDevOpsRestClient`.
-- `AzureDevOpsApiTypes` provides the request and response record types used for
-  serialization and deserialization.
-- The Azure DevOps REST API endpoint provides the remote repository data queried by
-  the client.
+- **AzureDevOpsRepoConnector** — creates and calls `AzureDevOpsRestClient` for all REST API
+  communication.

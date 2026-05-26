@@ -2,36 +2,25 @@
 
 #### Verification Approach
 
-`VersionCommitTag` is a simple data class with no dedicated test class. It is verified
-through `VersionTests.cs` via the test
-`VersionCommitTag_Constructor_ValidParameters_CreatesInstance`, which constructs an
-instance and asserts that the tag and commit-hash properties are stored correctly.
-
-#### Dependencies
-
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+`VersionCommitTag` is a simple data record. It has no external dependencies and no
+dependencies to mock or stub. It is verified through the subsystem integration test in
+`VersionTests.cs` via `VersionCommitTag_Constructor_ValidParameters_CreatesInstance`,
+which constructs an instance and asserts that the version-tag and commit-hash properties are
+stored correctly. No dedicated unit test class exists for this unit.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. No external dependencies or environment setup required.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- `VersionCommitTag_Constructor_ValidParameters_CreatesInstance` in `VersionTests.cs`
+  passes with zero failures.
 
 #### Test Scenarios
 
-##### VersionCommitTag_Constructor_ValidParameters_CreatesInstance
-
-**Scenario**: `VersionCommitTag` is constructed with a `VersionTag` and a commit hash
-string.
-
-**Expected**: The `Tag` and `CommitHash` properties return the supplied values.
-
-**Requirement coverage**: `BuildMark-Version-VersionCommitTag`
-
-#### Requirements Coverage
-
-- **BuildMark-Version-VersionCommitTag**: VersionCommitTag_Constructor_ValidParameters_CreatesInstance
+**VersionCommitTag_Constructor_ValidParameters_CreatesInstance**: `VersionCommitTag` is
+constructed with a `VersionTag` and a commit hash string. The `VersionTag` and
+`CommitHash` properties return the supplied values, confirming the data record stores its
+constructor arguments unchanged. This scenario is tested by
+`VersionCommitTag_Constructor_ValidParameters_CreatesInstance`.

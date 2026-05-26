@@ -1,51 +1,51 @@
 ---
-# Software Unit Requirements for the RepoConnectorFactory Class
-#
-# RepoConnectorFactory creates the appropriate IRepoConnector implementation
-# based on the runtime environment (GitHub Actions environment variables and
-# git remote URL inspection).
+# RepoConnectorFactory unit requirements
 
 sections:
-  - title: RepoConnectorFactory Unit Requirements
-    requirements:
-      - id: BuildMark-RepoConnectorFactory-Create
-        title: >-
-          The RepoConnectorFactory class shall create the appropriate repository
-          connector based on environment variables and git remote URL inspection.
-        justification: |
-          The factory encapsulates connector selection logic, auto-detecting
-          the environment using GitHub Actions environment variables and git remote
-          URL inspection, so that the program does not need to contain environment
-          detection logic itself.
-        tests:
-          - RepoConnectorFactory_Create_ReturnsConnector
-          - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
-          - RepoConnectorFactory_Create_WithGitHubRemoteUrl_ReturnsGitHubConnector
-          - RepoConnectorFactory_Create_WithNullRemoteUrl_DefaultsToGitHubConnector
+  - title: BuildMark Requirements
+    sections:
+      - title: RepoConnectors Requirements
+        sections:
+          - title: RepoConnectorFactory Requirements
+            requirements:
+              - id: BuildMark-RepoConnectorFactory-Create
+                title: >-
+                  The RepoConnectorFactory class shall create the appropriate repository
+                  connector based on environment variables and git remote URL inspection.
+                justification: |
+                  The factory encapsulates connector selection logic, auto-detecting
+                  the environment using GitHub Actions environment variables and git remote
+                  URL inspection, so that the program does not need to contain environment
+                  detection logic itself.
+                tests:
+                  - RepoConnectorFactory_Create_ReturnsConnector
+                  - RepoConnectorFactory_Create_ReturnsGitHubConnectorForThisRepo
+                  - RepoConnectorFactory_Create_WithGitHubRemoteUrl_ReturnsGitHubConnector
+                  - RepoConnectorFactory_Create_WithNullRemoteUrl_DefaultsToGitHubConnector
 
-      - id: BuildMark-RepoConnectorFactory-ConnectorConfig
-        title: >-
-          The RepoConnectorFactory class shall accept an optional ConnectorConfig and forward
-          connector-specific settings to the created connector.
-        justification: |
-          The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector
-          so that owner, repository, and base URL overrides from .buildmark.yaml take
-          effect. This pattern extends naturally to future connector types.
-        tests:
-          - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
+              - id: BuildMark-RepoConnectorFactory-ConnectorConfig
+                title: >-
+                  The RepoConnectorFactory class shall accept an optional ConnectorConfig and forward
+                  connector-specific settings to the created connector.
+                justification: |
+                  The factory must pass GitHubConnectorConfig (when present) to GitHubRepoConnector
+                  so that owner, repository, and base URL overrides from .buildmark.yaml take
+                  effect. This pattern extends naturally to future connector types.
+                tests:
+                  - RepoConnectorFactory_Create_WithConnectorConfig_ForwardsGitHubConfiguration
 
-      - id: BuildMark-RepoConnectorFactory-AzureDevOpsDetection
-        title: >-
-          The RepoConnectorFactory class shall detect Azure DevOps environments and create an
-          AzureDevOpsRepoConnector when appropriate.
-        justification: |
-          The factory must auto-detect Azure DevOps Pipelines environments by checking the
-          TF_BUILD environment variable and git remote URLs containing dev.azure.com or
-          visualstudio.com. It must also support explicit configuration via ConnectorConfig
-          with type "azure-devops" and forward AzureDevOpsConnectorConfig to the created connector.
-        tests:
-          - RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector
-          - RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector
-          - RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector
-          - RepoConnectorFactory_Create_WithVisualStudioRemoteUrl_ReturnsAzureDevOpsConnector
-          - RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration
+              - id: BuildMark-RepoConnectorFactory-AzureDevOpsDetection
+                title: >-
+                  The RepoConnectorFactory class shall detect Azure DevOps environments and create an
+                  AzureDevOpsRepoConnector when appropriate.
+                justification: |
+                  The factory must auto-detect Azure DevOps Pipelines environments by checking the
+                  TF_BUILD environment variable and git remote URLs containing dev.azure.com or
+                  visualstudio.com. It must also support explicit configuration via ConnectorConfig
+                  with type "azure-devops" and forward AzureDevOpsConnectorConfig to the created connector.
+                tests:
+                  - RepoConnectorFactory_Create_WithAzureDevOpsType_CreatesAzureDevOpsConnector
+                  - RepoConnectorFactory_Create_WithTfBuildEnv_ReturnsAzureDevOpsConnector
+                  - RepoConnectorFactory_Create_WithAzureDevOpsRemoteUrl_ReturnsAzureDevOpsConnector
+                  - RepoConnectorFactory_Create_WithVisualStudioRemoteUrl_ReturnsAzureDevOpsConnector
+                  - RepoConnectorFactory_Create_WithAzureDevOpsConnectorConfig_ForwardsAzureDevOpsConfiguration

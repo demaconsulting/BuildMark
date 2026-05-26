@@ -2,56 +2,35 @@
 
 #### Verification Approach
 
-`RuleMatchConfig` is a data model class verified indirectly through `ItemRouterTests.cs`.
-Tests that exercise label-based and type-based matching use `RuleMatchConfig` instances
-within `RuleConfig` to control item routing. Case-insensitive matching tests confirm
-the match comparison behavior.
-
-#### Dependencies
-
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+`RuleMatchConfig` is a data model unit with no external dependencies. It is verified indirectly
+through `ItemRouterTests.cs`, which places `RuleMatchConfig` instances inside `RuleConfig` objects
+and exercises label-based and work-item-type-based matching via `ItemRouter`. No mocking is
+required; the real `ItemRouter` logic is used.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All `ItemRouterTests.cs` tests that exercise `RuleMatchConfig`-driven routing pass with zero
+  failures.
 
-#### Test Scenarios (Integration)
+#### Test Scenarios
 
-##### ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
+**ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem**: A `RuleMatchConfig` specifying a
+work-item type is placed in a `RuleConfig` and an item with that type is routed via `ItemRouter`.
+The item must appear in the correct section, confirming that work-item-type matching is evaluated
+correctly. This scenario is tested by `ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem`.
 
-**Scenario**: A `RuleMatchConfig` specifying a work item type is used; item with
-matching type is routed.
+**ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem**: A `RuleMatchConfig` specifying a
+label is placed in a `RuleConfig` and an item carrying that label (in a different case) is routed
+via `ItemRouter`. The item must appear in the correct section regardless of label case, confirming
+that label matching is case-insensitive. This scenario is tested by
+`ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem`.
 
-**Expected**: Item appears in the correct section.
-
-**Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
-
-##### ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem
-
-**Scenario**: A `RuleMatchConfig` specifying a label is used; item with matching
-label (case-insensitive) is routed.
-
-**Expected**: Item appears in the correct section regardless of label case.
-
-**Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
-
-##### ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem
-
-**Scenario**: A `RuleMatchConfig` on a suppressed rule matches an item case-insensitively.
-
-**Expected**: Item is omitted from all sections.
-
-**Requirement coverage**: `BuildMark-Configuration-RuleMatchConfig`
-
-#### Requirements Coverage
-
-- **BuildMark-Configuration-RuleMatchConfig**:
-  ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem,
-  ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem,
-  ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem
+**ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem**: A `RuleMatchConfig` on
+a suppressed rule matches an item case-insensitively via `ItemRouter`. The item must be omitted
+from all sections, confirming that suppression works together with case-insensitive label matching.
+This scenario is tested by
+`ItemRouter_Route_WithCaseInsensitiveSuppressedRoute_OmitsMatchingItem`.

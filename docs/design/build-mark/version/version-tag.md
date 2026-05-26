@@ -1,110 +1,89 @@
-### Version Tag
+### VersionTag
 
 #### Purpose
 
-The `VersionTag` class parses repository tags to extract semantic version information.
-It handles various tag formats and prefixes while providing access to both the
-original tag and parsed semantic version. **Critically, VersionTag instances are
-compared based on their semantic version content (VersionComparable), not their
-tag strings, enabling version equality across different tag formats.**
+`VersionTag` parses a raw repository tag string and extracts the embedded semantic version.
+It preserves the original tag string for display and logging while providing structured
+version access through a `VersionSemantic` property. Equality between `VersionTag` instances
+is based on the semantic version content (`Semantic.Comparable`), not on the raw tag string,
+so tags with different prefixes but identical semantic versions compare as equal.
 
 #### Data Model
 
-| Property | Type            | Description                  |
-|----------|-----------------|------------------------------|
-| Tag      | string          | Original repository tag      |
-| Semantic | VersionSemantic | Parsed semantic version info |
+**Tag**: `string` — Original repository tag string exactly as it appears in the repository.
+
+**Semantic**: `VersionSemantic` — Parsed semantic version extracted from the tag.
+
+**FullVersion**: `string` — Delegated from `Semantic.FullVersion`; the extracted semantic
+version without the tag prefix.
+
+**Major**: `int` — Delegated from `Semantic.Major`.
+
+**Minor**: `int` — Delegated from `Semantic.Minor`.
+
+**Patch**: `int` — Delegated from `Semantic.Patch`.
+
+**Numbers**: `string` — Delegated from `Semantic.Numbers`; returns `major.minor.patch`.
+
+**PreRelease**: `string` — Delegated from `Semantic.PreRelease`; returns empty string when no
+pre-release is present.
+
+**CompareVersion**: `string` — Delegated from `Semantic.CompareVersion`.
+
+**Metadata**: `string` — Delegated from `Semantic.Metadata`; returns empty string when no
+build metadata is present.
+
+**IsPreRelease**: `bool` — Delegated from `Semantic.IsPreRelease`.
 
 #### Key Methods
 
-- `Create(string tag)` — Parses a repository tag string and extracts the embedded
-  semantic version; throws `ArgumentException` when no recognizable semantic version
-  can be found
-- `TryCreate(string tag)` — Parses a repository tag string; returns `null` when no
-  semantic version can be extracted instead of throwing
-- `ToString()` — Returns the original `Tag` string verbatim, preserving the repository
-  tag format for display and logging
+**Create**: Parses a repository tag string and returns a `VersionTag`; throws
+`ArgumentException` when no recognizable semantic version can be extracted.
 
-The parsing algorithm strips known prefix patterns (e.g., `v`, `ver`, `release/`) and then
-attempts `VersionSemantic.TryCreate` on the remainder. Equality between `VersionTag`
-instances is based on `Semantic.Comparable` rather than the raw `Tag` string, so tags with
-different prefixes but identical semantic versions compare as equal.
+- *Parameters*: `string tag` — the repository tag string to parse.
+- *Returns*: `VersionTag` — the parsed tag with its embedded semantic version.
+- *Preconditions*: Input contains a `major.minor.patch` triple, optionally preceded by an
+  alphabetic or path-separator prefix.
+- *Postconditions*: Returns a valid `VersionTag`; throws `ArgumentException` on invalid input.
 
-#### Delegated Properties
+**TryCreate**: Parses a repository tag string; returns `null` when no semantic version can be
+extracted, instead of throwing.
 
-For convenience, the following properties delegate to the `Semantic.Comparable` instance:
+- *Parameters*: `string tag` — the repository tag string to parse.
+- *Returns*: `VersionTag?` — the parsed tag, or `null` if no semantic version can be
+  extracted.
+- *Preconditions*: None — null and whitespace inputs return `null`.
+- *Postconditions*: Returns a valid `VersionTag` or `null`; never throws.
 
-- `Major`, `Minor`, `Patch` - Version number components  
-- `PreRelease` - Pre-release identifier
-- `CompareVersion` - Comparison string
-- `Numbers` - Version numbers only (major.minor.patch)
+Both methods apply a source-generated regex pattern that accepts an optional alphabetic or
+path-separator prefix before the `major.minor.patch` triple, and captures optional pre-release
+and build-metadata segments. The separator between the numbers and pre-release may be a hyphen
+(`-`) or a dot (`.`). Equality between `VersionTag` instances is determined by
+`Semantic.Comparable`, so `v1.2.3` and `release/1.2.3` are considered equal.
 
-Additional delegated properties from `Semantic`:
+**ToString**: Returns the original `Tag` string verbatim.
 
-- `Metadata` - Build metadata
-- `FullVersion` - Complete semantic version string
-
-#### Tag Format Support
-
-The parser supports various repository tag formats:
-
-- Simple: `1.2.3`, `v1.2.3`, `ver1.2.3`
-- Complex prefixes: `Release_1.2.3`, `MyApp-v1.2.3`
-- Path-separator prefixes: `release/1.2.3`, `builds/release/1.2.3`
-- Pre-release: `1.2.3-beta`, `1.2.3.rc.1` (dot becomes hyphen)
-- Metadata: `1.2.3+build.123`
-
-#### Version Equality
-
-**Important Design Principle**: VersionTag instances with different tag strings but
-identical semantic versions are considered equal. This enables repository connectors
-to correctly identify versions regardless of tagging conventions:
-
-- `"v1.2.3"` equals `"VER1.2.3"` equals `"Release-1.2.3"` equals `"release/1.2.3"`
-- Equality is determined by `Semantic.Comparable.Equals()`
-- FindVersionIndex in RepoConnectorBase uses this semantic comparison
-
-This design prevents version matching failures when repositories use different
-tag naming conventions but identical semantic versions.
-
-#### Factory Methods
-
-- `Create(string tag)` - Creates instance, throws on invalid tag
-- `TryCreate(string tag)` - Returns null for invalid tag
-
-#### Display / ToString
-
-The `ToString()` method is overridden to return the original `Tag` string verbatim.
-This preserves the repository tag format for display and logging purposes while keeping semantic comparison
-available through `Semantic.Comparable`:
-
-```csharp
-var versionTag = VersionTag.Create("release/1.2.3-rc.1");
-Console.WriteLine(versionTag);             // "release/1.2.3-rc.1"
-Console.WriteLine(versionTag.FullVersion); // "1.2.3-rc.1"
-```
-
-#### Example
-
-```csharp
-var versionTag = VersionTag.Create("MyApp-v1.2.3-beta.1+build.123");
-// versionTag.Tag = "MyApp-v1.2.3-beta.1+build.123"
-// versionTag.Numbers = "1.2.3"
-// versionTag.FullVersion = "1.2.3-beta.1+build.123"
-// versionTag.CompareVersion = "1.2.3-beta.1"
-
-// Version equality example
-var tag1 = VersionTag.Create("v1.2.3");
-var tag2 = VersionTag.Create("VER1.2.3");
-// tag1.Semantic.Comparable.Equals(tag2.Semantic.Comparable) == true
-```
+- *Parameters*: None.
+- *Returns*: `string` — the original repository tag string.
+- *Preconditions*: None.
+- *Postconditions*: Never throws; always returns the `Tag` value set at construction.
 
 #### Error Handling
 
-`Create(string tag)` throws `ArgumentException` when the tag cannot be parsed into a
-recognizable semantic version format. `TryCreate(string tag)` returns `null` instead of
-throwing. Once constructed, property access and `ToString()` cannot fail.
+`Create` throws `ArgumentException` when the tag string does not contain a recognizable
+`major.minor.patch` triple. `TryCreate` returns `null` instead of throwing. Once constructed,
+property access and `ToString` cannot fail.
 
-#### Interactions
+#### Dependencies
 
-Consumed by `VersionCommitTag`, RepoConnectors (for tag parsing), and `Program` (for filtering).
+- **VersionSemantic** — stores the parsed semantic version as the `Semantic` property.
+- **VersionComparable** — accessed indirectly through `Semantic.Comparable` for equality and
+  ordering.
+
+#### Callers
+
+- **VersionCommitTag** — holds a `VersionTag` as its `VersionTag` property.
+- **RepoConnectorBase** — uses `VersionTag` instances to locate version boundaries (e.g.,
+  `FindVersionIndex`).
+- **ItemControlsParser** — filters items by version using `VersionTag` values.
+- **Program** — uses `VersionTag` when filtering build notes by version range.

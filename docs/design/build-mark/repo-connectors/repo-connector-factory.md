@@ -2,76 +2,69 @@
 
 #### Purpose
 
-`RepoConnectorFactory` is a static factory class that creates the appropriate
-`IRepoConnector` implementation based on the runtime environment.
+`RepoConnectorFactory` is a static factory class that creates the appropriate `IRepoConnector`
+implementation based on the runtime environment. It examines explicit configuration, environment
+variables, and the git remote URL in a fixed priority order, then returns the matching connector so
+that callers never need to know which platform is in use.
 
 #### Data Model
 
-N/A — `RepoConnectorFactory` is a static factory class with no instance state.
+N/A — `RepoConnectorFactory` is a static class with no instance state.
 
 #### Key Methods
 
-##### `Create(ConnectorConfig? config) → IRepoConnector`
+**Create**: Creates a repository connector based on the current environment and optional
+configuration.
 
-The factory method accepts an optional `ConnectorConfig` from the
-parsed `.buildmark.yaml` file and returns the appropriate
-`IRepoConnector` implementation:
+- *Parameters*: `ConnectorConfig? config` — optional connector configuration parsed from
+  `.buildmark.yaml`.
+- *Returns*: `IRepoConnector` — the appropriate connector instance.
+- *Preconditions*: None; null `config` is treated as unconfigured.
+- *Postconditions*: Returns a non-null `IRepoConnector`; never throws.
 
-- If `config?.Type` is `"azure-devops"`, returns a new `AzureDevOpsRepoConnector`
-  initialized with `config?.AzureDevOps`.
+Selection order: (1) if `config.Type` equals `"azure-devops"`, return
+`AzureDevOpsRepoConnector(config.AzureDevOps)`; (2) if `TF_BUILD` environment variable is
+non-empty, return `AzureDevOpsRepoConnector(config?.AzureDevOps)`; (3) if `GITHUB_ACTIONS` or
+`GITHUB_WORKSPACE` is non-empty, return `GitHubRepoConnector(config?.GitHub)`; (4) read the git
+remote URL once via `ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin")` using
+sync-over-async (safe in a console application with no synchronization context); delegate to
+`CreateFromRemoteUrl` with the result. If the git process is unavailable, `TryRunAsync` returns
+`null` and `CreateFromRemoteUrl` defaults to `GitHubRepoConnector`.
 
-When `config?.Type` is not `"azure-devops"` (including when `config` is `null`
-or `Type` is `null`), the method auto-detects the environment using the
-following signals, checked in order:
+**CreateFromRemoteUrl**: Internal helper that selects a connector based on the git remote URL,
+bypassing environment-variable checks.
 
-1. The `TF_BUILD` environment variable is non-empty - indicates Azure DevOps
-   Pipelines; creates an `AzureDevOpsRepoConnector`.
-2. The `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable is
-   non-empty - creates a `GitHubRepoConnector`.
-3. The git remote URL contains `dev.azure.com` or `visualstudio.com` - creates
-   an `AzureDevOpsRepoConnector`.
-4. The git remote URL contains `github.com` - creates a `GitHubRepoConnector`.
-5. None of the above matched - defaults to a `GitHubRepoConnector`.
+- *Parameters*: `ConnectorConfig? config` — optional configuration; `string? remoteUrl` — the git
+  remote URL, or `null` if unavailable.
+- *Returns*: `IRepoConnector` — `AzureDevOpsRepoConnector` when `remoteUrl` contains
+  `dev.azure.com` or `visualstudio.com`; `GitHubRepoConnector` when `remoteUrl` contains
+  `github.com`; `GitHubRepoConnector` as the default when `remoteUrl` is null or unrecognized.
+- *Preconditions*: None.
+- *Postconditions*: Returns a non-null `IRepoConnector`.
 
-The git remote URL is obtained **once** using the sync-over-async pattern via
-`ProcessRunner.TryRunAsync("git", "remote", "get-url", "origin").GetAwaiter().GetResult()`,
-then forwarded to `CreateFromRemoteUrl`. If the git process is unavailable or returns
-no output, `TryRunAsync` returns `null`; in that case `CreateFromRemoteUrl` falls
-through to the default and returns a `GitHubRepoConnector`.
-BuildMark is distributed as a .NET tool and is not intended for consumption as a
-library by external callers, so this design reflects the tool-oriented execution
-model rather than a guarantee that synchronization-context-related deadlocks are
-impossible in every host.
-
-##### `CreateFromRemoteUrl(ConnectorConfig? config, string? remoteUrl) → IRepoConnector` *(internal)*
-
-An internal helper that selects a connector based on `remoteUrl` alone (skipping
-environment-variable checks). It is exposed internally so that unit tests can
-exercise the URL-based detection logic without requiring a real git process.
-
-- If `remoteUrl` contains `dev.azure.com` or `visualstudio.com` (case-insensitive),
-  returns a new `AzureDevOpsRepoConnector` initialized with `config?.AzureDevOps`.
-- If `remoteUrl` contains `github.com` (case-insensitive),
-  returns a new `GitHubRepoConnector` initialized with `config?.GitHub`.
-- If `remoteUrl` is `null` or does not match any known host, defaults to a
-  `GitHubRepoConnector` initialized with `config?.GitHub`.
+Exposed internally so that unit tests can exercise URL-based detection logic without requiring a
+real git process.
 
 #### Error Handling
 
 `Create` never throws. If the git remote URL cannot be determined (e.g., git is unavailable),
 `ProcessRunner.TryRunAsync` returns `null` and the factory silently defaults to a
-`GitHubRepoConnector`. Connector type detection errors are suppressed to avoid failing
-tool startup on environment differences.
+`GitHubRepoConnector`. Connector type detection errors are suppressed to avoid failing tool startup
+on environment differences.
 
-#### Interactions
+#### Dependencies
 
-| Unit / Subsystem             | Role                                                                   |
-| ---------------------------- | ---------------------------------------------------------------------- |
-| `IRepoConnector`             | Return type of `Create`                                                |
-| `ConnectorConfig`            | Optional envelope passed to `Create`; type discriminates result        |
-| `GitHubConnectorConfig`      | Forwarded to `GitHubRepoConnector` as `config?.GitHub`                 |
-| `AzureDevOpsConnectorConfig` | Forwarded to `AzureDevOpsRepoConnector` as `config?.AzureDevOps`       |
-| `GitHubRepoConnector`        | The concrete connector returned for GitHub repositories                |
-| `AzureDevOpsRepoConnector`   | The concrete connector returned for Azure DevOps repositories          |
-| `ProcessRunner`              | Used via sync-over-async by `Create` to inspect git remote URL         |
-| `Program`                    | Calls `RepoConnectorFactory.Create(result.Config?.Connector)`          |
+- **IRepoConnector** — the return type of both factory methods.
+- **ConnectorConfig** — optional envelope passed to `Create`; its `Type` field discriminates the
+  result.
+- **GitHubConnectorConfig** — forwarded to `GitHubRepoConnector` as `config?.GitHub`.
+- **AzureDevOpsConnectorConfig** — forwarded to `AzureDevOpsRepoConnector` as
+  `config?.AzureDevOps`.
+- **GitHubRepoConnector** — returned for GitHub repositories and as the default fallback.
+- **AzureDevOpsRepoConnector** — returned for Azure DevOps repositories.
+- **ProcessRunner** — used via sync-over-async by `Create` to inspect the git remote URL.
+
+#### Callers
+
+- **Program** — calls `RepoConnectorFactory.Create(result.Config?.Connector)` to obtain the
+  connector before processing build notes.

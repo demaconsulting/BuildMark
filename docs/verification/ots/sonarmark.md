@@ -30,8 +30,3 @@ The resulting TRX file is consumed by ReqStream to satisfy the OTS requirement.
 - *SonarMark quality report generation*: CI pipeline uses SonarMark to query the
   SonarCloud API and generate the SonarCloud quality report markdown; expects exit
   code 0 and a non-empty markdown report.
-
-### Requirements Coverage
-
-- **BuildMark-OTS-SonarMark**: CI pipeline self-validation TRX evidence from
-  `artifacts/sonarmark-self-validation.trx`

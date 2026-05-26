@@ -1,126 +1,123 @@
 ---
-# Software Unit Requirements for the Program Class
-#
-# The Program class is the main entry point for BuildMark. It creates a Context
-# from command-line arguments, dispatches to the appropriate logic based on the
-# flags (version, help, validate, report), and returns the exit code.
-
+# BuildMark Program unit requirements
 sections:
-  - title: Program Unit Requirements
-    requirements:
-      - id: BuildMark-Program-Version
-        title: The Program class shall support -v and --version flags to display version information.
-        justification: |
-          Users need to quickly identify the version of the tool they are using for
-          troubleshooting and compatibility verification.
-        tests:
-          - Program_Run_VersionFlag_OutputsVersionToConsole
-          - Program_Version_ReturnsValidVersion
+  - title: BuildMark Requirements
+    sections:
+      - title: Program Requirements
+        requirements:
+          - id: BuildMark-Program-Version
+            title: The Program class shall support -v and --version flags to display version information.
+            justification: |
+              Users need to quickly identify the version of the tool they are using for
+              troubleshooting and compatibility verification.
+            tests:
+              - Program_Run_VersionFlag_OutputsVersionToConsole
+              - Program_Version_ReturnsValidVersion
 
-      - id: BuildMark-Program-Help
-        title: The Program class shall support -?, -h, and --help flags to display usage information.
-        justification: |
-          Users need access to command-line usage documentation without requiring
-          external resources.
-        tests:
-          - Program_Run_HelpFlag_OutputsHelpMessage
-          - Program_Run_QuestionMarkFlag_OutputsHelpMessage
-          - Program_Run_LongHelpFlag_OutputsHelpMessage
+          - id: BuildMark-Program-Help
+            title: The Program class shall support -?, -h, and --help flags to display usage information.
+            justification: |
+              Users need access to command-line usage documentation without requiring
+              external resources.
+            tests:
+              - Program_Run_HelpFlag_OutputsHelpMessage
+              - Program_Run_QuestionMarkFlag_OutputsHelpMessage
+              - Program_Run_LongHelpFlag_OutputsHelpMessage
 
-      - id: BuildMark-Program-Validate
-        title: The Program class shall support --validate flag to invoke the self-validation framework.
-        justification: |
-          Provides a built-in mechanism to verify the tool is functioning correctly
-          in the deployment environment.
-        tests:
-          - Program_Run_ValidateFlag_OutputsValidationMessage
+          - id: BuildMark-Program-Validate
+            title: The Program class shall support --validate flag to invoke the self-validation framework.
+            justification: |
+              Provides a built-in mechanism to verify the tool is functioning correctly
+              in the deployment environment.
+            tests:
+              - Program_Run_ValidateFlag_OutputsValidationMessage
 
-      - id: BuildMark-Program-Lint
-        title: The Program class shall support a --lint flag to validate the .buildmark.yaml configuration file.
-        justification: |
-          Operators need a quick way to verify that the configuration file is well-formed
-          without running a full build. The --lint flag reads and validates .buildmark.yaml,
-          reports any issues to the user, and exits without generating a report.
-        tests:
-          - Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
+          - id: BuildMark-Program-Lint
+            title: The Program class shall support a --lint flag to validate the .buildmark.yaml configuration file.
+            justification: |
+              Operators need a quick way to verify that the configuration file is well-formed
+              without running a full build. The --lint flag reads and validates .buildmark.yaml,
+              reports any issues to the user, and exits without generating a report.
+            tests:
+              - Program_Run_LintFlagWithoutConfiguration_LeavesExitCodeAtZero
 
-      - id: BuildMark-Program-Report
-        title: The Program class shall generate build notes markdown reports when --report is specified.
-        justification: |
-          Report generation is the primary purpose of the BuildMark tool. The Program
-          class orchestrates the repository connector, gathering of build information,
-          and generation of the output markdown report.
-        tests:
-          - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+          - id: BuildMark-Program-Report
+            title: The Program class shall generate build notes markdown reports when --report is specified.
+            justification: |
+              Report generation is the primary purpose of the BuildMark tool. The Program
+              class orchestrates the repository connector, gathering of build information,
+              and generation of the output markdown report.
+            tests:
+              - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
 
-      - id: BuildMark-Program-Silent
-        title: The Program class shall support --silent flag to suppress console output during execution.
-        justification: |
-          Silent mode enables automated build pipelines to invoke BuildMark without
-          cluttering their output logs when only the exit code or report file is needed.
-        tests:
-          - Program_Run_WithSilentFlag_SuppressesOutput
+          - id: BuildMark-Program-Silent
+            title: The Program class shall support --silent flag to suppress console output during execution.
+            justification: |
+              Silent mode enables automated build pipelines to invoke BuildMark without
+              cluttering their output logs when only the exit code or report file is needed.
+            tests:
+              - Program_Run_WithSilentFlag_SuppressesOutput
 
-      - id: BuildMark-Program-Log
-        title: The Program class shall support --log flag to write execution output to a log file.
-        justification: |
-          Log file support enables persistent capture of BuildMark output for audit trails
-          and post-build analysis in automated environments.
-        tests:
-          - Program_Run_WithLogFlag_WritesToLogFile
+          - id: BuildMark-Program-Log
+            title: The Program class shall support --log flag to write execution output to a log file.
+            justification: |
+              Log file support enables persistent capture of BuildMark output for audit trails
+              and post-build analysis in automated environments.
+            tests:
+              - Program_Run_WithLogFlag_WritesToLogFile
 
-      - id: BuildMark-Program-Results
-        title: The Program class shall support --results flag to write validation results to a test results file.
-        justification: |
-          Writing results to standard test result formats (TRX or JUnit XML) enables
-          integration with CI/CD platforms that process test result files.
-        tests:
-          - Program_Run_WithResultsFlag_WritesResultsFile
+          - id: BuildMark-Program-Results
+            title: The Program class shall support --results flag to write validation results to a test results file.
+            justification: |
+              Writing results to standard test result formats (TRX or JUnit XML) enables
+              integration with CI/CD platforms that process test result files.
+            tests:
+              - Program_Run_WithResultsFlag_WritesResultsFile
 
-      - id: BuildMark-Program-BuildVersion
-        title: The Program class shall support --build-version flag to specify the version for report generation.
-        justification: |
-          Specifying the build version allows users to override or supplement version information
-          from source control, enabling flexible version management strategies.
-        tests:
-          - Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
+          - id: BuildMark-Program-BuildVersion
+            title: The Program class shall support --build-version flag to specify the version for report generation.
+            justification: |
+              Specifying the build version allows users to override or supplement version information
+              from source control, enabling flexible version management strategies.
+            tests:
+              - Program_Run_WithBuildVersionFlag_AcceptsBuildVersion
 
-      - id: BuildMark-Program-Depth
-        title: The Program class shall support --depth flag to configure the markdown heading depth of the report.
-        justification: |
-          Configurable heading depth allows BuildMark reports to be embedded at any level
-          within a larger document without disrupting the document hierarchy.
-        tests:
-          - Program_Run_WithDepthFlag_SetsHeadingDepth
+          - id: BuildMark-Program-Depth
+            title: The Program class shall support --depth flag to configure the markdown heading depth of the report.
+            justification: |
+              Configurable heading depth allows BuildMark reports to be embedded at any level
+              within a larger document without disrupting the document hierarchy.
+            tests:
+              - Program_Run_WithDepthFlag_SetsHeadingDepth
 
-      - id: BuildMark-Program-IncludeKnownIssues
-        title: >-
-          The Program class shall support --include-known-issues flag to include known
-          issues in the generated build notes report.
-        justification: |
-          Known-issue disclosure in release notes promotes transparency and helps users
-          avoid known pitfalls. The flag enables this optional section without affecting
-          the default report output.
-        tests:
-          - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
+          - id: BuildMark-Program-IncludeKnownIssues
+            title: >-
+              The Program class shall support --include-known-issues flag to include known
+              issues in the generated build notes report.
+            justification: |
+              Known-issue disclosure in release notes promotes transparency and helps users
+              avoid known pitfalls. The flag enables this optional section without affecting
+              the default report output.
+            tests:
+              - Program_Run_ReportWithIncludeKnownIssuesFlag_GeneratesReportWithKnownIssues
 
-      - id: BuildMark-Program-ErrorHandling-InvalidBuildVersion
-        title: >-
-          The Program class shall report an error and set exit code 1 when an invalid
-          build version is provided.
-        justification: |
-          Clear error reporting on invalid version inputs allows users and CI/CD pipelines
-          to detect and diagnose problems quickly without inspecting logs for root causes.
-        tests:
-          - Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode
+          - id: BuildMark-Program-ErrorHandling-InvalidBuildVersion
+            title: >-
+              The Program class shall report an error and set exit code 1 when an invalid
+              build version is provided.
+            justification: |
+              Clear error reporting on invalid version inputs allows users and CI/CD pipelines
+              to detect and diagnose problems quickly without inspecting logs for root causes.
+            tests:
+              - Program_Run_InvalidBuildVersion_WritesErrorAndSetsExitCode
 
-      - id: BuildMark-Program-ErrorHandling-ConnectorFailure
-        title: >-
-          The Program class shall report an error and set exit code 1 when the repository
-          connector fails during data retrieval.
-        justification: |
-          Clear error reporting on connector failures allows users and CI/CD pipelines to
-          detect and diagnose integration problems quickly without inspecting logs for root
-          causes.
-        tests:
-          - Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode
+          - id: BuildMark-Program-ErrorHandling-ConnectorFailure
+            title: >-
+              The Program class shall report an error and set exit code 1 when the repository
+              connector fails during data retrieval.
+            justification: |
+              Clear error reporting on connector failures allows users and CI/CD pipelines to
+              detect and diagnose integration problems quickly without inspecting logs for root
+              causes.
+            tests:
+              - Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode

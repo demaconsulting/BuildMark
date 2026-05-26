@@ -1,55 +1,51 @@
 ---
-# Utilities Subsystem Requirements
-#
-# PURPOSE:
-# - Define requirements for the BuildMark Utilities subsystem
-# - The Utilities subsystem spans PathHelpers.cs, ProcessRunner.cs, and TemporaryDirectory.cs
-# - Subsystem requirements describe the shared utility behavior available to all other subsystems
-
+# BuildMark Utilities subsystem requirements
 sections:
-  - title: Utilities Subsystem Requirements
-    requirements:
-      - id: BuildMark-Utilities-SafePaths
-        title: The Utilities subsystem shall provide safe file path manipulation that prevents path traversal.
-        justification: |
-          The Utilities subsystem provides shared path utilities consumed by other subsystems.
-          When constructing file paths from caller-supplied inputs, the subsystem must reject
-          path traversal sequences (such as '..') and absolute paths to prevent unintended
-          file system access. This requirement captures the subsystem-level safety guarantee
-          that all consumers of the Utilities subsystem can rely upon.
-        tests:
-          - Utilities_SafePaths_ValidPaths_CombinesCorrectly
-          - Utilities_SafePaths_TraversalPath_ThrowsException
-          - Utilities_SafePaths_AbsolutePath_ThrowsException
-        children:
-          - BuildMark-PathHelpers-SafeCombine
+  - title: BuildMark Requirements
+    sections:
+      - title: Utilities Requirements
+        requirements:
+          - id: BuildMark-Utilities-SafePaths
+            title: The Utilities subsystem shall provide safe file path manipulation that prevents path traversal.
+            justification: |
+              The Utilities subsystem provides shared path utilities consumed by other subsystems.
+              When constructing file paths from caller-supplied inputs, the subsystem must reject
+              path traversal sequences (such as '..') and absolute paths to prevent unintended
+              file system access. This requirement captures the subsystem-level safety guarantee
+              that all consumers of the Utilities subsystem can rely upon.
+            tests:
+              - Utilities_SafePaths_ValidPaths_CombinesCorrectly
+              - Utilities_SafePaths_TraversalPath_ThrowsException
+              - Utilities_SafePaths_AbsolutePath_ThrowsException
+            children:
+              - BuildMark-PathHelpers-SafeCombine
 
-      - id: BuildMark-Utilities-ProcessRunner
-        title: The Utilities subsystem shall provide a process execution utility for running external shell commands.
-        justification: |
-          Multiple subsystems need to execute shell commands (e.g., git, gh CLI) to retrieve
-          repository information and authentication tokens. Placing ProcessRunner in the shared
-          Utilities subsystem ensures a consistent, testable interface with proper error
-          handling, avoiding duplication across connector implementations.
-        tests:
-          - Utilities_ProcessRunner_ValidCommand_ReturnsOutput
-          - Utilities_ProcessRunner_InvalidCommand_ReturnsNull
-          - Utilities_ProcessRunner_FailingCommand_ThrowsException
-        children:
-          - BuildMark-ProcessRunner-RunAsync
+          - id: BuildMark-Utilities-ProcessRunner
+            title: The Utilities subsystem shall provide a process execution utility for running external shell commands.
+            justification: |
+              Multiple subsystems need to execute shell commands (e.g., git, gh CLI) to retrieve
+              repository information and authentication tokens. Placing ProcessRunner in the shared
+              Utilities subsystem ensures a consistent, testable interface with proper error
+              handling, avoiding duplication across connector implementations.
+            tests:
+              - Utilities_ProcessRunner_ValidCommand_ReturnsOutput
+              - Utilities_ProcessRunner_InvalidCommand_ReturnsNull
+              - Utilities_ProcessRunner_FailingCommand_ThrowsException
+            children:
+              - BuildMark-ProcessRunner-RunAsync
 
-      - id: BuildMark-Utilities-TemporaryDirectory
-        title: The Utilities subsystem shall provide a disposable temporary directory for isolating file-system artifacts.
-        justification: |
-          Multiple subsystems need a safe, isolated location to write temporary files during
-          self-test and integration operations. Placing TemporaryDirectory in the shared
-          Utilities subsystem ensures consistent creation, path-safety, and cleanup behavior
-          across all consumers, without each caller reimplementing ad-hoc temporary-file logic.
-        tests:
-          - TemporaryDirectory_Constructor_CreatesDirectory
-          - TemporaryDirectory_Dispose_DeletesDirectory
-        children:
-          - BuildMark-TemporaryDirectory-Creation
-          - BuildMark-TemporaryDirectory-FilePath
-          - BuildMark-TemporaryDirectory-Traversal
-          - BuildMark-TemporaryDirectory-Cleanup
+          - id: BuildMark-Utilities-TemporaryDirectory
+            title: The Utilities subsystem shall provide a disposable temporary directory for isolating file-system artifacts.
+            justification: |
+              Multiple subsystems need a safe, isolated location to write temporary files during
+              self-test and integration operations. Placing TemporaryDirectory in the shared
+              Utilities subsystem ensures consistent creation, path-safety, and cleanup behavior
+              across all consumers, without each caller reimplementing ad-hoc temporary-file logic.
+            tests:
+              - TemporaryDirectory_Constructor_CreatesDirectory
+              - TemporaryDirectory_Dispose_DeletesDirectory
+            children:
+              - BuildMark-TemporaryDirectory-Creation
+              - BuildMark-TemporaryDirectory-FilePath
+              - BuildMark-TemporaryDirectory-Traversal
+              - BuildMark-TemporaryDirectory-Cleanup

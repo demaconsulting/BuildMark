@@ -1,37 +1,17 @@
 # Introduction
 
-This document contains the requirements for the BuildMark project.
+This document lists all requirements for BuildMark.
 
 ## Purpose
 
-BuildMark is a .NET command-line tool that generates comprehensive markdown build notes reports from
-Git repository history and issue-tracking systems. It analyzes commits, pull requests, and issues to
-create human-readable build notes, making it easy to integrate release documentation into CI/CD
-pipelines and documentation workflows.
+To provide a complete, traceable record of all requirements for BuildMark,
+including requirements at the system, subsystem, and unit levels, plus OTS and Shared Package requirements.
 
 ## Scope
 
-This requirements document covers:
-
-- Command-line interface and options
-- Git repository integration
-- GitHub integration for issues and pull requests
-- Azure DevOps integration for work items and pull requests
-- Markdown report generation capabilities
-- Validation and self-testing features
-- Data models and repository connectors
-- Platform support for Windows, Linux, and multiple .NET runtimes
-
-## Audience
-
-This document is intended for:
-
-- Software developers working on BuildMark
-- Quality assurance teams validating requirements
-- Project stakeholders reviewing project scope
-- Users understanding the tool's capabilities
+This document covers all requirements defined in `docs/reqstream/` for BuildMark.
 
 ## References
 
-- [BuildMark Releases](https://github.com/demaconsulting/BuildMark/releases) —
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) —
   compiled requirements, trace matrix, and quality reports

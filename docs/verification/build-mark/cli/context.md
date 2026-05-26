@@ -1,398 +1,173 @@
-### Context Verification
-
-This document describes the unit-level verification design for the `Context` unit. It defines the
-test scenarios, dependency usage, and requirement coverage for `Cli/Context.cs`.
+### Context
 
 #### Verification Approach
 
-`Context` is verified with unit tests defined in `ContextTests.cs`. Because `Context` depends only
-on .NET base class library types (`Console`, `StreamWriter`, `Path`), no mocking or test doubles
-are required. Tests call `Context.Create` with controlled argument arrays, inspect the resulting
+`Context` is verified with unit tests in `ContextTests.cs`. Because `Context` depends only on .NET
+base class library types (`Console`, `StreamWriter`, `Path`), no mocking or test doubles are
+required. Tests call `Context.Create` with controlled argument arrays, inspect the resulting
 properties and exit codes, and verify output written to captured streams.
-
-#### Dependencies
-
-`Context` has no dependencies on other tool units. All dependencies are real .NET BCL types;
-no mocking is needed at this level.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment. `ContextTests.cs` runs within the standard `dotnet test` host;
+no external dependencies are required beyond temporary log files created by log-related tests.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All tests in `ContextTests.cs` pass with zero failures.
+- Flag parsing, argument parsing, output routing, silent mode, log file, exit code, and error
+  handling paths are all covered.
 
 #### Test Scenarios
 
-##### Context_Create_EmptyArguments_CreatesValidContext
+**Context_Create_EmptyArguments_CreatesValidContext**: Verifies that `Context.Create` with an empty
+argument array initializes successfully with all boolean flags false, `ResultsFile` null, `Depth`
+null, and `ExitCode` 0.
+This scenario is tested by `Context_Create_EmptyArguments_CreatesValidContext`.
 
-**Scenario**: `Context.Create` is called with an empty argument array.
+**Context_Create_ShortVersionFlag_SetsVersionProperty**: Verifies that `["-v"]` sets the `Version`
+property to true. This scenario is tested by
+`Context_Create_ShortVersionFlag_SetsVersionProperty`.
 
-**Expected**: All boolean flags are false; `ResultsFile` is null; `Depth` is null;
-exit code is 0.
+**Context_Create_LongVersionFlag_SetsVersionProperty**: Verifies that `["--version"]` sets the
+`Version` property to true. This scenario is tested by
+`Context_Create_LongVersionFlag_SetsVersionProperty`.
 
-**Requirement coverage**: `BuildMark-Context-DefaultConstruction`.
+**Context_Create_QuestionMarkHelpFlag_SetsHelpProperty**: Verifies that `["-?"]` sets the `Help`
+property to true. This scenario is tested by
+`Context_Create_QuestionMarkHelpFlag_SetsHelpProperty`.
 
-##### Context_Create_ShortVersionFlag_SetsVersionProperty
+**Context_Create_ShortHelpFlag_SetsHelpProperty**: Verifies that `["-h"]` sets the `Help` property
+to true. This scenario is tested by `Context_Create_ShortHelpFlag_SetsHelpProperty`.
 
-**Scenario**: `Context.Create` is called with `["-v"]`.
+**Context_Create_LongHelpFlag_SetsHelpProperty**: Verifies that `["--help"]` sets the `Help`
+property to true. This scenario is tested by `Context_Create_LongHelpFlag_SetsHelpProperty`.
 
-**Expected**: `Version` property is true.
+**Context_Create_SilentFlag_SetsSilentProperty**: Verifies that `["--silent"]` sets the `Silent`
+property to true. This scenario is tested by `Context_Create_SilentFlag_SetsSilentProperty`.
+
+**Context_Create_ValidateFlag_SetsValidateProperty**: Verifies that `["--validate"]` sets the
+`Validate` property to true.
+This scenario is tested by `Context_Create_ValidateFlag_SetsValidateProperty`.
+
+**Context_Create_LintFlag_SetsLintProperty**: Verifies that `["--lint"]` sets the `Lint` property
+to true. This scenario is tested by `Context_Create_LintFlag_SetsLintProperty`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_BuildVersionArgument_SetsBuildVersionProperty**: Verifies that
+`["--build-version", "1.2.3"]` sets `BuildVersion` to `"1.2.3"`.
+This scenario is tested by `Context_Create_BuildVersionArgument_SetsBuildVersionProperty`.
 
-##### Context_Create_LongVersionFlag_SetsVersionProperty
+**Context_Create_ReportArgument_SetsReportFileProperty**: Verifies that `["--report", "output.md"]`
+sets `ReportFile` to `"output.md"`.
+This scenario is tested by `Context_Create_ReportArgument_SetsReportFileProperty`.
 
-**Scenario**: `Context.Create` is called with `["--version"]`.
+**Context_Create_DepthArgument_SetsDepthProperty**: Verifies that `["--depth", "3"]` sets `Depth`
+to 3. This scenario is tested by `Context_Create_DepthArgument_SetsDepthProperty`.
 
-**Expected**: `Version` property is true.
+**Context_Create_LegacyReportDepthArgument_SetsDepthProperty**: Verifies that the legacy alias
+`["--report-depth", "3"]` sets `Depth` to 3 identically to `--depth`.
+This scenario is tested by `Context_Create_LegacyReportDepthArgument_SetsDepthProperty`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty**: Verifies that
+`["--include-known-issues"]` sets `IncludeKnownIssues` to true.
+This scenario is tested by
+`Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty`.
 
-##### Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
+**Context_Create_ResultsArgument_SetsResultsFileProperty**: Verifies that
+`["--results", "output.trx"]` sets `ResultsFile` to `"output.trx"`.
+This scenario is tested by `Context_Create_ResultsArgument_SetsResultsFileProperty`.
 
-**Scenario**: `Context.Create` is called with `["-?"]`.
+**Context_Create_ResultArgument_SetsResultsFileProperty**: Verifies that the `--result` alias sets
+`ResultsFile` identically to `--results`.
+This scenario is tested by `Context_Create_ResultArgument_SetsResultsFileProperty`.
 
-**Expected**: `Help` property is true.
+**Context_Create_LogArgument_CreatesLogFile**: Verifies that `["--log", "<tmp>.log"]` creates the
+log file and routes a subsequent `WriteLine` call to it.
+This scenario is tested by `Context_Create_LogArgument_CreatesLogFile`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_MultipleArguments_SetsAllPropertiesCorrectly**: Verifies that all flags and
+arguments in a combined invocation are parsed correctly in a single context creation.
+This scenario is tested by `Context_Create_MultipleArguments_SetsAllPropertiesCorrectly`.
 
-##### Context_Create_ShortHelpFlag_SetsHelpProperty
+**Context_Create_UnsupportedArgument_ThrowsArgumentException**: Verifies that `["--unsupported"]`
+throws an `ArgumentException` containing "Unsupported argument".
+This scenario is tested by `Context_Create_UnsupportedArgument_ThrowsArgumentException`.
 
-**Scenario**: `Context.Create` is called with `["-h"]`.
+**Context_Create_BuildVersionWithoutValue_ThrowsArgumentException**: Verifies that
+`["--build-version"]` without a value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_BuildVersionWithoutValue_ThrowsArgumentException`.
 
-**Expected**: `Help` property is true.
+**Context_Create_ReportWithoutValue_ThrowsArgumentException**: Verifies that `["--report"]`
+without a value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_ReportWithoutValue_ThrowsArgumentException`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_DepthWithoutValue_ThrowsArgumentException**: Verifies that `["--depth"]` without
+a value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_DepthWithoutValue_ThrowsArgumentException`.
 
-##### Context_Create_LongHelpFlag_SetsHelpProperty
+**Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException**: Verifies that
+`["--depth", "abc"]` throws an `ArgumentException`.
+This scenario is tested by `Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException`.
 
-**Scenario**: `Context.Create` is called with `["--help"]`.
+**Context_Create_DepthWithZeroValue_ThrowsArgumentException**: Verifies that `["--depth", "0"]`
+(below the minimum of 1) throws an `ArgumentException`.
+This scenario is tested by `Context_Create_DepthWithZeroValue_ThrowsArgumentException`.
 
-**Expected**: `Help` property is true.
+**Context_Create_DepthWithNegativeValue_ThrowsArgumentException**: Verifies that
+`["--depth", "-1"]` (negative value) throws an `ArgumentException`.
+This scenario is tested by `Context_Create_DepthWithNegativeValue_ThrowsArgumentException`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException**: Verifies that
+`["--depth", "7"]` (above the maximum of 6) throws an `ArgumentOutOfRangeException`.
+This scenario is tested by
+`Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException`.
 
-##### Context_Create_SilentFlag_SetsSilentProperty
+**Context_Create_ResultsWithoutValue_ThrowsArgumentException**: Verifies that `["--results"]`
+without a value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_ResultsWithoutValue_ThrowsArgumentException`.
 
-**Scenario**: `Context.Create` is called with `["--silent"]`.
+**Context_Create_ResultWithoutValue_ThrowsArgumentException**: Verifies that `["--result"]`
+without a value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_ResultWithoutValue_ThrowsArgumentException`.
 
-**Expected**: `Silent` property is true.
+**Context_Create_LogWithoutValue_ThrowsArgumentException**: Verifies that `["--log"]` without a
+value throws an `ArgumentException`.
+This scenario is tested by `Context_Create_LogWithoutValue_ThrowsArgumentException`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException**: Verifies that supplying an
+invalid log file path throws an `InvalidOperationException`.
+This scenario is tested by `Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException`.
 
-##### Context_Create_ValidateFlag_SetsValidateProperty
+**Context_WriteLine_NotSilent_WritesToConsole**: Verifies that a non-silent context writes to
+standard output when `WriteLine` is called.
+This scenario is tested by `Context_WriteLine_NotSilent_WritesToConsole`.
 
-**Scenario**: `Context.Create` is called with `["--validate"]`.
+**Context_WriteLine_Silent_DoesNotWriteToConsole**: Verifies that a silent context does not write
+to standard output when `WriteLine` is called.
+This scenario is tested by `Context_WriteLine_Silent_DoesNotWriteToConsole`.
 
-**Expected**: `Validate` property is true.
+**Context_WriteLine_WithLogFile_WritesToLogFile**: Verifies that a context with a log file routes
+`WriteLine` output to the log file.
+This scenario is tested by `Context_WriteLine_WithLogFile_WritesToLogFile`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_WriteError_NotSilent_WritesToConsole**: Verifies that a non-silent context writes to
+standard error when `WriteError` is called.
+This scenario is tested by `Context_WriteError_NotSilent_WritesToConsole`.
 
-##### Context_Create_LintFlag_SetsLintProperty
+**Context_WriteError_Silent_DoesNotWriteToConsole**: Verifies that a silent context does not write
+to standard error when `WriteError` is called.
+This scenario is tested by `Context_WriteError_Silent_DoesNotWriteToConsole`.
 
-**Scenario**: `Context.Create` is called with `["--lint"]`.
+**Context_WriteError_WithLogFile_WritesToLogFile**: Verifies that a context with a log file routes
+`WriteError` output to the log file.
+This scenario is tested by `Context_WriteError_WithLogFile_WritesToLogFile`.
 
-**Expected**: `Lint` property is true.
+**Context_WriteError_SetsExitCodeToOne**: Verifies that calling `WriteError` on a context sets
+`ExitCode` to 1. This scenario is tested by `Context_WriteError_SetsExitCodeToOne`.
 
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
+**Context_ExitCode_NoErrors_RemainsZero**: Verifies that a context with no errors written retains
+`ExitCode` of 0. This scenario is tested by `Context_ExitCode_NoErrors_RemainsZero`.
 
-##### Context_Create_BuildVersionArgument_SetsBuildVersionProperty
-
-**Scenario**: `Context.Create` is called with `["--build-version", "1.2.3"]`.
-
-**Expected**: `BuildVersion` property equals `"1.2.3"`.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_ReportArgument_SetsReportFileProperty
-
-**Scenario**: `Context.Create` is called with `["--report", "output.md"]`.
-
-**Expected**: `ReportFile` property equals `"output.md"`.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_DepthArgument_SetsDepthProperty
-
-**Scenario**: `Context.Create` is called with `["--depth", "3"]`.
-
-**Expected**: `Depth` property equals 3.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_LegacyReportDepthArgument_SetsDepthProperty
-
-**Scenario**: `Context.Create` is called with `["--report-depth", "3"]` (legacy alias for
-`--depth`).
-
-**Expected**: `Depth` property equals 3.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
-
-**Scenario**: `Context.Create` is called with `["--include-known-issues"]`.
-
-**Expected**: `IncludeKnownIssues` property is true.
-
-**Requirement coverage**: `BuildMark-Context-FlagParsing`.
-
-##### Context_Create_ResultsArgument_SetsResultsFileProperty
-
-**Scenario**: `Context.Create` is called with `["--results", "output.trx"]`.
-
-**Expected**: `ResultsFile` property equals `"output.trx"`.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_ResultArgument_SetsResultsFileProperty
-
-**Scenario**: `Context.Create` is called with `["--result", "output.trx"]` (alias).
-
-**Expected**: `ResultsFile` property equals `"output.trx"`.
-
-**Requirement coverage**: `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_LogArgument_CreatesLogFile
-
-**Scenario**: `Context.Create` is called with `["--log", "<tmp>.log"]`; `WriteLine` is then called
-with a test message.
-
-**Expected**: The log file is created; the test message is written to it.
-
-**Requirement coverage**: `BuildMark-Context-LogFile`.
-
-##### Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
-
-**Scenario**: `Context.Create` is called with `["--silent", "--validate", "--lint",
-"--build-version", "1.2.3", "--report", "report.md", "--depth", "2",
-"--include-known-issues", "--results", "results.trx"]`.
-
-**Expected**: `Silent`, `Validate`, `Lint`, and `IncludeKnownIssues` are true; `BuildVersion`
-equals `"1.2.3"`; `ReportFile` equals `"report.md"`; `Depth` equals 2; `ResultsFile` equals
-`"results.trx"`; no exception is thrown.
-
-**Requirement coverage**: `BuildMark-Context-FlagParsing`, `BuildMark-Context-ArgumentParsing`.
-
-##### Context_Create_UnsupportedArgument_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--unsupported"]`.
-
-**Expected**: An `ArgumentException` is thrown containing the text "Unsupported argument".
-
-**Boundary / error path**: Unknown argument rejection.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--build-version"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_ReportWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--report"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_DepthWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--depth"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--depth", "abc"]`.
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_DepthWithZeroValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--depth", "0"]` (below minimum of 1).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_DepthWithNegativeValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--depth", "-1"]` (negative value).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
-
-**Scenario**: `Context.Create` is called with `["--depth", "7"]` (above the maximum of 6).
-
-**Expected**: An `ArgumentOutOfRangeException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_ResultsWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--results"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_ResultWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--result"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_LogWithoutValue_ThrowsArgumentException
-
-**Scenario**: `Context.Create` is called with `["--log"]` (value missing).
-
-**Expected**: An `ArgumentException` is thrown.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
-
-**Scenario**: `Context.Create` is called with `["--log", "<invalid-path>"]`.
-
-**Expected**: An `InvalidOperationException` is thrown when the log file cannot be created.
-
-**Requirement coverage**: `BuildMark-Context-ErrorHandling`.
-
-##### Context_WriteLine_NotSilent_WritesToConsole
-
-**Scenario**: A non-silent `Context` is created and `WriteLine` is called with a test message.
-
-**Expected**: The test message appears on standard output.
-
-**Requirement coverage**: `BuildMark-Context-Output`.
-
-##### Context_WriteLine_Silent_DoesNotWriteToConsole
-
-**Scenario**: A silent `Context` (created with `["--silent"]`) calls `WriteLine`.
-
-**Expected**: Standard output receives nothing.
-
-**Requirement coverage**: `BuildMark-Context-SilentMode`.
-
-##### Context_WriteLine_WithLogFile_WritesToLogFile
-
-**Scenario**: A `Context` created with a log file calls `WriteLine` with a test message.
-
-**Expected**: The test message appears in the log file.
-
-**Requirement coverage**: `BuildMark-Context-LogFile`.
-
-##### Context_WriteError_NotSilent_WritesToConsole
-
-**Scenario**: A non-silent `Context` calls `WriteError` with a test message.
-
-**Expected**: The test message appears on standard error.
-
-**Requirement coverage**: `BuildMark-Context-Output`.
-
-##### Context_WriteError_Silent_DoesNotWriteToConsole
-
-**Scenario**: A silent `Context` calls `WriteError`.
-
-**Expected**: Standard error receives nothing.
-
-**Requirement coverage**: `BuildMark-Context-SilentMode`.
-
-##### Context_WriteError_WithLogFile_WritesToLogFile
-
-**Scenario**: A `Context` created with a log file calls `WriteError` with a test message.
-
-**Expected**: The test message appears in the log file.
-
-**Requirement coverage**: `BuildMark-Context-LogFile`.
-
-##### Context_WriteError_SetsExitCodeToOne
-
-**Scenario**: A `Context` calls `WriteError`.
-
-**Expected**: `ExitCode` is 1 after the call.
-
-**Requirement coverage**: `BuildMark-Context-ExitCode`.
-
-##### Context_ExitCode_NoErrors_RemainsZero
-
-**Scenario**: A `Context` is created and no errors are written.
-
-**Expected**: `ExitCode` remains 0.
-
-**Requirement coverage**: `BuildMark-Context-ExitCode`.
-
-##### Context_Dispose_ClosesLogFileProperly
-
-**Scenario**: A `Context` with a log file is disposed.
-
-**Expected**: The log file is properly closed without error.
-
-**Requirement coverage**: `BuildMark-Context-LogFile`.
-
-#### Requirements Coverage
-
-- **`BuildMark-Context-DefaultConstruction`**:
-  - Context_Create_EmptyArguments_CreatesValidContext
-- **`BuildMark-Context-FlagParsing`**:
-  - Context_Create_ShortVersionFlag_SetsVersionProperty
-  - Context_Create_LongVersionFlag_SetsVersionProperty
-  - Context_Create_QuestionMarkHelpFlag_SetsHelpProperty
-  - Context_Create_ShortHelpFlag_SetsHelpProperty
-  - Context_Create_LongHelpFlag_SetsHelpProperty
-  - Context_Create_SilentFlag_SetsSilentProperty
-  - Context_Create_ValidateFlag_SetsValidateProperty
-  - Context_Create_LintFlag_SetsLintProperty
-  - Context_Create_IncludeKnownIssuesFlag_SetsIncludeKnownIssuesProperty
-  - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
-- **`BuildMark-Context-ArgumentParsing`**:
-  - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
-  - Context_Create_ReportArgument_SetsReportFileProperty
-  - Context_Create_DepthArgument_SetsDepthProperty
-  - Context_Create_LegacyReportDepthArgument_SetsDepthProperty
-  - Context_Create_ResultsArgument_SetsResultsFileProperty
-  - Context_Create_ResultArgument_SetsResultsFileProperty
-  - Context_Create_MultipleArguments_SetsAllPropertiesCorrectly
-- **`BuildMark-Context-LogFile`**:
-  - Context_Create_LogArgument_CreatesLogFile
-  - Context_WriteLine_WithLogFile_WritesToLogFile
-  - Context_WriteError_WithLogFile_WritesToLogFile
-  - Context_Dispose_ClosesLogFileProperly
-- **`BuildMark-Context-ErrorHandling`**:
-  - Context_Create_UnsupportedArgument_ThrowsArgumentException
-  - Context_Create_BuildVersionWithoutValue_ThrowsArgumentException
-  - Context_Create_ReportWithoutValue_ThrowsArgumentException
-  - Context_Create_DepthWithoutValue_ThrowsArgumentException
-  - Context_Create_DepthWithNonIntegerValue_ThrowsArgumentException
-  - Context_Create_DepthWithZeroValue_ThrowsArgumentException
-  - Context_Create_DepthWithNegativeValue_ThrowsArgumentException
-  - Context_Create_DepthExceedingMaximum_ThrowsArgumentOutOfRangeException
-  - Context_Create_ResultsWithoutValue_ThrowsArgumentException
-  - Context_Create_ResultWithoutValue_ThrowsArgumentException
-  - Context_Create_LogWithoutValue_ThrowsArgumentException
-  - Context_Create_InvalidLogFilePath_ThrowsInvalidOperationException
-- **`BuildMark-Context-Output`**:
-  - Context_WriteLine_NotSilent_WritesToConsole
-  - Context_WriteError_NotSilent_WritesToConsole
-- **`BuildMark-Context-SilentMode`**:
-  - Context_WriteLine_Silent_DoesNotWriteToConsole
-  - Context_WriteError_Silent_DoesNotWriteToConsole
-- **`BuildMark-Context-ExitCode`**:
-  - Context_WriteError_SetsExitCodeToOne
-  - Context_ExitCode_NoErrors_RemainsZero
+**Context_Dispose_ClosesLogFileProperly**: Verifies that disposing a context with an open log file
+closes the file without error.
+This scenario is tested by `Context_Dispose_ClosesLogFileProperly`.

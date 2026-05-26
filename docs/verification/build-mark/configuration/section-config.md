@@ -2,39 +2,24 @@
 
 #### Verification Approach
 
-`SectionConfig` is verified through `ConfigurationTests.cs`. The test
-`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection` calls
-`BuildMarkConfig.CreateDefault()` and asserts on the `Id` and `Title` properties of the returned
-sections. No mocking is required.
-
-#### Dependencies
-
-| Mock / Stub | Reason          |
-| ----------- | --------------- |
-| None        | No mocks needed |
+`SectionConfig` is a data model unit with no external dependencies. It is verified through
+`ConfigurationTests.cs` via `BuildMarkConfig.CreateDefault()`, which constructs a `SectionConfig`
+collection and allows `Id` and `Title` properties to be asserted. No mocking is required.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All unit tests in `ConfigurationTests.cs` that inspect `SectionConfig` instances pass with zero
+  failures.
 
 #### Test Scenarios
 
-##### BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
-
-**Scenario**: `BuildMarkConfig.CreateDefault()` is called; the returned `Sections` collection is
-inspected.
-
-**Expected**: Three sections are present with ids `"changes"`, `"bugs-fixed"`, and
-`"dependency-updates"` and corresponding titles `"Changes"`, `"Bugs Fixed"`, and
-`"Dependency Updates"`.
-
-**Requirement coverage**: `BuildMark-SectionConfig-Properties`.
-
-#### Requirements Coverage
-
-- **`BuildMark-SectionConfig-Properties`**:
-  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
+**BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection**: `BuildMarkConfig.CreateDefault()`
+is called and the returned `Sections` collection is inspected. Three sections must be present with
+ids `"changes"`, `"bugs-fixed"`, and `"dependency-updates"` and their corresponding titles
+`"Changes"`, `"Bugs Fixed"`, and `"Dependency Updates"`, confirming that all section id and title
+fields are mapped correctly. This scenario is tested by
+`BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection`.

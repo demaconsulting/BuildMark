@@ -1,16 +1,14 @@
 ---
 title: BuildMark Code Quality Report
-subtitle: Code Quality Analysis Report
+subtitle: Markdown Build Notes Generation Tool
 author: DEMA Consulting
-description: Code Quality Analysis Report for the BuildMark Tool
+description: Code Quality Report for BuildMark
 lang: en-US
 keywords:
-  - BuildMark
   - Code Quality
+  - Static Analysis
   - SonarCloud
   - CodeQL
-  - Analysis
   - C#
   - .NET
-  - Documentation
 ---

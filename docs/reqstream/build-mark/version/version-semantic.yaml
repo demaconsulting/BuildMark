@@ -1,23 +1,26 @@
 ---
-# Version Semantic Requirements
-
+# BuildMark VersionSemantic unit requirements
 sections:
-  - title: VersionSemantic Requirements
-    requirements:
-      - id: BuildMark-VersionSemantic-FullVersion
-        title: >-
-          VersionSemantic shall represent a complete semantic version including
-          optional build metadata, with version precedence based on the major,
-          minor, patch, and pre-release components.
-        justification: |
-          Semantic versioning includes build metadata (e.g., +build.123) that
-          does not affect version precedence. VersionSemantic must preserve the
-          full string representation while correctly ordering versions based only
-          on the numeric and pre-release components.
-        tests:
-          - VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
-          - VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
-          - VersionSemantic_Properties_DelegateToComparable_Correctly
-          - VersionSemantic_ToString_FormatsCompletely_WithAllComponents
-          - VersionSemantic_TryCreate_InvalidVersion_ReturnsNull
-          - VersionSemantic_PreRelease_ReturnsEmptyStringForRelease
+  - title: BuildMark Requirements
+    sections:
+      - title: Version Requirements
+        sections:
+          - title: VersionSemantic Requirements
+            requirements:
+              - id: BuildMark-VersionSemantic-FullVersion
+                title: >-
+                  VersionSemantic shall represent a complete semantic version including
+                  optional build metadata, with version precedence based on the major,
+                  minor, patch, and pre-release components.
+                justification: |
+                  Semantic versioning includes build metadata (e.g., +build.123) that
+                  does not affect version precedence. VersionSemantic must preserve the
+                  full string representation while correctly ordering versions based only
+                  on the numeric and pre-release components.
+                tests:
+                  - VersionSemantic_Create_WithBuildMetadata_ReturnsInstance
+                  - VersionSemantic_Create_WithoutBuildMetadata_ReturnsInstance
+                  - VersionSemantic_Properties_DelegateToComparable_Correctly
+                  - VersionSemantic_ToString_FormatsCompletely_WithAllComponents
+                  - VersionSemantic_TryCreate_InvalidVersion_ReturnsNull
+                  - VersionSemantic_PreRelease_ReturnsEmptyStringForRelease

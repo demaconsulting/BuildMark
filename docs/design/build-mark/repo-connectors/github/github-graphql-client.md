@@ -2,83 +2,101 @@
 
 ##### Purpose
 
-`GitHubGraphQLClient` is the GitHub subsystem unit responsible for issuing
-paginated GraphQL requests to the GitHub API and translating the responses into
-typed records for connector consumption. `GitHubRepoConnector` delegates all
-GitHub API communication to this client.
+`GitHubGraphQLClient` is the unit responsible for issuing paginated GraphQL requests to the GitHub
+API and deserializing responses into typed `GitHubGraphQLTypes` records for consumption by
+`GitHubRepoConnector`. All GitHub API communication is delegated to this client.
 
-##### Constructors
-
-The class provides two constructors:
-
-- **Public constructor** - accepts a GitHub authentication token and an optional
-  `graphqlEndpoint` URL, then creates an owned `HttpClient` configured with the
-  token and wraps it in a `GraphQLHttpClient` instance (from the `GraphQL.Client.Http`
-  package). Used by `GitHubRepoConnector` in production. When `graphqlEndpoint` is
-  omitted, the default GitHub GraphQL API endpoint (`https://api.github.com/graphql`)
-  is used. For GitHub Enterprise Server, supply the enterprise-specific endpoint
-  (e.g., `https://your-github-enterprise/api/graphql`).
-- **Internal constructor** - accepts an existing `HttpClient` directly and an optional
-  `graphqlEndpoint` URL. Used by tests to inject a mock `HttpClient` without network
-  access.
-
-##### Lifecycle
-
-`GitHubGraphQLClient` implements `IDisposable`. When created via the public
-constructor, the instance owns its `GraphQLHttpClient` (and the `HttpClient` it wraps)
-and disposes them when the client is disposed. When created via the internal
-constructor, the caller retains ownership of the `HttpClient` and the client does
-not dispose it.
-
-Callers that construct `GitHubGraphQLClient` via the public constructor must
-wrap usage in a `using` statement or otherwise dispose the instance to release
-the underlying HTTP connection resources.
-
-##### Error Handling
-
-All API methods catch exceptions from the underlying `GraphQLHttpClient` and return
-empty lists rather than propagating the exception to the caller. This allows
-the connector to continue with partial data when the GitHub API is transiently
-unavailable.
-
-> **Note**: Because exceptions are silently swallowed and an empty list is returned,
-> runtime failures (network errors, authentication failures, malformed responses) are
-> not observable by the caller. Diagnostics require inspecting log output or
-> correlating an unexpectedly empty result set with network or authentication issues.
+The client authenticates via an `Authorization: bearer <token>` header. It accepts an optional
+`graphqlEndpoint` URL to support GitHub Enterprise Server (default:
+`https://api.github.com/graphql`). The client implements `IDisposable`; when created via the
+public constructor, it owns its `GraphQLHttpClient` (and the underlying `HttpClient`) and disposes
+them on disposal. When created via the internal constructor (for test injection), the caller retains
+ownership of the `HttpClient`.
 
 ##### Data Model
 
-`GitHubGraphQLClient` holds a single `GraphQLHttpClient` instance (from the external
-`GraphQL.Client.Http` NuGet package). The `GraphQLHttpClient` internally manages an
-`HttpClient` for HTTPS transport. When constructed via the public constructor, the
-client owns both the `GraphQLHttpClient` and the underlying `HttpClient` and disposes
-them on disposal. When constructed via the internal constructor (for test injection),
-the caller retains ownership of the `HttpClient` and the client does not dispose
-the injected instance.
+**_graphqlClient**: `GraphQLHttpClient` — The GraphQL HTTP client used for all API communication;
+configured with the authentication header and the GraphQL endpoint URI.
 
-##### Dependencies
-
-| Dependency                 | Package                                    | Purpose                                  |
-| -------------------------- | ------------------------------------------ | ---------------------------------------- |
-| `GraphQLHttpClient`        | `GraphQL.Client.Http`                      | Sends GraphQL queries over HTTPS         |
-| `SystemTextJsonSerializer` | `GraphQL.Client.Serializer.SystemTextJson` | Serializes/deserializes GraphQL payloads |
+**_ownsGraphQLClient**: `bool` — Indicates whether this instance owns the `GraphQLHttpClient` and
+must dispose it; `true` when constructed via the public constructor, `false` when constructed via
+the internal constructor.
 
 ##### Key Methods
 
-The client provides methods for retrieving the repository data needed to build a
-`BuildInformation` record:
+**GitHubGraphQLClient (public constructor)**: Creates a new client owned by this instance.
 
-- `GetCommitsAsync` for commit SHAs in a range
-- `GetReleasesAsync` for release tag names
-- `GetAllTagsAsync` for tag nodes
-- `GetPullRequestsAsync` for pull request data, including description bodies
-- `GetAllIssuesAsync` for issue data, including description bodies
-- `FindIssueIdsLinkedToPullRequestAsync` for cross-link lookups
+- *Parameters*: `string token` — GitHub authentication token; `string? graphqlEndpoint` —
+  optional GraphQL endpoint URL; defaults to `https://api.github.com/graphql`.
+- *Postconditions*: The instance owns its `HttpClient` and `GraphQLHttpClient` and must be
+  disposed by the caller.
 
-##### Interactions
+**GitHubGraphQLClient (internal constructor)**: Creates a new client using an injected
+`HttpClient`; intended for test scenarios.
 
-- `GitHubRepoConnector` creates and calls `GitHubGraphQLClient`.
-- `GitHubGraphQLTypes` provide the request and response record types used for
-  serialization and deserialization.
-- The GitHub GraphQL endpoint provides the remote repository data queried by the
-  client.
+- *Parameters*: `HttpClient httpClient` — pre-configured HTTP client; `string? graphqlEndpoint` —
+  optional GraphQL endpoint URL.
+- *Postconditions*: The caller retains ownership of `httpClient`; this instance does not dispose
+  it.
+
+**GetCommitsAsync**: Returns all commit SHAs reachable from a branch within an optional date range.
+
+- *Parameters*: `string owner`, `string repo`, `string branch` — repository coordinates; optional
+  date filters.
+- *Returns*: `Task<List<string>>` — list of commit SHAs; empty list on error.
+
+**GetReleasesAsync**: Returns all release tag names for the repository.
+
+- *Parameters*: `string owner`, `string repo`.
+- *Returns*: `Task<List<string>>` — list of release tag names; empty list on error.
+
+**GetAllTagsAsync**: Returns all tag nodes for the repository.
+
+- *Parameters*: `string owner`, `string repo`.
+- *Returns*: `Task<List<TagNode>>` — list of tag nodes with name and target commit SHA; empty list
+  on error.
+
+**GetPullRequestsAsync**: Returns all pull request nodes for the repository, including description
+bodies.
+
+- *Parameters*: `string owner`, `string repo`.
+- *Returns*: `Task<List<PullRequestNode>>` — list of pull request nodes including `Body`; empty
+  list on error.
+
+**GetAllIssuesAsync**: Returns all issue nodes for the repository across all states, including
+description bodies.
+
+- *Parameters*: `string owner`, `string repo`.
+- *Returns*: `Task<List<IssueNode>>` — list of issue nodes including `Body`; empty list on error.
+
+**FindIssueIdsLinkedToPullRequestAsync**: Finds issue numbers linked to a specific pull request
+via GitHub's closing-issues cross-reference.
+
+- *Parameters*: `string owner`, `string repo`, `int pullRequestNumber`.
+- *Returns*: `Task<List<int>>` — list of linked issue numbers; empty list on error.
+
+**Dispose**: Releases resources owned by this instance.
+
+- *Postconditions*: If `_ownsGraphQLClient` is true, disposes the `GraphQLHttpClient` (and the
+  underlying `HttpClient`).
+
+##### Error Handling
+
+All API methods catch exceptions from the underlying `GraphQLHttpClient` and return empty lists
+rather than propagating them. This allows `GitHubRepoConnector` to continue with partial data
+when the GitHub API is transiently unavailable. Because exceptions are silently swallowed, runtime
+failures such as network errors, authentication failures, and malformed responses are not directly
+observable by the caller; an unexpectedly empty result set is the only visible symptom.
+
+##### Dependencies
+
+- **GraphQLHttpClient** — from the `GraphQL.Client.Http` NuGet package; sends GraphQL queries over
+  HTTPS.
+- **SystemTextJsonSerializer** — from the `GraphQL.Client.Serializer.SystemTextJson` NuGet
+  package; serializes and deserializes GraphQL payloads.
+- **GitHubGraphQLTypes** — provides the record types used as deserialization targets.
+
+##### Callers
+
+- **GitHubRepoConnector** — creates and calls `GitHubGraphQLClient` for all GraphQL API
+  communication.

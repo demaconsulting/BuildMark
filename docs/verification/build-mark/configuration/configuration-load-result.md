@@ -2,59 +2,37 @@
 
 #### Verification Approach
 
-`ConfigurationLoadResult` is verified with dedicated unit tests in `ConfigurationTests.cs`. Tests
-construct `ConfigurationLoadResult` instances directly with controlled `ConfigurationIssue` entries
-and assert on the behavior of `ReportTo(context)`. No mocking is required.
-
-#### Dependencies
-
-| Mock / Stub | Reason          |
-| ----------- | --------------- |
-| None        | No mocks needed |
+`ConfigurationLoadResult` is verified with unit tests in `ConfigurationTests.cs`. Tests construct
+`ConfigurationLoadResult` instances directly with controlled `ConfigurationIssue` entries and call
+`ReportTo` on a silent `Context`. No mocking is required; the real `Context` is used in silent
+mode.
 
 #### Test Environment
 
-Standard dotnet test host; no external dependencies or environment setup required.
+N/A - standard test environment.
 
 #### Acceptance Criteria
 
-All tests in the test class pass with no errors or warnings.
+- All unit tests in `ConfigurationTests.cs` targeting `ConfigurationLoadResult` pass with zero
+  failures.
 
 #### Test Scenarios
 
-##### ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+**ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode**: A `ConfigurationLoadResult`
+containing one `Error`-severity `ConfigurationIssue` is created and `ReportTo` is called on a
+silent `Context`. The context exit code must equal 1, confirming that error-severity issues cause
+the process to report a failure. This scenario is tested by
+`ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode`.
 
-**Scenario**: A `ConfigurationLoadResult` containing one `Error`-severity issue is created;
-`ReportTo` is called on a silent `Context`.
+**ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode**: A `ConfigurationLoadResult`
+containing one `Warning`-severity `ConfigurationIssue` is created and `ReportTo` is called on a
+silent `Context`. The context exit code must remain 0, confirming that warning-severity issues do
+not escalate to a process failure. This scenario is tested by
+`ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode`.
 
-**Expected**: `context.ExitCode` equals 1.
-
-**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
-
-##### ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
-
-**Scenario**: A `ConfigurationLoadResult` containing one `Warning`-severity issue is created;
-`ReportTo` is called on a silent `Context`.
-
-**Expected**: `context.ExitCode` remains 0.
-
-**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
-
-##### ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
-
-**Scenario**: A `ConfigurationLoadResult` containing an `Error`-severity issue at `FilePath`
-`"/repo/.buildmark.yaml"`, `Line` 7, with description `"Unexpected value"` is created; `ReportTo`
-is called.
-
-**Expected**: `result.HasErrors` is true; `context.ExitCode` is 1;
-`result.Issues[0].FilePath` equals `"/repo/.buildmark.yaml"`; `result.Issues[0].Line` equals 7;
-`result.Issues[0].Description` equals `"Unexpected value"`.
-
-**Requirement coverage**: `BuildMark-ConfigLoadResult-ReportTo`.
-
-#### Requirements Coverage
-
-- **`BuildMark-ConfigLoadResult-ReportTo`**:
-  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
-  - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
-  - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber
+**ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber**: A `ConfigurationLoadResult`
+containing an `Error`-severity issue with `FilePath` `"/repo/.buildmark.yaml"`, `Line` 7, and
+description `"Unexpected value"` is created and `ReportTo` is called. The `HasErrors` flag must
+be true, exit code must be 1, and the issue record must expose the exact `FilePath`, `Line`,
+`Severity`, and `Description` values supplied at construction. This scenario is tested by
+`ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber`.

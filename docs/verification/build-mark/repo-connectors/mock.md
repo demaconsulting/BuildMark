@@ -1,11 +1,10 @@
 ### Mock
 
-#### Verification Strategy
+#### Verification Approach
 
-The Mock sub-subsystem is verified through `MockTests.cs` (3 subsystem-level tests)
-and `MockRepoConnectorTests.cs` (11 unit tests). The subsystem tests confirm
-integration of the mock connector within the broader pipeline. The unit tests are
-described in the individual unit chapter.
+The Mock sub-subsystem is verified through `MockTests.cs` (3 subsystem-level tests) and
+`MockRepoConnectorTests.cs` (12 unit tests). The subsystem tests confirm integration of the mock
+connector within the broader pipeline. The unit tests are described in the individual unit chapter.
 
 #### Dependencies
 
@@ -21,8 +20,8 @@ N/A - standard test environment. The Mock sub-subsystem has no external dependen
 #### Acceptance Criteria
 
 All 3 subsystem tests in `MockTests.cs` pass with zero failures. All
-`BuildMark-RepoConnectors-Mock` requirements have at least one test in the Requirements
-Coverage mapping.
+`BuildMark-RepoConnectors-Mock` requirements have at least one test traced in the ReqStream trace
+matrix.
 
 #### Test Scenarios (Subsystem-Level, MockTests.cs)
 
@@ -36,8 +35,7 @@ Coverage mapping.
 
 ##### Mock_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation
 
-**Scenario**: Mock connector is configured with direct data and `GetBuildInformationAsync`
-is called.
+**Scenario**: Mock connector is configured with direct data and `GetBuildInformationAsync` is called.
 
 **Expected**: Returns the configured `BuildInformation` directly.
 
@@ -50,9 +48,3 @@ is called.
 **Expected**: Returns an empty `BuildInformation`.
 
 **Requirement coverage**: `BuildMark-RepoConnectors-Mock`
-
-#### Requirements Coverage
-
-- **BuildMark-RepoConnectors-IRepoConnector**: Mock_ImplementsInterface_ReturnsTrue
-- **BuildMark-RepoConnectors-Mock**: Mock_GetBuildInformation_WithMockedData_ReturnsValidBuildInformation,
-  Mock_GetBuildInformation_WithNoData_ReturnsEmptyBuildInformation
