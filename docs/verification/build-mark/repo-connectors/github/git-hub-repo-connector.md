@@ -2,8 +2,7 @@
 
 ##### Verification Approach
 
-`GitHubRepoConnector` is tested through `GitHubRepoConnectorTests.cs`, which contains
-35 unit tests. The tests exercise constructor behavior (with and without config),
+`GitHubRepoConnector` is tested through `GitHubRepoConnectorTests.cs`, which contains 35 unit tests. The tests exercise constructor behavior (with and without config),
 the full `GetBuildInformationAsync` pipeline with various scenarios, URL parsing for
 github.com, GitHub Enterprise Cloud, and GitHub Enterprise Server remotes (SSH and HTTPS),
 visibility and type overrides, routing configuration, known issues filtering by affected

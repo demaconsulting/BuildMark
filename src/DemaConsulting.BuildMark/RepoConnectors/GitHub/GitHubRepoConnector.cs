@@ -1149,7 +1149,8 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// </returns>
     /// <exception cref="ArgumentException">
     ///     Thrown when <paramref name="url"/> is not a recognized SSH or HTTPS remote URL,
-    ///     or when the path segment does not contain exactly two slash-separated components.
+    ///     or when the HTTPS path contains fewer than two segments (SSH paths must contain
+    ///     exactly two slash-separated components; HTTPS paths use the last two segments).
     /// </exception>
     private static (string owner, string repo) ParseGitHubUrl(string url)
     {
