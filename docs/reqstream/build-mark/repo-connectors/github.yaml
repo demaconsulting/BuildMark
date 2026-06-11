@@ -32,3 +32,5 @@ sections:
                   - BuildMark-GitHub-GraphQLClient
                   - BuildMark-GitHub-Rules
                   - BuildMark-GitHub-TokenVariable
+                  - BuildMark-GitHub-ParseUrl-SSH
+                  - BuildMark-GitHub-ParseUrl-HTTPS

@@ -18,6 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using System.Reflection;
 using DemaConsulting.BuildMark.Configuration;
 using DemaConsulting.BuildMark.RepoConnectors;
 using DemaConsulting.BuildMark.RepoConnectors.GitHub;
@@ -37,10 +38,13 @@ public class GitHubRepoConnectorTests
     [Fact]
     public void GitHubRepoConnector_Constructor_CreatesInstance()
     {
-        // Create connector
+        // Arrange
+        // (no setup required)
+
+        // Act
         var connector = new GitHubRepoConnector();
 
-        // Verify instance
+        // Assert
         Assert.NotNull(connector);
         Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
     }
@@ -75,10 +79,13 @@ public class GitHubRepoConnectorTests
     [Fact]
     public void GitHubRepoConnector_ImplementsInterface_ReturnsTrue()
     {
-        // Create connector
+        // Arrange
+        // (no setup required)
+
+        // Act
         var connector = new GitHubRepoConnector();
 
-        // Verify interface implementation
+        // Assert
         Assert.IsAssignableFrom<IRepoConnector>(connector);
     }
 
@@ -1155,6 +1162,171 @@ public class GitHubRepoConnectorTests
             Environment.SetEnvironmentVariable(varName, savedValue);
         }
     }
+
+    /// <summary>
+    ///     Validates that a github.com SSH URL is parsed into the correct owner and repository name.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GitHubCom_SSH_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a standard github.com SSH URL
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "git@github.com:owner/repo.git" })!;
+
+        // Assert: owner and repo are extracted correctly
+        Assert.Equal("owner", result.owner);
+        Assert.Equal("repo", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that a github.com HTTPS URL is parsed into the correct owner and repository name.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a standard github.com HTTPS URL
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "https://github.com/owner/repo" })!;
+
+        // Assert: owner and repo are extracted correctly
+        Assert.Equal("owner", result.owner);
+        Assert.Equal("repo", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that a github.com HTTPS URL with a .git suffix is parsed correctly, stripping the suffix.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_WithGitSuffix_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a github.com HTTPS URL that includes a .git suffix
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "https://github.com/owner/repo.git" })!;
+
+        // Assert: .git suffix is stripped and owner and repo are returned correctly
+        Assert.Equal("owner", result.owner);
+        Assert.Equal("repo", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that a GitHub Enterprise Cloud HTTPS URL is parsed into the correct owner and repository name.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GHECloud_HTTPS_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a GitHub Enterprise Cloud (*.ghe.com) HTTPS URL
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "https://hiarc.ghe.com/BreakAway/PyStubGenerator" })!;
+
+        // Assert: owner and repo are extracted correctly from the GHE Cloud hostname
+        Assert.Equal("BreakAway", result.owner);
+        Assert.Equal("PyStubGenerator", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that a GitHub Enterprise Server HTTPS URL is parsed into the correct owner and repository name.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GHEServer_HTTPS_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a GitHub Enterprise Server (on-premises) HTTPS URL
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "https://github.mycompany.com/myorg/myrepo" })!;
+
+        // Assert: owner and repo are extracted correctly from the on-premises hostname
+        Assert.Equal("myorg", result.owner);
+        Assert.Equal("myrepo", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that a GitHub Enterprise Server SSH URL is parsed into the correct owner and repository name.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_GHEServer_SSH_ReturnsOwnerAndRepo()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act: invoke ParseGitHubUrl with a GitHub Enterprise Server (on-premises) SSH URL
+        var result = ((string owner, string repo))method!.Invoke(null, new object[] { "git@github.mycompany.com:myorg/myrepo.git" })!;
+
+        // Assert: owner and repo are extracted correctly from the on-premises SSH remote
+        Assert.Equal("myorg", result.owner);
+        Assert.Equal("myrepo", result.repo);
+    }
+
+    /// <summary>
+    ///     Validates that an unrecognized URL format causes ParseGitHubUrl to throw ArgumentException.
+    /// </summary>
+    [Fact]
+    public void GitHubRepoConnector_ParseGitHubUrl_Invalid_ThrowsArgumentException()
+    {
+        // Arrange: obtain the private static method via reflection
+        var method = typeof(GitHubRepoConnector).GetMethod(
+            "ParseGitHubUrl",
+            BindingFlags.NonPublic | BindingFlags.Static);
+
+        // Act / Assert: invoking ParseGitHubUrl with an invalid URL must throw ArgumentException
+        // (TargetInvocationException wraps the inner ArgumentException when using reflection)
+        var ex = Assert.Throws<System.Reflection.TargetInvocationException>(
+            () => method!.Invoke(null, new object[] { "not-a-url" }));
+        Assert.IsType<ArgumentException>(ex.InnerException);
+    }
+
+    /// <summary>
+    ///     Test that GetBuildInformationAsync generates a changelog URL using the GHE hostname
+    ///     when the git remote URL points to a GitHub Enterprise Server instance.
+    /// </summary>
+    [Fact]
+    public async Task GitHubRepoConnector_GetBuildInformationAsync_GHERemote_ChangelogUrlUsesGHEHost()
+    {
+        // Arrange
+        using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
+            .AddCommitsResponse("commit2", "commit1")
+            .AddReleasesResponse(
+                new MockRelease("v1.1.0", "2024-02-01T00:00:00Z"),
+                new MockRelease("v1.0.0", "2024-01-01T00:00:00Z"))
+            .AddPullRequestsResponse()
+            .AddIssuesResponse()
+            .AddTagsResponse(
+                new MockTag("v1.1.0", "commit2"),
+                new MockTag("v1.0.0", "commit1"));
+
+        using var mockHttpClient = new HttpClient(mockHandler);
+        var connector = new MockableGitHubRepoConnector(mockHttpClient);
+
+        connector.SetCommandResponse("git remote get-url origin", "https://github.mycompany.com/myorg/myrepo.git");
+        connector.SetCommandResponse("git rev-parse --abbrev-ref HEAD", "main");
+        connector.SetCommandResponse("git rev-parse HEAD", "commit2");
+        connector.SetCommandResponse("gh auth token", "test-token");
+
+        // Act
+        var buildInfo = await connector.GetBuildInformationAsync(VersionTag.Create("v1.1.0"));
+
+        // Assert
+        Assert.NotNull(buildInfo.CompleteChangelogLink);
+        Assert.StartsWith("https://github.mycompany.com/", buildInfo.CompleteChangelogLink.TargetUrl);
+    }
 }
-
-

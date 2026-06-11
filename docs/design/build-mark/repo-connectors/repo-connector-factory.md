@@ -41,6 +41,11 @@ bypassing environment-variable checks.
   `github.com`; `GitHubRepoConnector` as the default when `remoteUrl` is null or unrecognized.
 - *Preconditions*: None.
 - *Postconditions*: Returns a non-null `IRepoConnector`.
+- *Note*: GitHub Enterprise Cloud (`*.ghe.com`) and GitHub Enterprise Server (on-premises)
+  remotes do not match the `github.com` substring check and therefore fall through to the
+  default `GitHubRepoConnector`. This is correct and expected behavior: `GitHubRepoConnector`
+  is host-agnostic and handles any GitHub remote regardless of hostname; the factory default
+  ensures that enterprise remotes are processed by the same connector as public GitHub.
 
 Exposed internally so that unit tests can exercise URL-based detection logic without requiring a
 real git process.

@@ -24,7 +24,8 @@ sections:
                   - AzureDevOps_GetBuildInformation_WithOpenWorkItems_IdentifiesKnownIssues
                   - AzureDevOps_GetBuildInformation_ReleaseVersion_SkipsPreReleases
                 children:
-                  - BuildMark-AzureDevOps-UrlParsing
+                  - BuildMark-AzureDevOps-UrlParsing-HTTPS
+                  - BuildMark-AzureDevOps-UrlParsing-SSH
                   - BuildMark-AzureDevOps-ConnectorConfig
                   - BuildMark-AzureDevOps-BuildInformation
                   - BuildMark-AzureDevOps-ItemControls

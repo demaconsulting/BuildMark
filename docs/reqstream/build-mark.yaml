@@ -159,6 +159,18 @@ sections:
               - BuildMark-RepoConnectors-GitHub
               - BuildMark-Version-Subsystem
 
+          - id: BuildMark-GitHub-EnterpriseSupport
+            title: GitHub Enterprise support
+            justification: >
+              The tool shall support GitHub Enterprise Cloud and GitHub Enterprise Server
+              repositories by accepting SSH and HTTPS remote URLs with any hostname,
+              enabling owner and repository name resolution regardless of whether the host
+              is github.com, a GitHub Enterprise Cloud domain (*.ghe.com), or a GitHub
+              Enterprise Server on-premises instance.
+            children:
+              - BuildMark-GitHub-ParseUrl-SSH
+              - BuildMark-GitHub-ParseUrl-HTTPS
+
       - title: Azure DevOps Integration
         requirements:
           - id: BuildMark-AzureDevOps-BuildNotes

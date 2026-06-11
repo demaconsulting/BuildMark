@@ -111,7 +111,7 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <summary>
     ///     Gets build information for a release.
     /// </summary>
-    /// <param name="version">Optional target version. If not provided, uses the most recent tag if it matches current commit.</param>
+    /// <param name="version">Optional target version. If not provided, uses the most recent GitHub Release whose tag matches the current commit hash.</param>
     /// <returns>BuildInformation record with all collected data.</returns>
     /// <exception cref="InvalidOperationException">Thrown if version cannot be determined.</exception>
     public override async Task<BuildInformation> GetBuildInformationAsync(VersionTag? version = null)
@@ -190,8 +190,11 @@ public class GitHubRepoConnector : RepoConnectorBase
             ? new VersionCommitTag(fromVersion, fromHash)
             : null;
 
+        // Determine the web base URL for the changelog link
+        var webBaseUrl = DeriveWebBaseUrlFromConfig() ?? DeriveWebBaseUrl(repoUrl);
+
         // Generate full changelog link for GitHub
-        var changelogLink = GenerateGitHubChangelogLink(owner, repo, fromVersion?.Tag, toVersion.Tag, lookupData.BranchTagNames);
+        var changelogLink = GenerateGitHubChangelogLink(owner, repo, fromVersion?.Tag, toVersion.Tag, lookupData.BranchTagNames, webBaseUrl);
 
         // Create and return build information with all collected data
         return new BuildInformation(
@@ -234,6 +237,88 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Default GitHub Enterprise installations expose the GraphQL endpoint under /api/graphql.
         return $"{trimmed}/api/graphql";
+    }
+
+    /// <summary>
+    ///     Derives the web base URL from the configured <see cref="GitHubConnectorConfig.BaseUrl"/>.
+    ///     Strips API-specific paths and subdomains (e.g., <c>api.</c> prefix, <c>/api/v3</c> path)
+    ///     to produce a plain <c>https://&lt;host&gt;</c> URL suitable for building web links.
+    /// </summary>
+    /// <returns>
+    ///     The derived web base URL (e.g., <c>https://github.com</c> or
+    ///     <c>https://github.mycompany.com</c>), or <see langword="null"/> when
+    ///     <see cref="GitHubConnectorConfig.BaseUrl"/> is null or empty.
+    /// </returns>
+    private string? DeriveWebBaseUrlFromConfig()
+    {
+        var baseUrl = _config?.BaseUrl;
+        if (string.IsNullOrWhiteSpace(baseUrl))
+        {
+            return null;
+        }
+
+        // Parse the URL to extract just scheme://host (dropping any path such as /api/v3)
+        if (!Uri.TryCreate(baseUrl.TrimEnd('/'), UriKind.Absolute, out var uri))
+        {
+            return null;
+        }
+
+        // Use Authority (host + port) to preserve non-default ports (e.g., ghe.example.com:8443)
+        var authority = uri.Authority;
+
+        // Strip the "api." subdomain prefix when present (e.g., api.github.com → github.com)
+        if (authority.StartsWith("api.", StringComparison.OrdinalIgnoreCase))
+        {
+            authority = authority["api.".Length..];
+        }
+
+        return $"{uri.Scheme}://{authority}";
+    }
+
+    /// <summary>
+    ///     Derives the web base URL from a git remote URL by extracting the scheme and hostname.
+    /// </summary>
+    /// <param name="remoteUrl">
+    ///     Git remote URL in SSH (<c>git@&lt;host&gt;:owner/repo.git</c>) or HTTPS
+    ///     (<c>https://&lt;host&gt;/owner/repo</c>) format.
+    /// </param>
+    /// <returns>
+    ///     <c>https://&lt;host&gt;</c> extracted from the remote URL, or
+    ///     <c>https://github.com</c> as the default fallback.
+    /// </returns>
+    private static string DeriveWebBaseUrl(string remoteUrl)
+    {
+        remoteUrl = remoteUrl.Trim();
+
+        // SSH format: git@<host>:owner/repo.git → https://<host>
+        if (remoteUrl.StartsWith("git@", StringComparison.OrdinalIgnoreCase))
+        {
+            var atIndex = remoteUrl.IndexOf('@', StringComparison.Ordinal);
+            var colonIndex = remoteUrl.IndexOf(':', atIndex + 1, StringComparison.Ordinal);
+            if (atIndex >= 0 && colonIndex > atIndex)
+            {
+                var host = remoteUrl[(atIndex + 1)..colonIndex];
+                return $"https://{host}";
+            }
+        }
+
+        // HTTPS format: https://<host>/... → https://<host>
+        if (remoteUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            var withoutScheme = remoteUrl["https://".Length..];
+            var slashIndex = withoutScheme.IndexOf('/', StringComparison.Ordinal);
+            if (slashIndex >= 0)
+            {
+                var host = withoutScheme[..slashIndex];
+                return $"https://{host}";
+            }
+
+            // No path segment — use the whole URL as-is
+            return remoteUrl;
+        }
+
+        // Default fallback
+        return "https://github.com";
     }
 
     /// <summary>
@@ -1042,28 +1127,66 @@ public class GitHubRepoConnector : RepoConnectorBase
     }
 
     /// <summary>
-    ///     Parses GitHub owner and repo from a git remote URL.
+    ///     Parses the repository owner and name from a git remote URL.
     /// </summary>
-    /// <param name="url">Git remote URL.</param>
-    /// <returns>Tuple of (owner, repo).</returns>
-    /// <exception cref="ArgumentException">Thrown if URL format is invalid.</exception>
+    /// <remarks>
+    ///     Supports SSH format (<c>git@&lt;host&gt;:owner/repo.git</c>) and HTTPS format
+    ///     (<c>https://&lt;host&gt;/owner/repo</c>). The hostname is not validated, so
+    ///     github.com, GitHub Enterprise Cloud (<c>*.ghe.com</c>), and GitHub Enterprise
+    ///     Server (on-premises) remotes are all accepted. For SSH URLs the path segment
+    ///     after the colon is parsed. For HTTPS URLs the last two non-empty path segments
+    ///     are used as owner and repository name. The <c>.git</c> suffix is stripped from
+    ///     the repository name when present.
+    /// </remarks>
+    /// <param name="url">
+    ///     Git remote URL in SSH (<c>git@&lt;host&gt;:owner/repo.git</c>) or HTTPS
+    ///     (<c>https://&lt;host&gt;/owner/repo</c>) format. Leading and trailing whitespace
+    ///     is trimmed before parsing.
+    /// </param>
+    /// <returns>
+    ///     A tuple of (<c>owner</c>, <c>repo</c>) extracted from the URL, with the
+    ///     <c>.git</c> suffix removed from the repository name.
+    /// </returns>
+    /// <exception cref="ArgumentException">
+    ///     Thrown when <paramref name="url"/> is not a recognized SSH or HTTPS remote URL,
+    ///     or when the HTTPS path contains fewer than two segments (SSH paths must contain
+    ///     exactly two slash-separated components; HTTPS paths use the last two segments).
+    /// </exception>
     private static (string owner, string repo) ParseGitHubUrl(string url)
     {
         // Normalize URL by trimming whitespace
         url = url.Trim();
 
-        // Handle SSH URLs: git@github.com:owner/repo.git
-        if (url.StartsWith("git@github.com:", StringComparison.OrdinalIgnoreCase))
+        // Handle SSH URLs: git@<host>:owner/repo.git
+        // The hostname is not validated so that GitHub Enterprise Server remotes are also accepted
+        if (url.StartsWith("git@", StringComparison.OrdinalIgnoreCase))
         {
-            var path = url["git@github.com:".Length..];
-            return ParseOwnerRepo(path);
+            // Extract the path component after the colon separator
+            var colonIndex = url.IndexOf(':', StringComparison.Ordinal);
+            if (colonIndex > 0)
+            {
+                var path = url[(colonIndex + 1)..];
+                return ParseOwnerRepo(path);
+            }
         }
 
-        // Handle HTTPS URLs: https://github.com/owner/repo.git
-        if (url.StartsWith("https://github.com/", StringComparison.OrdinalIgnoreCase))
+        // Handle HTTPS URLs: https://<host>/owner/repo[.git]
+        // Strip the scheme and host, then take the last two non-empty path segments
+        if (url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
         {
-            var path = url["https://github.com/".Length..];
-            return ParseOwnerRepo(path);
+            // Remove scheme and locate the start of the path (first slash after the host)
+            var withoutScheme = url["https://".Length..];
+            var slashIndex = withoutScheme.IndexOf('/', StringComparison.Ordinal);
+            if (slashIndex >= 0)
+            {
+                // Split the path and take the last two non-empty segments as owner and repo
+                var segments = withoutScheme[(slashIndex + 1)..].Split('/', StringSplitOptions.RemoveEmptyEntries);
+                if (segments.Length >= 2)
+                {
+                    var ownerRepoPart = $"{segments[^2]}/{segments[^1]}";
+                    return ParseOwnerRepo(ownerRepoPart);
+                }
+            }
         }
 
         throw new ArgumentException($"Unsupported GitHub URL format: {url}", nameof(url));
@@ -1102,8 +1225,9 @@ public class GitHubRepoConnector : RepoConnectorBase
     /// <param name="oldTag">Old tag name (null if from beginning).</param>
     /// <param name="newTag">New tag name.</param>
     /// <param name="branchTagNames">Set of tag names on the current branch.</param>
+    /// <param name="webBaseUrl">Web base URL for the repository host (e.g., <c>https://github.com</c>).</param>
     /// <returns>WebLink to GitHub compare page, or null if no baseline tag or if tags not found in branch.</returns>
-    private static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag, HashSet<string> branchTagNames)
+    private static WebLink? GenerateGitHubChangelogLink(string owner, string repo, string? oldTag, string newTag, HashSet<string> branchTagNames, string webBaseUrl)
     {
         // Cannot generate comparison link without a baseline tag
         if (oldTag == null)
@@ -1117,9 +1241,9 @@ public class GitHubRepoConnector : RepoConnectorBase
             return null;
         }
 
-        // Build comparison label and URL
+        // Build comparison label and URL using the resolved host base URL
         var comparisonLabel = $"{oldTag}...{newTag}";
-        var comparisonUrl = $"https://github.com/{owner}/{repo}/compare/{comparisonLabel}";
+        var comparisonUrl = $"{webBaseUrl}/{owner}/{repo}/compare/{comparisonLabel}";
 
         return new WebLink(comparisonLabel, comparisonUrl);
     }

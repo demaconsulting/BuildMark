@@ -66,7 +66,10 @@ flowchart TD
 - *Role*: Consumer — BuildMark queries GitHub for tags, commits, issues, pull requests, and
   releases.
 - *Contract*: `GitHubGraphQLClient` sends paginated queries to
-  `https://api.github.com/graphql` using `Authorization: bearer <token>`.
+  `https://api.github.com/graphql` by default; the endpoint is overridden by
+  `GitHubConnectorConfig.BaseUrl` when set, enabling GitHub Enterprise Server support
+  (e.g., `https://github.mycompany.com/api/graphql`). Authentication uses
+  `Authorization: bearer <token>`.
 - *Constraints*: Authentication via `GH_TOKEN` or `GITHUB_TOKEN` environment variable, or
   `gh auth token` CLI fallback; subject to GitHub API rate limits.
 

@@ -41,7 +41,10 @@ and `security` are preserved as the label name; unlabeled items default to `"oth
 
 Steps: (1) get repository URL, branch, and current commit hash from Git via `RunCommandAsync`
 (inherited from `RepoConnectorBase`); (2) determine owner and repository name from `_config` or
-by parsing the remote URL; (3) resolve the GitHub authentication token; (4) create a
+by calling `ParseGitHubUrl` on the remote URL — host-agnostic parsing accepts github.com, GitHub
+Enterprise Cloud (`*.ghe.com`), and GitHub Enterprise Server (on-premises) instances for both SSH
+(`git@<host>:owner/repo.git`) and HTTPS (`https://<host>/owner/repo`) URL formats; (3) resolve
+the GitHub authentication token; (4) create a
 `GitHubGraphQLClient` with the resolved token, using `_config.BaseUrl` as the GraphQL endpoint
 when set (supports GitHub Enterprise Server); (5) fetch tags, releases, commits, pull requests
 (with `body`), and issues (with `body`) via GraphQL; (6) determine the target version — if a
@@ -56,6 +59,64 @@ or only when the issue is open otherwise (covers LTS back-port gaps for closed b
 affected versions); (10) if routing rules are configured, call `ApplyRules` to populate
 `BuildInformation.RoutedSections`; otherwise use legacy `Changes`, `Bugs`, and `KnownIssues`
 lists; (11) generate the changelog URL; (12) return the assembled `BuildInformation`.
+
+**ParseGitHubUrl** (private static): Extracts owner and repository name from a git remote URL.
+
+- *Parameters*: `url` (string) — SSH or HTTPS remote URL; leading and trailing whitespace is
+  trimmed.
+- *Returns*: `(string owner, string repo)` — owner and repository name with `.git` suffix removed.
+- *Algorithm*: Dispatches on URL prefix. For SSH format (`git@<host>:owner/repo.git`), the path
+  segment after the colon is forwarded to `ParseOwnerRepo`. For HTTPS format
+  (`https://<host>/owner/repo[.git]`), the host is stripped and the last two non-empty
+  slash-separated path segments are forwarded to `ParseOwnerRepo`. The hostname is never validated,
+  so github.com, GitHub Enterprise Cloud (`*.ghe.com`), and GitHub Enterprise Server (on-premises)
+  remotes are accepted uniformly.
+- *Postconditions*: Returns a `(owner, repo)` tuple on success; throws `ArgumentException` when
+  the URL is not a recognized SSH or HTTPS remote.
+
+**ParseOwnerRepo** (private static): Strips the `.git` suffix from a path segment and splits it
+into owner and repository name at the `/` separator.
+
+- *Parameters*: `path` (string) — path in `owner/repo[.git]` form.
+- *Returns*: `(string owner, string repo)`.
+- *Postconditions*: Throws `ArgumentException` when the path does not split into exactly two
+  slash-separated components.
+
+**ResolveGraphQLEndpoint** (private static): Maps a configured base URL to the correct GraphQL
+API endpoint for the target GitHub instance.
+
+- *Parameters*: `baseUrl` (string?) — the configured base URL from `GitHubConnectorConfig.BaseUrl`.
+- *Returns*: string? — the resolved GraphQL endpoint URL, or `null` when `baseUrl` is null or
+  empty (meaning the client should use its built-in default of `https://api.github.com/graphql`).
+- *Routing branches*:
+  1. Null or blank `baseUrl` → returns `null` (use GitHub.com default).
+  2. URL already ends with `/graphql` (case-insensitive) → returns the trimmed URL unchanged
+     (explicit passthrough for callers that supply the full endpoint directly).
+  3. URL contains `api.github.com` → appends `/graphql` to the trimmed URL.
+  4. Otherwise (GitHub Enterprise Server) → appends `/api/graphql` to the trimmed URL.
+- *Postconditions*: Returns a fully qualified GraphQL endpoint URL or `null`; never throws.
+
+**GenerateGitHubChangelogLink** (private static): Builds a GitHub compare URL between two version
+tags and wraps it in a `WebLink` record.
+
+- *Parameters*:
+  - `owner` (string) — repository owner.
+  - `repo` (string) — repository name.
+  - `oldTag` (string?) — the baseline tag; pass `null` when there is no baseline.
+  - `newTag` (string) — the target (current) tag.
+  - `branchTagNames` (HashSet\<string\>) — set of tag names present on the current branch.
+  - `webBaseUrl` (string) — the scheme-and-host portion of the repository's web URL
+    (e.g., `https://github.com` or `https://github.mycompany.com`), derived by
+    `DeriveWebBaseUrlFromConfig` or `DeriveWebBaseUrl`.
+- *Returns*: `WebLink?` — a `WebLink` whose `TargetUrl` is
+  `{webBaseUrl}/{owner}/{repo}/compare/{oldTag}...{newTag}` and whose label is
+  `{oldTag}...{newTag}`; returns `null` when `oldTag` is `null` or when either tag is
+  absent from `branchTagNames`.
+- *Algorithm*: (1) return `null` if `oldTag` is `null`; (2) return `null` if either tag is
+  not in `branchTagNames`; (3) construct comparison label and URL from `webBaseUrl`; (4) return
+  `new WebLink(label, url)`.
+- *Postconditions*: Returns a non-null `WebLink` only when a meaningful comparison range
+  exists on the current branch; never throws.
 
 ##### Error Handling
 
