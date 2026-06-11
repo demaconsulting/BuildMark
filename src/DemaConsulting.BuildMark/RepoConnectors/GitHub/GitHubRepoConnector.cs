@@ -263,15 +263,16 @@ public class GitHubRepoConnector : RepoConnectorBase
             return null;
         }
 
-        var host = uri.Host;
+        // Use Authority (host + port) to preserve non-default ports (e.g., ghe.example.com:8443)
+        var authority = uri.Authority;
 
         // Strip the "api." subdomain prefix when present (e.g., api.github.com → github.com)
-        if (host.StartsWith("api.", StringComparison.OrdinalIgnoreCase))
+        if (authority.StartsWith("api.", StringComparison.OrdinalIgnoreCase))
         {
-            host = host["api.".Length..];
+            authority = authority["api.".Length..];
         }
 
-        return $"{uri.Scheme}://{host}";
+        return $"{uri.Scheme}://{authority}";
     }
 
     /// <summary>

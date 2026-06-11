@@ -1,4 +1,4 @@
-##### GitHubRepoConnector
+#### GitHubRepoConnector
 
 ##### Verification Approach
 
@@ -49,7 +49,7 @@ equals `"https://api.github.com"`.
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
+**Requirement coverage**: `BuildMark-RepoConnectorBase-Interface`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
 
