@@ -10,24 +10,33 @@ sections:
             sections:
               - title: AzureDevOpsRepoConnector Requirements
                 requirements:
-                  - id: BuildMark-AzureDevOps-UrlParsing
+                  - id: BuildMark-AzureDevOps-UrlParsing-HTTPS
                     title: >-
                       The AzureDevOpsRepoConnector class shall parse organization URL, project, and repository
-                      from Azure DevOps Services and on-premises Azure DevOps Server git remote URLs.
+                      from Azure DevOps HTTPS remote URLs, supporting Azure DevOps Services (dev.azure.com,
+                      visualstudio.com) and on-premises Azure DevOps Server instances.
                     justification: |
-                      The connector must support both cloud Azure DevOps Services (dev.azure.com,
-                      visualstudio.com) and on-premises Azure DevOps Server instances. A unified URL
-                      parser using the _git path segment anchor handles all HTTPS URL formats, while
-                      SSH URLs use the git@ssh.dev.azure.com:v3 format.
+                      The connector must support HTTPS URL formats used by cloud Azure DevOps Services
+                      (dev.azure.com, visualstudio.com) and on-premises Azure DevOps Server instances.
+                      A unified URL parser using the _git path segment anchor handles all HTTPS URL formats.
                     tests:
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComHttps_ReturnsCorrectComponents
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_DevAzureComWithGitSuffix_StripsGitSuffix
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_VisualStudioComHttps_ReturnsCorrectComponents
-                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremServer_ReturnsCorrectComponents
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithPort_ReturnsCorrectComponents
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_OnPremWithGitSuffix_StripsGitSuffix
                       - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_UnsupportedFormat_ThrowsArgumentException
+
+                  - id: BuildMark-AzureDevOps-UrlParsing-SSH
+                    title: >-
+                      The AzureDevOpsRepoConnector class shall parse organization URL, project, and repository
+                      from Azure DevOps SSH remote URLs (git@ssh.dev.azure.com:v3 format).
+                    justification: |
+                      The connector must support the SSH URL format used by Azure DevOps Services
+                      (git@ssh.dev.azure.com:v3/org/project/repo) in addition to HTTPS formats.
+                    tests:
+                      - AzureDevOpsRepoConnector_ParseAzureDevOpsUrl_SshUrl_ReturnsCorrectComponents
 
                   - id: BuildMark-AzureDevOps-ConnectorConfig
                     title: >-

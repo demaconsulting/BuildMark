@@ -50,7 +50,8 @@ BuildMark (System)
 │   └── Validation (Unit)
 ├── Utilities (Subsystem)
 │   ├── PathHelpers (Unit)
-│   └── ProcessRunner (Unit)
+│   ├── ProcessRunner (Unit)
+│   └── TemporaryDirectory (Unit)
 ├── Version (Subsystem)
 │   ├── VersionComparable (Unit)
 │   ├── VersionSemantic (Unit)
@@ -110,7 +111,8 @@ src/DemaConsulting.BuildMark/
 │   └── Validation.cs                        - self-validation test runner
 ├── Utilities/
 │   ├── PathHelpers.cs                       - safe path combination utilities
-│   └── ProcessRunner.cs                     - process runner for Git commands
+│   ├── ProcessRunner.cs                     - process runner for Git commands
+│   └── TemporaryDirectory.cs                - temporary directory lifecycle management
 ├── Version/
 │   ├── VersionComparable.cs                 - core integer-based version comparison
 │   ├── VersionSemantic.cs                   - semantic version with build metadata

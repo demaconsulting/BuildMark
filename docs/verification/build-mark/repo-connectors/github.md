@@ -3,7 +3,7 @@
 #### Verification Approach
 
 The GitHub sub-subsystem is verified through `GitHubTests.cs` (6 subsystem-level tests),
-`GitHubRepoConnectorTests.cs` (27 unit tests), and six `GitHubGraphQLClient*Tests.cs` files
+`GitHubRepoConnectorTests.cs` (35 unit tests), and six `GitHubGraphQLClient*Tests.cs` files
 (49 tests). The subsystem tests exercise the full GitHub data pipeline through mock HTTP responses.
 The unit tests are described in the individual unit chapters.
 

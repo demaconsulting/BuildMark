@@ -1,12 +1,13 @@
-#### GitHubRepoConnector
+##### GitHubRepoConnector
 
 ##### Verification Approach
 
 `GitHubRepoConnector` is tested through `GitHubRepoConnectorTests.cs`, which contains
-25 unit tests. The tests exercise constructor behavior (with and without config),
-the full `GetBuildInformationAsync` pipeline with various scenarios, visibility and
-type overrides, routing configuration, known issues filtering by affected versions,
-and edge cases such as duplicate commit SHAs and substring label matching.
+35 unit tests. The tests exercise constructor behavior (with and without config),
+the full `GetBuildInformationAsync` pipeline with various scenarios, URL parsing for
+github.com, GitHub Enterprise Cloud, and GitHub Enterprise Server remotes (SSH and HTTPS),
+visibility and type overrides, routing configuration, known issues filtering by affected
+versions, and edge cases such as duplicate commit SHAs and substring label matching.
 
 ##### Dependencies
 
@@ -30,7 +31,7 @@ All tests in the test class pass with no errors or warnings.
 
 **Expected**: Instance is created without error.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ConnectorConfig`
 
 ###### GitHubRepoConnector_Constructor_WithConfig_StoresConfigurationOverrides
 
@@ -40,7 +41,7 @@ All tests in the test class pass with no errors or warnings.
 `ConfigurationOverrides.Repo` equals `"example-repo"`; `ConfigurationOverrides.BaseUrl`
 equals `"https://api.github.com"`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ConnectorConfig`
 
 ###### GitHubRepoConnector_ImplementsInterface_ReturnsTrue
 
@@ -48,7 +49,7 @@ equals `"https://api.github.com"`.
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectorBase-Interface`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithMockedData_ReturnsValidBuildInformation
 
@@ -57,7 +58,7 @@ equals `"https://api.github.com"`.
 **Expected**: Returns a `BuildInformation` instance with correct version, baseline,
 changes, and known issues.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithMultipleVersions_SelectsCorrectPreviousVersionAndGeneratesChangelogLink
 
@@ -65,7 +66,7 @@ changes, and known issues.
 
 **Expected**: Selects the correct previous release and generates a GitHub changelog link.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithPullRequests_GathersChangesCorrectly
 
@@ -74,7 +75,7 @@ changes, and known issues.
 **Expected**: Each pull request is represented as a change item with correct type
 classification.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithOpenIssues_IdentifiesKnownIssues
 
@@ -82,7 +83,7 @@ classification.
 
 **Expected**: Open issues appear in `BuildInformation.KnownIssues`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_PreReleaseWithSameCommitHash_SkipsToNextDifferentHash
 
@@ -90,7 +91,7 @@ classification.
 
 **Expected**: Connector skips to the next tag with a different commit hash.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_ReleaseVersion_SkipsAllPreReleases
 
@@ -98,7 +99,7 @@ classification.
 
 **Expected**: Pre-release tags are skipped; baseline is the previous release.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_PreReleaseNotInHistory_UsesLatestDifferentHash
 
@@ -106,7 +107,7 @@ classification.
 
 **Expected**: Uses the latest tag with a different commit hash as baseline.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_PreReleaseAllPreviousSameHash_ReturnsNullBaseline
 
@@ -114,7 +115,7 @@ classification.
 
 **Expected**: `BuildInformation.BaselineVersion` is `null`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithDuplicateMergeCommitSha_DoesNotThrow
 
@@ -122,7 +123,7 @@ classification.
 
 **Expected**: No exception is thrown; result is returned normally.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_PrWithSubstringMatchLabel_NotClassifiedAsBug
 
@@ -130,7 +131,7 @@ classification.
 
 **Expected**: Pull request is not classified as a bug.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_IssueWithSubstringMatchLabel_NotClassifiedAsKnownIssue
 
@@ -138,7 +139,7 @@ classification.
 
 **Expected**: Issue is not classified as a known issue.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_VisibilityInternal_ExcludesItem
 
@@ -146,7 +147,7 @@ classification.
 
 **Expected**: Item is excluded from the public output.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ItemControls`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_VisibilityPublic_IncludesItem
 
@@ -154,7 +155,7 @@ classification.
 
 **Expected**: Item is included in the output.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ItemControls`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_TypeBugOverride_ClassifiesAsBug
 
@@ -162,7 +163,7 @@ classification.
 
 **Expected**: Item is classified as a bug regardless of labels.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ItemControls`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_TypeFeatureOverride_ClassifiesAsFeature
 
@@ -170,7 +171,7 @@ classification.
 
 **Expected**: Item is classified as a feature regardless of labels.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-ItemControls`
 
 ###### GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
 
@@ -178,7 +179,7 @@ classification.
 
 **Expected**: `HasRules` returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-Rules`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
@@ -186,7 +187,7 @@ classification.
 
 **Expected**: `BuildInformation.RoutedSections` is populated with items routed per rules.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-Rules`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_KnownIssues_FilteredByAffectedVersions
 
@@ -194,7 +195,7 @@ classification.
 
 **Expected**: Issues outside the affected version range are excluded.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_ClosedBugWithMatchingAffectedVersions_IsKnownIssue
 
@@ -202,7 +203,7 @@ classification.
 
 **Expected**: Closed bug appears in `KnownIssues`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`
 
 ###### GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
 
@@ -231,3 +232,75 @@ corresponding environment variable is not set (null).
 **Expected**: `InvalidOperationException` is thrown.
 
 **Requirement coverage**: `BuildMark-GitHub-TokenVariable`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GitHubCom_SSH_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a standard github.com SSH URL
+(`git@github.com:owner/repo.git`).
+
+**Expected**: Returns owner `"owner"` and repo `"repo"`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-SSH`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a standard github.com HTTPS URL
+(`https://github.com/owner/repo`).
+
+**Expected**: Returns owner `"owner"` and repo `"repo"`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_WithGitSuffix_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a github.com HTTPS URL that includes a `.git` suffix
+(`https://github.com/owner/repo.git`).
+
+**Expected**: Returns owner `"owner"` and repo `"repo"` with the `.git` suffix stripped.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GHECloud_HTTPS_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a GitHub Enterprise Cloud HTTPS URL
+(`https://hiarc.ghe.com/BreakAway/PyStubGenerator`).
+
+**Expected**: Returns owner `"BreakAway"` and repo `"PyStubGenerator"`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GHEServer_HTTPS_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a GitHub Enterprise Server on-premises HTTPS URL
+(`https://github.mycompany.com/myorg/myrepo`).
+
+**Expected**: Returns owner `"myorg"` and repo `"myrepo"`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`
+
+###### GitHubRepoConnector_ParseGitHubUrl_GHEServer_SSH_ReturnsOwnerAndRepo
+
+**Scenario**: `ParseGitHubUrl` is called with a GitHub Enterprise Server on-premises SSH URL
+(`git@github.mycompany.com:myorg/myrepo.git`).
+
+**Expected**: Returns owner `"myorg"` and repo `"myrepo"`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-SSH`
+
+###### GitHubRepoConnector_ParseGitHubUrl_Invalid_ThrowsArgumentException
+
+**Scenario**: `ParseGitHubUrl` is called with an unrecognized string (`not-a-url`).
+
+**Expected**: `ArgumentException` is thrown.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`
+
+###### GitHubRepoConnector_GetBuildInformationAsync_GHERemote_ChangelogUrlUsesGHEHost
+
+**Scenario**: `GetBuildInformationAsync` is called with a GitHub Enterprise Server HTTPS remote
+URL (`https://github.mycompany.com/myorg/myrepo.git`).
+
+**Expected**: `CompleteChangelogLink.TargetUrl` starts with `https://github.mycompany.com/`,
+confirming the changelog URL uses the GHE hostname instead of the hardcoded `github.com`.
+
+**Requirement coverage**: `BuildMark-GitHub-ParseUrl-HTTPS`

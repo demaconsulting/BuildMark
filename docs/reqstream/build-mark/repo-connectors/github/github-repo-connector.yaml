@@ -81,6 +81,32 @@ sections:
                       - GitHubRepoConnector_Configure_WithRules_HasRulesReturnsTrue
                       - GitHubRepoConnector_GetBuildInformationAsync_WithConfiguredRules_PopulatesRoutedSections
 
+                  - id: BuildMark-GitHub-ParseUrl-SSH
+                    title: GitHub SSH URL parsing
+                    justification: >
+                      The GitHubRepoConnector class shall parse owner and repository name from
+                      SSH-format GitHub remote URLs (git@<host>:owner/repo.git), supporting
+                      github.com, GitHub Enterprise Cloud (*.ghe.com), and GitHub Enterprise
+                      Server (on-premises) hosts.
+                    tests:
+                      - GitHubRepoConnector_ParseGitHubUrl_GitHubCom_SSH_ReturnsOwnerAndRepo
+                      - GitHubRepoConnector_ParseGitHubUrl_GHEServer_SSH_ReturnsOwnerAndRepo
+
+                  - id: BuildMark-GitHub-ParseUrl-HTTPS
+                    title: GitHub HTTPS URL parsing
+                    justification: >
+                      The GitHubRepoConnector class shall parse owner and repository name from
+                      HTTPS-format GitHub remote URLs (https://<host>/owner/repo), supporting
+                      github.com, GitHub Enterprise Cloud (*.ghe.com), and GitHub Enterprise
+                      Server (on-premises) hosts.
+                    tests:
+                      - GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_ReturnsOwnerAndRepo
+                      - GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_WithGitSuffix_ReturnsOwnerAndRepo
+                      - GitHubRepoConnector_ParseGitHubUrl_GHECloud_HTTPS_ReturnsOwnerAndRepo
+                      - GitHubRepoConnector_ParseGitHubUrl_GHEServer_HTTPS_ReturnsOwnerAndRepo
+                      - GitHubRepoConnector_ParseGitHubUrl_Invalid_ThrowsArgumentException
+                      - GitHubRepoConnector_GetBuildInformationAsync_GHERemote_ChangelogUrlUsesGHEHost
+
                   - id: BuildMark-GitHub-TokenVariable
                     title: >-
                       The GitHubRepoConnector class shall use only the configured token variable when

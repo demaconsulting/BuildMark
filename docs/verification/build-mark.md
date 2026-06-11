@@ -128,3 +128,15 @@ that when the connector factory throws `InvalidOperationException`, an error mes
 to stderr and the exit code is 1.
 This scenario is tested by
 `Program_Run_ConnectorThrowsInvalidOperationException_WritesErrorAndSetsExitCode`.
+
+**GitHub_EnterpriseSupport_HostAgnosticUrlParsing**: Verifies that `GitHubRepoConnector` correctly
+parses owner and repository name from SSH and HTTPS remote URLs using any hostname — covering
+github.com (`GitHubRepoConnector_ParseGitHubUrl_GitHubCom_SSH_ReturnsOwnerAndRepo`,
+`GitHubRepoConnector_ParseGitHubUrl_GitHubCom_HTTPS_ReturnsOwnerAndRepo`), GitHub Enterprise
+Cloud (`GitHubRepoConnector_ParseGitHubUrl_GHECloud_HTTPS_ReturnsOwnerAndRepo`), and GitHub
+Enterprise Server on-premises (`GitHubRepoConnector_ParseGitHubUrl_GHEServer_HTTPS_ReturnsOwnerAndRepo`,
+`GitHubRepoConnector_ParseGitHubUrl_GHEServer_SSH_ReturnsOwnerAndRepo`). Additionally,
+`GitHubRepoConnector_GetBuildInformationAsync_GHERemote_ChangelogUrlUsesGHEHost` verifies that the
+generated changelog URL uses the GHE hostname rather than a hardcoded `github.com` value, confirming
+end-to-end enterprise server support. This collection of scenarios provides system-level coverage for
+`BuildMark-GitHub-EnterpriseSupport`.

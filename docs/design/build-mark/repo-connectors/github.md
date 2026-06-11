@@ -36,7 +36,10 @@ All other types in the subsystem are internal.
 1. Read the git remote URL and current commit hash via `RunCommandAsync` (inherited from
    `RepoConnectorBase`).
 2. Determine the owner and repository name from `GitHubConnectorConfig` or by parsing the remote
-   URL.
+   URL. The URL parser accepts github.com, GitHub Enterprise Cloud (`*.ghe.com`), and GitHub
+   Enterprise Server (on-premises) hosts in both SSH (`git@<host>:owner/repo.git`) and HTTPS
+   (`https://<host>/owner/repo`) formats; the hostname is never validated so any host is accepted
+   uniformly.
 3. Resolve a GitHub authentication token (`GH_TOKEN`, `GITHUB_TOKEN`, or `gh auth token`).
 4. Create a `GitHubGraphQLClient` with the resolved token, using `GitHubConnectorConfig.BaseUrl`
    as the GraphQL endpoint when set (supports GitHub Enterprise Server); fetch tags, releases,
