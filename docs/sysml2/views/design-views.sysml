@@ -6,61 +6,49 @@
 package BuildMark {
     view SoftwareStructureView {
         expose BuildMark;
-        render asTreeDiagram;
     }
 
     view BuildMarkView {
         expose BuildMarkSystem;
-        render asTreeDiagram;
     }
 
     view CliView {
         expose CliSubsystem;
-        render asTreeDiagram;
     }
 
     view BuildNotesView {
         expose BuildNotesSubsystem;
-        render asTreeDiagram;
     }
 
     view SelfTestView {
         expose SelfTestSubsystem;
-        render asTreeDiagram;
     }
 
     view UtilitiesView {
         expose UtilitiesSubsystem;
-        render asTreeDiagram;
     }
 
     view VersionView {
         expose VersionSubsystem;
-        render asTreeDiagram;
     }
 
     view ConfigurationView {
         expose ConfigurationSubsystem;
-        render asTreeDiagram;
     }
 
     view RepoConnectorsView {
         expose RepoConnectorsSubsystem;
-        render asTreeDiagram;
     }
 
     view GitHubView {
         expose GitHubSubsystem;
-        render asTreeDiagram;
     }
 
     view AzureDevOpsView {
         expose AzureDevOpsSubsystem;
-        render asTreeDiagram;
     }
 
     view MockView {
         expose MockSubsystem;
-        render asTreeDiagram;
     }
 }
