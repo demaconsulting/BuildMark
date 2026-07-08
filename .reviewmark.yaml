@@ -451,6 +451,11 @@ reviews:
       - "test/**/RepoConnectors/AzureDevOps/MockableAzureDevOpsRepoConnector.cs"
 
   # OTS Items
+  - id: OTS-YamlDotNet
+    title: Review that YamlDotNet Provides Required Functionality
+    paths:
+      - "docs/design/ots/yaml-dot-net.md"
+
   - id: OTS-BuildMark
     title: Review of BuildMark OTS verification evidence
     paths:
