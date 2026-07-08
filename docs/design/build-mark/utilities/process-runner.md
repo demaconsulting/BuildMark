@@ -1,6 +1,6 @@
 ### ProcessRunner
 
-![Utilities Structure](../../generated/UtilitiesView.svg)
+![Utilities Structure](UtilitiesView.svg)
 
 #### Purpose
 

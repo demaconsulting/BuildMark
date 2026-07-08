@@ -1,6 +1,6 @@
 ## Utilities Subsystem
 
-![Utilities Structure](../generated/UtilitiesView.svg)
+![Utilities Structure](UtilitiesView.svg)
 
 ### Overview
 

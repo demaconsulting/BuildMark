@@ -1,6 +1,6 @@
 #### MockRepoConnector
 
-![Mock Structure](../../../generated/MockView.svg)
+![Mock Structure](MockView.svg)
 
 ##### Purpose
 

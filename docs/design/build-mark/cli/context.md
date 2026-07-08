@@ -1,6 +1,6 @@
 ### Context
 
-![Cli Structure](../../generated/CliView.svg)
+![Cli Structure](CliView.svg)
 
 #### Purpose
 

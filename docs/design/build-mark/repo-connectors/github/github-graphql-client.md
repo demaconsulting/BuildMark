@@ -1,6 +1,6 @@
 #### GitHubGraphQLClient
 
-![GitHub Structure](../../../generated/GitHubView.svg)
+![GitHub Structure](GitHubView.svg)
 
 ##### Purpose
 

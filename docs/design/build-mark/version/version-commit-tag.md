@@ -1,6 +1,6 @@
 ### VersionCommitTag
 
-![Version Structure](../../generated/VersionView.svg)
+![Version Structure](VersionView.svg)
 
 #### Purpose
 

@@ -1,6 +1,6 @@
 ### Mock
 
-![Mock Structure](../../generated/MockView.svg)
+![Mock Structure](MockView.svg)
 
 #### Overview
 

@@ -1,6 +1,6 @@
 ## BuildNotes Subsystem
 
-![BuildNotes Structure](../generated/BuildNotesView.svg)
+![BuildNotes Structure](BuildNotesView.svg)
 
 ### Overview
 

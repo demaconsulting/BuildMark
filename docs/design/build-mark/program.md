@@ -1,6 +1,6 @@
 ## Program
 
-![BuildMark Structure](../generated/BuildMarkView.svg)
+![BuildMark Structure](BuildMarkView.svg)
 
 ### Purpose
 

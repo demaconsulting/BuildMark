@@ -1,6 +1,6 @@
 # BuildMark
 
-![BuildMark Structure](generated/BuildMarkView.svg)
+![BuildMark Structure](BuildMarkView.svg)
 
 ## Architecture
 

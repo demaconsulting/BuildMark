@@ -1,6 +1,6 @@
 ## RepoConnectors
 
-![RepoConnectors Structure](../generated/RepoConnectorsView.svg)
+![RepoConnectors Structure](RepoConnectorsView.svg)
 
 ### Overview
 

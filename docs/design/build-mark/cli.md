@@ -1,6 +1,6 @@
 ## Cli Subsystem
 
-![Cli Structure](../generated/CliView.svg)
+![Cli Structure](CliView.svg)
 
 ### Overview
 

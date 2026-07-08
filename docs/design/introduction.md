@@ -39,7 +39,7 @@ diagram below by SysML2Tools as part of the build pipeline. AI agents should que
 SysML2 model directly (see the `sysml2tools-query` skill) rather than parsing this
 diagram or the prose below.
 
-![Software Structure](generated/SoftwareStructureView.svg)
+![Software Structure](SoftwareStructureView.svg)
 
 ## Folder Layout
 

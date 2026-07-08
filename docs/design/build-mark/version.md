@@ -1,6 +1,6 @@
 ## Version Subsystem
 
-![Version Structure](../generated/VersionView.svg)
+![Version Structure](VersionView.svg)
 
 ### Overview
 

@@ -1,6 +1,6 @@
 #### AzureDevOpsRepoConnector
 
-![AzureDevOps Structure](../../../generated/AzureDevOpsView.svg)
+![AzureDevOps Structure](AzureDevOpsView.svg)
 
 ##### Purpose
 

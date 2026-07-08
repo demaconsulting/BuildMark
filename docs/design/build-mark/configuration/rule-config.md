@@ -1,6 +1,6 @@
 ### RuleConfig
 
-![Configuration Structure](../../generated/ConfigurationView.svg)
+![Configuration Structure](ConfigurationView.svg)
 
 #### Purpose
 

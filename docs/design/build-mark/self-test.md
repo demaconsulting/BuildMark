@@ -1,6 +1,6 @@
 ## SelfTest Subsystem
 
-![SelfTest Structure](../generated/SelfTestView.svg)
+![SelfTest Structure](SelfTestView.svg)
 
 ### Overview
 

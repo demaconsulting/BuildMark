@@ -1,6 +1,6 @@
 ### ItemInfo
 
-![BuildNotes Structure](../../generated/BuildNotesView.svg)
+![BuildNotes Structure](BuildNotesView.svg)
 
 #### Purpose
 

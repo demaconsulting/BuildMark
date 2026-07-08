@@ -1,6 +1,6 @@
 ### AzureDevOps
 
-![AzureDevOps Structure](../../generated/AzureDevOpsView.svg)
+![AzureDevOps Structure](AzureDevOpsView.svg)
 
 #### Overview
 

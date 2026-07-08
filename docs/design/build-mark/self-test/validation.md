@@ -1,6 +1,6 @@
 ### Validation
 
-![SelfTest Structure](../../generated/SelfTestView.svg)
+![SelfTest Structure](SelfTestView.svg)
 
 #### Purpose
 
