@@ -1,7 +1,5 @@
 # Introduction
 
-![Software Structure](generated/SoftwareStructureView.svg)
-
 This document provides the detailed design for BuildMark — a .NET command-line tool that
 generates markdown build notes from Git repository metadata, including GitHub and Azure DevOps
 repositories. It covers local software items (systems, subsystems, and units) and the OTS
@@ -57,19 +55,6 @@ diagram or the prose below.
       - **GitHub/** - GitHub subsystem
       - **AzureDevOps/** - AzureDevOps subsystem
       - **Mock/** - Mock subsystem
-- **test/** - test projects
-  - **DemaConsulting.BuildMark.Tests/** - BuildMark test source
-    - **Cli/** - Cli subsystem tests
-    - **BuildNotes/** - BuildNotes subsystem tests
-    - **SelfTest/** - SelfTest subsystem tests
-    - **Utilities/** - Utilities subsystem tests
-    - **Version/** - Version subsystem tests
-    - **Configuration/** - Configuration subsystem tests
-    - **RepoConnectors/** - RepoConnectors subsystem tests
-      - **GitHub/** - GitHub subsystem tests
-      - **AzureDevOps/** - AzureDevOps subsystem tests
-      - **Mock/** - Mock subsystem tests
-    - **ItemControls/** - RepoConnectors item-controls parsing tests
 
 ## Companion Artifact Structure
 
