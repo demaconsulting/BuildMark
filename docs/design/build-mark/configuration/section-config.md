@@ -1,5 +1,7 @@
 ### SectionConfig
 
+![Configuration Structure](ConfigurationView.svg)
+
 #### Purpose
 
 `SectionConfig` is an immutable record representing a single report section definition read

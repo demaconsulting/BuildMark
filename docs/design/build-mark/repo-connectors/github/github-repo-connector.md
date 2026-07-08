@@ -1,5 +1,7 @@
 #### GitHubRepoConnector
 
+![GitHub Structure](GitHubView.svg)
+
 ##### Purpose
 
 `GitHubRepoConnector` is the production connector in the GitHub subsystem. It implements

@@ -1,5 +1,7 @@
 ### ItemInfo
 
+![BuildNotes Structure](BuildNotesView.svg)
+
 #### Purpose
 
 `ItemInfo` is a record in the BuildNotes subsystem that represents a single issue or pull

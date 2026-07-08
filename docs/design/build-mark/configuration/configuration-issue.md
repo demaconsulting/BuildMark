@@ -1,5 +1,7 @@
 ### ConfigurationIssue
 
+![Configuration Structure](ConfigurationView.svg)
+
 #### Purpose
 
 `ConfigurationIssue` is an immutable positional record representing a single problem found

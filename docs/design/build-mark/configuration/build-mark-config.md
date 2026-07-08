@@ -1,5 +1,7 @@
 ### BuildMarkConfig
 
+![Configuration Structure](ConfigurationView.svg)
+
 #### Purpose
 
 `BuildMarkConfig` is the top-level configuration data model for BuildMark. It holds all

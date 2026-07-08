@@ -1,5 +1,7 @@
 #### GitHubGraphQLTypes
 
+![GitHub Structure](GitHubView.svg)
+
 ##### Purpose
 
 `GitHubGraphQLTypes` is the collection of internal C# record types used by the GitHub subsystem

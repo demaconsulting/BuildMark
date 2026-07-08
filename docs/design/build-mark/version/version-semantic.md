@@ -1,5 +1,7 @@
 ### VersionSemantic
 
+![Version Structure](VersionView.svg)
+
 #### Purpose
 
 `VersionSemantic` is a record that extends version comparison with optional build metadata

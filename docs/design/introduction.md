@@ -34,124 +34,27 @@ The following topics are out of scope:
 
 ## Software Structure
 
-The following tree shows how the BuildMark software items are organized across the
-system, subsystem, and unit levels:
+The software structure is modeled in SysML2 under `docs/sysml2/` and rendered to the
+diagram below by SysML2Tools as part of the build pipeline. AI agents should query the
+SysML2 model directly (see the `sysml2tools-query` skill) rather than parsing this
+diagram or the prose below.
 
-```text
-BuildMark (System)
-├── Program (Unit)
-├── Cli (Subsystem)
-│   └── Context (Unit)
-├── BuildNotes (Subsystem)
-│   ├── BuildInformation (Unit)
-│   ├── ItemInfo (Unit)
-│   └── WebLink (Unit)
-├── SelfTest (Subsystem)
-│   └── Validation (Unit)
-├── Utilities (Subsystem)
-│   ├── PathHelpers (Unit)
-│   ├── ProcessRunner (Unit)
-│   └── TemporaryDirectory (Unit)
-├── Version (Subsystem)
-│   ├── VersionComparable (Unit)
-│   ├── VersionSemantic (Unit)
-│   ├── VersionTag (Unit)
-│   ├── VersionInterval (Unit)
-│   ├── VersionIntervalSet (Unit)
-│   └── VersionCommitTag (Unit)
-├── Configuration (Subsystem)
-│   ├── BuildMarkConfig (Unit)
-│   ├── BuildMarkConfigReader (Unit)
-│   ├── ConfigurationLoadResult (Unit)
-│   ├── ConfigurationIssue (Unit)
-│   ├── ConnectorConfig (Unit)
-│   ├── GitHubConnectorConfig (Unit)
-│   ├── AzureDevOpsConnectorConfig (Unit)
-│   ├── ReportConfig (Unit)
-│   ├── SectionConfig (Unit)
-│   ├── RuleConfig (Unit)
-│   └── RuleMatchConfig (Unit)
-└── RepoConnectors (Subsystem)
-    ├── IRepoConnector (Unit)
-    ├── RepoConnectorBase (Unit)
-    ├── RepoConnectorFactory (Unit)
-    ├── ItemRouter (Unit)
-    ├── ItemControlsInfo (Unit)
-    ├── ItemControlsParser (Unit)
-    ├── GitHub (Subsystem)
-    │   ├── GitHubRepoConnector (Unit)
-    │   ├── GitHubGraphQLClient (Unit)
-    │   └── GitHubGraphQLTypes (Unit)
-    ├── AzureDevOps (Subsystem)
-    │   ├── AzureDevOpsRepoConnector (Unit)
-    │   ├── AzureDevOpsRestClient (Unit)
-    │   ├── AzureDevOpsApiTypes (Unit)
-    │   └── WorkItemMapper (Unit)
-    └── Mock (Subsystem)
-        └── MockRepoConnector (Unit)
-```
-
-Each unit is described in detail in its own chapter within this document.
+![Software Structure](SoftwareStructureView.svg)
 
 ## Folder Layout
 
-The source code folder structure mirrors the top-level subsystem breakdown above, giving
-reviewers an explicit navigation aid from design to code:
-
-```text
-src/DemaConsulting.BuildMark/
-├── Program.cs                               - entry point and execution orchestrator
-├── BuildNotes/
-│   ├── BuildInformation.cs                  - build information data model
-│   ├── ItemInfo.cs                          - item information data model
-│   └── WebLink.cs                           - web link helper
-├── Cli/
-│   └── Context.cs                           - command-line argument parser and I/O owner
-├── SelfTest/
-│   └── Validation.cs                        - self-validation test runner
-├── Utilities/
-│   ├── PathHelpers.cs                       - safe path combination utilities
-│   ├── ProcessRunner.cs                     - process runner for Git commands
-│   └── TemporaryDirectory.cs                - temporary directory lifecycle management
-├── Version/
-│   ├── VersionComparable.cs                 - core integer-based version comparison
-│   ├── VersionSemantic.cs                   - semantic version with build metadata
-│   ├── VersionTag.cs                        - repository tag parsing and normalization
-│   ├── VersionInterval.cs                   - single version interval model and parser
-│   ├── VersionIntervalSet.cs                - ordered set of version intervals
-│   └── VersionCommitTag.cs                  - version commit tag representation
-├── Configuration/
-│   ├── BuildMarkConfig.cs                   - top-level configuration data model
-│   ├── BuildMarkConfigReader.cs             - reads and parses .buildmark.yaml using YamlDotNet
-│   ├── ConfigurationLoadResult.cs           - holds config and any load issues
-│   ├── ConfigurationIssue.cs                - single issue with location and severity
-│   ├── ConnectorConfig.cs                   - connector envelope data model
-│   ├── GitHubConnectorConfig.cs             - GitHub connector settings data model
-│   ├── AzureDevOpsConnectorConfig.cs        - Azure DevOps connector settings data model
-│   ├── ReportConfig.cs                      - report output settings data model
-│   ├── SectionConfig.cs                     - report section definition data model
-│   └── RuleConfig.cs                        - routing rule and rule-match condition data models
-└── RepoConnectors/
-    ├── IRepoConnector.cs                    - repository connector interface
-    ├── RepoConnectorBase.cs                 - repository connector base class
-    ├── RepoConnectorFactory.cs              - repository connector factory
-    ├── ItemRouter.cs                        - shared item routing logic
-    ├── ItemControlsInfo.cs                  - item controls data model
-    ├── ItemControlsParser.cs                - buildmark block parser
-    ├── GitHub/
-    │   ├── GitHubRepoConnector.cs           - GitHub API integration
-    │   ├── GitHubGraphQLClient.cs           - GraphQL API client
-    │   └── GitHubGraphQLTypes.cs            - GraphQL type definitions
-    ├── AzureDevOps/
-    │   ├── AzureDevOpsRepoConnector.cs      - Azure DevOps API integration
-    │   ├── AzureDevOpsRestClient.cs         - REST API client
-    │   ├── AzureDevOpsApiTypes.cs           - REST API type definitions
-    │   └── WorkItemMapper.cs                - work item to ItemInfo mapper
-    └── Mock/
-        └── MockRepoConnector.cs             - mock repository connector for self-test
-```
-
-The test project mirrors the same layout under `test/DemaConsulting.BuildMark.Tests/`.
+- **src/** - source files and projects
+  - **DemaConsulting.BuildMark/** - BuildMark system source
+    - **Cli/** - Cli subsystem
+    - **BuildNotes/** - BuildNotes subsystem
+    - **SelfTest/** - SelfTest subsystem
+    - **Utilities/** - Utilities subsystem
+    - **Version/** - Version subsystem
+    - **Configuration/** - Configuration subsystem
+    - **RepoConnectors/** - RepoConnectors subsystem
+      - **GitHub/** - GitHub subsystem
+      - **AzureDevOps/** - AzureDevOps subsystem
+      - **Mock/** - Mock subsystem
 
 ## Companion Artifact Structure
 

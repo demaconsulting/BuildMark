@@ -1,5 +1,7 @@
 ## RepoConnectors
 
+![RepoConnectors Structure](RepoConnectorsView.svg)
+
 ### Overview
 
 The RepoConnectors subsystem abstracts access to repository metadata for BuildMark. It defines the

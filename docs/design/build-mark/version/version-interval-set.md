@@ -1,5 +1,7 @@
 ### VersionIntervalSet
 
+![Version Structure](VersionView.svg)
+
 #### Purpose
 
 `VersionIntervalSet` is an ordered, immutable collection of one or more `VersionInterval`

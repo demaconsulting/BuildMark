@@ -1,5 +1,7 @@
 ### Context
 
+![Cli Structure](CliView.svg)
+
 #### Purpose
 
 `Context` is the sole unit in the Cli subsystem. It owns the lifecycle of command-line argument

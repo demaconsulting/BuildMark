@@ -1,5 +1,7 @@
 ### ItemControlsInfo
 
+![RepoConnectors Structure](RepoConnectorsView.svg)
+
 #### Purpose
 
 `ItemControlsInfo` is an immutable data record used by the RepoConnectors subsystem to carry the

@@ -1,5 +1,7 @@
 ## Program
 
+![BuildMark Structure](BuildMarkView.svg)
+
 ### Purpose
 
 `Program` is the top-level unit of BuildMark. It owns the application entry point, creates

@@ -1,5 +1,7 @@
 ## Configuration
 
+![Configuration Structure](ConfigurationView.svg)
+
 ### Overview
 
 The Configuration subsystem is responsible for reading and parsing the optional `.buildmark.yaml`

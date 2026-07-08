@@ -1,5 +1,7 @@
 ## SelfTest Subsystem
 
+![SelfTest Structure](SelfTestView.svg)
+
 ### Overview
 
 The SelfTest subsystem provides a self-validation capability for BuildMark. When the user passes `--validate`,

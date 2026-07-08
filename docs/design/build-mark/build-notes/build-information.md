@@ -1,5 +1,7 @@
 ### BuildInformation
 
+![BuildNotes Structure](BuildNotesView.svg)
+
 #### Purpose
 
 `BuildInformation` is the top-level data record in the BuildNotes subsystem that holds all

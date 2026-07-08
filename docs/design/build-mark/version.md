@@ -1,5 +1,7 @@
 ## Version Subsystem
 
+![Version Structure](VersionView.svg)
+
 ### Overview
 
 The Version subsystem provides semantic version processing for BuildMark. It handles all

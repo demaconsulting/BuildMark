@@ -1,5 +1,7 @@
 ### ItemRouter
 
+![RepoConnectors Structure](RepoConnectorsView.svg)
+
 #### Purpose
 
 `ItemRouter` is a static utility class that routes a list of `ItemInfo` objects into report

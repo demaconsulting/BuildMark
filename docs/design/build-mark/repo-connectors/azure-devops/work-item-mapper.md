@@ -1,5 +1,7 @@
 #### WorkItemMapper
 
+![AzureDevOps Structure](AzureDevOpsView.svg)
+
 ##### Purpose
 
 `WorkItemMapper` maps `AzureDevOpsWorkItem` records from the Azure DevOps REST API into `ItemInfo`

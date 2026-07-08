@@ -1,5 +1,7 @@
 ### GitHub
 
+![GitHub Structure](GitHubView.svg)
+
 #### Overview
 
 The GitHub subsystem groups the units responsible for querying the GitHub GraphQL API. It sits

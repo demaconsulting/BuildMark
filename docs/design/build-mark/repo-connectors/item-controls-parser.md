@@ -1,5 +1,7 @@
 ### ItemControlsParser
 
+![RepoConnectors Structure](RepoConnectorsView.svg)
+
 #### Purpose
 
 `ItemControlsParser` is a static utility class that extracts a `buildmark` fenced code block from

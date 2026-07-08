@@ -1,5 +1,7 @@
 #### GitHubGraphQLClient
 
+![GitHub Structure](GitHubView.svg)
+
 ##### Purpose
 
 `GitHubGraphQLClient` is the unit responsible for issuing paginated GraphQL requests to the GitHub

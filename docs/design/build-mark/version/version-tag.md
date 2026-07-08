@@ -1,5 +1,7 @@
 ### VersionTag
 
+![Version Structure](VersionView.svg)
+
 #### Purpose
 
 `VersionTag` parses a raw repository tag string and extracts the embedded semantic version.

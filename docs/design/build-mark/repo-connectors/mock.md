@@ -1,5 +1,7 @@
 ### Mock
 
+![Mock Structure](MockView.svg)
+
 #### Overview
 
 The Mock subsystem groups the in-memory connector used by the built-in `--validate` self-test. It

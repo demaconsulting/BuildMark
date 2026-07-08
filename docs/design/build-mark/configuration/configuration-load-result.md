@@ -1,5 +1,7 @@
 ### ConfigurationLoadResult
 
+![Configuration Structure](ConfigurationView.svg)
+
 #### Purpose
 
 `ConfigurationLoadResult` is an immutable positional record that carries the output of
