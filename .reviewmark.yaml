@@ -10,6 +10,7 @@ needs-review:
   - "requirements.yaml"           # Root requirements file
   - "**/*.cs"                     # All C# source and test files
   - "docs/reqstream/**/*.yaml"    # Requirements files
+  - "docs/sysml2/**/*.sysml"      # SysML2 architecture model files
   - "docs/design/**/*.md"         # Design documentation files
   - "docs/verification/**/*.md"   # Verification documentation files
   - "docs/user_guide/**/*.md"     # User guide documentation
@@ -46,6 +47,7 @@ reviews:
       - "docs/reqstream/build-mark.yaml"
       - "docs/design/introduction.md"
       - "docs/design/build-mark.md"
+      - "docs/sysml2/**/*.sysml"
       - "docs/verification/introduction.md"
       - "docs/verification/build-mark.md"
       - "test/**/IntegrationTests.cs"
