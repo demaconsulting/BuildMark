@@ -1,5 +1,7 @@
 ### AzureDevOpsConnectorConfig
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `AzureDevOpsConnectorConfig` is an immutable record that carries Azure DevOps-specific connector

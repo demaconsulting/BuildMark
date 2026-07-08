@@ -1,5 +1,7 @@
 ### ConnectorConfig
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `ConnectorConfig` is an immutable record that serves as the connector envelope read from the

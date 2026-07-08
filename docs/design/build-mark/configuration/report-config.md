@@ -1,5 +1,7 @@
 ### ReportConfig
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `ReportConfig` is an immutable record holding optional report output settings read from the

@@ -1,5 +1,7 @@
 ### BuildMarkConfigReader
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `BuildMarkConfigReader` is a static utility class responsible for reading and deserializing

@@ -1,5 +1,7 @@
 #### MockRepoConnector
 
+![Mock Structure](../../../generated/MockView.svg)
+
 ##### Purpose
 
 `MockRepoConnector` is an in-memory implementation of `IRepoConnector` used for self-validation

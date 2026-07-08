@@ -1,5 +1,7 @@
 ### RepoConnectorFactory
 
+![RepoConnectors Structure](../../generated/RepoConnectorsView.svg)
+
 #### Purpose
 
 `RepoConnectorFactory` is a static factory class that creates the appropriate `IRepoConnector`

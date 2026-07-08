@@ -1,5 +1,7 @@
 #### AzureDevOpsRestClient
 
+![AzureDevOps Structure](../../../generated/AzureDevOpsView.svg)
+
 ##### Purpose
 
 `AzureDevOpsRestClient` is the unit responsible for issuing paginated HTTP requests to the Azure

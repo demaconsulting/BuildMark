@@ -1,5 +1,7 @@
 ### RepoConnectorBase
 
+![RepoConnectors Structure](../../generated/RepoConnectorsView.svg)
+
 #### Purpose
 
 `RepoConnectorBase` is an abstract class that implements `IRepoConnector` and provides shared

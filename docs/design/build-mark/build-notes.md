@@ -1,5 +1,7 @@
 ## BuildNotes Subsystem
 
+![BuildNotes Structure](../generated/BuildNotesView.svg)
+
 ### Overview
 
 The BuildNotes subsystem holds the shared output data model consumed by all repository

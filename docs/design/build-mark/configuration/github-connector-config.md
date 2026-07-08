@@ -1,5 +1,7 @@
 ### GitHubConnectorConfig
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `GitHubConnectorConfig` is an immutable record that carries GitHub-specific connector settings

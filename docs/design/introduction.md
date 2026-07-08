@@ -1,5 +1,7 @@
 # Introduction
 
+![Software Structure](generated/SoftwareStructureView.svg)
+
 This document provides the detailed design for BuildMark — a .NET command-line tool that
 generates markdown build notes from Git repository metadata, including GitHub and Azure DevOps
 repositories. It covers local software items (systems, subsystems, and units) and the OTS

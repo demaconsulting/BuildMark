@@ -1,5 +1,7 @@
 ### VersionComparable
 
+![Version Structure](../../generated/VersionView.svg)
+
 #### Purpose
 
 `VersionComparable` represents the comparable portion of a semantic version —

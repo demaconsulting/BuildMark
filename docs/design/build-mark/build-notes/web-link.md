@@ -1,5 +1,7 @@
 ### WebLink
 
+![BuildNotes Structure](../../generated/BuildNotesView.svg)
+
 #### Purpose
 
 `WebLink` is a record in the BuildNotes subsystem that represents a hyperlink. It is used by

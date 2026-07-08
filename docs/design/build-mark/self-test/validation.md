@@ -1,5 +1,7 @@
 ### Validation
 
+![SelfTest Structure](../../generated/SelfTestView.svg)
+
 #### Purpose
 
 `Validation` is the sole unit in the SelfTest subsystem. It runs a fixed set of self-tests that exercise

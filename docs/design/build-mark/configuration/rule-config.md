@@ -1,5 +1,7 @@
 ### RuleConfig
 
+![Configuration Structure](../../generated/ConfigurationView.svg)
+
 #### Purpose
 
 `RuleConfig` is an immutable record representing a single item routing rule read from the

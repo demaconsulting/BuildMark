@@ -1,5 +1,7 @@
 ## Utilities Subsystem
 
+![Utilities Structure](../generated/UtilitiesView.svg)
+
 ### Overview
 
 The Utilities subsystem provides the shared helper classes used across the BuildMark system. It

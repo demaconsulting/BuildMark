@@ -1,5 +1,7 @@
 ### AzureDevOps
 
+![AzureDevOps Structure](../../generated/AzureDevOpsView.svg)
+
 #### Overview
 
 The AzureDevOps subsystem groups the units responsible for querying the Azure DevOps REST API. It

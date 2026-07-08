@@ -1,5 +1,7 @@
 ## Cli Subsystem
 
+![Cli Structure](../generated/CliView.svg)
+
 ### Overview
 
 The Cli subsystem provides the command-line interface layer for BuildMark. It parses arguments

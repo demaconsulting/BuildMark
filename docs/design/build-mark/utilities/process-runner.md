@@ -1,5 +1,7 @@
 ### ProcessRunner
 
+![Utilities Structure](../../generated/UtilitiesView.svg)
+
 #### Purpose
 
 `ProcessRunner` is a static helper class in the Utilities subsystem that executes external shell commands

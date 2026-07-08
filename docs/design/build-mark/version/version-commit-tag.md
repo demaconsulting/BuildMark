@@ -1,5 +1,7 @@
 ### VersionCommitTag
 
+![Version Structure](../../generated/VersionView.svg)
+
 #### Purpose
 
 `VersionCommitTag` pairs a parsed `VersionTag` with the Git commit hash at which that tag

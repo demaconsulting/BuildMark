@@ -1,5 +1,7 @@
 #### AzureDevOpsApiTypes
 
+![AzureDevOps Structure](../../../generated/AzureDevOpsView.svg)
+
 ##### Purpose
 
 `AzureDevOpsApiTypes` is the collection of internal C# record types used by the AzureDevOps

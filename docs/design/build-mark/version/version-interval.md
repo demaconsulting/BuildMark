@@ -1,5 +1,7 @@
 ### VersionInterval
 
+![Version Structure](../../generated/VersionView.svg)
+
 #### Purpose
 
 `VersionInterval` represents a single mathematical version interval with optional inclusive

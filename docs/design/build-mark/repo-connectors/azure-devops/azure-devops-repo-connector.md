@@ -1,5 +1,7 @@
 #### AzureDevOpsRepoConnector
 
+![AzureDevOps Structure](../../../generated/AzureDevOpsView.svg)
+
 ##### Purpose
 
 `AzureDevOpsRepoConnector` is the production connector in the AzureDevOps subsystem. It implements

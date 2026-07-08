@@ -1,5 +1,7 @@
 # BuildMark
 
+![BuildMark Structure](generated/BuildMarkView.svg)
+
 ## Architecture
 
 BuildMark is composed of seven subsystems and a top-level entry-point unit. The diagram below
