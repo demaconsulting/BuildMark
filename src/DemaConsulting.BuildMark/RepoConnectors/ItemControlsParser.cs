@@ -168,7 +168,7 @@ public static partial class ItemControlsParser
                     break;
 
                 case "affected-versions" when !string.IsNullOrEmpty(value):
-                    var parsed = VersionIntervalSet.Parse(value!);
+                    var parsed = VersionIntervalSet.Parse(value);
                     if (parsed.Intervals.Count > 0)
                     {
                         affectedVersions = parsed;

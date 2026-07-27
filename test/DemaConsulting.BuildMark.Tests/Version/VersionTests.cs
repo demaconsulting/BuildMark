@@ -119,7 +119,7 @@ public class VersionTests
         var commitHash = "abc123def456789";
 
         // Act
-        var versionCommitTag = new VersionCommitTag(versionTag!, commitHash);
+        var versionCommitTag = new VersionCommitTag(versionTag, commitHash);
 
         // Assert
         Assert.NotNull(versionCommitTag);
@@ -140,7 +140,7 @@ public class VersionTests
         var versionSemantic = VersionSemantic.Create("2.0.0-beta.2+build.1");
         var versionTag = VersionTag.Create("v3.1.0");
         var versionInterval = new VersionInterval("1.0.0", true, "2.0.0", false);
-        var versionCommitTag = new VersionCommitTag(versionTag!, "abc123def456");
+        var versionCommitTag = new VersionCommitTag(versionTag, "abc123def456");
 
         // Assert - All types are created successfully
         Assert.NotNull(versionComparable);
@@ -173,11 +173,11 @@ public class VersionTests
         var version6 = VersionComparable.Create("1.0.0");
 
         // Assert - SemVer precedence is maintained
-        Assert.True(version1!.CompareTo(version2) < 0, "1.0.0-alpha < 1.0.0-alpha.1");
-        Assert.True(version2!.CompareTo(version3) < 0, "1.0.0-alpha.1 < 1.0.0-alpha.beta");
-        Assert.True(version3!.CompareTo(version4) < 0, "1.0.0-alpha.beta < 1.0.0-beta");
-        Assert.True(version4!.CompareTo(version5) < 0, "1.0.0-beta < 1.0.0-beta.2");
-        Assert.True(version5!.CompareTo(version6) < 0, "1.0.0-beta.2 < 1.0.0");
+        Assert.True(version1.CompareTo(version2) < 0, "1.0.0-alpha < 1.0.0-alpha.1");
+        Assert.True(version2.CompareTo(version3) < 0, "1.0.0-alpha.1 < 1.0.0-alpha.beta");
+        Assert.True(version3.CompareTo(version4) < 0, "1.0.0-alpha.beta < 1.0.0-beta");
+        Assert.True(version4.CompareTo(version5) < 0, "1.0.0-beta < 1.0.0-beta.2");
+        Assert.True(version5.CompareTo(version6) < 0, "1.0.0-beta.2 < 1.0.0");
     }
 
     /// <summary>
@@ -193,9 +193,9 @@ public class VersionTests
         var tag3 = VersionTag.Create("release-1.5.0");
 
         // Act - Get comparable versions
-        var comparable1 = tag1!.Semantic.Comparable;
-        var comparable2 = tag2!.Semantic.Comparable;
-        var comparable3 = tag3!.Semantic.Comparable;
+        var comparable1 = tag1.Semantic.Comparable;
+        var comparable2 = tag2.Semantic.Comparable;
+        var comparable3 = tag3.Semantic.Comparable;
 
         // Assert - Comparable versions are extracted correctly
         Assert.NotNull(comparable1);
