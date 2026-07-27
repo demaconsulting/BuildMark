@@ -222,7 +222,7 @@ public class RepoConnectorBaseTests
         // Assert - returns the first tag with a different commit hash (v1.0.0), skipping same-hash entries
         Assert.True(baseline != null, "Baseline should not be null when a different-commit predecessor exists");
         Assert.True(
-            baseline!.VersionTag.Tag == "v1.0.0",
+            baseline.VersionTag.Tag == "v1.0.0",
             $"Expected baseline 'v1.0.0' but got '{baseline.VersionTag.Tag}'");
     }
 
@@ -269,7 +269,7 @@ public class RepoConnectorBaseTests
         // Assert - returns v1.0.0, the most recent non-pre-release tag
         Assert.True(baseline != null, "Baseline should not be null when a preceding release tag exists");
         Assert.True(
-            baseline!.VersionTag.Tag == "v1.0.0",
+            baseline.VersionTag.Tag == "v1.0.0",
             $"Expected baseline 'v1.0.0' but got '{baseline.VersionTag.Tag}'");
     }
 

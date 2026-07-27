@@ -328,11 +328,11 @@ public class VersionIntervalTests
 
         // Act & Assert
         Assert.True(interval!.Contains("1.2.0-rc.1"));  // Equal to inclusive lower bound
-        Assert.True(interval!.Contains("1.2.0-rc.2"));  // Between bounds (rc.2 > rc.1)
-        Assert.True(interval!.Contains("1.2.0"));       // Equal to inclusive upper bound
-        Assert.False(interval!.Contains("1.2.0-alpha.1")); // Before lower bound (alpha < rc)
-        Assert.False(interval!.Contains("1.2.1"));     // After upper bound
-        Assert.False(interval!.Contains("1.1.9"));     // Before lower bound
+        Assert.True(interval.Contains("1.2.0-rc.2"));  // Between bounds (rc.2 > rc.1)
+        Assert.True(interval.Contains("1.2.0"));       // Equal to inclusive upper bound
+        Assert.False(interval.Contains("1.2.0-alpha.1")); // Before lower bound (alpha < rc)
+        Assert.False(interval.Contains("1.2.1"));     // After upper bound
+        Assert.False(interval.Contains("1.1.9"));     // Before lower bound
     }
 
     /// <summary>
@@ -346,9 +346,9 @@ public class VersionIntervalTests
 
         // Act & Assert
         Assert.True(interval!.Contains("1.2.0-alpha.1"));  // Equal to inclusive lower bound
-        Assert.True(interval!.Contains("1.2.0-beta.1"));   // Between bounds
-        Assert.False(interval!.Contains("1.2.0-rc.1"));   // Equal to exclusive upper bound
-        Assert.False(interval!.Contains("1.2.0"));        // After upper bound (release > pre-release)
+        Assert.True(interval.Contains("1.2.0-beta.1"));   // Between bounds
+        Assert.False(interval.Contains("1.2.0-rc.1"));   // Equal to exclusive upper bound
+        Assert.False(interval.Contains("1.2.0"));        // After upper bound (release > pre-release)
     }
 
     /// <summary>
@@ -362,10 +362,10 @@ public class VersionIntervalTests
 
         // Act & Assert
         Assert.True(interval!.Contains("1.0.0-alpha.5"));   // Equal to lower bound
-        Assert.True(interval!.Contains("1.0.0-alpha.6"));   // Between bounds
-        Assert.True(interval!.Contains("1.0.0-alpha.10"));  // Equal to upper bound
-        Assert.False(interval!.Contains("1.0.0-alpha.4"));  // Before lower bound
-        Assert.False(interval!.Contains("1.0.0-alpha.11")); // After upper bound
+        Assert.True(interval.Contains("1.0.0-alpha.6"));   // Between bounds
+        Assert.True(interval.Contains("1.0.0-alpha.10"));  // Equal to upper bound
+        Assert.False(interval.Contains("1.0.0-alpha.4"));  // Before lower bound
+        Assert.False(interval.Contains("1.0.0-alpha.11")); // After upper bound
     }
 
     /// <summary>
@@ -381,7 +381,7 @@ public class VersionIntervalTests
 
         // Act & Assert
         Assert.True(interval!.Contains(preReleaseVersion));
-        Assert.True(interval!.Contains(releaseVersion));
+        Assert.True(interval.Contains(releaseVersion));
     }
 }
 
