@@ -191,6 +191,7 @@ jobs:
           --coverlet
           --coverlet-output-format opencover
           --report-trx
+          --report-trx-filename "${{ matrix.os }}_{asm}_{tfm}_{arch}.trx"
           --results-directory artifacts
 
       - name: End Sonar Scanner
