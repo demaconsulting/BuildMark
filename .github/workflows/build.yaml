@@ -188,8 +188,9 @@ jobs:
           --no-build
           --configuration Release
           --property:Version=${{ inputs.version }}
-          --collect "XPlat Code Coverage;Format=opencover"
-          --logger "trx;LogFilePrefix=${{ matrix.os }}"
+          --coverlet
+          --coverlet-output-format opencover
+          --report-trx
           --results-directory artifacts
 
       - name: End Sonar Scanner
