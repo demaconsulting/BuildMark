@@ -25,7 +25,7 @@ if ($LASTEXITCODE -ne 0) { $buildError = $true }
 # [PROJECT-SPECIFIC] Add additional build steps here.
 
 Write-Host "Running unit tests..."
-dotnet test --no-build --configuration Release --logger trx --results-directory artifacts/tests
+dotnet test --no-build --configuration Release --report-trx --results-directory artifacts/tests
 if ($LASTEXITCODE -ne 0) { $buildError = $true }
 
 # [PROJECT-SPECIFIC] Add additional test or post-build steps here.
