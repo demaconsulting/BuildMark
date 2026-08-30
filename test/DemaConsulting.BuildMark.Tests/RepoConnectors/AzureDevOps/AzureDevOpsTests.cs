@@ -45,7 +45,7 @@ public class AzureDevOpsTests
         var connector = new AzureDevOpsRepoConnector();
 
         // Assert: the sub-subsystem connector satisfies the shared IRepoConnector interface
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>

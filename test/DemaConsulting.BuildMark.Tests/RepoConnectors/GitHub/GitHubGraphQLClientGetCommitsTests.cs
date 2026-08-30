@@ -207,8 +207,8 @@ public class GitHubGraphQLClientGetCommitsTests
 
         // Assert
         Assert.NotNull(commitShas);
-        Assert.Single(commitShas);
-        Assert.Equal("abc123def456", commitShas[0]);
+        var commitSha = Assert.Single(commitShas);
+        Assert.Equal("abc123def456", commitSha);
     }
 
     /// <summary>

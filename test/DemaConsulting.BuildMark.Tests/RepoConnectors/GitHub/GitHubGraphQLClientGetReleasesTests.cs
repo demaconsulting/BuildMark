@@ -195,8 +195,8 @@ public class GitHubGraphQLClientGetReleasesTests
 
         // Assert
         Assert.NotNull(releaseNodes);
-        Assert.Single(releaseNodes);
-        Assert.Equal("v2.0.0-beta1", releaseNodes[0].TagName);
+        var releaseNode = Assert.Single(releaseNodes);
+        Assert.Equal("v2.0.0-beta1", releaseNode.TagName);
     }
 
     /// <summary>

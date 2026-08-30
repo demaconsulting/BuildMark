@@ -89,8 +89,8 @@ public class GitHubGraphQLClientGetAllIssuesTests
         Assert.Equal("https://github.com/owner/repo/issues/1", issues[0].Url);
         Assert.Equal("OPEN", issues[0].State);
         Assert.NotNull(issues[0].Labels?.Nodes);
-        Assert.Single(issues[0].Labels!.Nodes!);
-        Assert.Equal("bug", issues[0].Labels!.Nodes![0].Name);
+        var label = Assert.Single(issues[0].Labels!.Nodes!);
+        Assert.Equal("bug", label.Name);
 
         Assert.Equal(2, issues[1].Number);
         Assert.Equal("Feature: Add dark mode", issues[1].Title);
@@ -247,9 +247,9 @@ public class GitHubGraphQLClientGetAllIssuesTests
 
         // Assert
         Assert.NotNull(issues);
-        Assert.Single(issues);
-        Assert.Equal(2, issues[0].Number);
-        Assert.Equal("Valid issue", issues[0].Title);
+        var issue = Assert.Single(issues);
+        Assert.Equal(2, issue.Number);
+        Assert.Equal("Valid issue", issue.Title);
     }
 
     /// <summary>
@@ -332,8 +332,8 @@ public class GitHubGraphQLClientGetAllIssuesTests
 
         // Assert
         Assert.NotNull(issues);
-        Assert.Single(issues);
-        Assert.Equal("This is an issue.\n\n```buildmark\nvisibility: internal\n```", issues[0].Body);
+        var issue = Assert.Single(issues);
+        Assert.Equal("This is an issue.\n\n```buildmark\nvisibility: internal\n```", issue.Body);
     }
 
     /// <summary>

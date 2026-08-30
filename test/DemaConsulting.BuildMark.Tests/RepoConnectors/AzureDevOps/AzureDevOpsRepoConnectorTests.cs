@@ -312,7 +312,7 @@ public class AzureDevOpsRepoConnectorTests
         var connector = new AzureDevOpsRepoConnector();
 
         // Assert
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     // ─────────────────────────────────────────────────────────────────────────

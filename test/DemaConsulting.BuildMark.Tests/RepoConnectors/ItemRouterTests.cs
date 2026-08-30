@@ -59,10 +59,10 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert
-        Assert.Single(routedItems["changes"]);
-        Assert.Equal("1", routedItems["changes"][0].Id);
-        Assert.Single(routedItems["bugs"]);
-        Assert.Equal("2", routedItems["bugs"][0].Id);
+        var change = Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", change.Id);
+        var bug = Assert.Single(routedItems["bugs"]);
+        Assert.Equal("2", bug.Id);
     }
 
     /// <summary>
@@ -150,10 +150,10 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - only the bug item is routed to "bugs"; feature falls through to default
-        Assert.Single(routedItems["changes"]);
-        Assert.Equal("1", routedItems["changes"][0].Id);
-        Assert.Single(routedItems["bugs"]);
-        Assert.Equal("2", routedItems["bugs"][0].Id);
+        var change = Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", change.Id);
+        var bug = Assert.Single(routedItems["bugs"]);
+        Assert.Equal("2", bug.Id);
     }
 
     /// <summary>
@@ -182,8 +182,8 @@ public class ItemRouterTests
         var routedItems = ItemRouter.Route(items, rules, sections);
 
         // Assert - unmatched item lands in the first section ("changes")
-        Assert.Single(routedItems["changes"]);
-        Assert.Equal("1", routedItems["changes"][0].Id);
+        var change = Assert.Single(routedItems["changes"]);
+        Assert.Equal("1", change.Id);
         Assert.Empty(routedItems["bugs"]);
     }
 
@@ -211,8 +211,8 @@ public class ItemRouterTests
         // Assert - item is routed to the new section, which is created dynamically
         Assert.Empty(routedItems["changes"]);
         Assert.True(routedItems.TryGetValue("new-section", out var newSection));
-        Assert.Single(newSection);
-        Assert.Equal("1", newSection[0].Id);
+        var newSectionItem = Assert.Single(newSection);
+        Assert.Equal("1", newSectionItem.Id);
     }
 
     /// <summary>
@@ -245,8 +245,8 @@ public class ItemRouterTests
 
         // Assert - "Bug" type matches "bug" label rule due to case-insensitive comparison
         Assert.Empty(routedItems["changes"]);
-        Assert.Single(routedItems["bugs"]);
-        Assert.Equal("1", routedItems["bugs"][0].Id);
+        var bug = Assert.Single(routedItems["bugs"]);
+        Assert.Equal("1", bug.Id);
     }
 
     /// <summary>

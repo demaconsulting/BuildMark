@@ -42,7 +42,7 @@ public class MockRepoConnectorTests
 
         // Verify instance
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<MockRepoConnector>(connector);
+        Assert.IsType<MockRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -55,7 +55,7 @@ public class MockRepoConnectorTests
         var connector = new MockRepoConnector();
 
         // Verify interface implementation
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>

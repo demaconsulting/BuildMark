@@ -43,13 +43,13 @@ public class MockGitHubGraphQLHttpMessageHandlerTests
 
         // Act & Assert - GetCommitsAsync should return commit1
         var commits = await client.GetCommitsAsync("owner", "repo", "main");
-        Assert.Single(commits);
-        Assert.Equal("commit1", commits[0]);
+        var commit = Assert.Single(commits);
+        Assert.Equal("commit1", commit);
 
         // Act & Assert - GetReleasesAsync should return different data
         var releases = await client.GetReleasesAsync("owner", "repo");
-        Assert.Single(releases);
-        Assert.Equal("v1.0.0", releases[0].TagName);
+        var release = Assert.Single(releases);
+        Assert.Equal("v1.0.0", release.TagName);
     }
 
     /// <summary>

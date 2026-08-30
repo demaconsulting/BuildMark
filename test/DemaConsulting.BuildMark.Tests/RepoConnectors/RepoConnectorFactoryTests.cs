@@ -41,7 +41,7 @@ public class RepoConnectorFactoryTests
 
         // Verify connector is created successfully
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -54,7 +54,7 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create();
 
         // Verify GitHub connector is returned
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -79,8 +79,8 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create(config);
 
         // Assert
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
-        var forwardedConfig = ((GitHubRepoConnector)connector).ConfigurationOverrides;
+        var gitHubConnector = Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
+        var forwardedConfig = gitHubConnector.ConfigurationOverrides;
         Assert.NotNull(forwardedConfig);
         Assert.Equal("example-owner", forwardedConfig.Owner);
         Assert.Equal("example-repo", forwardedConfig.Repo);
@@ -101,7 +101,7 @@ public class RepoConnectorFactoryTests
 
         // Assert
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+        Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -127,8 +127,7 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.Create(config);
 
         // Assert
-        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
-        var adoConnector = (AzureDevOpsRepoConnector)connector;
+        var adoConnector = Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
         Assert.NotNull(adoConnector.ConfigurationOverrides);
         Assert.Equal("https://dev.azure.com/myorg", adoConnector.ConfigurationOverrides.OrganizationUrl);
         Assert.Equal("myproject", adoConnector.ConfigurationOverrides.Project);
@@ -156,7 +155,7 @@ public class RepoConnectorFactoryTests
             var connector = RepoConnectorFactory.Create();
 
             // Assert
-            Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+            Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
         }
         finally
         {
@@ -188,7 +187,7 @@ public class RepoConnectorFactoryTests
             var connector = RepoConnectorFactory.Create();
 
             // Assert
-            Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+            Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
         }
         finally
         {
@@ -211,7 +210,7 @@ public class RepoConnectorFactoryTests
             "https://dev.azure.com/myorg/myproject/_git/myrepo");
 
         // Assert
-        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+        Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -226,7 +225,7 @@ public class RepoConnectorFactoryTests
             "https://myorg.visualstudio.com/myproject/_git/myrepo");
 
         // Assert
-        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+        Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -241,7 +240,7 @@ public class RepoConnectorFactoryTests
             "https://github.com/example-owner/example-repo.git");
 
         // Assert
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -254,6 +253,6 @@ public class RepoConnectorFactoryTests
         var connector = RepoConnectorFactory.CreateFromRemoteUrl(null, null);
 
         // Assert
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 }

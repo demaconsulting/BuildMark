@@ -223,9 +223,9 @@ public class BuildInformationTests
 
         // Assert - verify bugs and changes are properly separated
         Assert.Single(buildInfo.Changes);
-        Assert.Single(buildInfo.Bugs);
-        Assert.Equal("2", buildInfo.Bugs[0].Id);
-        Assert.Equal("Fix bug in Y", buildInfo.Bugs[0].Title);
+        var bug = Assert.Single(buildInfo.Bugs);
+        Assert.Equal("2", bug.Id);
+        Assert.Equal("Fix bug in Y", bug.Title);
     }
 
     /// <summary>

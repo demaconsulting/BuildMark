@@ -201,8 +201,8 @@ public class GitHubGraphQLClientFindIssueIdsTests
 
         // Assert
         Assert.NotNull(issueIds);
-        Assert.Single(issueIds);
-        Assert.Equal(999, issueIds[0]);
+        var issueId = Assert.Single(issueIds);
+        Assert.Equal(999, issueId);
     }
 
     /// <summary>

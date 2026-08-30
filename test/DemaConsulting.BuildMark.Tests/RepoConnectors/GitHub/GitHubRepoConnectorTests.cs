@@ -46,7 +46,7 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -86,7 +86,7 @@ public class GitHubRepoConnectorTests
         var connector = new GitHubRepoConnector();
 
         // Assert
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
 
@@ -754,8 +754,8 @@ public class GitHubRepoConnectorTests
         // Assert
         Assert.NotNull(buildInfo);
         // Item should be included in Changes (type "other" which is not bug)
-        Assert.Single(buildInfo.Changes);
-        Assert.Equal("Public PR", buildInfo.Changes[0].Title);
+        var change = Assert.Single(buildInfo.Changes);
+        Assert.Equal("Public PR", change.Title);
     }
 
     /// <summary>
@@ -786,8 +786,8 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.NotNull(buildInfo);
-        Assert.Single(buildInfo.Bugs);
-        Assert.Equal("Bug PR", buildInfo.Bugs[0].Title);
+        var bug = Assert.Single(buildInfo.Bugs);
+        Assert.Equal("Bug PR", bug.Title);
         Assert.Empty(buildInfo.Changes);
     }
 
@@ -819,9 +819,9 @@ public class GitHubRepoConnectorTests
 
         // Assert
         Assert.NotNull(buildInfo);
-        Assert.Single(buildInfo.Changes);
-        Assert.Equal("Feature PR", buildInfo.Changes[0].Title);
-        Assert.Equal("feature", buildInfo.Changes[0].Type);
+        var change = Assert.Single(buildInfo.Changes);
+        Assert.Equal("Feature PR", change.Title);
+        Assert.Equal("feature", change.Type);
         Assert.Empty(buildInfo.Bugs);
     }
 
@@ -853,7 +853,7 @@ public class GitHubRepoConnectorTests
 
         // Assert - Connector is still a valid instance after configuration
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
         Assert.True(connector.HasRules, "HasRules should return true after Configure is called with rules");
     }
 
@@ -910,15 +910,15 @@ public class GitHubRepoConnectorTests
         var featuresSection = buildInfo.RoutedSections[0];
         Assert.Equal("features", featuresSection.SectionId);
         Assert.Equal("Features", featuresSection.SectionTitle);
-        Assert.Single(featuresSection.Items);
-        Assert.Equal("Feature PR", featuresSection.Items[0].Title);
+        var featureItem = Assert.Single(featuresSection.Items);
+        Assert.Equal("Feature PR", featureItem.Title);
 
         // Verify the bug item was routed to the "bugs" section (second section)
         var bugsSection = buildInfo.RoutedSections[1];
         Assert.Equal("bugs", bugsSection.SectionId);
         Assert.Equal("Bugs Fixed", bugsSection.SectionTitle);
-        Assert.Single(bugsSection.Items);
-        Assert.Equal("Bug PR", bugsSection.Items[0].Title);
+        var bugItem = Assert.Single(bugsSection.Items);
+        Assert.Equal("Bug PR", bugItem.Title);
     }
 
     /// <summary>

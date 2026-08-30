@@ -49,7 +49,7 @@ public class RepoConnectorsTests
         var connector = new GitHubRepoConnector();
 
         // Assert: it satisfies the public IRepoConnector interface
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -272,9 +272,9 @@ public class RepoConnectorsTests
         var connector = new MockRepoConnector();
 
         // Assert: MockRepoConnector derives from the base class and satisfies the shared interface
-        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
-        Assert.IsAssignableFrom<MockRepoConnector>(connector);
+        Assert.IsType<RepoConnectorBase>(connector, exactMatch: false);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
+        Assert.IsType<MockRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -287,9 +287,9 @@ public class RepoConnectorsTests
         var connector = new GitHubRepoConnector();
 
         // Assert: GitHubRepoConnector derives from the base class and satisfies the shared interface
-        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<RepoConnectorBase>(connector, exactMatch: false);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -307,7 +307,7 @@ public class RepoConnectorsTests
 
         // Assert: instance is created and is of the expected type
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<MockRepoConnector>(connector);
+        Assert.IsType<MockRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -320,8 +320,8 @@ public class RepoConnectorsTests
         var connector = new MockRepoConnector();
 
         // Assert: it implements both the base class and the public interface
-        Assert.IsAssignableFrom<RepoConnectorBase>(connector);
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<RepoConnectorBase>(connector, exactMatch: false);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -466,7 +466,7 @@ public class RepoConnectorsTests
 
         // Assert: a valid IRepoConnector instance is returned
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
@@ -479,7 +479,7 @@ public class RepoConnectorsTests
         var connector = RepoConnectorFactory.Create();
 
         // Assert: the factory selects the GitHub connector for this GitHub-hosted repository
-        Assert.IsAssignableFrom<GitHubRepoConnector>(connector);
+        Assert.IsType<GitHubRepoConnector>(connector, exactMatch: false);
     }
 
     // ─────────────────────────────────────────────────────────────────────────
@@ -638,10 +638,10 @@ public class RepoConnectorsTests
         var routed = ItemRouter.Route(items, rules, sections);
 
         // Assert: each item is routed to its matching section
-        Assert.Single(routed["features"]);
-        Assert.Equal("1", routed["features"][0].Id);
-        Assert.Single(routed["bugs"]);
-        Assert.Equal("2", routed["bugs"][0].Id);
+        var feature = Assert.Single(routed["features"]);
+        Assert.Equal("1", feature.Id);
+        var bug = Assert.Single(routed["bugs"]);
+        Assert.Equal("2", bug.Id);
     }
 
     /// <summary>
@@ -687,7 +687,7 @@ public class RepoConnectorsTests
         var connector = new AzureDevOpsRepoConnector();
 
         // Assert: it satisfies the public IRepoConnector interface
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>

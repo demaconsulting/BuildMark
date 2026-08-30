@@ -971,7 +971,7 @@ public class IntegrationTests
         // Assert: configuration was parsed without errors and the factory created an Azure DevOps connector
         Assert.False(loadResult.HasErrors, "Configuration file should load without errors");
         Assert.NotNull(connector);
-        Assert.IsAssignableFrom<AzureDevOpsRepoConnector>(connector);
+        Assert.IsType<AzureDevOpsRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
