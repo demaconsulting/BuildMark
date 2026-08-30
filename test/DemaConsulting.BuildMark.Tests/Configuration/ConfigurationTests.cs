@@ -85,11 +85,11 @@ public class ConfigurationTests
         Assert.Equal("example-owner", result.Config.Connector?.GitHub?.Owner);
         Assert.Equal("hello-world", result.Config.Connector?.GitHub?.Repo);
         Assert.Equal("https://api.github.com", result.Config.Connector?.GitHub?.BaseUrl);
-        Assert.Single(result.Config.Sections);
-        Assert.Equal("changes", result.Config.Sections[0].Id);
-        Assert.Single(result.Config.Rules);
-        Assert.Equal("changes", result.Config.Rules[0].Route);
-        Assert.Equal("feature", result.Config.Rules[0].Match?.Label[0]);
+        var section = Assert.Single(result.Config.Sections);
+        Assert.Equal("changes", section.Id);
+        var rule = Assert.Single(result.Config.Rules);
+        Assert.Equal("changes", rule.Route);
+        Assert.Equal("feature", rule.Match?.Label[0]);
     }
 
     /// <summary>

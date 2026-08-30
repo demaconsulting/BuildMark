@@ -198,9 +198,9 @@ public class GitHubGraphQLClientGetAllTagsTests
 
         // Assert
         Assert.NotNull(tagNodes);
-        Assert.Single(tagNodes);
-        Assert.Equal("v2.0.0-beta1", tagNodes[0].Name);
-        Assert.Equal("xyz999", tagNodes[0].Target?.Oid);
+        var tagNode = Assert.Single(tagNodes);
+        Assert.Equal("v2.0.0-beta1", tagNode.Name);
+        Assert.Equal("xyz999", tagNode.Target?.Oid);
     }
 
     /// <summary>

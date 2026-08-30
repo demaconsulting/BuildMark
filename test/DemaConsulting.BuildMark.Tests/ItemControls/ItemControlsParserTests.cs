@@ -157,9 +157,9 @@ public class ItemControlsParserTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.AffectedVersions);
-        Assert.Single(result.AffectedVersions.Intervals);
-        Assert.Equal("1.0.0", result.AffectedVersions.Intervals[0].LowerBound);
-        Assert.Equal("2.0.0", result.AffectedVersions.Intervals[0].UpperBound);
+        var interval = Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Equal("1.0.0", interval.LowerBound);
+        Assert.Equal("2.0.0", interval.UpperBound);
     }
 
     /// <summary>

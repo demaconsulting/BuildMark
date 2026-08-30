@@ -141,14 +141,14 @@ public class RepoConnectorBaseTests
         // Assert - Feature item routed to features section
         var featuresSection = sections.FirstOrDefault(s => s.SectionId == "features");
         Assert.True(featuresSection.SectionTitle != null, "Features section should be present");
-        Assert.Single(featuresSection.Items);
-        Assert.True(featuresSection.Items[0].Id == "1", "Feature item should be in features section");
+        var featureItem = Assert.Single(featuresSection.Items);
+        Assert.True(featureItem.Id == "1", "Feature item should be in features section");
 
         // Assert - Bug item routed to bugs section
         var bugsSection = sections.FirstOrDefault(s => s.SectionId == "bugs");
         Assert.True(bugsSection.SectionTitle != null, "Bugs section should be present");
-        Assert.Single(bugsSection.Items);
-        Assert.True(bugsSection.Items[0].Id == "2", "Bug item should be in bugs section");
+        var bugItem = Assert.Single(bugsSection.Items);
+        Assert.True(bugItem.Id == "2", "Bug item should be in bugs section");
     }
 
     /// <summary>

@@ -96,8 +96,8 @@ public class GitHubGraphQLClientGetPullRequestsTests
         Assert.Equal("abc123", pullRequests[0].MergeCommit?.Oid);
         Assert.Equal("def456", pullRequests[0].HeadRefOid);
         Assert.NotNull(pullRequests[0].Labels?.Nodes);
-        Assert.Single(pullRequests[0].Labels!.Nodes!);
-        Assert.Equal("feature", pullRequests[0].Labels!.Nodes![0].Name);
+        var label = Assert.Single(pullRequests[0].Labels!.Nodes!);
+        Assert.Equal("feature", label.Name);
 
         Assert.Equal(2, pullRequests[1].Number);
         Assert.Equal("Fix bug B", pullRequests[1].Title);
@@ -244,9 +244,9 @@ public class GitHubGraphQLClientGetPullRequestsTests
 
         // Assert
         Assert.NotNull(pullRequests);
-        Assert.Single(pullRequests);
-        Assert.Equal(42, pullRequests[0].Number);
-        Assert.Equal("Important PR", pullRequests[0].Title);
+        var pullRequest = Assert.Single(pullRequests);
+        Assert.Equal(42, pullRequest.Number);
+        Assert.Equal("Important PR", pullRequest.Title);
     }
 
     /// <summary>
@@ -380,8 +380,8 @@ public class GitHubGraphQLClientGetPullRequestsTests
 
         // Assert
         Assert.NotNull(pullRequests);
-        Assert.Single(pullRequests);
-        Assert.Equal("This PR fixes a bug.\n\n```buildmark\ntype: bug\n```", pullRequests[0].Body);
+        var pullRequest = Assert.Single(pullRequests);
+        Assert.Equal("This PR fixes a bug.\n\n```buildmark\ntype: bug\n```", pullRequest.Body);
     }
 
     /// <summary>

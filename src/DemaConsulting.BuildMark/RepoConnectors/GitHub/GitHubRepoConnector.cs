@@ -52,6 +52,11 @@ public class GitHubRepoConnector : RepoConnectorBase
     private const string ItemTypeInternal = "internal";
 
     /// <summary>
+    ///     URL scheme prefix used to detect and strip HTTPS remote URLs.
+    /// </summary>
+    private const string HttpsPrefix = "https://";
+
+    /// <summary>
     ///     Item visibility: public (force-include in report).
     /// </summary>
     private const string VisibilityPublic = "public";
@@ -123,7 +128,7 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Parse owner and repo from URL, using non-empty config overrides when available
         string owner, repo;
-        if (!string.IsNullOrWhiteSpace(_config?.Owner) && !string.IsNullOrWhiteSpace(_config?.Repo))
+        if (!string.IsNullOrWhiteSpace(_config?.Owner) && !string.IsNullOrWhiteSpace(_config.Repo))
         {
             owner = _config.Owner;
             repo = _config.Repo;
@@ -298,19 +303,19 @@ public class GitHubRepoConnector : RepoConnectorBase
             if (atIndex >= 0 && colonIndex > atIndex)
             {
                 var host = remoteUrl[(atIndex + 1)..colonIndex];
-                return $"https://{host}";
+                return HttpsPrefix + host;
             }
         }
 
         // HTTPS format: https://<host>/... → https://<host>
-        if (remoteUrl.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        if (remoteUrl.StartsWith(HttpsPrefix, StringComparison.OrdinalIgnoreCase))
         {
-            var withoutScheme = remoteUrl["https://".Length..];
+            var withoutScheme = remoteUrl[HttpsPrefix.Length..];
             var slashIndex = withoutScheme.IndexOf('/', StringComparison.Ordinal);
             if (slashIndex >= 0)
             {
                 var host = withoutScheme[..slashIndex];
-                return $"https://{host}";
+                return HttpsPrefix + host;
             }
 
             // No path segment — use the whole URL as-is
@@ -318,7 +323,7 @@ public class GitHubRepoConnector : RepoConnectorBase
         }
 
         // Default fallback
-        return "https://github.com";
+        return $"{HttpsPrefix}github.com";
     }
 
     /// <summary>
@@ -1172,10 +1177,10 @@ public class GitHubRepoConnector : RepoConnectorBase
 
         // Handle HTTPS URLs: https://<host>/owner/repo[.git]
         // Strip the scheme and host, then take the last two non-empty path segments
-        if (url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        if (url.StartsWith(HttpsPrefix, StringComparison.OrdinalIgnoreCase))
         {
             // Remove scheme and locate the start of the path (first slash after the host)
-            var withoutScheme = url["https://".Length..];
+            var withoutScheme = url[HttpsPrefix.Length..];
             var slashIndex = withoutScheme.IndexOf('/', StringComparison.Ordinal);
             if (slashIndex >= 0)
             {

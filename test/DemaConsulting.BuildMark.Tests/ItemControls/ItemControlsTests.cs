@@ -201,8 +201,8 @@ public class ItemControlsTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.AffectedVersions);
-        Assert.Single(result.AffectedVersions.Intervals);
-        Assert.True(result.AffectedVersions.Intervals[0].LowerInclusive);
+        var interval = Assert.Single(result.AffectedVersions.Intervals);
+        Assert.True(interval.LowerInclusive);
     }
 
     /// <summary>
@@ -220,8 +220,8 @@ public class ItemControlsTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.AffectedVersions);
-        Assert.Single(result.AffectedVersions.Intervals);
-        Assert.False(result.AffectedVersions.Intervals[0].UpperInclusive);
+        var interval = Assert.Single(result.AffectedVersions.Intervals);
+        Assert.False(interval.UpperInclusive);
     }
 
     /// <summary>
@@ -239,8 +239,8 @@ public class ItemControlsTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.AffectedVersions);
-        Assert.Single(result.AffectedVersions.Intervals);
-        Assert.Null(result.AffectedVersions.Intervals[0].LowerBound);
+        var interval = Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Null(interval.LowerBound);
     }
 
     /// <summary>
@@ -258,8 +258,8 @@ public class ItemControlsTests
         // Assert
         Assert.NotNull(result);
         Assert.NotNull(result.AffectedVersions);
-        Assert.Single(result.AffectedVersions.Intervals);
-        Assert.Null(result.AffectedVersions.Intervals[0].UpperBound);
+        var interval = Assert.Single(result.AffectedVersions.Intervals);
+        Assert.Null(interval.UpperBound);
     }
 }
 

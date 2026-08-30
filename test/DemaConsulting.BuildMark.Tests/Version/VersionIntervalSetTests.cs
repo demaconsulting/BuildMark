@@ -41,9 +41,9 @@ public class VersionIntervalSetTests
 
         // Assert
         Assert.NotNull(result);
-        Assert.Single(result.Intervals);
-        Assert.Equal("1.0.0", result.Intervals[0].LowerBound);
-        Assert.Equal("2.0.0", result.Intervals[0].UpperBound);
+        var interval = Assert.Single(result.Intervals);
+        Assert.Equal("1.0.0", interval.LowerBound);
+        Assert.Equal("2.0.0", interval.UpperBound);
     }
 
     /// <summary>
@@ -121,9 +121,9 @@ public class VersionIntervalSetTests
 
         // Assert - invalid token is discarded; only the valid interval remains
         Assert.NotNull(result);
-        Assert.Single(result.Intervals);
-        Assert.Equal("1.0.0", result.Intervals[0].LowerBound);
-        Assert.Equal("2.0.0", result.Intervals[0].UpperBound);
+        var interval = Assert.Single(result.Intervals);
+        Assert.Equal("1.0.0", interval.LowerBound);
+        Assert.Equal("2.0.0", interval.UpperBound);
     }
 
     /// <summary>

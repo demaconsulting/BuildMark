@@ -142,7 +142,7 @@ public class ValidationTests
             Assert.Contains("Unsupported results file format", output);
 
             // Assert - Verify exit code is 1 when an error is reported
-            Assert.True(context.ExitCode == 1);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {
@@ -178,7 +178,7 @@ public class ValidationTests
             Assert.Contains("Failed to write results file", output);
 
             // Assert - Verify exit code is 1 when a write error is reported
-            Assert.True(context.ExitCode == 1);
+            Assert.Equal(1, context.ExitCode);
         }
         finally
         {

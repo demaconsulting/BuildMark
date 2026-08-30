@@ -43,9 +43,9 @@ public class VersionTests
         Assert.NotNull(simple);
         Assert.NotNull(preRelease);
         Assert.NotNull(complex);
-        Assert.IsAssignableFrom<VersionComparable>(simple);
-        Assert.IsAssignableFrom<VersionComparable>(preRelease);
-        Assert.IsAssignableFrom<VersionComparable>(complex);
+        Assert.IsType<VersionComparable>(simple, exactMatch: false);
+        Assert.IsType<VersionComparable>(preRelease, exactMatch: false);
+        Assert.IsType<VersionComparable>(complex, exactMatch: false);
     }
 
     /// <summary>
@@ -63,9 +63,9 @@ public class VersionTests
         Assert.NotNull(simple);
         Assert.NotNull(withMetadata);
         Assert.NotNull(complex);
-        Assert.IsAssignableFrom<VersionSemantic>(simple);
-        Assert.IsAssignableFrom<VersionSemantic>(withMetadata);
-        Assert.IsAssignableFrom<VersionSemantic>(complex);
+        Assert.IsType<VersionSemantic>(simple, exactMatch: false);
+        Assert.IsType<VersionSemantic>(withMetadata, exactMatch: false);
+        Assert.IsType<VersionSemantic>(complex, exactMatch: false);
     }
 
     /// <summary>
@@ -83,9 +83,9 @@ public class VersionTests
         Assert.NotNull(simple);
         Assert.NotNull(prefixed);
         Assert.NotNull(complex);
-        Assert.IsAssignableFrom<VersionTag>(simple);
-        Assert.IsAssignableFrom<VersionTag>(prefixed);
-        Assert.IsAssignableFrom<VersionTag>(complex);
+        Assert.IsType<VersionTag>(simple, exactMatch: false);
+        Assert.IsType<VersionTag>(prefixed, exactMatch: false);
+        Assert.IsType<VersionTag>(complex, exactMatch: false);
     }
 
     /// <summary>
@@ -103,9 +103,9 @@ public class VersionTests
         Assert.NotNull(inclusive);
         Assert.NotNull(exclusive);
         Assert.NotNull(mixed);
-        Assert.IsAssignableFrom<VersionInterval>(inclusive);
-        Assert.IsAssignableFrom<VersionInterval>(exclusive);
-        Assert.IsAssignableFrom<VersionInterval>(mixed);
+        Assert.IsType<VersionInterval>(inclusive, exactMatch: false);
+        Assert.IsType<VersionInterval>(exclusive, exactMatch: false);
+        Assert.IsType<VersionInterval>(mixed, exactMatch: false);
     }
 
     /// <summary>
@@ -123,7 +123,7 @@ public class VersionTests
 
         // Assert
         Assert.NotNull(versionCommitTag);
-        Assert.IsAssignableFrom<VersionCommitTag>(versionCommitTag);
+        Assert.IsType<VersionCommitTag>(versionCommitTag, exactMatch: false);
         Assert.Equal(versionTag, versionCommitTag.VersionTag);
         Assert.Equal(commitHash, versionCommitTag.CommitHash);
     }

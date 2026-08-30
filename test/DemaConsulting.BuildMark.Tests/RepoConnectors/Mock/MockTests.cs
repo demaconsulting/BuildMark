@@ -44,7 +44,7 @@ public class MockTests
         var connector = new MockRepoConnector();
 
         // Assert: the sub-subsystem connector satisfies the shared IRepoConnector interface
-        Assert.IsAssignableFrom<IRepoConnector>(connector);
+        Assert.IsType<IRepoConnector>(connector, exactMatch: false);
     }
 
     /// <summary>
