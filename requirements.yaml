@@ -1,6 +1,15 @@
 ---
+# root-tags identifies which requirements are "roots" that every other requirement must
+# trace up to. Any requirement not reachable from a requirement tagged with one of these
+# tags is reported as an orphan by `dotnet reqstream --enforce`, without needing a
+# separate command or flag.
+root-tags:
+  - system
+  - quality
+
 includes:
   - docs/reqstream/build-mark.yaml
+  - docs/reqstream/quality.yaml
   - docs/reqstream/build-mark/platform-requirements.yaml
   - docs/reqstream/build-mark/program.yaml
   - docs/reqstream/build-mark/cli.yaml
