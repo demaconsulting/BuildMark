@@ -7,6 +7,8 @@ sections:
         requirements:
           - id: BuildMark-Command-Cli
             title: The tool shall provide a command-line interface.
+            tags:
+              - system
             justification: |
               A command-line interface is essential for BuildMark to integrate seamlessly into
               automated build pipelines, CI/CD workflows, and scripting environments. This enables
@@ -34,6 +36,8 @@ sections:
 
           - id: BuildMark-Command-Version
             title: The tool shall display version information when requested.
+            tags:
+              - system
             justification: |
               Version information helps users identify which version of BuildMark they are running,
               which is critical for debugging issues, ensuring compatibility, and tracking tool
@@ -42,9 +46,12 @@ sections:
               - BuildMark_VersionFlag_OutputsVersion
             children:
               - BuildMark-Cli-Version
+              - BuildMark-Program-Version
 
           - id: BuildMark-Command-Help
             title: The tool shall display help information when requested.
+            tags:
+              - system
             justification: |
               Help information provides users with immediate access to usage instructions, available
               commands, and parameter descriptions. This improves user experience and reduces the
@@ -53,9 +60,12 @@ sections:
               - BuildMark_HelpFlag_OutputsUsageInformation
             children:
               - BuildMark-Cli-Help
+              - BuildMark-Program-Help
 
           - id: BuildMark-Command-Silent
             title: The tool shall support silent mode to suppress console output.
+            tags:
+              - system
             justification: |
               Silent mode is essential for automated build environments where excessive console
               output can clutter logs or interfere with parsing build results. This allows users
@@ -64,9 +74,12 @@ sections:
               - BuildMark_SilentFlag_SuppressesOutput
             children:
               - BuildMark-Cli-Silent
+              - BuildMark-Program-Silent
 
           - id: BuildMark-Command-Log
             title: The tool shall support writing output to a log file.
+            tags:
+              - system
             justification: |
               Log file support enables persistent storage of BuildMark output for audit trails,
               troubleshooting, and post-build analysis. This is particularly valuable in automated
@@ -75,9 +88,12 @@ sections:
               - BuildMark_LogParameter_IsAccepted
             children:
               - BuildMark-Cli-Log
+              - BuildMark-Program-Log
 
           - id: BuildMark-Command-BuildVersion
             title: The tool shall support specifying a build version.
+            tags:
+              - system
             justification: |
               Specifying a build version allows users to override or supplement version information
               from source control, enabling flexible version management strategies and supporting
@@ -86,9 +102,13 @@ sections:
               - BuildMark_BuildVersionParameter_IsAccepted
             children:
               - BuildMark-Cli-BuildVersion
+              - BuildMark-Program-BuildVersion
+              - BuildMark-Program-ErrorHandling-InvalidBuildVersion
 
           - id: BuildMark-Command-InvalidArgs
             title: The tool shall validate command-line arguments.
+            tags:
+              - system
             justification: |
               Argument validation prevents misuse of the tool and provides clear error messages
               when invalid inputs are provided. This improves reliability, helps users identify
@@ -100,6 +120,8 @@ sections:
 
           - id: BuildMark-Command-FilePaths
             title: The tool shall handle invalid file paths gracefully.
+            tags:
+              - system
             justification: |
               Graceful handling of invalid file paths prevents cryptic error messages and ensures
               the tool fails safely when given incorrect paths. This improves user experience and
@@ -113,6 +135,8 @@ sections:
 
           - id: BuildMark-Command-ExitCode
             title: The tool shall return appropriate exit codes.
+            tags:
+              - system
             justification: |
               Standard exit codes enable build automation systems and scripts to detect success
               or failure conditions programmatically. This is fundamental for proper integration
@@ -121,11 +145,14 @@ sections:
               - BuildMark_InvalidArgument_ShowsError
             children:
               - BuildMark-Cli-ExitCode
+              - BuildMark-Program-ErrorHandling-ConnectorFailure
 
       - title: GitHub Integration
         requirements:
           - id: BuildMark-GitHub-BuildNotes
             title: The tool shall generate build notes from GitHub repositories.
+            tags:
+              - system
             justification: |
               Generating build notes from GitHub repositories automates the documentation of
               changes between releases. This saves significant time during release processes and
@@ -138,6 +165,8 @@ sections:
 
           - id: BuildMark-GitHub-IssueTracking
             title: The tool shall track issues and pull requests from GitHub.
+            tags:
+              - system
             justification: |
               Tracking issues and pull requests provides traceability between code changes and
               work items, enabling comprehensive release notes that link features, bug fixes, and
@@ -149,6 +178,8 @@ sections:
 
           - id: BuildMark-GitHub-VersionTags
             title: The tool shall identify changes between version tags.
+            tags:
+              - system
             justification: |
               Identifying changes between version tags enables differential release notes that
               accurately capture what changed in each version. This is essential for semantic
@@ -158,15 +189,21 @@ sections:
             children:
               - BuildMark-RepoConnectors-GitHub
               - BuildMark-Version-Subsystem
+              - BuildMark-Version-SemanticVersioning
 
           - id: BuildMark-GitHub-EnterpriseSupport
-            title: GitHub Enterprise support
-            justification: >
+            title: >-
               The tool shall support GitHub Enterprise Cloud and GitHub Enterprise Server
-              repositories by accepting SSH and HTTPS remote URLs with any hostname,
-              enabling owner and repository name resolution regardless of whether the host
-              is github.com, a GitHub Enterprise Cloud domain (*.ghe.com), or a GitHub
-              Enterprise Server on-premises instance.
+              repositories by accepting SSH and HTTPS remote URLs with any hostname.
+            tags:
+              - system
+            justification: |
+              Many organizations use GitHub Enterprise Cloud or GitHub Enterprise Server rather
+              than github.com. Supporting arbitrary hostnames for SSH and HTTPS remotes ensures
+              owner and repository name resolution works correctly regardless of whether the
+              host is github.com, a GitHub Enterprise Cloud domain (*.ghe.com), or a GitHub
+              Enterprise Server on-premises instance, without requiring users on enterprise
+              platforms to modify their configuration or environment.
             children:
               - BuildMark-GitHub-ParseUrl-SSH
               - BuildMark-GitHub-ParseUrl-HTTPS
@@ -175,6 +212,8 @@ sections:
         requirements:
           - id: BuildMark-AzureDevOps-BuildNotes
             title: The tool shall generate build notes from Azure DevOps repositories.
+            tags:
+              - system
             justification: |
               Generating build notes from Azure DevOps repositories automates the documentation of
               changes between releases for teams using Azure DevOps. This saves significant time
@@ -187,6 +226,8 @@ sections:
 
           - id: BuildMark-AzureDevOps-IssueTracking
             title: The tool shall track work items and pull requests from Azure DevOps.
+            tags:
+              - system
             justification: |
               Tracking work items and pull requests from Azure DevOps provides traceability between
               code changes and work items, enabling comprehensive release notes that link features,
@@ -199,6 +240,8 @@ sections:
 
           - id: BuildMark-AzureDevOps-VersionTags
             title: The tool shall identify changes between version tags in Azure DevOps repositories.
+            tags:
+              - system
             justification: |
               Identifying changes between version tags enables differential release notes that
               accurately capture what changed in each version for Azure DevOps repositories. This is
@@ -213,6 +256,8 @@ sections:
         requirements:
           - id: BuildMark-Config-File
             title: The tool shall consume settings from a `.buildmark.yaml` configuration file in the repository root.
+            tags:
+              - system
             justification: |
               A dedicated configuration file separates persistent repository settings from runtime
               arguments, simplifying CI invocations and enabling version-controlled configuration.
@@ -224,6 +269,8 @@ sections:
 
           - id: BuildMark-Config-Connector
             title: The tool shall read repository connector settings from the `.buildmark.yaml` file.
+            tags:
+              - system
             justification: |
               Centralizing connector configuration in the repository avoids repeating connection
               details across multiple CI pipelines.
@@ -234,9 +281,13 @@ sections:
               - BuildMark-Configuration-ConnectorConfig
               - BuildMark-RepoConnectors-Factory
               - BuildMark-RepoConnectors-GitHub
+              - BuildMark-RepoConnectors-ConnectorInterface
+              - BuildMark-RepoConnectors-ProcessRunner
 
           - id: BuildMark-Config-Sections
             title: The tool shall read report section definitions from the `.buildmark.yaml` file.
+            tags:
+              - system
             justification: |
               Configurable sections let teams tailor the structure of generated build notes to
               their conventions without modifying the tool.
@@ -244,11 +295,14 @@ sections:
               - BuildMark_Report_ContainsSectionDefinitions
             children:
               - BuildMark-Configuration-Read
+              - BuildMark-SectionConfig-Properties
 
           - id: BuildMark-Config-Rules
             title: >-
               The tool shall read item routing rules from the `.buildmark.yaml` file and route
               items to the appropriate report section.
+            tags:
+              - system
             justification: |
               Declarative routing rules allow repository owners to control categorization of items
               without embedding logic in CI scripts.
@@ -257,11 +311,14 @@ sections:
             children:
               - BuildMark-Configuration-Read
               - BuildMark-RepoConnectors-ItemRouter
+              - BuildMark-RuleConfig-Properties
 
           - id: BuildMark-Config-Lint
             title: >-
               The tool shall provide a --lint flag to validate the .buildmark.yaml
               configuration file and report any issues.
+            tags:
+              - system
             justification: |
               Operators need a way to verify the configuration file is well-formed without
               running a full build. Linting with precise issue locations helps teams fix
@@ -276,6 +333,8 @@ sections:
         requirements:
           - id: BuildMark-Report-Markdown
             title: The tool shall generate markdown reports.
+            tags:
+              - system
             justification: |
               Markdown is a widely-adopted, human-readable format that works seamlessly with
               GitHub, documentation systems, and static site generators. Generating reports in
@@ -289,6 +348,8 @@ sections:
 
           - id: BuildMark-Report-Depth
             title: The tool shall support configurable report depth.
+            tags:
+              - system
             justification: |
               Configurable report depth allows BuildMark output to be embedded within existing
               documentation structures by adjusting heading levels. This flexibility ensures
@@ -298,9 +359,12 @@ sections:
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
+              - BuildMark-Program-Depth
 
           - id: BuildMark-Report-VersionInfo
             title: The tool shall report version information in build notes.
+            tags:
+              - system
             justification: |
               Version information clearly identifies which release the build notes describe,
               providing essential context for users reviewing changes and enabling proper
@@ -313,6 +377,8 @@ sections:
 
           - id: BuildMark-Report-Changes
             title: The tool shall report changes in build notes.
+            tags:
+              - system
             justification: |
               Reporting changes documents new features and enhancements introduced in each
               release, helping users understand the evolution of the software and make informed
@@ -325,6 +391,8 @@ sections:
 
           - id: BuildMark-Report-BugFixes
             title: The tool shall report bug fixes in build notes.
+            tags:
+              - system
             justification: |
               Documenting bug fixes informs users about resolved issues, demonstrates ongoing
               maintenance, and helps users determine if specific problems they encountered have
@@ -340,6 +408,8 @@ sections:
               The tool shall support including known issues in build notes, using
               affected-versions metadata when available and falling back to open/closed
               status when it is not.
+            tags:
+              - system
             justification: |
               Disclosing known issues in release notes promotes transparency, helps users avoid
               known pitfalls, and manages expectations about current limitations.
@@ -361,12 +431,15 @@ sections:
             children:
               - BuildMark-BuildNotes-ReportModel
               - BuildMark-Program-Report
+              - BuildMark-Program-IncludeKnownIssues
               - BuildMark-RepoConnectors-GitHub
               - BuildMark-RepoConnectors-AzureDevOps
               - BuildMark-RepoConnectors-Mock
 
           - id: BuildMark-Report-VersionRange
             title: The tool shall support filtering build notes by version range.
+            tags:
+              - system
             justification: |
               Version range filtering enables generation of cumulative release notes covering
               multiple versions or focused notes for specific releases. This flexibility supports
@@ -381,6 +454,8 @@ sections:
             title: >-
               The tool shall select the previous tag with a different commit hash as the
               baseline when generating build notes for a pre-release version.
+            tags:
+              - system
             justification: |
               When two pre-release tags point to the same commit, using the immediately
               preceding tag as the baseline would produce an empty changelog. Selecting
@@ -395,6 +470,8 @@ sections:
             title: >-
               The tool shall select the previous release tag as the baseline when
               generating build notes for a release version, skipping all pre-release tags.
+            tags:
+              - system
             justification: |
               Release notes should cover all changes since the last stable release, not
               just changes since the most recent pre-release. Skipping pre-release
@@ -409,6 +486,8 @@ sections:
             title: >-
               The tool shall generate build notes from the beginning of repository history
               when no previous version tag qualifies as a baseline.
+            tags:
+              - system
             justification: |
               When a project publishes its first release there is no predecessor tag.
               Treating the absence of a qualifying baseline as "generate from the start
@@ -421,6 +500,8 @@ sections:
 
           - id: BuildMark-Report-Hyperlinks
             title: The tool shall include hyperlinks to issues and pull requests.
+            tags:
+              - system
             justification: |
               Hyperlinks provide direct navigation to detailed information about changes,
               enabling users to investigate specific items of interest and maintaining
@@ -435,6 +516,8 @@ sections:
             title: >-
               The tool shall format build notes using ATX-style headings at the configured
               heading depth.
+            tags:
+              - system
             justification: |
               ATX-style headings at a configurable depth allow BuildMark reports to be
               embedded at any level within a larger document without disrupting the heading
@@ -449,6 +532,8 @@ sections:
             title: >-
               The tool shall format change and bug entries as bullet list items in the
               generated build notes.
+            tags:
+              - system
             justification: |
               Bullet lists provide a scannable, visually distinct format for change and bug
               entries that renders correctly across markdown processors and documentation
@@ -463,6 +548,8 @@ sections:
             title: >-
               The tool shall place the version heading as the first section element of the
               generated build notes.
+            tags:
+              - system
             justification: |
               Leading with the version heading makes the report immediately identifiable and
               ensures a consistent structure across all generated documents.
@@ -476,6 +563,8 @@ sections:
         requirements:
           - id: BuildMark-Controls-Block
             title: The tool shall recognize a buildmark code block in issue and pull request descriptions.
+            tags:
+              - system
             justification: |
               A dedicated buildmark code block provides a structured, machine-readable way for
               developers to attach control metadata directly to issues and pull requests. This
@@ -490,6 +579,8 @@ sections:
             title: >-
               The tool shall support a visibility field in the buildmark block to
               override default item visibility in the build notes.
+            tags:
+              - system
             justification: |
               Developers may need to suppress internal housekeeping items from public release
               notes, or promote items that would otherwise be excluded. A visibility override
@@ -504,6 +595,8 @@ sections:
             title: >-
               The tool shall include an item in the build notes when visibility is set to
               public, overriding any default exclusion rules.
+            tags:
+              - system
             justification: |
               Some items lack the standard labels that trigger automatic inclusion. The public
               value ensures these items still appear in the generated notes when the developer
@@ -518,6 +611,8 @@ sections:
             title: >-
               The tool shall exclude an item from the build notes when visibility is set
               to internal, overriding any default inclusion rules including standard issue labels.
+            tags:
+              - system
             justification: |
               Items such as dependency updates, internal refactoring, or CI configuration changes
               are often irrelevant to end-users. The internal value lets developers suppress such
@@ -532,6 +627,8 @@ sections:
             title: >-
               The tool shall support a type field in the buildmark block to override
               the item classification used in the build notes.
+            tags:
+              - system
             justification: |
               GitHub labels do not always map cleanly to the bug/feature distinction used in
               release notes. A type override lets developers correct the classification for any
@@ -546,6 +643,8 @@ sections:
             title: >-
               The tool shall classify an item as a bug when type is set to bug and route it to the
               configured bug-fix section (default: 'Bugs Fixed').
+            tags:
+              - system
             justification: |
               Correct classification of bug fixes is important for end-users assessing whether a
               release addresses their reported problems. An explicit override ensures accuracy
@@ -560,6 +659,8 @@ sections:
             title: >-
               The tool shall classify an item as a feature when type is set to feature and route it
               to the configured changes section (default: 'Changes').
+            tags:
+              - system
             justification: |
               Not all feature work carries the expected labels. An explicit override ensures the
               item appears under Changes rather than being misclassified or omitted.
@@ -573,6 +674,8 @@ sections:
             title: >-
               The tool shall support an affected-versions field in the buildmark block
               to record which software versions are affected by the change.
+            tags:
+              - system
             justification: |
               Encoding affected versions directly on the work item improves traceability and
               enables downstream tooling to filter or highlight relevant items for a given
@@ -587,6 +690,8 @@ sections:
             title: >-
               The affected-versions field shall use mathematical interval notation with
               inclusive and exclusive bounds, and shall support multiple comma-separated ranges.
+            tags:
+              - system
             justification: |
               Mathematical interval notation is compact, unambiguous, and familiar to developers.
               Supporting multiple ranges allows expression of disjoint sets of affected versions
@@ -602,6 +707,8 @@ sections:
             title: >-
               The tool shall recognize a buildmark code block that is wrapped in an HTML
               comment, allowing developers to hide the block from the GitHub rendered view.
+            tags:
+              - system
             justification: |
               Some teams prefer clean issue descriptions without visible metadata blocks. Allowing
               the block to be hidden in an HTML comment satisfies both the need to supply control
@@ -615,6 +722,8 @@ sections:
         requirements:
           - id: BuildMark-Validation-SelfValidation
             title: The tool shall support self-validation mode.
+            tags:
+              - system
             justification: |
               Self-validation mode allows users to validate the tool's functionality in their
               environment, providing evidence that the user's environment does not introduce
@@ -623,9 +732,13 @@ sections:
               - BuildMark_ValidateFlag_RunsSelfValidation
             children:
               - BuildMark-SelfTest-Qualification
+              - BuildMark-Program-Validate
+              - BuildMark-Utilities-TemporaryDirectory
 
           - id: BuildMark-Validation-ResultsFiles
             title: The tool shall write validation results to test result files.
+            tags:
+              - system
             justification: |
               Writing validation results to files enables integration with testing frameworks,
               CI/CD pipelines, and reporting tools. This allows BuildMark's validation results
@@ -636,9 +749,12 @@ sections:
               - BuildMark_ResultsParameter_WritesJUnitFile
             children:
               - BuildMark-SelfTest-ResultsOutput
+              - BuildMark-Program-Results
 
           - id: BuildMark-Validation-TrxFormat
             title: The tool shall support TRX format for test results.
+            tags:
+              - system
             justification: |
               TRX format support enables integration with Microsoft test tooling and Visual
               Studio Test Explorer, providing native support for .NET development environments
@@ -651,6 +767,8 @@ sections:
 
           - id: BuildMark-Validation-JUnitFormat
             title: The tool shall support JUnit format for test results.
+            tags:
+              - system
             justification: |
               JUnit format is a widely-supported standard across many CI/CD platforms and
               testing tools. Supporting this format ensures BuildMark can integrate with diverse

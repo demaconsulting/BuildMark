@@ -37,6 +37,7 @@ sections:
               - Configuration_Issues_ValidationError_ReportsAccurateLine
             children:
               - BuildMark-ConfigLoadResult-ReportTo
+              - BuildMark-ConfigurationIssue-Record
 
           - id: BuildMark-Configuration-ConnectorConfig
             title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
@@ -50,7 +51,10 @@ sections:
               - Configuration_ConnectorConfig_ValidFile_ParsesAzureDevOpsSettings
             children:
               - BuildMark-GitHubConnectorConfig-Properties
+              - BuildMark-GitHubConnectorConfig-TokenVariable
               - BuildMark-AzureDevOpsConnectorConfig-Properties
+              - BuildMark-AzureDevOpsConnectorConfig-TokenVariable
+              - BuildMark-ConnectorConfig-Properties
         sections:
           - title: BuildMarkConfigReader Requirements
             requirements:

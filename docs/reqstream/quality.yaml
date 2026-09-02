@@ -1,0 +1,114 @@
+---
+# Quality and process requirements
+#
+# These requirements represent repository-level and process outcomes (test
+# infrastructure, build integrity, static analysis, peer review, documentation
+# generation, and requirements traceability) that are not part of BuildMark's
+# externally observable behavior, but are required for the repository to be
+# considered releasable. They exist so the OTS (off-the-shelf) process tooling
+# requirements have a root to trace to, instead of being orphaned leaves with
+# no consumer.
+
+sections:
+  - title: Quality and Process Requirements
+    requirements:
+      - id: BuildMark-Quality-TestInfrastructure
+        title: The repository shall execute and report unit tests using a verified test framework.
+        tags:
+          - quality
+        justification: |
+          xUnit executes and reports the tests that serve as evidence for every other
+          requirement in this document. It is a foundational process dependency rather than
+          a tool behavior, so this requirement roots it instead of leaving it orphaned.
+        children:
+          - BuildMark-OTS-xUnit
+        tests:
+          - Context_Create_EmptyArguments_CreatesValidContext
+          - Context_Create_ShortVersionFlag_SetsVersionProperty
+          - Context_Create_LongVersionFlag_SetsVersionProperty
+          - Context_Create_SilentFlag_SetsSilentProperty
+          - Context_Create_ValidateFlag_SetsValidateProperty
+          - Context_Create_BuildVersionArgument_SetsBuildVersionProperty
+
+      - id: BuildMark-Quality-BuildIntegrity
+        title: The repository shall produce build and version-tracking documentation for every release.
+        tags:
+          - quality
+        justification: |
+          Build integrity outcomes (build-notes generation and tool-version tracking) are
+          produced by BuildMark and VersionMark and consumed by maintainers and release
+          reviewers, not by tool callers. This requirement roots those OTS requirements so
+          they are not orphaned.
+        children:
+          - BuildMark-OTS-BuildMark
+          - BuildMark-OTS-VersionMark
+        tests:
+          - BuildMark_MarkdownReportGeneration
+          - VersionMark_CapturesVersions
+          - VersionMark_GeneratesMarkdownReport
+
+      - id: BuildMark-Quality-StaticAnalysis
+        title: The repository shall enforce static analysis and SARIF-based code quality gates.
+        tags:
+          - quality
+        justification: |
+          Static analysis outcomes (SARIF enforcement and SonarCloud quality gates) protect
+          code quality for maintainers and CI, not tool callers. This requirement roots those
+          OTS requirements so they are not orphaned.
+        children:
+          - BuildMark-OTS-SarifMark
+          - BuildMark-OTS-SonarMark
+        tests:
+          - SarifMark_SarifReading
+          - SarifMark_MarkdownReportGeneration
+          - SonarMark_QualityGateRetrieval
+          - SonarMark_IssuesRetrieval
+          - SonarMark_HotSpotsRetrieval
+          - SonarMark_MarkdownReportGeneration
+
+      - id: BuildMark-Quality-PeerReview
+        title: The repository shall generate and enforce peer-review plans and reports for all reviewable files.
+        tags:
+          - quality
+        justification: |
+          Peer-review outcomes (plan generation and report generation) are produced by
+          ReviewMark and consumed by maintainers and reviewers, not by tool callers. This
+          requirement roots those OTS requirements so they are not orphaned.
+        children:
+          - BuildMark-OTS-ReviewMark
+        tests:
+          - ReviewMark_ReviewPlanGeneration
+          - ReviewMark_ReviewReportGeneration
+
+      - id: BuildMark-Quality-DocumentationGeneration
+        title: The repository shall generate design and build documentation in distributable HTML and PDF formats.
+        tags:
+          - quality
+        justification: |
+          Documentation generation outcomes (Pandoc HTML rendering, WeasyPrint PDF rendering,
+          and FileAssert document validation) are consumed by maintainers browsing
+          documentation, not by tool callers at runtime. This requirement roots those OTS
+          requirements so they are not orphaned.
+        children:
+          - BuildMark-OTS-Pandoc
+          - BuildMark-OTS-WeasyPrint
+          - BuildMark-OTS-FileAssert
+        tests:
+          - Pandoc_BuildNotesHtml
+          - Pandoc_DesignHtml
+          - WeasyPrint_BuildNotesPdf
+          - FileAssert_VersionDisplay
+          - FileAssert_HelpDisplay
+
+      - id: BuildMark-Quality-RequirementsTraceability
+        title: The repository shall maintain and enforce requirements traceability.
+        tags:
+          - quality
+        justification: |
+          Requirements traceability outcomes (ReqStream requirements enforcement) are produced
+          by ReqStream and consumed by maintainers verifying compliance, not by tool callers.
+          This requirement roots the OTS requirement so it is not orphaned.
+        children:
+          - BuildMark-OTS-ReqStream
+        tests:
+          - ReqStream_EnforcementMode
