@@ -192,15 +192,18 @@ sections:
               - BuildMark-Version-SemanticVersioning
 
           - id: BuildMark-GitHub-EnterpriseSupport
-            title: GitHub Enterprise support
+            title: >-
+              The tool shall support GitHub Enterprise Cloud and GitHub Enterprise Server
+              repositories by accepting SSH and HTTPS remote URLs with any hostname.
             tags:
               - system
-            justification: >
-              The tool shall support GitHub Enterprise Cloud and GitHub Enterprise Server
-              repositories by accepting SSH and HTTPS remote URLs with any hostname,
-              enabling owner and repository name resolution regardless of whether the host
-              is github.com, a GitHub Enterprise Cloud domain (*.ghe.com), or a GitHub
-              Enterprise Server on-premises instance.
+            justification: |
+              Many organizations use GitHub Enterprise Cloud or GitHub Enterprise Server rather
+              than github.com. Supporting arbitrary hostnames for SSH and HTTPS remotes ensures
+              owner and repository name resolution works correctly regardless of whether the
+              host is github.com, a GitHub Enterprise Cloud domain (*.ghe.com), or a GitHub
+              Enterprise Server on-premises instance, without requiring users on enterprise
+              platforms to modify their configuration or environment.
             children:
               - BuildMark-GitHub-ParseUrl-SSH
               - BuildMark-GitHub-ParseUrl-HTTPS
