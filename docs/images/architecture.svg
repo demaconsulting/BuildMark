@@ -1,0 +1,92 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="900" height="590" viewBox="0 0 900 590" font-family="Segoe UI, Arial, sans-serif">
+  <defs>
+    <marker id="a" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0,0 L10,5 L0,10 z" fill="#475569"/>
+    </marker>
+  </defs>
+  <!-- Transparent canvas; a white rounded card keeps the diagram readable in light and dark themes -->
+  <rect x="14" y="16" width="875" height="561" rx="28" fill="#d5dce6"/>
+  <rect x="10" y="10" width="875" height="561" rx="28" fill="#ffffff" stroke="#cbd5e1" stroke-width="2"/>
+
+  <g transform="translate(30,30)">
+    <!-- Caller -->
+    <rect x="150" y="0" width="460" height="70" rx="10" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+    <text x="380" y="31" font-size="16" font-family="Consolas, monospace" font-weight="600" fill="#92400e" text-anchor="middle">buildmark</text>
+    <text x="380" y="53" font-size="13" fill="#92400e" text-anchor="middle">command-line tool run by you or your CI pipeline</text>
+    <line x1="380" y1="74" x2="380" y2="118" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <text x="392" y="100" font-size="12" fill="#334155">--build-version, --report, --depth ...</text>
+
+    <!-- BuildMark frame -->
+    <rect x="150" y="122" width="460" height="400" rx="14" fill="#f8fafc" stroke="#2563eb" stroke-width="2" stroke-dasharray="8 5"/>
+    <text x="166" y="148" font-size="14" font-weight="600" fill="#2563eb">DemaConsulting.BuildMark</text>
+
+    <!-- Cli -->
+    <rect x="170" y="162" width="420" height="52" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="380" y="185" font-size="16" font-weight="600" fill="#166534" text-anchor="middle">Cli</text>
+    <text x="380" y="204" font-size="12" fill="#166534" text-anchor="middle">Parses flags, then dispatches to the requested action</text>
+
+    <!-- Configuration and Version -->
+    <rect x="170" y="230" width="200" height="72" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="270" y="256" font-size="15" font-weight="600" fill="#1e3a8a" text-anchor="middle">Configuration</text>
+    <text x="270" y="276" font-size="12" fill="#1e40af" text-anchor="middle">Connector, sections,</text>
+    <text x="270" y="291" font-size="12" fill="#1e40af" text-anchor="middle">and routing rules</text>
+    <rect x="390" y="230" width="200" height="72" rx="8" fill="#dbeafe" stroke="#2563eb" stroke-width="2"/>
+    <text x="490" y="256" font-size="15" font-weight="600" fill="#1e3a8a" text-anchor="middle">Version</text>
+    <text x="490" y="276" font-size="12" fill="#1e40af" text-anchor="middle">Tags, semantic versions,</text>
+    <text x="490" y="291" font-size="12" fill="#1e40af" text-anchor="middle">and release intervals</text>
+
+    <!-- RepoConnectors -->
+    <rect x="170" y="318" width="420" height="110" rx="12" fill="#ede9fe" stroke="#7c3aed" stroke-width="2"/>
+    <text x="380" y="344" font-size="16" font-weight="600" fill="#4c1d95" text-anchor="middle">RepoConnectors</text>
+    <rect x="190" y="358" width="180" height="56" rx="6" fill="#ffffff" stroke="#7c3aed"/>
+    <text x="280" y="382" font-size="14" font-family="Consolas, monospace" fill="#4c1d95" text-anchor="middle">GitHub</text>
+    <text x="280" y="402" font-size="12" fill="#5b21b6" text-anchor="middle">GraphQL API</text>
+    <rect x="390" y="358" width="180" height="56" rx="6" fill="#ffffff" stroke="#7c3aed"/>
+    <text x="480" y="382" font-size="14" font-family="Consolas, monospace" fill="#4c1d95" text-anchor="middle">AzureDevOps</text>
+    <text x="480" y="402" font-size="12" fill="#5b21b6" text-anchor="middle">REST API</text>
+
+    <!-- BuildNotes -->
+    <rect x="170" y="444" width="420" height="62" rx="10" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="380" y="470" font-size="16" font-weight="600" fill="#166534" text-anchor="middle">BuildNotes</text>
+    <text x="380" y="490" font-size="12" fill="#166534" text-anchor="middle">Routes items into sections and renders the markdown report</text>
+
+    <!-- Inputs -->
+    <text x="60" y="190" font-size="13" font-weight="600" fill="#475569" text-anchor="middle">Inputs</text>
+    <rect x="0" y="206" width="120" height="66" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+    <text x="60" y="233" font-size="15" font-weight="600" fill="#334155" text-anchor="middle">Config file</text>
+    <text x="60" y="254" font-size="12" fill="#475569" text-anchor="middle">.buildmark.yaml</text>
+    <rect x="0" y="300" width="120" height="66" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+    <text x="60" y="327" font-size="15" font-weight="600" fill="#334155" text-anchor="middle">Git history</text>
+    <text x="60" y="348" font-size="12" fill="#475569" text-anchor="middle">commits and tags</text>
+    <rect x="0" y="394" width="120" height="66" rx="6" fill="#f1f5f9" stroke="#64748b" stroke-width="2"/>
+    <text x="60" y="415" font-size="14" font-weight="600" fill="#334155" text-anchor="middle">GitHub or</text>
+    <text x="60" y="431" font-size="14" font-weight="600" fill="#334155" text-anchor="middle">Azure DevOps</text>
+    <text x="60" y="450" font-size="12" fill="#475569" text-anchor="middle">PRs, issues, items</text>
+    <line x1="124" y1="239" x2="146" y2="239" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="124" y1="333" x2="146" y2="333" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="124" y1="427" x2="146" y2="427" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+
+    <!-- Report out -->
+    <rect x="650" y="240" width="165" height="266" rx="12" fill="#dcfce7" stroke="#16a34a" stroke-width="2"/>
+    <text x="732" y="268" font-size="16" font-weight="600" fill="#166534" text-anchor="middle">Build notes</text>
+    <g font-size="13" fill="#14532d" text-anchor="middle">
+      <rect x="664" y="284" width="137" height="30" rx="5" fill="#ffffff" stroke="#16a34a"/>
+      <text x="732" y="304">Version summary</text>
+      <rect x="664" y="322" width="137" height="30" rx="5" fill="#ffffff" stroke="#16a34a"/>
+      <text x="732" y="342">Changes</text>
+      <rect x="664" y="360" width="137" height="30" rx="5" fill="#ffffff" stroke="#16a34a"/>
+      <text x="732" y="380">Bugs fixed</text>
+      <rect x="664" y="398" width="137" height="30" rx="5" fill="#ffffff" stroke="#16a34a"/>
+      <text x="732" y="418">Known issues</text>
+    </g>
+    <text x="732" y="452" font-size="12" font-family="Consolas, monospace" fill="#166534" text-anchor="middle">--report</text>
+    <text x="732" y="470" font-size="12" fill="#166534" text-anchor="middle">Sections follow your</text>
+    <text x="732" y="485" font-size="12" fill="#166534" text-anchor="middle">routing rules</text>
+    <line x1="590" y1="475" x2="646" y2="475" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+
+    <!-- Internal flow -->
+    <line x1="380" y1="214" x2="380" y2="226" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="380" y1="302" x2="380" y2="314" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+    <line x1="380" y1="428" x2="380" y2="440" stroke="#475569" stroke-width="2" marker-end="url(#a)"/>
+  </g>
+</svg>
