@@ -17,6 +17,7 @@ language: en
 words:
   - ACCESSTOKEN
   - buildmark
+  - canvasnet
   - demaconsulting
   - Dema
   - fileassert

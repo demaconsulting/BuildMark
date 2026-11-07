@@ -17,6 +17,10 @@ BuildMark is a .NET command-line tool that generates comprehensive markdown buil
 history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
 notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
+![BuildMark architecture: inputs (configuration file, Git history, and GitHub or Azure DevOps data)
+flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes components
+into a markdown build notes report][architecture]
+
 For detailed documentation, see the [BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
 
 ## Features
@@ -287,3 +291,5 @@ BuildMark is built with the following open-source projects:
 
 - [.NET](https://dotnet.microsoft.com/) - Cross-platform framework for building applications
 - [Octokit](https://github.com/octokit/octokit.net) - GitHub API client library for .NET
+
+[architecture]: https://raw.githubusercontent.com/demaconsulting/BuildMark/main/docs/images/architecture.png
