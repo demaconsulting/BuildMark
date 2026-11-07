@@ -14,7 +14,9 @@ integration into CI/CD pipelines and release documentation workflows.
 The figure below shows how the pieces fit together: the `buildmark` command reads your configuration file, Git history,
 and GitHub or Azure DevOps data, then renders the results into a markdown build notes report.
 
-![BuildMark architecture: inputs (configuration file, Git history, and GitHub or Azure DevOps data) flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes components into a markdown build notes report](architecture.svg)
+![BuildMark architecture: inputs (configuration file, Git history, and GitHub or Azure DevOps data)
+flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes components
+into a markdown build notes report](architecture.svg)
 
 Key capabilities include:
 
