@@ -11,6 +11,6 @@ package BuildMark {
             verificationFiles = ("docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md");
             requirementFiles = ("docs/reqstream/build-mark/repo-connectors/azure-devops.yaml");
         }
-        // Note: no testRef - no dedicated test file exists (exercised only indirectly).
+        // Note: no testFiles - no dedicated test file exists (exercised only indirectly).
     }
 }

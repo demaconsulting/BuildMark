@@ -17,7 +17,7 @@ package BuildMark {
             verificationFiles = ("docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md");
             requirementFiles = ("docs/reqstream/build-mark/repo-connectors/github/github-graphql-client.yaml");
         }
-        // Note: verificationRef uses a different kebab-case split than designRef for the
+        // Note: verificationFiles uses a different kebab-case split than designFiles for the
         // same PascalCase name (pre-existing casing inconsistency, used verbatim, not fixed).
     }
 }

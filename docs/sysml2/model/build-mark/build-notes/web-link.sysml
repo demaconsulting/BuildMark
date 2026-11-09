@@ -11,6 +11,6 @@ package BuildMark {
             verificationFiles = ("docs/verification/build-mark/build-notes/web-link.md");
             requirementFiles = ("docs/reqstream/build-mark/build-notes/web-link.yaml");
         }
-        // Note: no testRef - no dedicated test file exists (exercised only indirectly).
+        // Note: no testFiles - no dedicated test file exists (exercised only indirectly).
     }
 }

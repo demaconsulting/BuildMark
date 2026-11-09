@@ -11,8 +11,8 @@ package BuildMark {
             verificationFiles = ("docs/verification/build-mark/configuration/git-hub-connector-config.md");
             requirementFiles = ("docs/reqstream/build-mark/configuration.yaml");
         }
-        // Note: verificationRef uses a different kebab-case split than designRef for the
+        // Note: verificationFiles uses a different kebab-case split than designFiles for the
         // same PascalCase name (pre-existing casing inconsistency, used verbatim, not fixed).
-        // Note: no testRef - no dedicated test file exists (exercised only indirectly).
+        // Note: no testFiles - no dedicated test file exists (exercised only indirectly).
     }
 }

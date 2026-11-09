@@ -11,6 +11,6 @@ package BuildMark {
             verificationFiles = ("docs/verification/build-mark/configuration/configuration-load-result.md");
             requirementFiles = ("docs/reqstream/build-mark/configuration.yaml");
         }
-        // Note: no testRef - no dedicated test file exists (exercised only indirectly).
+        // Note: no testFiles - no dedicated test file exists (exercised only indirectly).
     }
 }
