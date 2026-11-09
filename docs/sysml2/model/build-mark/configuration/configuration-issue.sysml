@@ -1,11 +1,16 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     part def ConfigurationIssue {
         doc /* Single issue with location and severity. */
 
-        comment sourceRef /* Source: src/DemaConsulting.BuildMark/Configuration/ConfigurationIssue.cs */
-        comment designRef /* Design: docs/design/build-mark/configuration/configuration-issue.md */
-        comment verificationRef /* Verification: docs/verification/build-mark/configuration/configuration-issue.md */
-        comment reqRef /* Requirements: docs/reqstream/build-mark/configuration.yaml (documented exception: no dedicated per-unit reqstream file exists for Configuration units) */
+        metadata info : SoftwareInfo {
+            description = "Single issue with location and severity (requirements documented in the subsystem requirements file).";
+            sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/ConfigurationIssue.cs");
+            designFiles = ("docs/design/build-mark/configuration/configuration-issue.md");
+            verificationFiles = ("docs/verification/build-mark/configuration/configuration-issue.md");
+            requirementFiles = ("docs/reqstream/build-mark/configuration.yaml");
+        }
         // Note: no testRef - no dedicated test file exists (exercised only indirectly).
     }
 }

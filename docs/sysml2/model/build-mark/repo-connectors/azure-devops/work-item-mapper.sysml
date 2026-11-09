@@ -1,11 +1,16 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     part def WorkItemMapper {
         doc /* Work item to ItemInfo mapper. */
 
-        comment sourceRef /* Source: src/DemaConsulting.BuildMark/RepoConnectors/AzureDevOps/WorkItemMapper.cs */
-        comment testRef /* Test: test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/WorkItemMapperTests.cs */
-        comment designRef /* Design: docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md */
-        comment verificationRef /* Verification: docs/verification/build-mark/repo-connectors/azure-devops/work-item-mapper.md */
-        comment reqRef /* Requirements: docs/reqstream/build-mark/repo-connectors/azure-devops/work-item-mapper.yaml */
+        metadata info : SoftwareInfo {
+            description = "Work item to ItemInfo mapper.";
+            sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/AzureDevOps/WorkItemMapper.cs");
+            testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/WorkItemMapperTests.cs");
+            designFiles = ("docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md");
+            verificationFiles = ("docs/verification/build-mark/repo-connectors/azure-devops/work-item-mapper.md");
+            requirementFiles = ("docs/reqstream/build-mark/repo-connectors/azure-devops/work-item-mapper.yaml");
+        }
     }
 }

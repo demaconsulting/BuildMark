@@ -130,7 +130,7 @@ public class RepoConnectorsTests
     [Fact]
     public async Task RepoConnectors_GitHubConnector_GetBuildInformation_WithPullRequests_GathersChanges()
     {
-        // Arrange: two PRs – one labelled "feature", one labelled "bug"
+        // Arrange: two PRs – one labeled "feature", one labeled "bug"
         using var mockHandler = new MockGitHubGraphQLHttpMessageHandler()
             .AddCommitsResponse("commit3", "commit2", "commit1")
             .AddReleasesResponse(

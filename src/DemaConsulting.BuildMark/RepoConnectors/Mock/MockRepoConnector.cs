@@ -100,7 +100,7 @@ public class MockRepoConnector : RepoConnectorBase
         { "5", VersionIntervalSet.Parse("[5.0.0,)") },
 
         // Issue 7 is deliberately closed (not in _openIssues) but still affects v1.0.0 exactly,
-        // modelling a bug that was fixed in a later release but never back-ported to the v1.0 branch.
+        // modeling a bug that was fixed in a later release but never back-ported to the v1.0 branch.
         { "7", VersionIntervalSet.Parse("[1.0.0,1.0.0]") }
     };
 

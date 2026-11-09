@@ -61,7 +61,7 @@
     {
       "label": "spell check",
       "type": "shell",
-      "command": "npx cspell \"**/*.{md,cs}\"",
+      "command": "dotnet textlint",
       "group": "none",
       "presentation": {
         "reveal": "always",

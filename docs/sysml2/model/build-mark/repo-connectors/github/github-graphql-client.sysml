@@ -1,13 +1,23 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     part def GitHubGraphQLClient {
         doc /* GraphQL API client. */
 
-        comment sourceRef /* Source: src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubGraphQLClient.cs */
-        comment testRef /* Test: test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClient*Tests.cs (split across 6 per-method test files: FindIssueIds, GetAllIssues, GetAllTags, GetCommits, GetPullRequests, GetReleases) */
-        comment designRef /* Design: docs/design/build-mark/repo-connectors/github/github-graphql-client.md */
-        comment verificationRef /* Verification: docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md */
+        metadata info : SoftwareInfo {
+            description = "GraphQL API client (tests split across 6 per-method test files).";
+            sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubGraphQLClient.cs");
+            testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientFindIssueIdsTests.cs",
+                "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetAllIssuesTests.cs",
+                "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetAllTagsTests.cs",
+                "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetCommitsTests.cs",
+                "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetPullRequestsTests.cs",
+                "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetReleasesTests.cs");
+            designFiles = ("docs/design/build-mark/repo-connectors/github/github-graphql-client.md");
+            verificationFiles = ("docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md");
+            requirementFiles = ("docs/reqstream/build-mark/repo-connectors/github/github-graphql-client.yaml");
+        }
         // Note: verificationRef uses a different kebab-case split than designRef for the
         // same PascalCase name (pre-existing casing inconsistency, used verbatim, not fixed).
-        comment reqRef /* Requirements: docs/reqstream/build-mark/repo-connectors/github/github-graphql-client.yaml */
     }
 }

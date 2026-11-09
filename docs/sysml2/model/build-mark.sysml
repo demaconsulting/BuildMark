@@ -1,4 +1,6 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     import OtsDependencies::*;
 
     doc
@@ -10,10 +12,13 @@ package BuildMark {
     part def BuildMarkSystem {
         doc /* The BuildMark system as a whole. */
 
-        comment testRef /* Test: test/DemaConsulting.BuildMark.Tests/IntegrationTests.cs */
-        comment designRef /* Design: docs/design/build-mark.md */
-        comment verificationRef /* Verification: docs/verification/build-mark.md */
-        comment reqRef /* Requirements: docs/reqstream/build-mark.yaml */
+        metadata info : SoftwareInfo {
+            description = "The BuildMark system as a whole.";
+            testFiles = ("test/DemaConsulting.BuildMark.Tests/IntegrationTests.cs");
+            designFiles = ("docs/design/build-mark.md");
+            verificationFiles = ("docs/verification/build-mark.md");
+            requirementFiles = ("docs/reqstream/build-mark.yaml");
+        }
 
         part program : Program;
         part cli : CliSubsystem;

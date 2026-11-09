@@ -1,11 +1,16 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     part def ReportConfig {
         doc /* Report output settings data model. */
 
-        comment sourceRef /* Source: src/DemaConsulting.BuildMark/Configuration/ReportConfig.cs */
-        comment designRef /* Design: docs/design/build-mark/configuration/report-config.md */
-        comment verificationRef /* Verification: docs/verification/build-mark/configuration/report-config.md */
-        comment reqRef /* Requirements: docs/reqstream/build-mark/configuration.yaml (documented exception: no dedicated per-unit reqstream file exists for Configuration units) */
+        metadata info : SoftwareInfo {
+            description = "Report output settings data model (requirements documented in the subsystem requirements file).";
+            sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/ReportConfig.cs");
+            designFiles = ("docs/design/build-mark/configuration/report-config.md");
+            verificationFiles = ("docs/verification/build-mark/configuration/report-config.md");
+            requirementFiles = ("docs/reqstream/build-mark/configuration.yaml");
+        }
         // Note: no testRef - no dedicated test file exists (exercised only indirectly).
     }
 }

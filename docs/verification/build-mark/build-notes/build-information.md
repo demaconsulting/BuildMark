@@ -65,7 +65,7 @@ This scenario is tested by
 `BuildInformation_GetBuildInformationAsync_OrdersChangesByIndex`.
 
 **BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues**: Verifies that for
-`v2.0.0`, items labelled as bugs appear in `Bugs` (id `"2"`, title `"Fix bug in Y"`) and not in
+`v2.0.0`, items labeled as bugs appear in `Bugs` (id `"2"`, title `"Fix bug in Y"`) and not in
 `Changes`. This scenario is tested by
 `BuildInformation_GetBuildInformationAsync_SeparatesBugAndChangeIssues`.
 
