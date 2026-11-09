@@ -1,0 +1,66 @@
+---
+# Spell-Checking with TextLint
+#
+# PURPOSE:
+# - Maintain professional documentation and code quality
+# - Catch spelling errors before publication
+# - Support consistent technical terminology usage
+# - Misspelled words should be fixed in the source
+# - NEVER add a misspelled word to the 'words' list
+# - PROPOSE only genuine technical terms/names as needed
+
+version: "0.2"
+language: en
+
+# The files to spell-check
+files:
+  - "**/*.{md,yaml,yml,json,cs,cpp,hpp,h,txt}"
+# Matches cspell, which also checks hidden paths such as .github/ and .*.yaml
+enableGlobDot: true
+
+# Project-specific technical terms and tool names
+words:
+  - ACCESSTOKEN
+  - Dema
+  - DEMA
+  - demaconsulting
+  - DEMACONSULTINGNUGETKEY
+  - dotnettool
+  - myorg
+  - myproject
+  - myrepo
+  - ncipollo
+  - nestings
+  - netstandard
+  - pullrequest
+  - pullrequests
+  - SARIF
+  - sarif
+  - Sarif
+  - shopt
+  - snupkg
+  - sonarscanner
+  - tagobj
+  - thirdparty
+  - unconfigured
+  - unidirectionality
+  - venv
+  - wiql
+  - Wiql
+  - WIQL
+  - workitems
+  - yamlfix
+
+# Exclude common build artifacts, dependencies, and vendored third-party code
+ignorePaths:
+  - "**/.git/**"
+  - "**/node_modules/**"
+  - "**/.venv/**"
+  - "**/thirdparty/**"
+  - "**/third-party/**"
+  - "**/3rd-party/**"
+  - "**/generated/**"
+  - "**/.agent-logs/**"
+  - "**/bin/**"
+  - "**/obj/**"
+  - package-lock.json

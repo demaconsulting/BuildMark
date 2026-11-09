@@ -1,11 +1,16 @@
 package BuildMark {
+    private import SoftwareItemMetadata::*;
+
     part def AzureDevOpsSubsystem {
         doc /* Azure DevOps repository connector, REST client, and work item mapping. */
 
-        comment testRef /* Test: test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs */
-        comment designRef /* Design: docs/design/build-mark/repo-connectors/azure-devops.md */
-        comment verificationRef /* Verification: docs/verification/build-mark/repo-connectors/azure-devops.md */
-        comment reqRef /* Requirements: docs/reqstream/build-mark/repo-connectors/azure-devops.yaml */
+        metadata info : SoftwareInfo {
+            description = "Azure DevOps repository connector, REST client, and work item mapping.";
+            testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs");
+            designFiles = ("docs/design/build-mark/repo-connectors/azure-devops.md");
+            verificationFiles = ("docs/verification/build-mark/repo-connectors/azure-devops.md");
+            requirementFiles = ("docs/reqstream/build-mark/repo-connectors/azure-devops.yaml");
+        }
 
         part azureDevOpsRepoConnector : AzureDevOpsRepoConnector;
         part azureDevOpsRestClient : AzureDevOpsRestClient;

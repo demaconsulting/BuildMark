@@ -283,7 +283,7 @@ public class MockRepoConnectorTests
     /// </summary>
     /// <remarks>
     ///     What is being tested: MockRepoConnector known-issues rule for closed bugs with AV
-    ///     What the assertions prove: LTS back-port gap is modelled correctly — a closed bug
+    ///     What the assertions prove: LTS back-port gap is modeled correctly — a closed bug
     ///     with a matching AV is included; the same bug is excluded for an unaffected version
     /// </remarks>
     [Fact]

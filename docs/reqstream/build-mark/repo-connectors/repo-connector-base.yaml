@@ -40,7 +40,7 @@ sections:
                   and apply them to distribute items into the appropriate report sections.
                 justification: |
                   Centralizing routing configuration and application in the base class ensures
-                  that all connectors honour the same rules and section definitions supplied by
+                  that all connectors honor the same rules and section definitions supplied by
                   the program configuration, without duplicating routing logic in every concrete
                   connector.
                 tests:
