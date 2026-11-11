@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Self-validation test runner. */
 
         metadata info : SoftwareInfo {
-            description = "Self-validation test runner.";
             sourceFiles = ("src/DemaConsulting.BuildMark/SelfTest/Validation.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/SelfTest/ValidationTests.cs");
             designFiles = ("docs/design/build-mark/self-test/validation.md");

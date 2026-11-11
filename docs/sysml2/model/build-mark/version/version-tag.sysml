@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Repository tag parsing and normalization. */
 
         metadata info : SoftwareInfo {
-            description = "Repository tag parsing and normalization.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Version/VersionTag.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Version/VersionTagTests.cs");
             designFiles = ("docs/design/build-mark/version/version-tag.md");

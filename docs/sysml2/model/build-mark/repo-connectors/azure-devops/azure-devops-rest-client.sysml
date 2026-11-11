@@ -5,7 +5,6 @@ package BuildMark {
         doc /* REST API client. */
 
         metadata info : SoftwareInfo {
-            description = "REST API client.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/AzureDevOps/AzureDevOpsRestClient.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/AzureDevOpsRestClientTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md");

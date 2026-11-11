@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Version comparison, semantic versioning, tag parsing, and version intervals. */
 
         metadata info : SoftwareInfo {
-            description = "Version comparison, semantic versioning, tag parsing, and version intervals.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Version/VersionTests.cs");
             designFiles = ("docs/design/build-mark/version.md");
             verificationFiles = ("docs/verification/build-mark/version.md");

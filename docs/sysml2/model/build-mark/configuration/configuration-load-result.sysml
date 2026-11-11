@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def ConfigurationLoadResult {
-        doc /* Holds config and any load issues. */
+        doc /* Holds config and any load issues (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Holds config and any load issues (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/ConfigurationLoadResult.cs");
             designFiles = ("docs/design/build-mark/configuration/configuration-load-result.md");
             verificationFiles = ("docs/verification/build-mark/configuration/configuration-load-result.md");

@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def BuildMarkConfig {
-        doc /* Top-level configuration data model. */
+        doc /* Top-level configuration data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Top-level configuration data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/BuildMarkConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/build-mark-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/build-mark-config.md");

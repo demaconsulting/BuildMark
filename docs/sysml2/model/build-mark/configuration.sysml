@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Configuration data models and .buildmark.yaml loading/parsing. */
 
         metadata info : SoftwareInfo {
-            description = "Configuration data models and .buildmark.yaml loading/parsing.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Configuration/ConfigurationSubsystemTests.cs");
             designFiles = ("docs/design/build-mark/configuration.md");
             verificationFiles = ("docs/verification/build-mark/configuration.md");

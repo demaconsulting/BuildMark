@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def BuildMarkConfigReader {
-        doc /* Reads and parses .buildmark.yaml using YamlDotNet. */
+        doc /* Reads and parses .buildmark.yaml using YamlDotNet (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Reads and parses .buildmark.yaml using YamlDotNet (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/BuildMarkConfigReader.cs");
             designFiles = ("docs/design/build-mark/configuration/build-mark-config-reader.md");
             verificationFiles = ("docs/verification/build-mark/configuration/build-mark-config-reader.md");

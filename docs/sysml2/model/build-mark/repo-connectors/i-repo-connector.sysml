@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def IRepoConnector {
-        doc /* Repository connector interface (the connector contract). */
+        doc /* Repository connector interface (the connector contract; documented in the subsystem design doc). */
 
         metadata info : SoftwareInfo {
-            description = "Repository connector interface (the connector contract; documented in the subsystem design doc).";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/IRepoConnector.cs");
             designFiles = ("docs/design/build-mark/repo-connectors.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/i-repo-connector.md");

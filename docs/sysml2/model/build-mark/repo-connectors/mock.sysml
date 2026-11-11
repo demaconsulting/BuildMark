@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Mock repository connector used for self-test. */
 
         metadata info : SoftwareInfo {
-            description = "Mock repository connector used for self-test.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/Mock/MockTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/mock.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/mock.md");

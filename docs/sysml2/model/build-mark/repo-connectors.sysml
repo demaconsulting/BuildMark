@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Repository connector abstraction, routing, and provider-specific integrations. */
 
         metadata info : SoftwareInfo {
-            description = "Repository connector abstraction, routing, and provider-specific integrations.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/RepoConnectorsTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors.md");

@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Version commit tag representation. */
 
         metadata info : SoftwareInfo {
-            description = "Version commit tag representation.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Version/VersionCommitTag.cs");
             designFiles = ("docs/design/build-mark/version/version-commit-tag.md");
             verificationFiles = ("docs/verification/build-mark/version/version-commit-tag.md");

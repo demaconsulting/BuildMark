@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Ordered set of version intervals. */
 
         metadata info : SoftwareInfo {
-            description = "Ordered set of version intervals.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Version/VersionIntervalSet.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Version/VersionIntervalSetTests.cs");
             designFiles = ("docs/design/build-mark/version/version-interval-set.md");

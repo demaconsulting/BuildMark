@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def GitHubGraphQLClient {
-        doc /* GraphQL API client. */
+        doc /* GraphQL API client (tests split across 6 per-method test files). */
 
         metadata info : SoftwareInfo {
-            description = "GraphQL API client (tests split across 6 per-method test files).";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubGraphQLClient.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientFindIssueIdsTests.cs",
                 "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetAllIssuesTests.cs",

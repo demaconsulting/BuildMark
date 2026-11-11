@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Azure DevOps repository connector, REST client, and work item mapping. */
 
         metadata info : SoftwareInfo {
-            description = "Azure DevOps repository connector, REST client, and work item mapping.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/AzureDevOpsTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/azure-devops.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/azure-devops.md");

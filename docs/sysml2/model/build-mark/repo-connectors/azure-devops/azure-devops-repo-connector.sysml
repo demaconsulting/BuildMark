@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Azure DevOps API integration. */
 
         metadata info : SoftwareInfo {
-            description = "Azure DevOps API integration.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnector.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/AzureDevOps/AzureDevOpsRepoConnectorTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md");

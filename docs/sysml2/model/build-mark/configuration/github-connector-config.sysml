@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def GitHubConnectorConfig {
-        doc /* GitHub connector settings data model. */
+        doc /* GitHub connector settings data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "GitHub connector settings data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/GitHubConnectorConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/github-connector-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/git-hub-connector-config.md");

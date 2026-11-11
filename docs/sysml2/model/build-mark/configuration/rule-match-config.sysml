@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def RuleMatchConfig {
-        doc /* Rule-match condition data model (companion record defined alongside RuleConfig). */
+        doc /* Rule-match condition data model (companion record defined alongside RuleConfig; documented as a supporting value type in the rule-config docs). */
 
         metadata info : SoftwareInfo {
-            description = "Rule-match condition data model (companion record defined alongside RuleConfig; documented as a supporting value type in the rule-config docs).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/RuleConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/rule-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/rule-match-config.md");

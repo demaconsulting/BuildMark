@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def GitHubGraphQLTypes {
-        doc /* GraphQL type definitions. */
+        doc /* GraphQL type definitions (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "GraphQL type definitions (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubGraphQLTypes.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/github/github-graphql-types.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-types.md");

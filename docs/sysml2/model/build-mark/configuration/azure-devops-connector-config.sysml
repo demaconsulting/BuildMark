@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def AzureDevOpsConnectorConfig {
-        doc /* Azure DevOps connector settings data model. */
+        doc /* Azure DevOps connector settings data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Azure DevOps connector settings data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/AzureDevOpsConnectorConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/azure-devops-connector-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/azure-devops-connector-config.md");

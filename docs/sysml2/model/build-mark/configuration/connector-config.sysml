@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def ConnectorConfig {
-        doc /* Connector envelope data model. */
+        doc /* Connector envelope data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Connector envelope data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/ConnectorConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/connector-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/connector-config.md");
