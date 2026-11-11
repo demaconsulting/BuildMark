@@ -186,7 +186,7 @@ memory-boundary segregation is required.
 
 ## Design Constraints
 
-- **Target framework**: .NET 8, .NET 9, and .NET 10
+- **Target framework**: .NET 10 and .NET 11
 - **Platform support**: Windows, Linux, macOS
 - **Packaging**: Published as a .NET global tool (`dotnet tool install`)
 - **Authentication**: GitHub token supplied via `GH_TOKEN` or `GITHUB_TOKEN` environment

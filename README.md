@@ -17,9 +17,11 @@ BuildMark is a .NET command-line tool that generates comprehensive markdown buil
 history and issue-tracking systems. It analyzes commits, pull requests, and issues to create human-readable build
 notes, making it easy to integrate release documentation into your CI/CD pipelines and documentation workflows.
 
-![BuildMark architecture: inputs (configuration file, Git history, and GitHub or Azure DevOps data)
-flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes components
-into a markdown build notes report][architecture]
+The workflow below shows how to use it: prepare your repository, run BuildMark from the command
+line or a CI pipeline, and publish the resulting markdown build notes.
+
+![BuildMark workflow: prepare your repository, run BuildMark from the command line or a CI pipeline,
+get markdown build notes, then use them as release notes, build artifacts, or in larger documents][workflow]
 
 For detailed documentation, see the [BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
 
@@ -31,7 +33,7 @@ For detailed documentation, see the [BuildMark releases page](https://github.com
 - 🔀 **Configurable Routing** - Route items to sections by label or type
 - 🎯 **Customizable Output** - Control report depth, sections, and content
 - 🚀 **CI/CD Ready** - Integrate with GitHub Actions and Azure Pipelines
-- 🌐 **Multi-Platform** - Windows, Linux, and macOS on .NET 8, 9, and 10
+- 🌐 **Multi-Platform** - Windows, Linux, and macOS on .NET 10 and 11
 - ✅ **Self-Validation** - Built-in qualification tests
 - 📊 **Dependency Updates** - Track changes from Dependabot and Renovate
 
@@ -39,7 +41,7 @@ For detailed documentation, see the [BuildMark releases page](https://github.com
 
 ### Prerequisites
 
-- [.NET SDK](https://dotnet.microsoft.com/download) 8.0, 9.0, or 10.0
+- [.NET SDK](https://dotnet.microsoft.com/download) 10.0 or 11.0
 
 ### Global Installation
 
@@ -86,9 +88,8 @@ dotnet tool update DemaConsulting.BuildMark
 
 | Component  | Version | Status       |
 |------------|---------|--------------|
-| .NET SDK   | 8.0     | ✅ Supported |
-| .NET SDK   | 9.0     | ✅ Supported |
 | .NET SDK   | 10.0    | ✅ Supported |
+| .NET SDK   | 11.0    | ✅ Supported |
 | OS         | Windows | ✅ Supported |
 | OS         | Linux   | ✅ Supported |
 | OS         | macOS   | ✅ Supported |
@@ -292,4 +293,4 @@ BuildMark is built with the following open-source projects:
 - [.NET](https://dotnet.microsoft.com/) - Cross-platform framework for building applications
 - [Octokit](https://github.com/octokit/octokit.net) - GitHub API client library for .NET
 
-[architecture]: https://raw.githubusercontent.com/demaconsulting/BuildMark/main/docs/images/architecture.png
+[workflow]: https://raw.githubusercontent.com/demaconsulting/BuildMark/main/docs/images/workflow.png

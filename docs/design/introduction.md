@@ -41,6 +41,15 @@ diagram or the prose below.
 
 ![Software Structure](SoftwareStructureView.svg)
 
+The diagram below complements the structure view by showing how data flows at run time:
+the configuration file, the local Git clone, and GitHub or Azure DevOps data pass through
+the Cli, Configuration, Version, RepoConnectors, and BuildNotes subsystems to produce the
+markdown build notes report.
+
+![BuildMark architecture: inputs (configuration file, Git clone, and GitHub or Azure DevOps data)
+flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes subsystems
+into a markdown build notes report](architecture.svg)
+
 ## Folder Layout
 
 - **src/** - source files and projects
