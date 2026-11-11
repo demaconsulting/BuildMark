@@ -1,6 +1,7 @@
 ---
 resource-path:
   - docs/design
+  - docs/design/generated
   - docs/design/build-mark
   - docs/design/build-mark/build-notes
   - docs/design/build-mark/cli
@@ -14,6 +15,7 @@ resource-path:
   - docs/design/build-mark/repo-connectors/azure-devops
   - docs/images
   - docs/template
+embed-resources: true
 
 input-files:
   - docs/design/title.txt
