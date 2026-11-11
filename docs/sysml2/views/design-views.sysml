@@ -5,7 +5,8 @@
 // 'render' - is what scopes the rendered diagram content.
 package BuildMark {
     view SoftwareStructureView {
-        expose BuildMark;
+        expose BuildMark::**;
+        render asInterconnectionDiagram;
     }
 
     view BuildMarkView {
