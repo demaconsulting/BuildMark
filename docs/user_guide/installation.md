@@ -4,9 +4,8 @@
 
 BuildMark requires a supported .NET SDK version:
 
-- .NET 8.0
-- .NET 9.0
 - .NET 10.0
+- .NET 11.0
 
 Install the SDK from <https://dotnet.microsoft.com/download> if it is not already available on the
 build machine.

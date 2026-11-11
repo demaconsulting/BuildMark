@@ -11,12 +11,13 @@ BuildMark is a .NET command-line tool that analyzes commits, pull requests, and 
 and Azure DevOps repositories to produce human-readable markdown build notes. It is designed for
 integration into CI/CD pipelines and release documentation workflows.
 
-The figure below shows how the pieces fit together: the `buildmark` command reads your configuration file, Git history,
-and GitHub or Azure DevOps data, then renders the results into a markdown build notes report.
+The workflow below shows how BuildMark is used: prepare your repository with version tags, an
+optional `.buildmark.yaml` file, and an access token, run the `buildmark` command locally or in a
+CI pipeline, and use the resulting markdown build notes as release notes, build artifacts, or part
+of larger documents.
 
-![BuildMark architecture: inputs (configuration file, Git history, and GitHub or Azure DevOps data)
-flow through the Cli, Configuration, Version, RepoConnectors, and BuildNotes components
-into a markdown build notes report](architecture.svg)
+![BuildMark workflow: prepare your repository, run BuildMark from the command line or a CI pipeline,
+get markdown build notes, then use them as release notes, build artifacts, or in larger documents](workflow.svg)
 
 Key capabilities include:
 
@@ -24,7 +25,7 @@ Key capabilities include:
 - **Issue Tracking** — extracts changes and bug fixes from GitHub and Azure DevOps
 - **Configurable Routing** — routes items into custom report sections by label or work-item type
 - **CI/CD Ready** — designed for automation in GitHub Actions and Azure Pipelines
-- **Multi-Platform** — runs on Windows, Linux, and macOS with .NET 8, 9, and 10
+- **Multi-Platform** — runs on Windows, Linux, and macOS with .NET 10 and 11
 - **Self-Validation** — built-in qualification tests for use in regulated environments
 
 ## Scope
@@ -35,7 +36,7 @@ common command examples in *Getting Started*, the `.buildmark.yaml` configuratio
 version targeting controls in *Item Visibility and Version Controls*, and CI/CD integration,
 report format, version selection rules, best practices, and troubleshooting in *Common Use Cases*.
 It is intended for developers and CI/CD engineers who want to automate build notes generation as
-part of their release workflow. A .NET SDK (version 8.0, 9.0, or 10.0) is required.
+part of their release workflow. A .NET SDK (version 10.0 or 11.0) is required.
 
 The following topics are out of scope:
 

@@ -12,6 +12,7 @@ resource-path:
   - docs/design/build-mark/repo-connectors/github
   - docs/design/build-mark/repo-connectors/mock
   - docs/design/build-mark/repo-connectors/azure-devops
+  - docs/images
   - docs/template
 
 input-files:

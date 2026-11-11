@@ -26,5 +26,5 @@ provides broad platform coverage evidence.
 ### Test Scenarios
 
 - *xUnit test discovery and execution*: CI pipeline executes `dotnet test` across the
-  full OS and .NET version matrix (Windows, Ubuntu, macOS × .NET 8, 9, 10); expects zero
+  full OS and .NET version matrix (Windows, Ubuntu, macOS × .NET 10, 11); expects zero
   test failures and a non-empty TRX result file for each platform/version combination.

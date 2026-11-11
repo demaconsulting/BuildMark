@@ -29,7 +29,7 @@ for assertion.
 
 ## Test Environment
 
-Tests run via `dotnet test` on the CI matrix (Windows, Ubuntu, macOS) against .NET 8, 9, and 10.
+Tests run via `dotnet test` on the CI matrix (Windows, Ubuntu, macOS) against .NET 10 and 11.
 No external services are required for unit and integration tests; all HTTP communication is
 intercepted by `MockHttpMessageHandler`. A live GitHub Actions environment is used for the
 end-to-end CI validation of the report generation pipeline.
