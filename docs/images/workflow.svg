@@ -65,7 +65,7 @@
     <text x="860" y="158" font-size="12" fill="#166534" text-anchor="middle">kept for historical tracking</text>
     <rect x="764" y="182" width="192" height="58" rx="6" fill="#ffffff" stroke="#16a34a"/>
     <text x="860" y="206" font-size="14" font-weight="600" fill="#14532d" text-anchor="middle">Larger documents</text>
-    <text x="860" y="226" font-size="12" fill="#166534" text-anchor="middle">embed with --depth</text>
+    <text x="860" y="226" font-size="12" fill="#166534" text-anchor="middle">heading level via --depth</text>
 
     <text x="485" y="290" font-size="13" font-style="italic" fill="#475569" text-anchor="middle">Need tool qualification evidence? Run buildmark --validate --results validation-results.trx</text>
   </g>
