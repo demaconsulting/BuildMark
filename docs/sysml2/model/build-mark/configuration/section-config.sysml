@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def SectionConfig {
-        doc /* Report section definition data model. */
+        doc /* Report section definition data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Report section definition data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/SectionConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/section-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/section-config.md");

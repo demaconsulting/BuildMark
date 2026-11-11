@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Shared item routing logic. */
 
         metadata info : SoftwareInfo {
-            description = "Shared item routing logic.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/ItemRouter.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/ItemRouterTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/item-router.md");

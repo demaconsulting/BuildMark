@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Shared utility helpers: path handling, process execution, and temp directories. */
 
         metadata info : SoftwareInfo {
-            description = "Shared utility helpers: path handling, process execution, and temp directories.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Utilities/UtilitiesTests.cs");
             designFiles = ("docs/design/build-mark/utilities.md");
             verificationFiles = ("docs/verification/build-mark/utilities.md");

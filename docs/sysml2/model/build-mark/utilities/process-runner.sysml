@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Process runner for Git commands. */
 
         metadata info : SoftwareInfo {
-            description = "Process runner for Git commands.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Utilities/ProcessRunner.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Utilities/ProcessRunnerTests.cs");
             designFiles = ("docs/design/build-mark/utilities/process-runner.md");

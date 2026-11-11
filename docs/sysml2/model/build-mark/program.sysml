@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Entry point and execution orchestrator. */
 
         metadata info : SoftwareInfo {
-            description = "Entry point and execution orchestrator.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Program.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/ProgramTests.cs");
             designFiles = ("docs/design/build-mark/program.md");

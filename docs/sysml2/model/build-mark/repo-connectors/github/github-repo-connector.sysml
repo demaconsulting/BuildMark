@@ -5,7 +5,6 @@ package BuildMark {
         doc /* GitHub API integration. */
 
         metadata info : SoftwareInfo {
-            description = "GitHub API integration.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubRepoConnector.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubRepoConnectorTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/github/github-repo-connector.md");

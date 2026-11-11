@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Item information data model. */
 
         metadata info : SoftwareInfo {
-            description = "Item information data model.";
             sourceFiles = ("src/DemaConsulting.BuildMark/BuildNotes/ItemInfo.cs");
             designFiles = ("docs/design/build-mark/build-notes/item-info.md");
             verificationFiles = ("docs/verification/build-mark/build-notes/item-info.md");

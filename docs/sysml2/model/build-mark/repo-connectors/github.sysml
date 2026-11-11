@@ -5,7 +5,6 @@ package BuildMark {
         doc /* GitHub repository connector, GraphQL client, and GraphQL type definitions. */
 
         metadata info : SoftwareInfo {
-            description = "GitHub repository connector, GraphQL client, and GraphQL type definitions.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/github.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/github.md");

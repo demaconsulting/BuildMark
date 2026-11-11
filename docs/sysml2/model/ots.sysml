@@ -7,7 +7,6 @@ package OtsDependencies {
         doc /* OTS: YAML parsing library used to read/write .buildmark.yaml configuration. */
 
         metadata info : SoftwareInfo {
-            description = "OTS: YAML parsing library used to read/write .buildmark.yaml configuration.";
             designFiles = ("docs/design/ots/yaml-dot-net.md");
         }
         // Note: no verificationFiles/requirementFiles - docs/verification/ots/ and docs/reqstream/ots/

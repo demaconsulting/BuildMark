@@ -13,7 +13,6 @@ package BuildMark {
         doc /* The BuildMark system as a whole. */
 
         metadata info : SoftwareInfo {
-            description = "The BuildMark system as a whole.";
             testFiles = ("test/DemaConsulting.BuildMark.Tests/IntegrationTests.cs");
             designFiles = ("docs/design/build-mark.md");
             verificationFiles = ("docs/verification/build-mark.md");

@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Command-line argument parser and I/O owner. */
 
         metadata info : SoftwareInfo {
-            description = "Command-line argument parser and I/O owner.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Cli/Context.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Cli/ContextTests.cs");
             designFiles = ("docs/design/build-mark/cli/context.md");

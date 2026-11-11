@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Repository connector base class. */
 
         metadata info : SoftwareInfo {
-            description = "Repository connector base class.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/RepoConnectorBase.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/RepoConnectors/RepoConnectorBaseTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/repo-connector-base.md");

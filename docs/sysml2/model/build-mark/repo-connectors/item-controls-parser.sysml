@@ -5,7 +5,6 @@ package BuildMark {
         doc /* BuildMark control-block parser. */
 
         metadata info : SoftwareInfo {
-            description = "BuildMark control-block parser.";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/ItemControlsParser.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/ItemControls/ItemControlsParserTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/item-controls-parser.md");

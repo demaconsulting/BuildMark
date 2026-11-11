@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def ReportConfig {
-        doc /* Report output settings data model. */
+        doc /* Report output settings data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Report output settings data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/Configuration/ReportConfig.cs");
             designFiles = ("docs/design/build-mark/configuration/report-config.md");
             verificationFiles = ("docs/verification/build-mark/configuration/report-config.md");

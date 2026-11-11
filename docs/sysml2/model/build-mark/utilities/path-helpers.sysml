@@ -5,7 +5,6 @@ package BuildMark {
         doc /* Safe path combination utilities. */
 
         metadata info : SoftwareInfo {
-            description = "Safe path combination utilities.";
             sourceFiles = ("src/DemaConsulting.BuildMark/Utilities/PathHelpers.cs");
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Utilities/PathHelpersTests.cs");
             designFiles = ("docs/design/build-mark/utilities/path-helpers.md");

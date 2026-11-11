@@ -2,10 +2,9 @@ package BuildMark {
     private import SoftwareItemMetadata::*;
 
     part def ItemControlsInfo {
-        doc /* Item controls data model. */
+        doc /* Item controls data model (requirements documented in the subsystem requirements file). */
 
         metadata info : SoftwareInfo {
-            description = "Item controls data model (requirements documented in the subsystem requirements file).";
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/ItemControlsInfo.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/item-controls-info.md");
             verificationFiles = ("docs/verification/build-mark/repo-connectors/item-controls-info.md");
