@@ -8,11 +8,11 @@ matching (case-insensitive), routing to new sections, and default section fallba
 
 #### Dependencies
 
-| Mock / Stub      | Reason                                                       |
-| ---------------- | ------------------------------------------------------------ |
+| Mock / Stub | Reason |
+| --- | --- |
 | `ItemInfo` stubs | Constructed with specific labels and types for routing tests |
-| `SectionConfig`  | Provided as test input to define available sections          |
-| `RuleConfig`     | Provided as test input to define routing rules               |
+| `SectionConfig` | Provided as test input to define available sections |
+| `RuleConfig` | Provided as test input to define routing rules |
 
 #### Test Environment
 

@@ -8,9 +8,9 @@ connector within the broader pipeline. The unit tests are described in the indiv
 
 #### Dependencies
 
-| Mock / Stub | Reason    |
-| ----------- | --------- |
-| None        | Pure mock |
+| Mock / Stub | Reason |
+| --- | --- |
+| None | Pure mock |
 
 #### Test Environment
 

@@ -9,9 +9,9 @@ hidden). Unknown keys and unrecognized values are tested for graceful ignorance.
 
 #### Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Pure logic |
+| Mock / Stub | Reason |
+| --- | --- |
+| None | Pure logic |
 
 #### Test Environment
 

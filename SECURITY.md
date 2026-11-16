@@ -4,10 +4,10 @@
 
 BuildMark follows semantic versioning. Security updates are provided for the following versions:
 
-| Version | Supported          |
-| ------- | ------------------ |
-| Latest  | :white_check_mark: |
-| Older   | :x:                |
+| Version | Supported |
+| --- | --- |
+| Latest | :white_check_mark: |
+| Older | :x: |
 
 We recommend always using the latest version to ensure you have the most recent security updates.
 

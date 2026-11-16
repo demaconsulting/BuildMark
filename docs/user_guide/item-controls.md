@@ -37,7 +37,7 @@ visibility: internal
 The `visibility` field explicitly overrides the default visibility rules for an item.
 
 | Value | Behavior |
-| :---- | :-------- |
+| :--- | :--- |
 | `public` | Force-include the item in build notes, overriding any default exclusion. |
 | `internal` | Force-exclude the item from build notes, overriding any default inclusion. |
 
@@ -66,7 +66,7 @@ The `type` field overrides the item classification that BuildMark uses when plac
 into the report.
 
 | Value | Report Section |
-| :---- | :------------- |
+| :--- | :--- |
 | `bug` | **Bugs Fixed** section |
 | `feature` | **Changes** section |
 
@@ -74,7 +74,8 @@ The `type` field sets the item classification. Routing rules (configured in `.bu
 report section each classified item is placed in. The section names in the table above reflect the default
 configuration only.
 
-When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels or from the Azure DevOps work-item type.
+When `type` is absent, BuildMark infers the type from the GitHub issue or PR labels or from the Azure DevOps work-item
+type.
 
 ### Type Example
 
@@ -96,7 +97,7 @@ affected-versions: (,1.0.1],[1.1.0,1.2.0),(1.2.5,2.0.0],[3.0.0,)
 ### Interval Syntax
 
 | Symbol | Meaning |
-| :----- | :------ |
+| :--- | :--- |
 | `[` | Inclusive lower bound |
 | `(` | Exclusive lower bound |
 | `]` | Inclusive upper bound |
@@ -107,7 +108,7 @@ affected-versions: (,1.0.1],[1.1.0,1.2.0),(1.2.5,2.0.0],[3.0.0,)
 ### Affected Version Examples
 
 | Expression | Meaning |
-| :--------- | :------ |
+| :--- | :--- |
 | `(,1.0.1]` | All versions up to and including `1.0.1` |
 | `[1.1.0,1.2.0)` | From `1.1.0` up to (but not including) `1.2.0` |
 | `(1.2.5,2.0.0]` | After `1.2.5` up to and including `2.0.0` |
@@ -151,6 +152,6 @@ fields, as an alternative to embedding `buildmark` code blocks in descriptions. 
 field and a `buildmark` block are present, the custom field takes precedence.
 
 | Custom Field | Equivalent | Description |
-| :----------- | :--------- | :---------- |
+| :--- | :--- | :--- |
 | `Custom.Visibility` | `visibility` | Set to `public` or `internal` to override default visibility. |
 | `Custom.AffectedVersions` | `affected-versions` | Version interval set using the same interval notation. |

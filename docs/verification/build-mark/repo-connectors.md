@@ -10,11 +10,11 @@ unit-level chapters.
 
 ### Dependencies
 
-| Mock / Stub              | Reason                                                        |
-| ------------------------ | ------------------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to GitHub GraphQL and Azure DevOps REST |
-| `MockRepoConnector`      | Used directly for factory and base class tests                |
-| `ProcessRunner` (real)   | Used by ProcessRunner tests with actual OS commands           |
+| `MockRepoConnector` | Used directly for factory and base class tests |
+| `ProcessRunner` (real) | Used by ProcessRunner tests with actual OS commands |
 
 ### Test Environment
 

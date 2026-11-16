@@ -10,8 +10,8 @@ extraction for visibility and affected-versions controls.
 
 ##### Dependencies
 
-| Mock / Stub          | Reason                                                      |
-| -------------------- | ----------------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `WorkItem` test data | Constructed in-line with specific types, states, and fields |
 
 ##### Test Environment

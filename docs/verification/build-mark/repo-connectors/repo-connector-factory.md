@@ -9,10 +9,10 @@ detection.
 
 #### Dependencies
 
-| Mock / Stub              | Reason                                                   |
-| ------------------------ | -------------------------------------------------------- |
-| Environment variables    | Tests set/clear `GITHUB_ACTIONS` and `TF_BUILD` env vars |
-| Git remote URL (process) | Factory may invoke Git to detect the remote URL          |
+| Mock / Stub | Reason |
+| --- | --- |
+| Environment variables | Tests set/clear `GITHUB_ACTIONS` and `TF_BUILD` env vars |
+| Git remote URL (process) | Factory may invoke Git to detect the remote URL |
 
 #### Test Environment
 

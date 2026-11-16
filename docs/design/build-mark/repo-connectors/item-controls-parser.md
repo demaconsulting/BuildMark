@@ -18,11 +18,11 @@ value is compared case-sensitively. Unknown keys and unrecognized values are sil
 
 Recognized keys and accepted values:
 
-| Key                 | Accepted values      | Effect                                    |
-|---------------------|----------------------|-------------------------------------------|
-| `visibility`        | `public`, `internal` | Sets `ItemControlsInfo.Visibility`        |
-| `type`              | `bug`, `feature`     | Sets `ItemControlsInfo.Type`              |
-| `affected-versions` | Interval expression  | Sets `ItemControlsInfo.AffectedVersions`  |
+| Key | Accepted values | Effect |
+| --- | --- | --- |
+| `visibility` | `public`, `internal` | Sets `ItemControlsInfo.Visibility` |
+| `type` | `bug`, `feature` | Sets `ItemControlsInfo.Type` |
+| `affected-versions` | Interval expression | Sets `ItemControlsInfo.AffectedVersions` |
 
 #### Data Model
 

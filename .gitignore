@@ -50,9 +50,6 @@ test-results/
 __pycache__/
 *.py[cod]
 
-# Node
-node_modules/
-
 # Generated compliance documents (build outputs — never committed)
 **/generated/
 
@@ -66,4 +63,3 @@ Thumbs.db
 # VersionMark captures (generated during CI/CD)
 versionmark-*.json
 
-/package-lock.json

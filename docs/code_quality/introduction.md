@@ -22,5 +22,7 @@ The analysis includes:
 
 ## References
 
-- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each release
-- [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=demaconsulting_BuildMark) — live code quality and security analysis
+- [BuildMark releases](https://github.com/demaconsulting/BuildMark/releases) — compiled compliance documents for each
+  release
+- [SonarCloud Dashboard](https://sonarcloud.io/dashboard?id=demaconsulting_BuildMark) — live code quality and security
+  analysis

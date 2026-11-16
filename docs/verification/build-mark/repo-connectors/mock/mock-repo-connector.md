@@ -9,9 +9,9 @@ API, handles all routing and `HasRules` logic, and correctly implements all memb
 
 ##### Dependencies
 
-| Mock / Stub | Reason                             |
-| ----------- | ---------------------------------- |
-| None        | Self-contained in-memory connector |
+| Mock / Stub | Reason |
+| --- | --- |
+| None | Self-contained in-memory connector |
 
 ##### Test Environment
 

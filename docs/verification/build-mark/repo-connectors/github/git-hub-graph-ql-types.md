@@ -9,8 +9,8 @@ JSON deserialization of mocked API responses.
 
 ##### Dependencies
 
-| Mock / Stub              | Reason                                                       |
-| ------------------------ | ------------------------------------------------------------ |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Provides JSON payloads whose structure matches the DTO types |
 
 ##### Test Environment

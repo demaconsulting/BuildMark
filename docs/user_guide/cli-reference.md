@@ -1,7 +1,7 @@
 # Command-Line Options
 
 | Option | Description |
-| :----- | :---------- |
+| :--- | :--- |
 | `-v`, `--version` | Display version information and exit |
 | `-h`, `-?`, `--help` | Display help message and exit |
 | `--silent` | Suppress console output |
