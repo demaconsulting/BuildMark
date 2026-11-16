@@ -9,8 +9,8 @@ response variants (string-valued ids) and error handling (HTTP errors, empty inp
 
 ##### Dependencies
 
-| Mock / Stub              | Reason                                                       |
-| ------------------------ | ------------------------------------------------------------ |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the Azure DevOps REST endpoints |
 
 ##### Test Environment

@@ -10,8 +10,8 @@ work item deduplication and version tag handling.
 
 ##### Dependencies
 
-| Mock / Stub              | Reason                                                      |
-| ------------------------ | ----------------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts all HTTP calls to the Azure DevOps REST endpoint |
 
 ##### Test Environment

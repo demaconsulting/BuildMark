@@ -51,7 +51,7 @@
     {
       "label": "lint markdown",
       "type": "shell",
-      "command": "npx markdownlint-cli2 \"**/*.md\"",
+      "command": "dotnet lintmark",
       "group": "none",
       "presentation": {
         "reveal": "always",

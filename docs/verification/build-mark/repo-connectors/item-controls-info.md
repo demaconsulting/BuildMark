@@ -9,9 +9,9 @@ fields are populated correctly.
 
 #### Dependencies
 
-| Mock / Stub | Reason     |
-| ----------- | ---------- |
-| None        | Data class |
+| Mock / Stub | Reason |
+| --- | --- |
+| None | Data class |
 
 #### Test Environment
 

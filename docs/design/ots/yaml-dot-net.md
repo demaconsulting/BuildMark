@@ -14,12 +14,12 @@ records rather than throwing unhandled exceptions.
 
 BuildMark uses the YamlDotNet **representation model** exclusively:
 
-| Type                | Usage                                                            |
-|---------------------|------------------------------------------------------------------|
-| `YamlStream`        | Top-level container; parsed from the raw file text               |
-| `YamlMappingNode`   | Key-value mapping; used for all object nodes in the config       |
-| `YamlSequenceNode`  | Ordered list; used for `sections` and `rules` arrays             |
-| `YamlScalarNode`    | Leaf node value; represents a string, boolean, or number value   |
+| Type | Usage |
+| --- | --- |
+| `YamlStream` | Top-level container; parsed from the raw file text |
+| `YamlMappingNode` | Key-value mapping; used for all object nodes in the config |
+| `YamlSequenceNode` | Ordered list; used for `sections` and `rules` arrays |
+| `YamlScalarNode` | Leaf node value; represents a string, boolean, or number value |
 
 The serializer/deserializer (`YamlDotNet.Serialization`) is **not** used
 because it requires a fixed schema and throws on unknown keys, which would

@@ -108,7 +108,7 @@ The `connector` section declares how BuildMark connects to source-control and wo
 The `type` key selects the connector:
 
 | Value | Description |
-| :---- | :---------- |
+| :--- | :--- |
 | `github` | GitHub or GitHub Enterprise |
 | `azure-devops` | Azure DevOps (cloud or on-premises) |
 
@@ -126,7 +126,7 @@ back to well-known names or the GitHub CLI. An error is raised if the variable i
 3. `gh auth token` (GitHub CLI, if authenticated)
 
 | Key | Required | Description |
-| :-- | :------- | :---------- |
+| :--- | :--- | :--- |
 | `url` | No | Base URL of the GitHub instance. Defaults to `https://api.github.com`. |
 | `repository` | Yes | Repository in `owner/repo` format. |
 | `token-variable` | No | Name of the environment variable for the access token. When set, only this variable is used. |
@@ -158,7 +158,7 @@ back to well-known names or the Azure CLI. An error is raised if the variable is
 5. `az account get-access-token` (Azure CLI, if logged in)
 
 | Key | Required | Description |
-| :-- | :------- | :---------- |
+| :--- | :--- | :--- |
 | `url` | Yes | Azure DevOps organization URL, e.g. `https://dev.azure.com/myorg`. |
 | `project` | Yes | Azure DevOps project name. |
 | `repository` | Yes | Repository name within the project. |
@@ -196,7 +196,7 @@ default works correctly without any configuration for the vast majority of teams
 **Scoping summary:**
 
 | `area-path` value | Behavior |
-| :---------------- | :-------- |
+| :--- | :--- |
 | Not set (default) | Scoped to `{project}` (the project root area) |
 | Explicit value (e.g. `MyProject\MyRepo`) | Scoped to that area path and all descendants |
 | Empty string (`""`) | No scoping — queries all bugs in the ADO project |
@@ -252,7 +252,7 @@ The `sections` sequence defines which sections appear in the generated build not
 order. Each entry has two keys:
 
 | Key | Description |
-| :-- | :---------- |
+| :--- | :--- |
 | `id` | Unique identifier used to reference this section in routing rules. |
 | `title` | Human-readable heading that appears in the generated report. |
 
@@ -267,14 +267,14 @@ Rules are evaluated in order and the **first matching rule wins**.
 Each rule may contain:
 
 | Key | Description |
-| :-- | :---------- |
+| :--- | :--- |
 | `match` | Optional. Criteria to test against each item (see below). |
 | `route` | Required. The section `id` to place matched items in, or `suppressed` to exclude them. |
 
 ### Match criteria
 
 | Criterion | Description |
-| :-------- | :---------- |
+| :--- | :--- |
 | `label` | A label name or list of label names. Matches if the item carries any of the listed labels. |
 | `work-item-type` | A work-item type name or list of names (e.g., `Bug`, `Task`, `Epic`). |
 
@@ -296,7 +296,7 @@ The optional `report` section sets default report generation options. CLI argume
 override any values set here.
 
 | Key | Description |
-| :-- | :---------- |
+| :--- | :--- |
 | `file` | Default output file path for the generated report. |
 | `depth` | Markdown heading depth (default: 1). |
 | `include-known-issues` | Set to `true` to include known issues by default. |
@@ -318,7 +318,7 @@ and routing rules:
 **Default sections:**
 
 | Section ID | Title |
-| :--------- | :---- |
+| :--- | :--- |
 | `changes` | Changes |
 | `bugs-fixed` | Bugs Fixed |
 | `dependency-updates` | Dependency Updates |

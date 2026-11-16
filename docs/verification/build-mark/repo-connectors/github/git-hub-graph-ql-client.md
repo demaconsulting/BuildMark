@@ -8,19 +8,19 @@ return controlled JSON responses. Tests cover successful responses, empty data,
 missing required properties, HTTP errors, invalid JSON, single-item responses, and
 pagination.
 
-| Test File                                    | Method Tested                          | Test Count |
-| -------------------------------------------- | -------------------------------------- | ---------- |
-| `GitHubGraphQLClientFindIssueIdsTests.cs`    | `FindIssueIdsLinkedToPullRequestAsync` | 8          |
-| `GitHubGraphQLClientGetAllIssuesTests.cs`    | `GetAllIssuesAsync`                    | 8          |
-| `GitHubGraphQLClientGetAllTagsTests.cs`      | `GetAllTagsAsync`                      | 8          |
-| `GitHubGraphQLClientGetCommitsTests.cs`      | `GetCommitsAsync`                      | 8          |
-| `GitHubGraphQLClientGetPullRequestsTests.cs` | `GetPullRequestsAsync`                 | 9          |
-| `GitHubGraphQLClientGetReleasesTests.cs`     | `GetReleasesAsync`                     | 8          |
+| Test File | Method Tested | Test Count |
+| --- | --- | --- |
+| `GitHubGraphQLClientFindIssueIdsTests.cs` | `FindIssueIdsLinkedToPullRequestAsync` | 8 |
+| `GitHubGraphQLClientGetAllIssuesTests.cs` | `GetAllIssuesAsync` | 8 |
+| `GitHubGraphQLClientGetAllTagsTests.cs` | `GetAllTagsAsync` | 8 |
+| `GitHubGraphQLClientGetCommitsTests.cs` | `GetCommitsAsync` | 8 |
+| `GitHubGraphQLClientGetPullRequestsTests.cs` | `GetPullRequestsAsync` | 9 |
+| `GitHubGraphQLClientGetReleasesTests.cs` | `GetReleasesAsync` | 8 |
 
 ##### Dependencies
 
-| Mock / Stub              | Reason                                                  |
-| ------------------------ | ------------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls; returns controlled JSON payloads |
 
 ##### Test Environment

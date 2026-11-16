@@ -9,8 +9,8 @@ cross-prefix equality).
 
 #### Dependencies
 
-| Mock / Stub               | Reason                                                         |
-| ------------------------- | -------------------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | Concrete subclass fixture | Tests instantiate a minimal concrete subclass for testing base |
 
 #### Test Environment

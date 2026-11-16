@@ -9,8 +9,8 @@ pipeline through mock HTTP responses. The unit tests are described in the indivi
 
 #### Dependencies
 
-| Mock / Stub              | Reason                                             |
-| ------------------------ | -------------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to the Azure DevOps REST API |
 
 #### Test Environment

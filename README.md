@@ -86,13 +86,13 @@ dotnet tool update DemaConsulting.BuildMark
 
 ### Compatibility
 
-| Component  | Version | Status       |
-|------------|---------|--------------|
-| .NET SDK   | 10.0    | ✅ Supported |
-| .NET SDK   | 11.0    | ✅ Supported |
-| OS         | Windows | ✅ Supported |
-| OS         | Linux   | ✅ Supported |
-| OS         | macOS   | ✅ Supported |
+| Component | Version | Status |
+| --- | --- | --- |
+| .NET SDK | 10.0 | ✅ Supported |
+| .NET SDK | 11.0 | ✅ Supported |
+| OS | Windows | ✅ Supported |
+| OS | Linux | ✅ Supported |
+| OS | macOS | ✅ Supported |
 
 ## Usage
 
@@ -163,7 +163,8 @@ pwsh ./build.ps1
 
 ## User Guide
 
-The BuildMark User Guide is available on the [BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
+The BuildMark User Guide is available on the
+[BuildMark releases page](https://github.com/demaconsulting/BuildMark/releases).
 
 ## Configuration File
 
@@ -251,7 +252,7 @@ are determined by the configuration.
 
 The BuildMark repository itself follows these development practices:
 
-- 🔍 **Linting Enforcement** - markdownlint, TextLint, and yamllint enforced on every CI run
+- 🔍 **Linting Enforcement** - LintMark, TextLint, and yamllint enforced on every CI run
 - 📋 **Continuous Compliance** - Compliance evidence generated automatically on every CI run,
   following the [Continuous Compliance](https://github.com/demaconsulting/ContinuousCompliance) methodology
 - ☁️ **SonarCloud Integration** - Quality gate and security analysis on every build
@@ -284,7 +285,8 @@ By contributing to this project, you agree that your contributions will be licen
 
 ## Security
 
-For security concerns and vulnerability reporting, please see our [Security Policy](https://github.com/demaconsulting/BuildMark/blob/main/SECURITY.md).
+For security concerns and vulnerability reporting, please see our
+[Security Policy](https://github.com/demaconsulting/BuildMark/blob/main/SECURITY.md).
 
 ## Acknowledgments
 

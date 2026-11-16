@@ -36,13 +36,13 @@ file at the end of the run.
 
 The five self-tests each exercise a distinct aspect of the tool:
 
-| Test Name                            | What It Verifies                                                      |
-|--------------------------------------|-----------------------------------------------------------------------|
-| `BuildMark_MarkdownReportGeneration` | Markdown report is correctly generated from mock data                 |
-| `BuildMark_GitIntegration`           | Git repository connector reads version tags and commits               |
-| `BuildMark_IssueTracking`            | GitHub issue and pull request tracking works correctly                |
-| `BuildMark_KnownIssuesReporting`     | Known issues are correctly included in the report when requested      |
-| `BuildMark_RulesRouting`             | Rules-based item routing assigns items to the correct report sections |
+| Test Name | What It Verifies |
+| --- | --- |
+| `BuildMark_MarkdownReportGeneration` | Markdown report is correctly generated from mock data |
+| `BuildMark_GitIntegration` | Git repository connector reads version tags and commits |
+| `BuildMark_IssueTracking` | GitHub issue and pull request tracking works correctly |
+| `BuildMark_KnownIssuesReporting` | Known issues are correctly included in the report when requested |
+| `BuildMark_RulesRouting` | Rules-based item routing assigns items to the correct report sections |
 
 Each test method creates its own `MockRepoConnector` instance, builds a `BuildInformation` record, and
 validates the output against expected content. Tests are independent and share no mutable state.

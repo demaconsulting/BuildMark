@@ -9,8 +9,8 @@ The unit tests are described in the individual unit chapters.
 
 #### Dependencies
 
-| Mock / Stub              | Reason                                          |
-| ------------------------ | ----------------------------------------------- |
+| Mock / Stub | Reason |
+| --- | --- |
 | `MockHttpMessageHandler` | Intercepts HTTP calls to the GitHub GraphQL API |
 
 #### Test Environment

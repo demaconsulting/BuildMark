@@ -9,9 +9,9 @@ tests that confirm the concrete class implements `IRepoConnector`.
 
 #### Dependencies
 
-| Mock / Stub | Reason    |
-| ----------- | --------- |
-| None        | Interface |
+| Mock / Stub | Reason |
+| --- | --- |
+| None | Interface |
 
 #### Test Environment
 
