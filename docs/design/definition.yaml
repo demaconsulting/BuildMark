@@ -13,7 +13,6 @@ resource-path:
   - docs/design/build-mark/repo-connectors/github
   - docs/design/build-mark/repo-connectors/mock
   - docs/design/build-mark/repo-connectors/azure-devops
-  - docs/design/ots
   - docs/images
   - docs/template
 embed-resources: true
@@ -70,7 +69,6 @@ input-files:
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md
   - docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md
-  - docs/design/ots/yaml-dot-net.md
 template: template.html
 table-of-contents: true
 number-sections: true
