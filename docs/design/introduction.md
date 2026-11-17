@@ -21,9 +21,19 @@ Local items:
 
 - **BuildMark**: system, subsystem, and unit design for all local components.
 
-OTS items:
+OTS items (integration and usage design; see *OTS Integration Design*):
 
-- **YamlDotNet**: integration and usage design.
+- **YamlDotNet** — YAML parsing library used by the Configuration subsystem.
+- **xUnit** — unit testing framework.
+- **BuildMark** — build notes generation tool (previously released version).
+- **FileAssert** — generated document assertion tool.
+- **Pandoc** — Markdown-to-HTML document conversion tool.
+- **ReqStream** — requirements traceability tool.
+- **ReviewMark** — file review enforcement tool.
+- **SarifMark** — SARIF report generation tool.
+- **SonarMark** — SonarCloud report generation tool.
+- **VersionMark** — tool version capture tool.
+- **WeasyPrint** — HTML-to-PDF renderer.
 
 The following topics are out of scope:
 

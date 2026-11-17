@@ -38,6 +38,7 @@ sections:
             children:
               - BuildMark-ConfigLoadResult-ReportTo
               - BuildMark-ConfigurationIssue-Record
+              - BuildMark-OTS-YamlDotNet-NodeLocation
 
           - id: BuildMark-Configuration-ConnectorConfig
             title: The Configuration subsystem shall deserialize the connector envelope and connector-specific settings.
@@ -68,6 +69,8 @@ sections:
                   regardless of file presence or parse errors.
                 tests:
                   - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+                children:
+                  - BuildMark-OTS-YamlDotNet-Parse
 
               - id: BuildMark-ConfigReader-MissingFile
                 title: >-
@@ -88,6 +91,8 @@ sections:
                   than a silent failure or an unhandled exception.
                 tests:
                   - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
+                children:
+                  - BuildMark-OTS-YamlDotNet-SyntaxErrors
 
           - title: ConfigurationLoadResult Requirements
             requirements:

@@ -45,6 +45,7 @@ OTS items verified in this document:
 - **VersionMark** — tool version capture tool.
 - **WeasyPrint** — HTML-to-PDF renderer.
 - **xUnit** — unit testing framework.
+- **YamlDotNet** — YAML parsing library.
 
 The following topics are out of scope:
 
