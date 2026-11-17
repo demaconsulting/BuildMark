@@ -31,6 +31,7 @@ input-files:
   - docs/verification/build-mark/utilities.md
   - docs/verification/build-mark/utilities/path-helpers.md
   - docs/verification/build-mark/utilities/process-runner.md
+  - docs/verification/build-mark/utilities/temporary-directory.md
   - docs/verification/build-mark/version.md
   - docs/verification/build-mark/version/version-comparable.md
   - docs/verification/build-mark/version/version-semantic.md

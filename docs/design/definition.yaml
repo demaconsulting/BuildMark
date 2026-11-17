@@ -34,6 +34,8 @@ input-files:
   - docs/design/build-mark/configuration/configuration-load-result.md
   - docs/design/build-mark/configuration/configuration-issue.md
   - docs/design/build-mark/configuration/connector-config.md
+  - docs/design/build-mark/configuration/github-connector-config.md
+  - docs/design/build-mark/configuration/azure-devops-connector-config.md
   - docs/design/build-mark/configuration/report-config.md
   - docs/design/build-mark/configuration/rule-config.md
   - docs/design/build-mark/configuration/section-config.md
@@ -42,6 +44,7 @@ input-files:
   - docs/design/build-mark/utilities.md
   - docs/design/build-mark/utilities/path-helpers.md
   - docs/design/build-mark/utilities/process-runner.md
+  - docs/design/build-mark/utilities/temporary-directory.md
   - docs/design/build-mark/version.md
   - docs/design/build-mark/version/version-comparable.md
   - docs/design/build-mark/version/version-semantic.md
