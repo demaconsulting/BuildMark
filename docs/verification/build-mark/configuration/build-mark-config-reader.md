@@ -46,6 +46,12 @@ The result must have a null `Config`, `HasErrors` true, and an issue description
 `"tab"` (case-insensitive). This scenario is tested by
 `BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue`.
 
+**BuildMarkConfigReader_ReadAsync_SyntaxError_ReportsErrorLine**: A `.buildmark.yaml` whose third
+line contains a mapping value inside a plain scalar (`title: Changes: Notes`) is written and read
+via `BuildMarkConfigReader.ReadAsync`. The result must have a null `Config` and a single error
+issue on line 3, confirming that YAML syntax errors are reported at their source line. This
+scenario is tested by `BuildMarkConfigReader_ReadAsync_SyntaxError_ReportsErrorLine`.
+
 **BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration**: A
 `.buildmark.yaml` with an Azure DevOps connector block using canonical keys (organization,
 repository) is written and read via `BuildMarkConfigReader.ReadAsync`. All Azure DevOps fields

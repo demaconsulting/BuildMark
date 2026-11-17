@@ -1,0 +1,45 @@
+---
+# YamlDotNet OTS Software Requirements
+#
+# Requirements for the YamlDotNet library functionality consumed by BuildMark.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: YamlDotNet Requirements
+        requirements:
+          - id: BuildMark-OTS-YamlDotNet-Parse
+            title: YamlDotNet shall parse well-formed YAML text into a node tree of mappings, sequences, and scalars.
+            justification: |
+              BuildMarkConfigReader loads the optional .buildmark.yaml file with the YamlDotNet
+              representation model (YamlStream, YamlMappingNode, YamlSequenceNode, and
+              YamlScalarNode) and walks the resulting node tree to build the configuration.
+              Correct parsing of nested mappings, block and flow sequences, and scalar values
+              is required for every configuration setting to reach BuildMark.
+            tags: [ots]
+            tests:
+              - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+              - Configuration_ReadAsync_ValidFile_ReturnsConfiguration
+
+          - id: BuildMark-OTS-YamlDotNet-SyntaxErrors
+            title: YamlDotNet shall reject malformed YAML text with an exception that identifies the line of the error.
+            justification: |
+              BuildMarkConfigReader catches YamlException and converts it into an error
+              ConfigurationIssue at YamlException.Start.Line. YamlDotNet must detect invalid
+              YAML rather than return a partial document, and must report where the error is
+              so that users can correct the file.
+            tags: [ots]
+            tests:
+              - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
+              - BuildMarkConfigReader_ReadAsync_SyntaxError_ReportsErrorLine
+
+          - id: BuildMark-OTS-YamlDotNet-NodeLocation
+            title: YamlDotNet shall report the 1-based source line on which each parsed node starts.
+            justification: |
+              BuildMarkConfigReader reports configuration validation errors, such as unsupported
+              keys and wrong node types for the structural blocks, at YamlNode.Start.Line.
+              Accurate node locations are required for these issues to point users at the
+              offending line.
+            tags: [ots]
+            tests:
+              - Configuration_Issues_ValidationError_ReportsAccurateLine

@@ -8,8 +8,8 @@ package OtsDependencies {
 
         metadata info : SoftwareInfo {
             designFiles = ("docs/design/ots/yaml-dot-net.md");
+            verificationFiles = ("docs/verification/ots/yaml-dot-net.md");
+            requirementFiles = ("docs/reqstream/ots/yaml-dot-net.yaml");
         }
-        // Note: no verificationFiles/requirementFiles - docs/verification/ots/ and docs/reqstream/ots/
-        // do not contain a yaml-dot-net entry (discovered pre-existing gap, not fabricated).
     }
 }

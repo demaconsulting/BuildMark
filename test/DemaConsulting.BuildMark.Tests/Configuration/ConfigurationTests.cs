@@ -146,6 +146,30 @@ public class ConfigurationTests
     }
 
     /// <summary>
+    ///     Test that a YAML syntax error is reported at the line where the parser detected it.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_SyntaxError_ReportsErrorLine()
+    {
+        // Arrange: the nested mapping value that YAML forbids in a plain scalar is on line 3
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            "sections:\n  - id: changes\n    title: Changes: Notes\n",
+            TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+
+        // Assert
+        Assert.Null(result.Config);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, issue.Severity);
+        Assert.Equal(3, issue.Line);
+    }
+
+    /// <summary>
     ///     Test that a valid Azure DevOps connector block is parsed into the configuration model.
     /// </summary>
     [Fact]

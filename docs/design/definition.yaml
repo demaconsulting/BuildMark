@@ -13,6 +13,7 @@ resource-path:
   - docs/design/build-mark/repo-connectors/github
   - docs/design/build-mark/repo-connectors/mock
   - docs/design/build-mark/repo-connectors/azure-devops
+  - docs/design/ots
   - docs/images
   - docs/template
 embed-resources: true
@@ -38,6 +39,7 @@ input-files:
   - docs/design/build-mark/configuration/azure-devops-connector-config.md
   - docs/design/build-mark/configuration/report-config.md
   - docs/design/build-mark/configuration/rule-config.md
+  - docs/design/build-mark/configuration/rule-match-config.md
   - docs/design/build-mark/configuration/section-config.md
   - docs/design/build-mark/self-test.md
   - docs/design/build-mark/self-test/validation.md
@@ -69,6 +71,18 @@ input-files:
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md
   - docs/design/build-mark/repo-connectors/azure-devops/azure-devops-api-types.md
   - docs/design/build-mark/repo-connectors/azure-devops/work-item-mapper.md
+  - docs/design/ots.md
+  - docs/design/ots/buildmark.md
+  - docs/design/ots/fileassert.md
+  - docs/design/ots/pandoc.md
+  - docs/design/ots/reqstream.md
+  - docs/design/ots/reviewmark.md
+  - docs/design/ots/sarifmark.md
+  - docs/design/ots/sonarmark.md
+  - docs/design/ots/versionmark.md
+  - docs/design/ots/weasyprint.md
+  - docs/design/ots/xunit.md
+  - docs/design/ots/yaml-dot-net.md
 template: template.html
 table-of-contents: true
 number-sections: true

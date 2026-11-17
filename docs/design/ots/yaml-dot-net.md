@@ -1,49 +1,58 @@
 ## YamlDotNet Integration Design
 
-### Why YamlDotNet Was Chosen
+### Purpose
 
-YamlDotNet is the established YAML parsing library for .NET. It provides a
-representation model (`YamlStream`, `YamlMappingNode`, `YamlSequenceNode`,
-`YamlScalarNode`) that allows walking the YAML node tree without requiring a
-pre-defined schema. This is important for BuildMark because the configuration
-file is optional and partially structured: the reader must tolerate absent
-sections gracefully and convert malformed content into `ConfigurationIssue`
-records rather than throwing unhandled exceptions.
+YamlDotNet is the established YAML parsing library for .NET. BuildMark uses it to parse the
+optional `.buildmark.yaml` configuration file. It was chosen because its representation model
+lets BuildMark walk the YAML node tree without a fixed schema and exposes the source line of
+every node and parse error. BuildMark needs both: unknown keys and wrong node types must be
+reported as `ConfigurationIssue` records with accurate line numbers rather than as unhandled
+exceptions.
 
-### APIs Used
+### Features Used
 
-BuildMark uses the YamlDotNet **representation model** exclusively:
+BuildMark uses the YamlDotNet **representation model** (`YamlDotNet.RepresentationModel`) and the
+`YamlException` type (`YamlDotNet.Core`):
 
-| Type | Usage |
+| Feature | Usage in BuildMark |
 | --- | --- |
-| `YamlStream` | Top-level container; parsed from the raw file text |
-| `YamlMappingNode` | Key-value mapping; used for all object nodes in the config |
-| `YamlSequenceNode` | Ordered list; used for `sections` and `rules` arrays |
-| `YamlScalarNode` | Leaf node value; represents a string, boolean, or number value |
+| `YamlStream` | Loads the file text and exposes the parsed documents |
+| `YamlDocument.RootNode` | Root of the first document; must be a mapping |
+| `YamlMappingNode` | Object nodes: the root, `connector`, `report`, sections, rules, and `match` |
+| `YamlSequenceNode` | `sections` and `rules` lists, and multi-value `match` entries |
+| `YamlScalarNode` | Leaf values such as keys, identifiers, titles, and routes |
+| `YamlNode.Start.Line` | 1-based line number for each validation issue |
+| `YamlException.Start.Line` | 1-based line number for syntax errors |
 
-The serializer/deserializer (`YamlDotNet.Serialization`) is **not** used
-because it requires a fixed schema and throws on unknown keys, which would
-prevent forward-compatible configuration files.
+The serializer (`YamlDotNet.Serialization`) is not used: it maps YAML onto fixed types and does
+not let BuildMark report every unknown key or wrong node type with its own line number.
 
 ### Integration Pattern
 
-`BuildMarkConfigReader.ReadAsync` reads the file text and passes it to
-`YamlStream.Load(reader)`. If parsing succeeds, the first document's root
-node is cast to `YamlMappingNode` and walked recursively. Each expected key
-is looked up by name; absent keys produce `null` and are handled with
-`ConfigurationIssue` creation when they are required, or silently ignored
-when optional.
+YamlDotNet is used only inside `BuildMarkConfigReader.ReadAsync`. No YamlDotNet type appears in
+any public signature, so callers see only BuildMark configuration types.
 
-The node walk is deliberately defensive:
+1. If the configuration file does not exist, YamlDotNet is not invoked and an empty result is
+   returned.
+2. The file text is read and passed through a `StringReader` to `YamlStream.Load`. A
+   `YamlException` is caught and converted into an error `ConfigurationIssue` at
+   `YamlException.Start.Line`.
+3. A file with no documents (empty or comment-only) produces a default `BuildMarkConfig`.
+4. The first document's root node must be a `YamlMappingNode`. Structural nodes are then
+   checked for their expected type before they are read: the `connector`, `github`,
+   `azure-devops`, and `report` blocks and each section, rule, and `match` entry must be
+   mappings, and `sections` and `rules` must be sequences. A wrong structural node type or an
+   unsupported key produces an error `ConfigurationIssue` at `YamlNode.Start.Line`; parsing
+   continues so that all issues are reported together.
+5. Scalar values are read through `GetScalarValue`, which returns an empty string for any node
+   that is not a `YamlScalarNode`. The node type of scalar fields such as `connector.type`,
+   `sections[].title`, and `rules[].route` is therefore not validated: a mapping or sequence
+   in these fields is read as empty without an issue. Only the fields with their own checks
+   report a wrong value: `area-path` (must be a scalar), `token-variable` (must be a non-empty
+   string), the `report` `file`, `depth`, and `include-known-issues` values, and the required
+   section `id` and `title`.
+6. If any error issue was recorded the result carries a `null` configuration; otherwise it
+   carries the parsed `BuildMarkConfig`.
 
-- Every cast is guarded; an unexpected node type generates a `ConfigurationIssue`
-  with `Severity.Warning` so the tool can continue with partial configuration.
-- Line numbers are extracted from `YamlNode.Start.Line` and included in every
-  issue for precise user feedback.
-
-### Version Constraints
-
-BuildMark targets the version of YamlDotNet specified in the project file
-(`src/DemaConsulting.BuildMark/DemaConsulting.BuildMark.csproj`). No version
-below 13.x is supported because earlier versions used a different namespace
-layout for the representation model types.
+No initialization or configuration of YamlDotNet is required. `YamlStream` holds no unmanaged
+resources; the `StringReader` is disposed by a `using` declaration.
