@@ -38,12 +38,20 @@ any public signature, so callers see only BuildMark configuration types.
    `YamlException` is caught and converted into an error `ConfigurationIssue` at
    `YamlException.Start.Line`.
 3. A file with no documents (empty or comment-only) produces a default `BuildMarkConfig`.
-4. The first document's root node is pattern-matched to `YamlMappingNode`, then each child node
-   is checked for the expected node type (`is not YamlMappingNode` or `is not YamlSequenceNode`)
-   before it is read. An unexpected node type or an unsupported key produces an error
-   `ConfigurationIssue` at `YamlNode.Start.Line`; parsing continues so that all issues are
-   reported together.
-5. If any error issue was recorded the result carries a `null` configuration; otherwise it
+4. The first document's root node must be a `YamlMappingNode`. Structural nodes are then
+   checked for their expected type before they are read: the `connector`, `github`,
+   `azure-devops`, and `report` blocks and each section, rule, and `match` entry must be
+   mappings, and `sections` and `rules` must be sequences. A wrong structural node type or an
+   unsupported key produces an error `ConfigurationIssue` at `YamlNode.Start.Line`; parsing
+   continues so that all issues are reported together.
+5. Scalar values are read through `GetScalarValue`, which returns an empty string for any node
+   that is not a `YamlScalarNode`. The node type of scalar fields such as `connector.type`,
+   `sections[].title`, and `rules[].route` is therefore not validated: a mapping or sequence
+   in these fields is read as empty without an issue. Only the fields with their own checks
+   report a wrong value: `area-path` (must be a scalar), `token-variable` (must be a non-empty
+   string), the `report` `file`, `depth`, and `include-known-issues` values, and the required
+   section `id` and `title`.
+6. If any error issue was recorded the result carries a `null` configuration; otherwise it
    carries the parsed `BuildMarkConfig`.
 
 No initialization or configuration of YamlDotNet is required. `YamlStream` holds no unmanaged

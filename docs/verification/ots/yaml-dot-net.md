@@ -6,8 +6,9 @@ YamlDotNet is an OTS YAML parsing library used only by `BuildMarkConfigReader` t
 `.buildmark.yaml` configuration file. It is verified through the Configuration unit and
 subsystem tests in `DemaConsulting.BuildMark.Tests`, which write real YAML files to a temporary
 directory and load them through `BuildMarkConfigReader.ReadAsync`. YamlDotNet is not mocked, so
-each test exercises the library's parser, its node tree, and its source locations. The tests run
-on every operating system and .NET version in the CI matrix.
+each test exercises the library's parser and node tree. Source-line reporting is verified only by
+the syntax-error and validation-error tests, which assert the reported line; the valid-file tests
+do not check locations. The tests run on every operating system and .NET version in the CI matrix.
 
 ### Evidence
 

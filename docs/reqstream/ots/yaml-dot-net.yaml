@@ -36,9 +36,10 @@ sections:
           - id: BuildMark-OTS-YamlDotNet-NodeLocation
             title: YamlDotNet shall report the 1-based source line on which each parsed node starts.
             justification: |
-              BuildMarkConfigReader reports unsupported keys and wrong node types at
-              YamlNode.Start.Line. Accurate node locations are required for configuration
-              issues to point users at the offending line.
+              BuildMarkConfigReader reports configuration validation errors, such as unsupported
+              keys and wrong node types for the structural blocks, at YamlNode.Start.Line.
+              Accurate node locations are required for these issues to point users at the
+              offending line.
             tags: [ots]
             tests:
               - Configuration_Issues_ValidationError_ReportsAccurateLine
