@@ -36,14 +36,18 @@ when `path` is a directory). Reads file content asynchronously, then passes it t
 message are captured as an `Error`-severity `ConfigurationIssue` and a `null`-config result is
 returned. For a successful parse, `ParseDocument` dispatches each top-level YAML key to a
 dedicated private parser that populates the corresponding data record; unrecognized keys and
-invalid node types produce `Error`-severity issues. If any errors were collected, `Config` is
-returned as `null`.
+invalid node types produce `Error`-severity issues. Scalar fields are read through
+`ReadScalarValue`, which reports a mapping or sequence value as an `Error`-severity issue at the
+value's line (for example `Connector type must be a scalar value.`) instead of reading it as an
+empty string. A section whose `id` or `title` was reported as non-scalar is not also reported as
+missing that field. If any errors were collected, `Config` is returned as `null`.
 
 #### Error Handling
 
 `ReadAsync` never throws. All `YamlException` parse errors are caught and converted to
 `ConfigurationIssue` records with `Severity = Error`. Node-walk failures — including invalid
-node types and unsupported configuration keys — also produce `Error`-severity issues. When any
+node types for structural blocks and scalar fields, and unsupported configuration keys — also
+produce `Error`-severity issues. When any
 error-severity issue is present, `Config` is `null` in the returned result.
 
 #### Dependencies

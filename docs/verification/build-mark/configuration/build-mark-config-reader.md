@@ -108,3 +108,31 @@ is written and read via `BuildMarkConfigReader.ReadAsync`. The result must have 
 `HasErrors` true, and an issue description containing
 `"Azure DevOps area-path must be a scalar string value"`. This scenario is tested by
 `BuildMarkConfigReader_ReadAsync_AzureDevOpsNonScalarAreaPath_ReturnsErrorIssue`.
+
+**BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine**: A
+`.buildmark.yaml` whose `connector.type` value is a mapping starting on line 3 is written and read
+via `BuildMarkConfigReader.ReadAsync`. The result must have a null `Config` and a single error
+issue on line 3 whose description contains `"Connector type must be a scalar value"`, confirming
+that a non-scalar value in a scalar field is reported at its source line. This scenario is tested
+by `BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine`.
+
+**BuildMarkConfigReader_ReadAsync_NonScalarAzureDevOpsProject_ReturnsErrorIssue**: A
+`.buildmark.yaml` whose `azure-devops.project` value is a sequence is written and read via
+`BuildMarkConfigReader.ReadAsync`. The result must have a null `Config` and a single error issue on
+the sequence's line whose description contains `"Azure DevOps project must be a scalar value"`,
+confirming that optional scalar fields reject non-scalar values. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_NonScalarAzureDevOpsProject_ReturnsErrorIssue`.
+
+**BuildMarkConfigReader_ReadAsync_NonScalarSectionTitle_ReturnsSingleErrorIssue**: A
+`.buildmark.yaml` with a section whose `title` value is a mapping is written and read via
+`BuildMarkConfigReader.ReadAsync`. The result must have a null `Config` and exactly one error issue,
+whose description contains `"Section title must be a scalar value"`, confirming that the section is
+not also reported as missing its title. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_NonScalarSectionTitle_ReturnsSingleErrorIssue`.
+
+**BuildMarkConfigReader_ReadAsync_NonScalarMatchLabelItem_ReturnsErrorIssue**: A `.buildmark.yaml`
+with a rule whose `match.label` list contains a mapping entry is written and read via
+`BuildMarkConfigReader.ReadAsync`. The result must have a null `Config` and a single error issue on
+the entry's line whose description contains `"Match label must be a scalar value"`, confirming that
+list entries are validated rather than dropped. This scenario is tested by
+`BuildMarkConfigReader_ReadAsync_NonScalarMatchLabelItem_ReturnsErrorIssue`.

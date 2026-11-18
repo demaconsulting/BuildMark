@@ -44,13 +44,13 @@ any public signature, so callers see only BuildMark configuration types.
    mappings, and `sections` and `rules` must be sequences. A wrong structural node type or an
    unsupported key produces an error `ConfigurationIssue` at `YamlNode.Start.Line`; parsing
    continues so that all issues are reported together.
-5. Scalar values are read through `GetScalarValue`, which returns an empty string for any node
-   that is not a `YamlScalarNode`. The node type of scalar fields such as `connector.type`,
-   `sections[].title`, and `rules[].route` is therefore not validated: a mapping or sequence
-   in these fields is read as empty without an issue. Only the fields with their own checks
-   report a wrong value: `area-path` (must be a scalar), `token-variable` (must be a non-empty
-   string), the `report` `file`, `depth`, and `include-known-issues` values, and the required
-   section `id` and `title`.
+5. Scalar fields must be `YamlScalarNode` values. A mapping or sequence in a scalar field, such
+   as `connector.type`, the GitHub and Azure DevOps connector settings, `sections[].id`,
+   `sections[].title`, `rules[].route`, or an entry of a `match` `label` or `work-item-type`
+   list, produces an error `ConfigurationIssue` at the value's `YamlNode.Start.Line`. Fields
+   with their own value checks report a wrong node type through those checks: `area-path`
+   (must be a scalar), `token-variable` (must be a non-empty string), and the `report` `file`,
+   `depth`, and `include-known-issues` values.
 6. If any error issue was recorded the result carries a `null` configuration; otherwise it
    carries the parsed `BuildMarkConfig`.
 

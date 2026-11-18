@@ -43,3 +43,18 @@ sections:
                 children:
                   - BuildMark-OTS-YamlDotNet-SyntaxErrors
 
+              - id: BuildMark-ConfigReader-NonScalarValues
+                title: >-
+                  BuildMarkConfigReader shall report an error, at the value's line, when a scalar
+                  configuration field holds a mapping or sequence.
+                justification: |
+                  A mapping or sequence in a scalar field such as connector.type, a section title,
+                  or a rule route is a configuration mistake. Reading it as an empty value would
+                  silently change the report, so it must be reported like any other invalid value.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine
+                  - BuildMarkConfigReader_ReadAsync_NonScalarAzureDevOpsProject_ReturnsErrorIssue
+                  - BuildMarkConfigReader_ReadAsync_NonScalarSectionTitle_ReturnsSingleErrorIssue
+                  - BuildMarkConfigReader_ReadAsync_NonScalarMatchLabelItem_ReturnsErrorIssue
+                children:
+                  - BuildMark-OTS-YamlDotNet-NodeLocation

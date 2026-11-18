@@ -38,6 +38,7 @@ sections:
             children:
               - BuildMark-ConfigLoadResult-ReportTo
               - BuildMark-ConfigurationIssue-Record
+              - BuildMark-ConfigReader-NonScalarValues
               - BuildMark-OTS-YamlDotNet-NodeLocation
 
           - id: BuildMark-Configuration-ConnectorConfig
