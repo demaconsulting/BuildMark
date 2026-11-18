@@ -28,5 +28,6 @@ package BuildMark {
         part configuration : ConfigurationSubsystem;
         part repoConnectors : RepoConnectorsSubsystem;
         part yamlDotNet : YamlDotNet;
+        part graphQLClient : GraphQLClient;
     }
 }

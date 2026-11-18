@@ -1,0 +1,28 @@
+---
+# SysML2Tools OTS Software Requirements
+#
+# Requirements for the SysML2Tools architecture modeling tool functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: SysML2Tools Requirements
+        requirements:
+          - id: BuildMark-OTS-SysML2Tools-Lint
+            title: SysML2Tools shall validate the SysML2 model for syntax and reference errors.
+            justification: |
+              lint.ps1 runs `dotnet sysml2tools lint` on the model under docs/sysml2. Linting in
+              CI catches broken references and syntax errors in the architecture model before
+              they reach the generated design documentation.
+            tags: [ots]
+            tests:
+              - SysML2Tools_LintSelfTest
+
+          - id: BuildMark-OTS-SysML2Tools-Render
+            title: SysML2Tools shall render the declared views of the SysML2 model to SVG diagrams.
+            justification: |
+              The build-docs job renders the design views to SVG files that the design document
+              embeds, so a failure to render must fail the build rather than omit a diagram.
+            tags: [ots]
+            tests:
+              - SysML2Tools_RenderSvgSelfTest

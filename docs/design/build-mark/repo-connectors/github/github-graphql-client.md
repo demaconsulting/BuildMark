@@ -92,8 +92,8 @@ observable by the caller; an unexpectedly empty result set is the only visible s
 
 ##### Dependencies
 
-- **GraphQLHttpClient** — from the `GraphQL.Client.Http` NuGet package; sends GraphQL queries over
-  HTTPS.
+- **GraphQLHttpClient** — from the `GraphQL.Client` OTS package (see *GraphQL.Client Integration
+  Design*); sends GraphQL queries over HTTPS.
 - **SystemTextJsonSerializer** — from the `GraphQL.Client.Serializer.SystemTextJson` NuGet
   package; serializes and deserializes GraphQL payloads.
 - **GitHubGraphQLTypes** — provides the record types used as deserialization targets.

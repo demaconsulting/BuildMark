@@ -36,12 +36,17 @@ Local items verified in this document:
 OTS items verified in this document:
 
 - **BuildMark** — build notes generation tool (self-referential).
+- **CanvasNet** — diagram drawing tool used as a Pandoc filter.
 - **FileAssert** — file content assertion tool.
+- **GraphQL.Client** — GraphQL client library.
+- **LintMark** — Markdown formatting checker.
 - **Pandoc** — document conversion tool.
 - **ReqStream** — requirements traceability tool.
 - **ReviewMark** — code review enforcement tool.
 - **SarifMark** — SARIF report generation tool.
 - **SonarMark** — SonarCloud report generation tool.
+- **SysML2Tools** — SysML2 model checker and diagram renderer.
+- **TextLint** — spell checker.
 - **VersionMark** — tool version capture tool.
 - **WeasyPrint** — HTML-to-PDF renderer.
 - **xUnit** — unit testing framework.

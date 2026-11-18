@@ -1,0 +1,21 @@
+---
+# CanvasNet OTS Software Requirements
+#
+# Requirements for the CanvasNet drawing tool functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: CanvasNet Requirements
+        requirements:
+          - id: BuildMark-OTS-CanvasNet
+            title: CanvasNet shall draw the Mermaid diagrams of a Pandoc document as pictures through its Pandoc filter.
+            justification: |
+              Every document definition lists the docs/filters/canvasnet.lua shim, which runs
+              `canvasnet pandoc-filter` to draw the Mermaid code blocks in the design document as
+              pictures. A diagram it cannot draw stops the build. Its self-validation runs the
+              Pandoc filter protocol and draws Mermaid diagrams.
+            tags: [ots]
+            tests:
+              - CanvasNetTool_PandocFilter
+              - CanvasNetTool_RenderMermaid

@@ -1,0 +1,22 @@
+---
+# LintMark OTS Software Requirements
+#
+# Requirements for the LintMark Markdown linting tool functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: LintMark Requirements
+        requirements:
+          - id: BuildMark-OTS-LintMark
+            title: LintMark shall check the Markdown files against the rules configured in .lintmark.yaml.
+            justification: |
+              DemaConsulting.LintMark checks the formatting of every Markdown file in lint.ps1,
+              which fails the quality-checks job on any finding. The self-validation of the
+              pinned LintMark version covers only its version and help output, so it proves that
+              the pinned tool starts in the build environment; the lint rules themselves are
+              qualified by the LintMark project and by the lint gate rejecting violations.
+            tags: [ots]
+            tests:
+              - LintMark_VersionDisplay
+              - LintMark_HelpDisplay

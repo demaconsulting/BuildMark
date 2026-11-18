@@ -66,6 +66,18 @@ jobs:
           --validate
           --results artifacts/versionmark-self-validation-quality.trx
 
+      - name: Run TextLint self-validation
+        run: >
+          dotnet textlint
+          --validate
+          --results artifacts/textlint-self-validation.trx
+
+      - name: Run LintMark self-validation
+        run: >
+          dotnet lintmark
+          --validate
+          --results artifacts/lintmark-self-validation.trx
+
       # === RUN QUALITY CHECKS ===
       # This section runs the linting and quality checks for the project.
       # Downstream projects: Add any additional quality check steps here.
@@ -470,6 +482,12 @@ jobs:
         shell: bash
         run: mkdir -p docs/generated
 
+      - name: Run CanvasNet self-validation
+        run: >
+          dotnet canvasnet
+          --validate
+          --results artifacts/canvasnet-self-validation.trx
+
       # === COMPILE BUILD NOTES ===
       # This section generates the Build Notes document. BuildMark and VersionMark self-validations
       # run here to co-locate their evidence with the document that depends on their output.
@@ -712,6 +730,12 @@ jobs:
       - name: Create design output directory
         shell: bash
         run: mkdir -p docs/design/generated
+
+      - name: Run SysML2Tools self-validation
+        run: >
+          dotnet sysml2tools
+          --validate
+          --results artifacts/sysml2tools-self-validation.trx
 
       - name: Render Software Structure diagrams with SysML2Tools
         shell: pwsh

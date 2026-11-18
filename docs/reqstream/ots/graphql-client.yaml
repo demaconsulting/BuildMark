@@ -1,0 +1,61 @@
+---
+# GraphQL.Client OTS Software Requirements
+#
+# Requirements for the GraphQL.Client library functionality consumed by BuildMark.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: GraphQL.Client Requirements
+        requirements:
+          - id: BuildMark-OTS-GraphQLClient-SendQuery
+            title: GraphQL.Client shall send a GraphQL query and its variables to the configured HTTP endpoint.
+            justification: |
+              GitHubGraphQLClient builds each GitHub query as a GraphQLRequest with variables
+              (owner, repository, branch, and the pagination cursor) and sends it with
+              GraphQLHttpClient.SendQueryAsync. The variables must reach the endpoint for
+              pagination to request the next page; the pagination tests answer each page only
+              when the previous page's cursor is present in the request body.
+            tags: [ots]
+            tests:
+              - GitHubGraphQLClient_GetCommitsAsync_WithPagination_ReturnsAllCommits
+              - GitHubGraphQLClient_GetReleasesAsync_WithPagination_ReturnsAllReleases
+              - GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags
+              - GitHubGraphQLClient_GetPullRequestsAsync_WithPagination_ReturnsAllPullRequests
+              - GitHubGraphQLClient_GetAllIssuesAsync_WithPagination_ReturnsAllIssues
+              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_WithPagination_ReturnsAllIssues
+
+          - id: BuildMark-OTS-GraphQLClient-Deserialize
+            title: GraphQL.Client shall deserialize the data of a GraphQL response into the requested response type.
+            justification: |
+              GitHubGraphQLClient reads commits, releases, tags, pull requests, issues, and
+              linked issue numbers from the typed response objects that GraphQL.Client and its
+              System.Text.Json serializer produce. Correct deserialization is required for the
+              repository data to reach the build notes.
+            tags: [ots]
+            tests:
+              - GitHubGraphQLClient_GetCommitsAsync_ValidResponse_ReturnsCommitShas
+              - GitHubGraphQLClient_GetReleasesAsync_ValidResponse_ReturnsReleaseTagNames
+              - GitHubGraphQLClient_GetAllTagsAsync_ValidResponse_ReturnsTagNodes
+              - GitHubGraphQLClient_GetPullRequestsAsync_ValidResponse_ReturnsPullRequests
+              - GitHubGraphQLClient_GetAllIssuesAsync_ValidResponse_ReturnsIssues
+              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_ValidResponse_ReturnsIssueIds
+
+          - id: BuildMark-OTS-GraphQLClient-Failures
+            title: GraphQL.Client shall raise an exception when the endpoint returns an HTTP error or invalid JSON.
+            justification: |
+              GitHubGraphQLClient catches the exception and returns an empty result, so a failed
+              request never produces partial or invented repository data. GraphQL.Client must
+              therefore signal the failure rather than return a default response.
+            tags: [ots]
+            tests:
+              - GitHubGraphQLClient_GetCommitsAsync_HttpError_ReturnsEmptyList
+              - GitHubGraphQLClient_GetCommitsAsync_InvalidJson_ReturnsEmptyList
+              - GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList
+              - GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList
+              - GitHubGraphQLClient_GetAllTagsAsync_HttpError_ReturnsEmptyList
+              - GitHubGraphQLClient_GetAllTagsAsync_InvalidJson_ReturnsEmptyList
+              - GitHubGraphQLClient_GetPullRequestsAsync_HttpError_ReturnsEmptyList
+              - GitHubGraphQLClient_GetPullRequestsAsync_InvalidJson_ReturnsEmptyList
+              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_HttpError_ReturnsEmptyList
+              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_InvalidJson_ReturnsEmptyList

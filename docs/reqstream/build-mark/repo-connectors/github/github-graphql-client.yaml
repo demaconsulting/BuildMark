@@ -45,6 +45,9 @@ sections:
                       - BuildMark-GitHub-GetPullRequests
                       - BuildMark-GitHub-GetIssues
                       - BuildMark-GitHub-ErrorHandling
+                      - BuildMark-OTS-GraphQLClient-SendQuery
+                      - BuildMark-OTS-GraphQLClient-Deserialize
+                      - BuildMark-OTS-GraphQLClient-Failures
 
                   - id: BuildMark-GitHub-DescriptionBody
                     title: >-
