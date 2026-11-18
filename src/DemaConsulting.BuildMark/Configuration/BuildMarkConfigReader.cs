@@ -173,7 +173,7 @@ public static class BuildMarkConfigReader
             switch (key)
             {
                 case "type":
-                    connector = connector with { Type = GetScalarValue(entry.Value) };
+                    connector = connector with { Type = ReadScalarValue(filePath, entry.Value, "Connector type", issues) };
                     break;
 
                 case "github":
@@ -326,28 +326,33 @@ public static class BuildMarkConfigReader
         foreach (var entry in mapping.Children)
         {
             var key = GetScalarValue(entry.Key);
-            var value = GetScalarValue(entry.Value);
             switch (key)
             {
                 case "owner":
-                    owner = value;
+                    owner = ReadScalarValue(filePath, entry.Value, "GitHub owner", issues);
                     break;
 
                 case "repo":
-                    repo = value;
+                    repo = ReadScalarValue(filePath, entry.Value, "GitHub repo", issues);
                     break;
 
                 case "repository":
-                    ApplyRepositoryOverride(value, ref owner, ref repo, filePath, GetLine(entry.Value), issues);
+                    var repository = ReadScalarValue(filePath, entry.Value, "GitHub repository", issues);
+                    if (repository != null)
+                    {
+                        ApplyRepositoryOverride(repository, ref owner, ref repo, filePath, GetLine(entry.Value), issues);
+                    }
+
                     break;
 
                 case "base-url":
                 case "baseurl":
                 case "url":
-                    baseUrl = value;
+                    baseUrl = ReadScalarValue(filePath, entry.Value, $"GitHub {key}", issues);
                     break;
 
                 case "token-variable":
+                    var value = GetScalarValue(entry.Value);
                     if (string.IsNullOrWhiteSpace(value))
                     {
                         AddError(issues, filePath, GetLine(entry.Value), "GitHub token-variable must be a non-empty string.");
@@ -437,28 +442,28 @@ public static class BuildMarkConfigReader
         foreach (var entry in mapping.Children)
         {
             var key = GetScalarValue(entry.Key);
-            var value = GetOptionalScalarValue(entry.Value);
             switch (key)
             {
                 case "url":
-                    organizationUrl = value;
+                    organizationUrl = ReadOptionalScalarValue(filePath, entry.Value, "Azure DevOps url", issues);
                     break;
 
                 case "organization":
                 case "org":
-                    organization = value;
+                    organization = ReadOptionalScalarValue(filePath, entry.Value, $"Azure DevOps {key}", issues);
                     break;
 
                 case "project":
-                    project = value;
+                    project = ReadOptionalScalarValue(filePath, entry.Value, "Azure DevOps project", issues);
                     break;
 
                 case "repository":
                 case "repo":
-                    repository = value;
+                    repository = ReadOptionalScalarValue(filePath, entry.Value, $"Azure DevOps {key}", issues);
                     break;
 
                 case "token-variable":
+                    var value = GetOptionalScalarValue(entry.Value);
                     if (string.IsNullOrWhiteSpace(value))
                     {
                         AddError(issues, filePath, GetLine(entry.Value), "Azure DevOps token-variable must be a non-empty string.");
@@ -551,6 +556,8 @@ public static class BuildMarkConfigReader
 
         string? id = null;
         string? title = null;
+        var idInvalid = false;
+        var titleInvalid = false;
 
         foreach (var entry in mapping.Children)
         {
@@ -558,11 +565,13 @@ public static class BuildMarkConfigReader
             switch (key)
             {
                 case "id":
-                    id = GetScalarValue(entry.Value);
+                    id = ReadScalarValue(filePath, entry.Value, "Section id", issues);
+                    idInvalid = id == null;
                     break;
 
                 case "title":
-                    title = GetScalarValue(entry.Value);
+                    title = ReadScalarValue(filePath, entry.Value, "Section title", issues);
+                    titleInvalid = title == null;
                     break;
 
                 default:
@@ -571,12 +580,13 @@ public static class BuildMarkConfigReader
             }
         }
 
-        if (string.IsNullOrEmpty(id))
+        // A non-scalar id or title has already been reported; do not report it as missing too.
+        if (string.IsNullOrEmpty(id) && !idInvalid)
         {
             AddError(issues, filePath, GetLine(node), "Section entries require an id.");
         }
 
-        if (string.IsNullOrEmpty(title))
+        if (string.IsNullOrEmpty(title) && !titleInvalid)
         {
             AddError(issues, filePath, GetLine(node), "Section entries require a title.");
         }
@@ -638,7 +648,7 @@ public static class BuildMarkConfigReader
             switch (key)
             {
                 case "route":
-                    route = GetScalarValue(entry.Value);
+                    route = ReadScalarValue(filePath, entry.Value, "Rule route", issues);
                     break;
 
                 case "match":
@@ -681,11 +691,11 @@ public static class BuildMarkConfigReader
             switch (key)
             {
                 case "label":
-                    match.Label.AddRange(ParseNodeStringList(entry.Value));
+                    match.Label.AddRange(ParseNodeStringList(filePath, entry.Value, "Match label", issues));
                     break;
 
                 case "work-item-type":
-                    match.WorkItemType.AddRange(ParseNodeStringList(entry.Value));
+                    match.WorkItemType.AddRange(ParseNodeStringList(filePath, entry.Value, "Match work-item-type", issues));
                     break;
 
                 default:
@@ -700,20 +710,65 @@ public static class BuildMarkConfigReader
     /// <summary>
     ///     Parses a YAML node as a string list (scalar or sequence).
     /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
     /// <param name="node">The YAML value node.</param>
+    /// <param name="fieldName">The field name used in error descriptions.</param>
+    /// <param name="issues">The collected issues.</param>
     /// <returns>The parsed strings.</returns>
-    private static IEnumerable<string> ParseNodeStringList(YamlNode node)
+    private static List<string> ParseNodeStringList(
+        string filePath,
+        YamlNode node,
+        string fieldName,
+        List<ConfigurationIssue> issues)
     {
         // Accept either a scalar value or a sequence of scalars.
-        if (node is YamlSequenceNode sequence)
+        var nodes = node is YamlSequenceNode sequence ? sequence.Children : (IEnumerable<YamlNode>)[node];
+        return nodes
+            .Select(item => ReadScalarValue(filePath, item, fieldName, issues))
+            .Where(value => !string.IsNullOrWhiteSpace(value))
+            .Select(value => value!)
+            .ToList();
+    }
+
+    /// <summary>
+    ///     Reads the scalar string value of a field, reporting an error if the node is not a scalar.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML value node.</param>
+    /// <param name="fieldName">The field name used in the error description.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The scalar value, or null if the node is a mapping or sequence.</returns>
+    private static string? ReadScalarValue(
+        string filePath,
+        YamlNode node,
+        string fieldName,
+        List<ConfigurationIssue> issues)
+    {
+        if (node is YamlScalarNode scalar)
         {
-            return sequence.Children
-                .Select(GetScalarValue)
-                .Where(value => !string.IsNullOrWhiteSpace(value));
+            return scalar.Value ?? string.Empty;
         }
 
-        var scalar = GetScalarValue(node);
-        return string.IsNullOrWhiteSpace(scalar) ? [] : [scalar];
+        AddError(issues, filePath, GetLine(node), $"{fieldName} must be a scalar value.");
+        return null;
+    }
+
+    /// <summary>
+    ///     Reads an optional scalar value of a field, reporting an error if the node is not a scalar.
+    /// </summary>
+    /// <param name="filePath">The configuration file path.</param>
+    /// <param name="node">The YAML value node.</param>
+    /// <param name="fieldName">The field name used in the error description.</param>
+    /// <param name="issues">The collected issues.</param>
+    /// <returns>The scalar value, or null if the value is empty, whitespace, or not a scalar.</returns>
+    private static string? ReadOptionalScalarValue(
+        string filePath,
+        YamlNode node,
+        string fieldName,
+        List<ConfigurationIssue> issues)
+    {
+        var value = ReadScalarValue(filePath, node, fieldName, issues);
+        return string.IsNullOrWhiteSpace(value) ? null : value;
     }
 
     /// <summary>

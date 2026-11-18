@@ -1,0 +1,20 @@
+---
+# ConfigurationLoadResult unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: ConfigurationLoadResult Requirements
+            requirements:
+              - id: BuildMark-ConfigLoadResult-ReportTo
+                title: >-
+                  ConfigurationLoadResult shall report all configuration issues to the user
+                  and signal an error exit code when any issue has error severity.
+                justification: |
+                  Centralizing issue reporting in the result object ensures consistent
+                  formatting and exit-code behavior across both the --lint path and the
+                  normal build path.
+                tests:
+                  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode

@@ -1,0 +1,34 @@
+---
+# GitHubConnectorConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: GitHubConnectorConfig Requirements
+            requirements:
+              - id: BuildMark-GitHubConnectorConfig-Properties
+                title: >-
+                  GitHubConnectorConfig shall expose Owner, Repo, and BaseUrl properties that
+                  override the corresponding auto-detected values in GitHubRepoConnector.
+                justification: |
+                  Teams using GitHub Enterprise or repositories where auto-detection is unreliable
+                  need a way to specify the owner, repository name, and API base URL explicitly
+                  in the configuration file.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+
+              - id: BuildMark-GitHubConnectorConfig-TokenVariable
+                title: >-
+                  GitHubConnectorConfig shall expose a TokenVariable property that specifies the
+                  name of the environment variable holding the GitHub access token.
+                justification: |
+                  Teams that store their GitHub access token in a non-standard environment variable
+                  need a way to tell the connector which variable to read. When TokenVariable is set,
+                  the connector must use only that variable and must not fall back to well-known names
+                  or the gh CLI, so that the operator retains full control over credential sourcing.
+                tests:
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_UsesCustomVariable
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_EmptyValue_ThrowsInvalidOperationException
+                  - GitHubRepoConnector_GetBuildInformationAsync_WithTokenVariable_NotSet_ThrowsInvalidOperationException

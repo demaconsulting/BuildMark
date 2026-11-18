@@ -651,4 +651,124 @@ public class ConfigurationTests
         Assert.Equal(ConfigurationIssueSeverity.Error, result.Issues[0].Severity);
         Assert.Contains("token-variable", result.Issues[0].Description);
     }
+
+    /// <summary>
+    ///     Test that a mapping in a scalar field is reported as an error at the value's line.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine()
+    {
+        // Arrange: the connector type value is a mapping starting on line 3
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            "connector:\n  type:\n    name: github\n",
+            TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+
+        // Assert
+        Assert.Null(result.Config);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, issue.Severity);
+        Assert.Equal(3, issue.Line);
+        Assert.Contains("Connector type must be a scalar value", issue.Description);
+    }
+
+    /// <summary>
+    ///     Test that a sequence in an optional scalar field is reported as an error.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_NonScalarAzureDevOpsProject_ReturnsErrorIssue()
+    {
+        // Arrange
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            connector:
+              type: azure-devops
+              azure-devops:
+                url: https://dev.azure.com/myorg
+                project:
+                  - MyProject
+                repository: MyRepo
+            """,
+            TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+
+        // Assert
+        Assert.Null(result.Config);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, issue.Severity);
+        Assert.Equal(6, issue.Line);
+        Assert.Contains("Azure DevOps project must be a scalar value", issue.Description);
+    }
+
+    /// <summary>
+    ///     Test that a non-scalar section title is reported once and not also as a missing title.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_NonScalarSectionTitle_ReturnsSingleErrorIssue()
+    {
+        // Arrange
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            sections:
+              - id: changes
+                title:
+                  text: Changes
+            """,
+            TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+
+        // Assert
+        Assert.Null(result.Config);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, issue.Severity);
+        Assert.Equal(4, issue.Line);
+        Assert.Contains("Section title must be a scalar value", issue.Description);
+    }
+
+    /// <summary>
+    ///     Test that a mapping inside a match label list is reported as an error.
+    /// </summary>
+    [Fact]
+    public async Task BuildMarkConfigReader_ReadAsync_NonScalarMatchLabelItem_ReturnsErrorIssue()
+    {
+        // Arrange
+        using var tempDir = new TemporaryDirectory();
+        var filePath = tempDir.GetFilePath(".buildmark.yaml");
+        await File.WriteAllTextAsync(
+            filePath,
+            """
+            rules:
+              - match:
+                  label:
+                    - bug
+                    - name: feature
+                route: changes
+            """,
+            TestContext.Current.CancellationToken);
+
+        // Act
+        var result = await BuildMarkConfigReader.ReadAsync(tempDir.DirectoryPath);
+
+        // Assert
+        Assert.Null(result.Config);
+        var issue = Assert.Single(result.Issues);
+        Assert.Equal(ConfigurationIssueSeverity.Error, issue.Severity);
+        Assert.Equal(5, issue.Line);
+        Assert.Contains("Match label must be a scalar value", issue.Description);
+    }
 }

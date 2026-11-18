@@ -1,0 +1,60 @@
+---
+# BuildMarkConfigReader unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: BuildMarkConfigReader Requirements
+            requirements:
+              - id: BuildMark-ConfigReader-ReadAsync
+                title: >-
+                  BuildMarkConfigReader shall always return a configuration load result regardless
+                  of whether the file is present or contains parse errors.
+                justification: |
+                  Callers must always receive a result object rather than null or an exception
+                  so that subsequent steps (issue reporting, connector creation) are uniform
+                  regardless of file presence or parse errors.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+                children:
+                  - BuildMark-OTS-YamlDotNet-Parse
+
+              - id: BuildMark-ConfigReader-MissingFile
+                title: >-
+                  BuildMarkConfigReader shall return an empty configuration result when
+                  the .buildmark.yaml file is absent.
+                justification: |
+                  An absent configuration file is the normal case for repositories that have
+                  not yet adopted .buildmark.yaml. The tool must continue working with defaults.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_MissingFile_ReturnsEmptyResult
+
+              - id: BuildMark-ConfigReader-MalformedFile
+                title: >-
+                  BuildMarkConfigReader shall return an error result with actionable messages
+                  when the configuration file cannot be parsed.
+                justification: |
+                  A malformed configuration file should produce actionable error messages rather
+                  than a silent failure or an unhandled exception.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_MalformedFile_ReturnsErrorIssue
+                children:
+                  - BuildMark-OTS-YamlDotNet-SyntaxErrors
+
+              - id: BuildMark-ConfigReader-NonScalarValues
+                title: >-
+                  BuildMarkConfigReader shall report an error, at the value's line, when a scalar
+                  configuration field holds a mapping or sequence.
+                justification: |
+                  A mapping or sequence in a scalar field such as connector.type, a section title,
+                  or a rule route is a configuration mistake. Reading it as an empty value would
+                  silently change the report, so it must be reported like any other invalid value.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine
+                  - BuildMarkConfigReader_ReadAsync_NonScalarAzureDevOpsProject_ReturnsErrorIssue
+                  - BuildMarkConfigReader_ReadAsync_NonScalarSectionTitle_ReturnsSingleErrorIssue
+                  - BuildMarkConfigReader_ReadAsync_NonScalarMatchLabelItem_ReturnsErrorIssue
+                children:
+                  - BuildMark-OTS-YamlDotNet-NodeLocation

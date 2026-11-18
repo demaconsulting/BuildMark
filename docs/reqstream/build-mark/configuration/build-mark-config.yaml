@@ -1,0 +1,20 @@
+---
+# BuildMarkConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: BuildMarkConfig Requirements
+            requirements:
+              - id: BuildMark-BuildMarkConfig-CreateDefault
+                title: >-
+                  BuildMarkConfig shall provide a default configuration with Changes, Bugs Fixed,
+                  and Dependency Updates sections and the routing rules that populate them.
+                justification: |
+                  Repositories without a .buildmark.yaml file, or with one that omits sections
+                  and rules, still need useful build notes. The default configuration gives them
+                  the standard report structure without any configuration.
+                tests:
+                  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

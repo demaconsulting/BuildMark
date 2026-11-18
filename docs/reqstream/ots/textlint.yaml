@@ -1,0 +1,23 @@
+---
+# TextLint OTS Software Requirements
+#
+# Requirements for the TextLint spell-checking tool functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: TextLint Requirements
+        requirements:
+          - id: BuildMark-OTS-TextLint
+            title: TextLint shall report misspelled words in the files and with the settings configured in .textlint.yaml.
+            justification: |
+              DemaConsulting.TextLint.Tool spell-checks the documentation, requirements, and
+              source comments in lint.ps1, which fails the quality-checks job on any finding.
+              Its self-validation checks that a clean file passes, that a misspelling is
+              reported, and that the settings file and inline directives are honored.
+            tags: [ots]
+            tests:
+              - TextLintTool_CheckCleanFile
+              - TextLintTool_CheckMisspelling
+              - TextLintTool_CheckSettingsFile
+              - TextLintTool_CheckInlineDirective

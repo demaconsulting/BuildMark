@@ -1,0 +1,35 @@
+---
+# LintMark OTS Software Requirements
+#
+# Requirements for the LintMark Markdown linting tool functionality.
+
+sections:
+  - title: OTS Software Requirements
+    sections:
+      - title: LintMark Requirements
+        requirements:
+          - id: BuildMark-OTS-LintMark
+            title: LintMark shall start in the build environment and report its version and usage.
+            justification: |
+              DemaConsulting.LintMark is restored from .config/dotnet-tools.json and run by
+              lint.ps1 and fix.ps1. Its self-validation, which checks the version and help output,
+              proves that the pinned tool starts in the build environment. It does not exercise
+              any lint rule; rule checking is covered by BuildMark-OTS-LintMark-RuleViolations.
+            tags: [ots]
+            tests:
+              - LintMark_VersionDisplay
+              - LintMark_HelpDisplay
+
+          - id: BuildMark-OTS-LintMark-RuleViolations
+            title: >-
+              LintMark shall report each rule violation in a Markdown file with its location and rule
+              name, and exit with a non-zero code, while passing a conforming file.
+            justification: |
+              lint.ps1 relies on LintMark failing the quality-checks job when a Markdown file breaks
+              a rule in .lintmark.yaml. The quality-checks job runs the pinned LintMark on a
+              conforming and a malformed Markdown fixture after lint.ps1, and FileAssert checks the
+              captured output and exit codes, so the evidence comes from the rules actually running.
+            tags: [ots]
+            tests:
+              - LintMark_PassesConformingMarkdown
+              - LintMark_ReportsRuleViolations

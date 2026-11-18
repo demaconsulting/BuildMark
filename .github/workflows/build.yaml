@@ -66,6 +66,18 @@ jobs:
           --validate
           --results artifacts/versionmark-self-validation-quality.trx
 
+      - name: Run TextLint self-validation
+        run: >
+          dotnet textlint
+          --validate
+          --results artifacts/textlint-self-validation.trx
+
+      - name: Run LintMark self-validation
+        run: >
+          dotnet lintmark
+          --validate
+          --results artifacts/lintmark-self-validation.trx
+
       # === RUN QUALITY CHECKS ===
       # This section runs the linting and quality checks for the project.
       # Downstream projects: Add any additional quality check steps here.
@@ -73,6 +85,21 @@ jobs:
       - name: Run linters
         shell: pwsh
         run: ./lint.ps1
+
+      # Runs LintMark on a conforming and a malformed Markdown fixture and checks its output with
+      # FileAssert, so the LintMark OTS evidence covers rule checking, not only self-validation.
+      # This runs after lint.ps1 so that the malformed fixture is not part of the repository lint.
+      - name: Check LintMark rule detection
+        shell: pwsh
+        run: |
+          New-Item -ItemType Directory -Force artifacts/lintmark-check | Out-Null
+          Set-Content -NoNewline -Path artifacts/lintmark-check/clean.md -Value "# Clean Fixture`n`nThis file follows the configured rules.`n"
+          Set-Content -NoNewline -Path artifacts/lintmark-check/malformed.md -Value "#Malformed Fixture`nText with trailing spaces   `n"
+          foreach ($name in 'clean', 'malformed') {
+            $output = dotnet lintmark "artifacts/lintmark-check/$name.md" 2>&1
+            @($output) + "exit-code: $LASTEXITCODE" | Set-Content -Path "artifacts/lintmark-check/$name.txt"
+          }
+          dotnet fileassert --results artifacts/fileassert-lintmark.trx lintmark
 
       # === UPLOAD ARTIFACTS ===
       # This section uploads all generated artifacts for use by downstream jobs.
@@ -470,6 +497,12 @@ jobs:
         shell: bash
         run: mkdir -p docs/generated
 
+      - name: Run CanvasNet self-validation
+        run: >
+          dotnet canvasnet
+          --validate
+          --results artifacts/canvasnet-self-validation.trx
+
       # === COMPILE BUILD NOTES ===
       # This section generates the Build Notes document. BuildMark and VersionMark self-validations
       # run here to co-locate their evidence with the document that depends on their output.
@@ -712,6 +745,12 @@ jobs:
       - name: Create design output directory
         shell: bash
         run: mkdir -p docs/design/generated
+
+      - name: Run SysML2Tools self-validation
+        run: >
+          dotnet sysml2tools
+          --validate
+          --results artifacts/sysml2tools-self-validation.trx
 
       - name: Render Software Structure diagrams with SysML2Tools
         shell: pwsh

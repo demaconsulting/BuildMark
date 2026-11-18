@@ -43,3 +43,4 @@ sections:
             tags: [ots]
             tests:
               - Configuration_Issues_ValidationError_ReportsAccurateLine
+              - BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine

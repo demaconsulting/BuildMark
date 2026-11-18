@@ -93,6 +93,8 @@ sections:
           - BuildMark-OTS-Pandoc
           - BuildMark-OTS-WeasyPrint
           - BuildMark-OTS-FileAssert
+          - BuildMark-OTS-SysML2Tools-Render
+          - BuildMark-OTS-CanvasNet
         tests:
           - Pandoc_BuildNotesHtml
           - Pandoc_DesignHtml
@@ -112,3 +114,23 @@ sections:
           - BuildMark-OTS-ReqStream
         tests:
           - ReqStream_EnforcementMode
+
+      - id: BuildMark-Quality-Linting
+        title: >-
+          The repository shall check the spelling and Markdown formatting of its documentation
+          and the validity of its architecture model before merging.
+        tags:
+          - quality
+        justification: |
+          Lint outcomes (spell-checking, Markdown formatting, and SysML2 model checking) are
+          enforced by lint.ps1 in the quality-checks job and consumed by maintainers, not by
+          tool callers. This requirement roots those OTS requirements so they are not orphaned.
+        children:
+          - BuildMark-OTS-TextLint
+          - BuildMark-OTS-LintMark
+          - BuildMark-OTS-LintMark-RuleViolations
+          - BuildMark-OTS-SysML2Tools-Lint
+        tests:
+          - TextLintTool_CheckMisspelling
+          - LintMark_ReportsRuleViolations
+          - SysML2Tools_LintSelfTest

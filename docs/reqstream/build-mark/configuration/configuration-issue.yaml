@@ -1,0 +1,22 @@
+---
+# ConfigurationIssue unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: ConfigurationIssue Requirements
+            requirements:
+              - id: BuildMark-ConfigurationIssue-Record
+                title: >-
+                  ConfigurationIssue shall record the file path, line number, severity,
+                  and description of a single configuration parse or validation problem.
+                justification: |
+                  Structured issue records allow the tool to report precise, actionable
+                  feedback about configuration problems without losing location context
+                  when multiple issues are present in the same file.
+                tests:
+                  - ConfigurationLoadResult_ReportTo_ErrorIssue_SetsExitCode
+                  - ConfigurationLoadResult_ReportTo_WarningIssue_DoesNotSetExitCode
+                  - ConfigurationLoadResult_ReportTo_IssueMessage_IncludesLineNumber

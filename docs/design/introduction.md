@@ -24,14 +24,19 @@ Local items:
 OTS items (integration and usage design; see *OTS Integration Design*):
 
 - **YamlDotNet** — YAML parsing library used by the Configuration subsystem.
+- **GraphQL.Client** — GraphQL client library used by the GitHub subsystem.
 - **xUnit** — unit testing framework.
 - **BuildMark** — build notes generation tool (previously released version).
+- **CanvasNet** — diagram drawing tool used as a Pandoc filter.
 - **FileAssert** — generated document assertion tool.
+- **LintMark** — Markdown formatting checker.
 - **Pandoc** — Markdown-to-HTML document conversion tool.
 - **ReqStream** — requirements traceability tool.
 - **ReviewMark** — file review enforcement tool.
 - **SarifMark** — SARIF report generation tool.
 - **SonarMark** — SonarCloud report generation tool.
+- **SysML2Tools** — SysML2 model checker and diagram renderer.
+- **TextLint** — spell checker.
 - **VersionMark** — tool version capture tool.
 - **WeasyPrint** — HTML-to-PDF renderer.
 

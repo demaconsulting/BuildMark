@@ -296,6 +296,7 @@ sections:
             children:
               - BuildMark-Configuration-Read
               - BuildMark-SectionConfig-Properties
+              - BuildMark-BuildMarkConfig-CreateDefault
 
           - id: BuildMark-Config-Rules
             title: >-
@@ -312,6 +313,7 @@ sections:
               - BuildMark-Configuration-Read
               - BuildMark-RepoConnectors-ItemRouter
               - BuildMark-RuleConfig-Properties
+              - BuildMark-RuleMatchConfig-Conditions
 
           - id: BuildMark-Config-Lint
             title: >-

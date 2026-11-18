@@ -37,3 +37,8 @@ This scenario is tested by `BuildMarkConfigReader_ReadAsync_SyntaxError_ReportsE
 line 3 is loaded. The validation error must be reported on line 3, confirming that
 `YamlNode.Start.Line` is correct and 1-based. This scenario is tested by
 `Configuration_Issues_ValidationError_ReportsAccurateLine`.
+
+**YamlDotNet reports the source line of a value node**: A file whose `connector.type` value is a
+mapping starting on line 3 is loaded. The non-scalar value error must be reported on line 3,
+confirming that `YamlNode.Start.Line` is correct for value nodes as well as keys. This scenario is
+tested by `BuildMarkConfigReader_ReadAsync_NonScalarConnectorType_ReturnsErrorIssueAtValueLine`.

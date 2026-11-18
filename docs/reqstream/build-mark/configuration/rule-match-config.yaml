@@ -1,0 +1,21 @@
+---
+# RuleMatchConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: RuleMatchConfig Requirements
+            requirements:
+              - id: BuildMark-RuleMatchConfig-Conditions
+                title: >-
+                  RuleMatchConfig shall expose Label and WorkItemType condition lists that select
+                  the items a routing rule applies to.
+                justification: |
+                  Routing rules select items by label (GitHub) or by work-item type (Azure DevOps).
+                  Holding both condition lists in one match object lets a single rule set serve
+                  either connector.
+                tests:
+                  - ItemRouter_Route_WithWorkItemTypeMatch_RoutesMatchingItem
+                  - ItemRouter_Route_WithCaseInsensitiveLabelMatch_RoutesItem

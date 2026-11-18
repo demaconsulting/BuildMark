@@ -13,7 +13,7 @@ package BuildMark {
                 "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetPullRequestsTests.cs",
                 "test/DemaConsulting.BuildMark.Tests/RepoConnectors/GitHub/GitHubGraphQLClientGetReleasesTests.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/github/github-graphql-client.md");
-            verificationFiles = ("docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md");
+            verificationFiles = ("docs/verification/build-mark/repo-connectors/github/github-graphql-client.md");
             requirementFiles = ("docs/reqstream/build-mark/repo-connectors/github/github-graphql-client.yaml");
         }
         // Note: verificationFiles uses a different kebab-case split than designFiles for the
