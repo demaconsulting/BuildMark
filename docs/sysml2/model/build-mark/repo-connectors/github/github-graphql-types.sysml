@@ -7,7 +7,7 @@ package BuildMark {
         metadata info : SoftwareInfo {
             sourceFiles = ("src/DemaConsulting.BuildMark/RepoConnectors/GitHub/GitHubGraphQLTypes.cs");
             designFiles = ("docs/design/build-mark/repo-connectors/github/github-graphql-types.md");
-            verificationFiles = ("docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-types.md");
+            verificationFiles = ("docs/verification/build-mark/repo-connectors/github/github-graphql-types.md");
             requirementFiles = ("docs/reqstream/build-mark/repo-connectors/github.yaml");
         }
         // Note: verificationFiles uses a different kebab-case split than designFiles for the

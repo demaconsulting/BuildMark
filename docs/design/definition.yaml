@@ -55,6 +55,7 @@ input-files:
   - docs/design/build-mark/version/version-interval-set.md
   - docs/design/build-mark/version/version-commit-tag.md
   - docs/design/build-mark/repo-connectors.md
+  - docs/design/build-mark/repo-connectors/i-repo-connector.md
   - docs/design/build-mark/repo-connectors/repo-connector-base.md
   - docs/design/build-mark/repo-connectors/item-router.md
   - docs/design/build-mark/repo-connectors/item-controls-info.md

@@ -45,7 +45,7 @@ input-files:
   - docs/verification/build-mark/configuration/configuration-load-result.md
   - docs/verification/build-mark/configuration/configuration-issue.md
   - docs/verification/build-mark/configuration/connector-config.md
-  - docs/verification/build-mark/configuration/git-hub-connector-config.md
+  - docs/verification/build-mark/configuration/github-connector-config.md
   - docs/verification/build-mark/configuration/azure-devops-connector-config.md
   - docs/verification/build-mark/configuration/report-config.md
   - docs/verification/build-mark/configuration/section-config.md
@@ -59,9 +59,9 @@ input-files:
   - docs/verification/build-mark/repo-connectors/item-controls-info.md
   - docs/verification/build-mark/repo-connectors/item-controls-parser.md
   - docs/verification/build-mark/repo-connectors/github.md
-  - docs/verification/build-mark/repo-connectors/github/git-hub-repo-connector.md
-  - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-client.md
-  - docs/verification/build-mark/repo-connectors/github/git-hub-graph-ql-types.md
+  - docs/verification/build-mark/repo-connectors/github/github-repo-connector.md
+  - docs/verification/build-mark/repo-connectors/github/github-graphql-client.md
+  - docs/verification/build-mark/repo-connectors/github/github-graphql-types.md
   - docs/verification/build-mark/repo-connectors/azure-devops.md
   - docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-repo-connector.md
   - docs/verification/build-mark/repo-connectors/azure-devops/azure-devops-rest-client.md

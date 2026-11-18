@@ -32,7 +32,7 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-RepoConnectors-GitHub`
 
 ##### RepoConnectors_MockConnector_ImplementsInterface_ReturnsTrue
 
@@ -40,7 +40,7 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-RepoConnectors-Mock`
 
 ##### RepoConnectors_AzureDevOps_ImplementsInterface_ReturnsTrue
 
@@ -48,7 +48,7 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-RepoConnectors-AzureDevOps`
 
 ##### GitHubRepoConnector_ImplementsInterface_ReturnsTrue
 
@@ -56,7 +56,7 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-GitHub-BuildInformation`, `BuildMark-RepoConnectorBase-Interface`
 
 ##### MockRepoConnector_ImplementsInterface
 
@@ -64,7 +64,7 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-MockRepoConnector-Deterministic`, `BuildMark-RepoConnectorBase-Interface`
 
 ##### AzureDevOpsRepoConnector_ImplementsInterface_ReturnsTrue
 
@@ -72,4 +72,4 @@ All interface-implementation tests across `RepoConnectorsTests.cs`, `GitHubTests
 
 **Expected**: Returns `true`.
 
-**Requirement coverage**: `BuildMark-RepoConnectors-IRepoConnector`
+**Requirement coverage**: `BuildMark-AzureDevOps-BuildInformation`
