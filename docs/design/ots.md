@@ -109,12 +109,14 @@ published SBOM.
 
 - **Integration tests**: YamlDotNet is qualified by the Configuration tests that load real YAML
   files through `BuildMarkConfigReader` (see *YamlDotNet Verification*), and GraphQL.Client by
-  the `GitHubGraphQLClient` tests that query a mocked GitHub endpoint (see *GraphQL.Client
-  Verification*).
+  the `GitHubGraphQLClient` tests that query a mocked GitHub endpoint and by OTS tests that drive
+  `GraphQLHttpClient` directly against it (see *GraphQL.Client Verification*).
 - **Self-validation**: BuildMark, VersionMark, SarifMark, SonarMark, ReviewMark, ReqStream,
   FileAssert, TextLint, LintMark, SysML2Tools, and CanvasNet run `--validate` in CI and write TRX
   results consumed by ReqStream.
 - **Downstream assertion**: Pandoc and WeasyPrint outputs are checked by FileAssert for every
   document collection.
+- **Fixture assertion**: LintMark's output on a conforming and a malformed Markdown fixture is
+  checked by FileAssert, because its self-validation does not exercise the lint rules.
 - **Implicit qualification**: xUnit is qualified by the passing of the full test suite on every
   supported platform.

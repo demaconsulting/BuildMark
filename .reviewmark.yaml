@@ -729,6 +729,7 @@ reviews:
       - "docs/reqstream/ots/graphql-client.yaml"
       - "docs/design/ots/graphql-client.md"
       - "docs/verification/ots/graphql-client.md"
+      - "test/**/OtsSoftwareTests/GraphQLClientTests.cs"
 
   - id: OTS-CanvasNet
     title: Review that CanvasNet Provides Required Functionality

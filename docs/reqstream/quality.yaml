@@ -128,8 +128,9 @@ sections:
         children:
           - BuildMark-OTS-TextLint
           - BuildMark-OTS-LintMark
+          - BuildMark-OTS-LintMark-RuleViolations
           - BuildMark-OTS-SysML2Tools-Lint
         tests:
           - TextLintTool_CheckMisspelling
-          - LintMark_VersionDisplay
+          - LintMark_ReportsRuleViolations
           - SysML2Tools_LintSelfTest

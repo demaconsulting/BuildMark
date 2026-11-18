@@ -7,8 +7,10 @@ GitHub GraphQL API. It is verified through the `GitHubGraphQLClient` unit tests 
 `DemaConsulting.BuildMark.Tests`, which pass an `HttpClient` over a mocked
 `HttpMessageHandler` to the internal constructor. GraphQL.Client and its System.Text.Json
 serializer are not mocked, so each test exercises request serialization, the HTTP exchange, and
-response deserialization; only the network endpoint is replaced. The tests run on every operating
-system and .NET version in the CI matrix.
+response deserialization; only the network endpoint is replaced. Because `GitHubGraphQLClient`
+catches every exception, the failure behavior is verified by `GraphQLClientTests.cs` in
+`OtsSoftwareTests`, which drives `GraphQLHttpClient` directly against the same mocked handler. The
+tests run on every operating system and .NET version in the CI matrix.
 
 ### Evidence
 
@@ -29,8 +31,12 @@ The values must reach the returned list, confirming that the response is deseria
 typed response records. This scenario is tested by the `*_ValidResponse_*` tests of the same
 six methods.
 
-**GraphQL.Client reports failures**: Each query is answered with an HTTP error status or with
-invalid JSON. GraphQL.Client must throw, which `GitHubGraphQLClient` converts to an empty list.
-This scenario is tested by the `*_HttpError_ReturnsEmptyList` and `*_InvalidJson_ReturnsEmptyList`
-tests of `GetCommitsAsync`, `GetReleasesAsync`, `GetAllTagsAsync`, `GetPullRequestsAsync`, and
-`FindIssueIdsLinkedToPullRequestAsync`.
+**GraphQL.Client reports failures**: `GraphQLHttpClient.SendQueryAsync` is called directly, without
+the wrapper, against a mocked endpoint that answers with an HTTP 404 status and then with invalid
+JSON. It must throw a `GraphQLHttpRequestException` carrying the status code for the HTTP error and
+a `JsonException` for the invalid JSON. This scenario is tested by
+`GraphQLClient_SendQueryAsync_HttpError_ThrowsGraphQLHttpRequestException` and
+`GraphQLClient_SendQueryAsync_InvalidJson_ThrowsJsonException`. That `GitHubGraphQLClient` turns
+these exceptions into an empty list is verified by its own tests for `GetCommitsAsync`,
+`GetReleasesAsync`, `GetAllTagsAsync`, `GetPullRequestsAsync`, `GetAllIssuesAsync`, and
+`FindIssueIdsLinkedToPullRequestAsync` (see the *GitHubGraphQLClient* verification section).

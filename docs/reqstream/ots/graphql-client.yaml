@@ -46,16 +46,10 @@ sections:
             justification: |
               GitHubGraphQLClient catches the exception and returns an empty result, so a failed
               request never produces partial or invented repository data. GraphQL.Client must
-              therefore signal the failure rather than return a default response.
+              therefore signal the failure rather than return a default response. Because the
+              wrapper hides the exception, these tests drive GraphQLHttpClient directly against
+              the mocked endpoint and assert the exception it raises.
             tags: [ots]
             tests:
-              - GitHubGraphQLClient_GetCommitsAsync_HttpError_ReturnsEmptyList
-              - GitHubGraphQLClient_GetCommitsAsync_InvalidJson_ReturnsEmptyList
-              - GitHubGraphQLClient_GetReleasesAsync_HttpError_ReturnsEmptyList
-              - GitHubGraphQLClient_GetReleasesAsync_InvalidJson_ReturnsEmptyList
-              - GitHubGraphQLClient_GetAllTagsAsync_HttpError_ReturnsEmptyList
-              - GitHubGraphQLClient_GetAllTagsAsync_InvalidJson_ReturnsEmptyList
-              - GitHubGraphQLClient_GetPullRequestsAsync_HttpError_ReturnsEmptyList
-              - GitHubGraphQLClient_GetPullRequestsAsync_InvalidJson_ReturnsEmptyList
-              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_HttpError_ReturnsEmptyList
-              - GitHubGraphQLClient_FindIssueIdsLinkedToPullRequestAsync_InvalidJson_ReturnsEmptyList
+              - GraphQLClient_SendQueryAsync_HttpError_ThrowsGraphQLHttpRequestException
+              - GraphQLClient_SendQueryAsync_InvalidJson_ThrowsJsonException
