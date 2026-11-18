@@ -9,7 +9,7 @@
 [![Security](https://sonarcloud.io/api/project_badges/measure?project=demaconsulting_BuildMark&metric=security_rating)](https://sonarcloud.io/dashboard?id=demaconsulting_BuildMark)
 [![NuGet](https://img.shields.io/nuget/v/DemaConsulting.BuildMark?style=plastic)](https://www.nuget.org/packages/DemaConsulting.BuildMark)
 
-Markdown Build Notes Generation Tool
+![BuildMark banner: the BuildMark name with the tagline 'Every build, documented. Every change, traced.' and the command 'buildmark --report notes.md --build-version v1.2.3'. Version tags, pull requests, GitHub issues, and Azure DevOps work items flow on curved arrows into the buildmark .NET tool, and arrows lead out to Markdown build notes with Changes, Bugs Fixed, and Known Issues sections, a Pandoc PDF, release notes, and a CI pipeline artifact][hero]
 
 ## Overview
 
@@ -295,4 +295,5 @@ BuildMark is built with the following open-source projects:
 - [.NET](https://dotnet.microsoft.com/) - Cross-platform framework for building applications
 - [Octokit](https://github.com/octokit/octokit.net) - GitHub API client library for .NET
 
+[hero]: https://raw.githubusercontent.com/demaconsulting/BuildMark/main/docs/images/hero.png
 [workflow]: https://raw.githubusercontent.com/demaconsulting/BuildMark/main/docs/images/workflow.png
