@@ -1,0 +1,21 @@
+---
+# ReportConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: ReportConfig Requirements
+            requirements:
+              - id: BuildMark-ReportConfig-Properties
+                title: >-
+                  ReportConfig shall expose File, Depth, and IncludeKnownIssues properties
+                  that override the corresponding default report output settings.
+                justification: |
+                  Teams that want to control the report output file path, heading depth, or
+                  inclusion of known issues need a way to specify these settings explicitly
+                  in the configuration file via the report: key.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidReportSection_ReturnsParsedReportConfig
+                  - BuildMarkConfigReader_ReadAsync_InvalidReportDepth_ReturnsErrorIssue

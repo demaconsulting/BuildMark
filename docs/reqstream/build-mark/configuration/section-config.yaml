@@ -1,0 +1,20 @@
+---
+# SectionConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: SectionConfig Requirements
+            requirements:
+              - id: BuildMark-SectionConfig-Properties
+                title: >-
+                  SectionConfig shall expose Id and Title properties that define one
+                  named report section for item routing.
+                justification: |
+                  Report sections must have a stable machine-readable identifier (Id) for
+                  routing rules to reference and a human-readable display title for the
+                  generated markdown output.
+                tests:
+                  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection

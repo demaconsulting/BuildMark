@@ -343,16 +343,46 @@ reviews:
       - "docs/verification/build-mark/configuration.md"
       - "test/**/Configuration/ConfigurationSubsystemTests.cs"
 
+  - id: BuildMark-Configuration-BuildMarkConfig
+    title: Review that BuildMark Configuration BuildMarkConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/build-mark-config.yaml"
+      - "docs/design/build-mark/configuration/build-mark-config.md"
+      - "docs/verification/build-mark/configuration/build-mark-config.md"
+      - "src/**/Configuration/BuildMarkConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
   - id: BuildMark-Configuration-BuildMarkConfigReader
     title: Review that BuildMark Configuration BuildMarkConfigReader Implementation is Correct
     context:
       - "docs/design/build-mark.md"
       - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
     paths:
-      - "docs/reqstream/build-mark/configuration/configuration.yaml"
-      - "docs/design/build-mark/configuration/configuration.md"
+      - "docs/reqstream/build-mark/configuration/build-mark-config-reader.yaml"
+      - "docs/design/build-mark/configuration/build-mark-config-reader.md"
       - "docs/verification/build-mark/configuration/build-mark-config-reader.md"
       - "src/**/Configuration/BuildMarkConfigReader.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-ConfigurationIssue
+    title: Review that BuildMark Configuration ConfigurationIssue Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/configuration-issue.yaml"
+      - "docs/design/build-mark/configuration/configuration-issue.md"
+      - "docs/verification/build-mark/configuration/configuration-issue.md"
+      - "src/**/Configuration/ConfigurationIssue.cs"
       - "test/**/Configuration/ConfigurationTests.cs"
 
   - id: BuildMark-Configuration-ConfigurationLoadResult
@@ -360,13 +390,13 @@ reviews:
     context:
       - "docs/design/build-mark.md"
       - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
     paths:
-      - "docs/reqstream/build-mark/configuration/configuration.yaml"
-      - "docs/design/build-mark/configuration/configuration.md"
+      - "docs/reqstream/build-mark/configuration/configuration-load-result.yaml"
+      - "docs/design/build-mark/configuration/configuration-load-result.md"
       - "docs/verification/build-mark/configuration/configuration-load-result.md"
-      - "docs/verification/build-mark/configuration/configuration-issue.md"
       - "src/**/Configuration/ConfigurationLoadResult.cs"
-      - "src/**/Configuration/ConfigurationIssue.cs"
       - "test/**/Configuration/ConfigurationTests.cs"
 
   - id: BuildMark-Configuration-ConnectorConfig
@@ -374,26 +404,98 @@ reviews:
     context:
       - "docs/design/build-mark.md"
       - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
     paths:
-      - "docs/reqstream/build-mark/configuration/configuration.yaml"
-      - "docs/design/build-mark/configuration/configuration.md"
-      - "docs/verification/build-mark/configuration/build-mark-config.md"
+      - "docs/reqstream/build-mark/configuration/connector-config.yaml"
+      - "docs/design/build-mark/configuration/connector-config.md"
       - "docs/verification/build-mark/configuration/connector-config.md"
-      - "docs/verification/build-mark/configuration/github-connector-config.md"
-      - "docs/verification/build-mark/configuration/azure-devops-connector-config.md"
-      - "docs/verification/build-mark/configuration/report-config.md"
-      - "docs/verification/build-mark/configuration/section-config.md"
-      - "docs/verification/build-mark/configuration/rule-config.md"
-      - "docs/design/build-mark/configuration/rule-match-config.md"
-      - "docs/verification/build-mark/configuration/rule-match-config.md"
-      - "src/**/Configuration/BuildMarkConfig.cs"
       - "src/**/Configuration/ConnectorConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-GitHubConnectorConfig
+    title: Review that BuildMark Configuration GitHubConnectorConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/github-connector-config.yaml"
+      - "docs/design/build-mark/configuration/github-connector-config.md"
+      - "docs/verification/build-mark/configuration/github-connector-config.md"
       - "src/**/Configuration/GitHubConnectorConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-AzureDevOpsConnectorConfig
+    title: Review that BuildMark Configuration AzureDevOpsConnectorConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/azure-devops-connector-config.yaml"
+      - "docs/design/build-mark/configuration/azure-devops-connector-config.md"
+      - "docs/verification/build-mark/configuration/azure-devops-connector-config.md"
       - "src/**/Configuration/AzureDevOpsConnectorConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-ReportConfig
+    title: Review that BuildMark Configuration ReportConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/report-config.yaml"
+      - "docs/design/build-mark/configuration/report-config.md"
+      - "docs/verification/build-mark/configuration/report-config.md"
       - "src/**/Configuration/ReportConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-SectionConfig
+    title: Review that BuildMark Configuration SectionConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/section-config.yaml"
+      - "docs/design/build-mark/configuration/section-config.md"
+      - "docs/verification/build-mark/configuration/section-config.md"
       - "src/**/Configuration/SectionConfig.cs"
+      - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-RuleConfig
+    title: Review that BuildMark Configuration RuleConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/rule-config.yaml"
+      - "docs/design/build-mark/configuration/rule-config.md"
+      - "docs/verification/build-mark/configuration/rule-config.md"
       - "src/**/Configuration/RuleConfig.cs"
       - "test/**/Configuration/ConfigurationTests.cs"
+
+  - id: BuildMark-Configuration-RuleMatchConfig
+    title: Review that BuildMark Configuration RuleMatchConfig Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/configuration.md"
+      - "docs/reqstream/build-mark/configuration.yaml"
+    paths:
+      - "docs/reqstream/build-mark/configuration/rule-match-config.yaml"
+      - "docs/design/build-mark/configuration/rule-match-config.md"
+      - "docs/verification/build-mark/configuration/rule-match-config.md"
+      - "src/**/Configuration/RuleConfig.cs"
+      - "test/**/RepoConnectors/ItemRouterTests.cs"
 
   # BuildMark - RepoConnectors
   - id: BuildMark-RepoConnectors

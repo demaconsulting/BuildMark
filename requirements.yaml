@@ -40,6 +40,17 @@ includes:
   - docs/reqstream/build-mark/repo-connectors/mock.yaml
   - docs/reqstream/build-mark/repo-connectors/mock/mock-repo-connector.yaml
   - docs/reqstream/build-mark/configuration.yaml
+  - docs/reqstream/build-mark/configuration/build-mark-config.yaml
+  - docs/reqstream/build-mark/configuration/build-mark-config-reader.yaml
+  - docs/reqstream/build-mark/configuration/configuration-issue.yaml
+  - docs/reqstream/build-mark/configuration/configuration-load-result.yaml
+  - docs/reqstream/build-mark/configuration/connector-config.yaml
+  - docs/reqstream/build-mark/configuration/github-connector-config.yaml
+  - docs/reqstream/build-mark/configuration/azure-devops-connector-config.yaml
+  - docs/reqstream/build-mark/configuration/report-config.yaml
+  - docs/reqstream/build-mark/configuration/section-config.yaml
+  - docs/reqstream/build-mark/configuration/rule-config.yaml
+  - docs/reqstream/build-mark/configuration/rule-match-config.yaml
   - docs/reqstream/ots/yaml-dot-net.yaml
   - docs/reqstream/ots/xunit.yaml
   - docs/reqstream/ots/reqstream.yaml

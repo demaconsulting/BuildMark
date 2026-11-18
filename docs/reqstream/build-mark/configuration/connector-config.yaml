@@ -1,0 +1,21 @@
+---
+# ConnectorConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: ConnectorConfig Requirements
+            requirements:
+              - id: BuildMark-ConnectorConfig-Properties
+                title: >-
+                  ConnectorConfig shall expose Type, GitHub, and AzureDevOps properties
+                  that select and configure the active repository connector.
+                justification: |
+                  The ConnectorConfig envelope carries a type discriminator and per-connector
+                  settings so the factory can instantiate and configure the correct connector
+                  without inspecting multiple top-level keys.
+                tests:
+                  - BuildMarkConfigReader_ReadAsync_ValidFile_ReturnsParsedConfiguration
+                  - BuildMarkConfigReader_ReadAsync_ValidAzureDevOpsConnector_ReturnsParsedConfiguration

@@ -1,0 +1,20 @@
+---
+# RuleConfig unit requirements
+
+sections:
+  - title: BuildMark Requirements
+    sections:
+      - title: Configuration Requirements
+        sections:
+          - title: RuleConfig Requirements
+            requirements:
+              - id: BuildMark-RuleConfig-Properties
+                title: >-
+                  RuleConfig shall expose Match and Route properties that define one
+                  item-routing rule for the ItemRouter.
+                justification: |
+                  Routing rules must specify match conditions (label or work-item type)
+                  and a destination section identifier so that ItemRouter can correctly
+                  categorize items without embedding routing logic in connector code.
+                tests:
+                  - BuildMarkConfig_CreateDefault_ContainsDependencyUpdatesSection
