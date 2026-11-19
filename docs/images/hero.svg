@@ -108,7 +108,7 @@
   <rect width="1600" height="640" fill="url(#dots)"/>
 
   <!-- Wordmark and tagline -->
-  <image href="dc-logo-dark.svg" x="46" y="54" width="50" height="50"/>
+  <image href="hero/dc-logo-dark.svg" x="46" y="54" width="50" height="50"/>
   <text class="eyebrow" x="100" y="90">DEMA Consulting</text>
   <text class="word" x="52" y="176">Build</text>
   <text class="word brandText" x="281.9" y="176">Mark</text>
