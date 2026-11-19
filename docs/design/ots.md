@@ -116,7 +116,5 @@ published SBOM.
   results consumed by ReqStream.
 - **Downstream assertion**: Pandoc and WeasyPrint outputs are checked by FileAssert for every
   document collection.
-- **Fixture assertion**: LintMark's output on a conforming and a malformed Markdown fixture is
-  checked by FileAssert, because its self-validation does not exercise the lint rules.
 - **Implicit qualification**: xUnit is qualified by the passing of the full test suite on every
   supported platform.

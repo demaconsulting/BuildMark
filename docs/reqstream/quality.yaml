@@ -129,8 +129,9 @@ sections:
           - BuildMark-OTS-TextLint
           - BuildMark-OTS-LintMark
           - BuildMark-OTS-LintMark-RuleViolations
+          - BuildMark-OTS-LintMark-Fix
           - BuildMark-OTS-SysML2Tools-Lint
         tests:
           - TextLintTool_CheckMisspelling
-          - LintMark_ReportsRuleViolations
+          - LintMark_ViolationsReported
           - SysML2Tools_LintSelfTest

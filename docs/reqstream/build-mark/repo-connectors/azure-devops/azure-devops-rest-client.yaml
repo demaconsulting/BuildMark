@@ -60,8 +60,7 @@ sections:
                       - AzureDevOpsRestClient_GetTagsAsync_ValidResponse_ReturnsTags
 
                   - id: BuildMark-AzureDevOps-GetPullRequests
-                    title: The AzureDevOpsRestClient shall retrieve pull requests from the Azure DevOps API with pagination
-                      support.
+                    title: The AzureDevOpsRestClient shall retrieve pull requests from the Azure DevOps API with pagination support.
                     justification: |
                       Pull request retrieval provides the change entries for build notes. Pagination
                       ensures all pull requests in the version range are included.

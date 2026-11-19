@@ -13,11 +13,22 @@ sections:
             justification: |
               DemaConsulting.TextLint.Tool spell-checks the documentation, requirements, and
               source comments in lint.ps1, which fails the quality-checks job on any finding.
-              Its self-validation checks that a clean file passes, that a misspelling is
-              reported, and that the settings file and inline directives are honored.
+              Its self-validation checks that the pinned tool starts and reports its version and
+              usage, that a clean file passes, that a misspelling is reported, that the settings
+              file (globs, overrides, technical terms, and language) is honored and an invalid one
+              is reported, that inline directives are honored, and that binary files are skipped.
             tags: [ots]
             tests:
+              - TextLintTool_VersionDisplay
+              - TextLintTool_HelpDisplay
               - TextLintTool_CheckCleanFile
               - TextLintTool_CheckMisspelling
               - TextLintTool_CheckSettingsFile
+              - TextLintTool_CheckSettingsError
+              - TextLintTool_CheckGlobsReplaceFiles
+              - TextLintTool_CheckOverrides
+              - TextLintTool_CheckTechnicalTerms
+              - TextLintTool_CheckLanguageOption
               - TextLintTool_CheckInlineDirective
+              - TextLintTool_CheckBinaryFileSkipped
+              - TextLintTool_CheckCspellTokenization

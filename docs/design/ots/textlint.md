@@ -18,4 +18,6 @@ TextLint is the dotnet local tool `DemaConsulting.TextLint.Tool`, restored from
 
 - `lint.ps1` runs `dotnet textlint`; any finding fails the lint gate.
 - The `quality-checks` job runs `dotnet textlint --validate --results
-  artifacts/textlint-self-validation.trx` before `lint.ps1`.
+  artifacts/textlint-self-validation.trx` before `lint.ps1`. The self-validation exercises the
+  spell-checking, the settings file, and inline directives, so its results are the evidence for
+  the TextLint OTS requirement.
