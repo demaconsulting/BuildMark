@@ -90,8 +90,7 @@ sections:
                       - GitHubGraphQLClient_GetAllTagsAsync_WithPagination_ReturnsAllTags
 
                   - id: BuildMark-GitHub-GetPullRequests
-                    title: The GitHubGraphQLClient shall retrieve pull requests from the GitHub repository with pagination
-                      support.
+                    title: The GitHubGraphQLClient shall retrieve pull requests from the GitHub repository with pagination support.
                     justification: |
                       Pull request retrieval provides the change entries for build notes. Pagination
                       ensures all pull requests in the version range are included.
