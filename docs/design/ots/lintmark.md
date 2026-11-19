@@ -19,7 +19,6 @@ LintMark is the dotnet local tool `DemaConsulting.LintMark`, restored from
 - `lint.ps1` runs `dotnet lintmark`; any finding fails the lint gate.
 - `fix.ps1` runs LintMark to apply its formatting fixes.
 - The `quality-checks` job runs `dotnet lintmark --validate --results
-  artifacts/lintmark-self-validation.trx` before `lint.ps1`.
-- After `lint.ps1`, the `quality-checks` job runs `dotnet lintmark` on a conforming and a
-  malformed Markdown fixture and checks the captured output with FileAssert (tag `lintmark` in
-  `.fileassert.yaml`), writing `artifacts/fileassert-lintmark.trx`.
+  artifacts/lintmark-self-validation.trx` before `lint.ps1`. The self-validation exercises the
+  lint rules, the configuration file, and the fix mode, so its results are the evidence for the
+  LintMark OTS requirements.

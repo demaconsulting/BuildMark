@@ -1,12 +1,11 @@
 ---
 # FileAssert document validation tests for BuildMark.
 # Tests are tagged by document group to allow per-group execution during the build pipeline.
-# Tags: build-notes, code-quality, code-review, design, verification, user-guide, requirements, lintmark.
+# Tags: build-notes, code-quality, code-review, design, verification, user-guide, requirements.
 #
 # NOTE: build-notes through user-guide tests provide OTS evidence for Pandoc and WeasyPrint
 # and run before ReqStream. The requirements tests run after ReqStream and validate the
-# final outputs, but do not contribute to OTS requirements evidence. The lintmark tests check the
-# LintMark output captured by the quality-checks job and provide OTS evidence for LintMark.
+# final outputs, but do not contribute to OTS requirements evidence.
 
 tests:
 
@@ -308,25 +307,3 @@ tests:
             min: 1
           text:
             - contains: "Trace Matrix"
-
-  # --- LINTMARK ---
-
-  - name: LintMark_PassesConformingMarkdown
-    description: "LintMark reports no issues and exits 0 for a conforming Markdown file"
-    tags: [lintmark]
-    files:
-      - pattern: "artifacts/lintmark-check/clean.txt"
-        count: 1
-        text:
-          - contains: "exit-code: 0"
-
-  - name: LintMark_ReportsRuleViolations
-    description: "LintMark reports each rule violation and exits 1 for a malformed Markdown file"
-    tags: [lintmark]
-    files:
-      - pattern: "artifacts/lintmark-check/malformed.txt"
-        count: 1
-        text:
-          - contains: "malformed.md:1:1: heading-missing-space"
-          - contains: "malformed.md:2:26: trailing-whitespace"
-          - contains: "exit-code: 1"
