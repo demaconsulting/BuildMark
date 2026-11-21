@@ -1,6 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1600" height="640" viewBox="0 0 1600 640">
   <!-- The README hero banner. Version tags, pull requests, GitHub issues, and Azure DevOps work items flow into the
-       buildmark tool, and come out as Markdown build notes, a Pandoc PDF, release notes, and a CI pipeline artifact.
+       buildmark tool, and come out as Markdown build notes, a PDF made from them by Pandoc, release notes, and a CI pipeline artifact.
        The definitions and the left panel follow the shared DEMA Consulting hero (CanvasNet docs/images/hero). -->
   <defs>
     <style>
@@ -292,7 +292,7 @@
     <text class="mini" x="960" y="511" fill="#ffffff" text-anchor="middle">PDF</text>
     <rect class="bar" x="1004" y="500" width="34" height="5" rx="2.5"/>
     <rect class="bar" x="964" y="528" width="64" height="5" rx="2.5"/>
-    <text class="label" x="999" y="585">Pandoc PDF</text>
+    <text class="label" x="999" y="585">PDF via Pandoc</text>
 
     <!-- A release with its notes -->
     <rect class="card" x="1122" y="390" width="220" height="210" rx="16"/>
