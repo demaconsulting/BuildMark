@@ -1,4 +1,4 @@
-# ![BuildMark: Markdown build notes from GitHub or Azure DevOps. Reads version tags, pull requests and issues; writes the changes, bugs fixed and known issues between two versions. Shown with the command 'buildmark --report notes.md --build-version v1.2.3' and the note '.NET 10 and 11, Windows, Linux, macOS'. Version tags, pull requests, GitHub issues, and Azure DevOps work items flow into the buildmark .NET tool, and arrows lead out to Markdown build notes with Changes, Bugs Fixed, and Known Issues sections, a Pandoc PDF, release notes, and a CI pipeline artifact][hero]
+# ![BuildMark: Markdown build notes from GitHub or Azure DevOps][hero]
 
 [![GitHub forks](https://img.shields.io/github/forks/demaconsulting/BuildMark?style=plastic)](https://github.com/demaconsulting/BuildMark/network/members)
 [![GitHub stars](https://img.shields.io/github/stars/demaconsulting/BuildMark?style=plastic)](https://github.com/demaconsulting/BuildMark/stargazers)
