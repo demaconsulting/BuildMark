@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_PathHelpers {
     private import SoftwareItemMetadata::*;
 
     part def PathHelpers {

@@ -1,4 +1,15 @@
-package BuildMark {
+package BuildMark_ConfigurationSubsystem {
+    public import BuildMark_AzureDevOpsConnectorConfig::*;
+    public import BuildMark_BuildMarkConfigReader::*;
+    public import BuildMark_BuildMarkConfig::*;
+    public import BuildMark_ConfigurationIssue::*;
+    public import BuildMark_ConfigurationLoadResult::*;
+    public import BuildMark_ConnectorConfig::*;
+    public import BuildMark_GitHubConnectorConfig::*;
+    public import BuildMark_ReportConfig::*;
+    public import BuildMark_RuleConfig::*;
+    public import BuildMark_RuleMatchConfig::*;
+    public import BuildMark_SectionConfig::*;
     private import SoftwareItemMetadata::*;
 
     part def ConfigurationSubsystem {

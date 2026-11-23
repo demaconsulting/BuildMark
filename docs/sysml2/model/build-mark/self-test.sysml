@@ -1,4 +1,5 @@
-package BuildMark {
+package BuildMark_SelfTestSubsystem {
+    public import BuildMark_Validation::*;
     private import SoftwareItemMetadata::*;
 
     part def SelfTestSubsystem {

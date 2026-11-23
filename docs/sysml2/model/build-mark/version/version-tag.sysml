@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_VersionTag {
     private import SoftwareItemMetadata::*;
 
     part def VersionTag {

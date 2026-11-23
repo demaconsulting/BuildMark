@@ -138,6 +138,17 @@ responsibility - invoke the lint-fix agent once before submitting a pull request
 CI runs `lint.ps1` which checks: lintmark, textlint, yamllint, dotnet format,
 reqstream, versionmark, reviewmark, and sysml2tools.
 
+# Efficient Validation (ALL Agents)
+
+Full `build.ps1` and `lint.ps1` runs can take many minutes on large repositories. Spend them
+once, not after every edit:
+
+- **While iterating**, run only the checks covering what you just changed - e.g. a test filter or
+  single test project, one linter on the changed files, one document build
+- **Before handing back**, run the full gates your agent requires once; re-run them only if you
+  change files after they pass
+- Never report a targeted check as the full gate - state which full gates ran in your report
+
 # Scope Discipline (ALL Agents Must Follow)
 
 - **No generated file access**: Files inside any `generated/` folder are build
@@ -158,7 +169,17 @@ requires it and the modification preserves the documented design intent:
 
 - `.reviewmark.yaml`, `.textlint.yaml`, `.editorconfig`
 - `.lintmark.yaml`, `.yamllint.yaml`
-- `requirements.yaml`, `fix.ps1`, `lint.ps1`
+- `requirements.yaml`
+
+# Project Scripts
+
+`build.ps1`, `lint.ps1`, and `fix.ps1` belong to the project: extend them as it grows. Add project-specific
+steps, update tool versions, and add optional parameters that focus a run (for example one library in a
+multi-library repository, or headless tests without GUI automation). Two rules keep them trustworthy:
+
+- Run with no arguments, each script still does its full job (CI and the agents rely on that); slow or
+  environment-dependent test tiers may be opt-in switches of `build.ps1`.
+- Never remove or weaken a check to make lint or tests pass.
 
 # Continuous Compliance Overview
 

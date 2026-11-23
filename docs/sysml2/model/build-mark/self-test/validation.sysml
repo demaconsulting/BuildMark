@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_Validation {
     private import SoftwareItemMetadata::*;
 
     part def Validation {

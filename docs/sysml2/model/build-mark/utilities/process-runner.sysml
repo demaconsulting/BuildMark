@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ProcessRunner {
     private import SoftwareItemMetadata::*;
 
     part def ProcessRunner {

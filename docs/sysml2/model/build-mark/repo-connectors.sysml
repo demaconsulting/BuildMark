@@ -1,4 +1,13 @@
-package BuildMark {
+package BuildMark_RepoConnectorsSubsystem {
+    public import BuildMark_AzureDevOpsSubsystem::*;
+    public import BuildMark_GitHubSubsystem::*;
+    public import BuildMark_IRepoConnector::*;
+    public import BuildMark_ItemControlsInfo::*;
+    public import BuildMark_ItemControlsParser::*;
+    public import BuildMark_ItemRouter::*;
+    public import BuildMark_MockSubsystem::*;
+    public import BuildMark_RepoConnectorBase::*;
+    public import BuildMark_RepoConnectorFactory::*;
     private import SoftwareItemMetadata::*;
 
     part def RepoConnectorsSubsystem {

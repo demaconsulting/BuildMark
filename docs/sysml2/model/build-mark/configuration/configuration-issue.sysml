@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ConfigurationIssue {
     private import SoftwareItemMetadata::*;
 
     part def ConfigurationIssue {

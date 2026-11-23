@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_AzureDevOpsRestClient {
     private import SoftwareItemMetadata::*;
 
     part def AzureDevOpsRestClient {

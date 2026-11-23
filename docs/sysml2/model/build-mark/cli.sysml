@@ -1,4 +1,5 @@
-package BuildMark {
+package BuildMark_CliSubsystem {
+    public import BuildMark_Context::*;
     private import SoftwareItemMetadata::*;
 
     part def CliSubsystem {

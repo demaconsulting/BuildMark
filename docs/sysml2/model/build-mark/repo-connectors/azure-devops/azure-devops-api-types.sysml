@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_AzureDevOpsApiTypes {
     private import SoftwareItemMetadata::*;
 
     part def AzureDevOpsApiTypes {

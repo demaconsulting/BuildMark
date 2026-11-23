@@ -1,4 +1,7 @@
-package BuildMark {
+package BuildMark_UtilitiesSubsystem {
+    public import BuildMark_PathHelpers::*;
+    public import BuildMark_ProcessRunner::*;
+    public import BuildMark_TemporaryDirectory::*;
     private import SoftwareItemMetadata::*;
 
     part def UtilitiesSubsystem {

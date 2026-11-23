@@ -1,4 +1,7 @@
-package BuildMark {
+package BuildMark_BuildNotesSubsystem {
+    public import BuildMark_BuildInformation::*;
+    public import BuildMark_ItemInfo::*;
+    public import BuildMark_WebLink::*;
     private import SoftwareItemMetadata::*;
 
     part def BuildNotesSubsystem {

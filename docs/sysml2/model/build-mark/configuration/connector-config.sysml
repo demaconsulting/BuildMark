@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ConnectorConfig {
     private import SoftwareItemMetadata::*;
 
     part def ConnectorConfig {

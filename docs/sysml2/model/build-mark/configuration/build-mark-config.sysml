@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_BuildMarkConfig {
     private import SoftwareItemMetadata::*;
 
     part def BuildMarkConfig {

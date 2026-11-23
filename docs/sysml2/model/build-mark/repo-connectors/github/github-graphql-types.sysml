@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_GitHubGraphQLTypes {
     private import SoftwareItemMetadata::*;
 
     part def GitHubGraphQLTypes {

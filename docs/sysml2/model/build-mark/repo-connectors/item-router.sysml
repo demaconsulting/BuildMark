@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ItemRouter {
     private import SoftwareItemMetadata::*;
 
     part def ItemRouter {

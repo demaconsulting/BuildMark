@@ -1,4 +1,10 @@
-package BuildMark {
+package BuildMark_VersionSubsystem {
+    public import BuildMark_VersionCommitTag::*;
+    public import BuildMark_VersionComparable::*;
+    public import BuildMark_VersionIntervalSet::*;
+    public import BuildMark_VersionInterval::*;
+    public import BuildMark_VersionSemantic::*;
+    public import BuildMark_VersionTag::*;
     private import SoftwareItemMetadata::*;
 
     part def VersionSubsystem {

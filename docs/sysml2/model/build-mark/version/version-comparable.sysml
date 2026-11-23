@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_VersionComparable {
     private import SoftwareItemMetadata::*;
 
     part def VersionComparable {

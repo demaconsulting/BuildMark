@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_RepoConnectorBase {
     private import SoftwareItemMetadata::*;
 
     part def RepoConnectorBase {
