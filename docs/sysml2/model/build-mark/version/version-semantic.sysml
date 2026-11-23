@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_VersionSemantic {
     private import SoftwareItemMetadata::*;
 
     part def VersionSemantic {

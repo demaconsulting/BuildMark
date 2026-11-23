@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_GitHubConnectorConfig {
     private import SoftwareItemMetadata::*;
 
     part def GitHubConnectorConfig {

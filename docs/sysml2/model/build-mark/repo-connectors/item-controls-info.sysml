@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ItemControlsInfo {
     private import SoftwareItemMetadata::*;
 
     part def ItemControlsInfo {

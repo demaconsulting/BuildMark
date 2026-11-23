@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_WorkItemMapper {
     private import SoftwareItemMetadata::*;
 
     part def WorkItemMapper {

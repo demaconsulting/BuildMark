@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_VersionIntervalSet {
     private import SoftwareItemMetadata::*;
 
     part def VersionIntervalSet {

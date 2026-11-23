@@ -1,4 +1,5 @@
-package BuildMark {
+package BuildMark_MockSubsystem {
+    public import BuildMark_MockRepoConnector::*;
     private import SoftwareItemMetadata::*;
 
     part def MockSubsystem {

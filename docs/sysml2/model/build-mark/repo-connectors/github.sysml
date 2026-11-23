@@ -1,4 +1,7 @@
-package BuildMark {
+package BuildMark_GitHubSubsystem {
+    public import BuildMark_GitHubGraphQLClient::*;
+    public import BuildMark_GitHubGraphQLTypes::*;
+    public import BuildMark_GitHubRepoConnector::*;
     private import SoftwareItemMetadata::*;
 
     part def GitHubSubsystem {

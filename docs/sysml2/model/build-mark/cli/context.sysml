@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_Context {
     private import SoftwareItemMetadata::*;
 
     part def Context {

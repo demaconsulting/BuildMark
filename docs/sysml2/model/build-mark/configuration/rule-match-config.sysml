@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_RuleMatchConfig {
     private import SoftwareItemMetadata::*;
 
     part def RuleMatchConfig {

@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_AzureDevOpsRepoConnector {
     private import SoftwareItemMetadata::*;
 
     part def AzureDevOpsRepoConnector {

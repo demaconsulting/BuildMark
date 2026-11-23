@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_ConfigurationLoadResult {
     private import SoftwareItemMetadata::*;
 
     part def ConfigurationLoadResult {

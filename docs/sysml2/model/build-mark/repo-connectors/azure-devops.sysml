@@ -1,4 +1,8 @@
-package BuildMark {
+package BuildMark_AzureDevOpsSubsystem {
+    public import BuildMark_AzureDevOpsApiTypes::*;
+    public import BuildMark_AzureDevOpsRepoConnector::*;
+    public import BuildMark_AzureDevOpsRestClient::*;
+    public import BuildMark_WorkItemMapper::*;
     private import SoftwareItemMetadata::*;
 
     part def AzureDevOpsSubsystem {

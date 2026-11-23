@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_IRepoConnector {
     private import SoftwareItemMetadata::*;
 
     part def IRepoConnector {

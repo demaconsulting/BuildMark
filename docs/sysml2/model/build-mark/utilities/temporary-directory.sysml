@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_TemporaryDirectory {
     private import SoftwareItemMetadata::*;
 
     part def TemporaryDirectory {

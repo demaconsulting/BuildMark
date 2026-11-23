@@ -1,4 +1,4 @@
-package BuildMark {
+package BuildMark_WebLink {
     private import SoftwareItemMetadata::*;
 
     part def WebLink {

@@ -1,7 +1,14 @@
 package BuildMark {
+    public import BuildMark_BuildNotesSubsystem::*;
+    public import BuildMark_CliSubsystem::*;
+    public import BuildMark_ConfigurationSubsystem::*;
+    public import BuildMark_Program::*;
+    public import BuildMark_RepoConnectorsSubsystem::*;
+    public import BuildMark_SelfTestSubsystem::*;
+    public import BuildMark_UtilitiesSubsystem::*;
+    public import BuildMark_VersionSubsystem::*;
+    private import OtsDependencies::*;
     private import SoftwareItemMetadata::*;
-
-    import OtsDependencies::*;
 
     doc
     /*
