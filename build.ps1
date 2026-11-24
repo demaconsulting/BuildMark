@@ -116,16 +116,17 @@ if ($DryRun) { Write-Host "Dry run: would run the full build and all tests."; ex
 # ==============================================================================
 
 $buildError = $false
+$failedStep = $null   # the step that failed first, so the skip message names the real cause
 
 # Each step runs only if the steps before it succeeded, so tests never run against stale binaries
 Write-Host "Restoring dependencies..."
 dotnet restore
-if ($LASTEXITCODE -ne 0) { $buildError = $true }
+if ($LASTEXITCODE -ne 0) { $buildError = $true; $failedStep = 'restore' }
 
 if (-not $buildError) {
     Write-Host "Building..."
     dotnet build --no-restore --configuration Release
-    if ($LASTEXITCODE -ne 0) { $buildError = $true }
+    if ($LASTEXITCODE -ne 0) { $buildError = $true; $failedStep = 'build' }
 }
 
 # [PROJECT-SPECIFIC] Add additional build steps here. Guard steps that depend on the build with: if (-not $buildError) { ... }
@@ -135,7 +136,8 @@ if (-not $buildError) {
     dotnet test --no-build --configuration Release --report-trx --results-directory artifacts/tests
     if ($LASTEXITCODE -ne 0) { $buildError = $true }
 } else {
-    Write-Host "Skipping tests: the build failed."
+    if ($failedStep -eq 'restore') { Write-Host "Skipping build and tests: restore failed." }
+    else { Write-Host "Skipping tests: the $failedStep failed." }
 }
 
 # [PROJECT-SPECIFIC] Add additional test or post-build steps here.

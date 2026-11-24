@@ -123,6 +123,9 @@ function Resolve-NameList {
         Accepts names given as separate values or comma-separated (-Check a,b and -Check a -Check b
         both work), matches them case-insensitively, and returns the canonical spelling. An unknown
         name prints an error that lists the valid names and returns $null, so the script can exit 1.
+        A value that names nothing (only delimiters or blanks, such as -Check ',') is an error too,
+        handled the same way: otherwise the scope would be accepted and the script would run no
+        check and exit 0.
     .PARAMETER Names
         The names as supplied by the caller.
     .PARAMETER Valid
@@ -137,7 +140,12 @@ function Resolve-NameList {
     )
 
     $resolved = [System.Collections.Generic.List[string]]::new()
-    foreach ($name in @($Names | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })) {
+    $tokens = @($Names | ForEach-Object { $_ -split ',' } | ForEach-Object { $_.Trim() } | Where-Object { $_ })
+    if ($null -ne $Names -and @($Names).Count -gt 0 -and $tokens.Count -eq 0) {
+        Write-Host "No $Label named in '$(@($Names) -join ' ')'. Valid ${Label}s: $($Valid -join ', ')"
+        return $null
+    }
+    foreach ($name in $tokens) {
         $match = $Valid | Where-Object { $_ -eq $name } | Select-Object -First 1
         if (-not $match) {
             Write-Host "Unknown $Label '$name'. Valid ${Label}s: $($Valid -join ', ')"
@@ -382,8 +390,18 @@ function Get-ProjectGraph {
         input of the scoped build: a changed file selects its project, every project referencing it,
         and every project that links the file in. Convention: src/ holds libraries, test/ holds test
         projects, and tools/ holds projects that are only built.
+
+        Projects are keyed by file name because ProjectReference entries are matched by file name.
+        When two scanned projects share a file name (for example src/Foo/Foo.csproj and
+        test/Foo/Foo.csproj) the graph would be ambiguous, so the function throws instead.
     .PARAMETER Root
         Folders to scan for projects (missing folders are ignored).
+    .OUTPUTS
+        An ordered dictionary of project name to project record.
+    .NOTES
+        Throws when two scanned projects share a file name; the error names both files. Remediation:
+        rename one project, or exclude the folder holding the duplicate (for example sample or fixture
+        projects that are test inputs) from the scan in the repository's build.ps1.
     #>
     param([string[]]$Root = @('src', 'test', 'tools'))
 
@@ -422,7 +440,15 @@ function Get-ProjectGraph {
             }
         }
 
+        # Project names are the file names without extension (ProjectReference items are matched by that name),
+        # so two projects with the same name would silently overwrite each other and hide one from the scoped
+        # build. Fail clearly instead; a repository with intentional duplicates (for example sample projects
+        # used as test fixtures) passes a narrower -Root.
         $name = [System.IO.Path]::GetFileNameWithoutExtension($file.Name)
+        if ($graph.Contains($name)) {
+            throw "Duplicate project name '$name': '$($graph[$name].Path)' and '$path'. Project names must be unique " +
+                "(rename one) or the folder holding the duplicate must be left out of the scanned -Root."
+        }
         $graph[$name] = [pscustomobject]@{
             Name       = $name
             Path       = $path

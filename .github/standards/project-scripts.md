@@ -24,7 +24,13 @@ switches, valid `-Check` names, and examples for a repository is the output of
 - **`-DryRun`** prints the selection (what would run or be skipped) and runs nothing.
 - **`build.ps1 -Project <names>`** exists only in multi-project repositories and builds and tests
   what the named projects affect. **`lint.ps1`/`fix.ps1 -Check <names>`** run only the named
-  checks or fixers, in full; combined with `-Changed` they are limited to changed inputs.
+  checks or fixers, in full; combined with `-Changed` they are limited to changed inputs. A `-Check`
+  value must name at least one valid check or fixer: an unknown name, or a value with only delimiters
+  (`-Check ','`), prints the valid names and exits 1 instead of running nothing.
+- **Project names are unique.** The module keys the project graph by project file name, so two `.csproj`
+  files with the same name (for example `src/Foo/Foo.csproj` and `test/Foo/Foo.csproj`) make the scoped
+  build fail with a message naming both. Rename one, or leave the folder holding the duplicates out of
+  the scanned `-Root` (fixture projects, for example).
 - **`fix.ps1` always exits 0** when it actually runs fixers. Usage and argument errors still exit 1.
 
 # Running the Scripts (ALL Agents)
