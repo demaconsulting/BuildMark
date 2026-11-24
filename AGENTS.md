@@ -166,7 +166,9 @@ and exit 1.
 
 BuildMark has one library and one test project. `build.ps1 -Changed` and `build.ps1 -Project` select the test projects
 a change affects through the project reference graph: a change to the library or the tests, or to a file linked into
-one of them (such as `README.md` or `Icon.png`), selects the test project. A build-wide file (solution, project,
+one of them as a build input, selects the test project. Pack-only items (`README.md` and `Icon.png` are `None` items
+with `Pack="true"` and no output copy) are not build inputs, so changing them selects nothing. A build-wide file
+(solution, project,
 props/targets, `global.json`, `.editorconfig`, `nuget.config`, tool manifest, `build.ps1`,
 `scripts/ProjectScripts.psm1`) runs the full build and tests; documentation-only changes build nothing. The tests
 read no repository files at run time, so `$RuntimeReads` in `build.ps1` is empty; keep it in step if a test starts
