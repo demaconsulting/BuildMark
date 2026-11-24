@@ -3,7 +3,7 @@
 # PURPOSE:
 #   Unified cross-platform build script for BuildMark.
 #   Restores dependencies, builds the solution in Release configuration, and runs all unit tests,
-#   either unconditionally (-All, what CI runs) or only when the changed files affect the build (-Changed).
+#   either unconditionally (-All, the full local build and test run) or only when the changed files affect the build (-Changed).
 #
 # USAGE:
 #   pwsh ./build.ps1 -Help                     Print the usage text and exit 0
@@ -28,10 +28,10 @@
 #   [PROJECT-SPECIFIC] extension points. The reusable scoping logic lives in
 #   scripts/ProjectScripts.psm1, which is shared across repositories and must not be edited here.
 #   With no arguments the script prints the usage text and exits 1; -All must still build and run
-#   the standard test suite (CI relies on that). Never remove or weaken a test step to make it pass.
+#   the standard test suite (the agents rely on that). Never remove or weaken a test step to make it pass.
 
 param(
-    # Full build and all tests (what CI runs).
+    # Full local build and all tests.
     [switch]$All,
 
     # Build and test only when the changed files affect the build.
@@ -61,7 +61,7 @@ function Show-Usage {
     Write-ScriptUsage -Script 'build.ps1' `
         -Purpose 'build the solution (Release) and run the unit tests.' `
         -Options ([ordered]@{
-            '-All'        = 'Full build and all tests (what CI runs); cannot be combined with another scope.'
+            '-All'        = 'Full local build and all tests; cannot be combined with another scope.'
             '-Changed'    = 'Build and test only if files changed since the base, plus uncommitted files, affect the build.'
             '-Base <ref>' = 'Base reference for -Changed (default origin/main, else main).'
             '-DryRun'     = 'Print what would be built and tested, then exit 0 without running anything.'
