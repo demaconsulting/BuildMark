@@ -153,7 +153,7 @@ Full `build.ps1 -All` and `lint.ps1 -All` runs can take many minutes on large re
 them once, not after every edit. The scripts require a scope: with no arguments they print usage
 and exit 1.
 
-- **While iterating**, use `-Changed` (or `build.ps1 -Project`, `lint.ps1`/`fix.ps1 -Check`) so only
+- **While iterating**, use `-Changed` (or `lint.ps1`/`fix.ps1 -Check`) so only
   the affected work runs; add `-DryRun` to see the selection without running anything
 - **Before handing back**, run the full gates your agent requires once (`build.ps1 -All`,
   `lint.ps1 -All`); re-run them only if you change files after they pass
