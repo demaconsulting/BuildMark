@@ -23,15 +23,16 @@
 #   Search for "[PROJECT-SPECIFIC]" comments to find the designated locations
 #   for adding project-specific lint checks.
 #
-# MODIFICATION POLICY:
-#   Only modify this file to add project-specific operations at the designated
-#   [PROJECT-SPECIFIC] extension points, or to update tool versions as needed.
+# CUSTOMIZATION:
+#   This script belongs to the project: extend it as the project grows. Add steps at the
+#   [PROJECT-SPECIFIC] points, update tool versions, and add optional parameters that focus a run.
 #   To add a check, add it to the $checks table (its name becomes a valid -Check value and
 #   appears in the usage text), then add its input filter and its run step at the
 #   [PROJECT-SPECIFIC] points. The reusable scoping logic lives in scripts/ProjectScripts.psm1,
-#   which is shared across repositories and must not be edited here.
+#   which is delivered by the Agents release zip, is shared across repositories, and must never
+#   be edited here.
 #   With no arguments the script prints the usage text and exits 1; -All must still run every
-#   check (CI relies on that). Never remove or weaken a check to make it pass.
+#   check (CI relies on that), and never remove or weaken a check to make it pass.
 
 param(
     # Run every check (what CI runs).
