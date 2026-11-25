@@ -69,4 +69,9 @@
     <ProjectReference Include="..\..\src\DemaConsulting.BuildMark\DemaConsulting.BuildMark.csproj" />
   </ItemGroup>
 
+  <!-- Test Data -->
+  <ItemGroup>
+    <None Update="TestData\**\*" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
 </Project>

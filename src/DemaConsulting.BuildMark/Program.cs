@@ -67,16 +67,29 @@ internal static class Program
     /// <param name="args">Command-line arguments.</param>
     /// <returns>Exit code: 0 for success, non-zero for failure.</returns>
     /// <remarks>
-    ///     Catches <see cref="ArgumentException"/> and <see cref="InvalidOperationException"/>
-    ///     as expected failure modes, writing the message to <see cref="Console.Error"/> and
-    ///     returning exit code 1. Any other exception type is re-thrown after logging so that
-    ///     the runtime can generate event logs for unexpected failures.
-    ///     The method itself runs on the main thread; no async execution occurs at this level.
+    ///     <para>
+    ///         The <c>help</c> command is answered first, by <see cref="HelpCommand"/>, before the
+    ///         command-line options are parsed: <c>help</c> is a command and not an option, so
+    ///         <see cref="Context.Create(string[])"/> would reject it. Its exit code is returned as is.
+    ///     </para>
+    ///     <para>
+    ///         Catches <see cref="ArgumentException"/> and <see cref="InvalidOperationException"/>
+    ///         as expected failure modes, writing the message to <see cref="Console.Error"/> and
+    ///         returning exit code 1. Any other exception type is re-thrown after logging so that
+    ///         the runtime can generate event logs for unexpected failures.
+    ///         The method itself runs on the main thread; no async execution occurs at this level.
+    ///     </para>
     /// </remarks>
-    private static int Main(string[] args)
+    internal static int Main(string[] args)
     {
         try
         {
+            // Answer the help command before the options are parsed
+            if (HelpCommand.Default.TryRun(args, out var helpExitCode))
+            {
+                return helpExitCode;
+            }
+
             // Create context from command-line arguments
             using var context = Context.Create(args);
 
@@ -179,7 +192,7 @@ internal static class Program
     }
 
     /// <summary>
-    ///     Prints usage information.
+    ///     Prints usage information, ending with a pointer to the built-in help topics.
     /// </summary>
     /// <param name="context">The context for output.</param>
     /// <remarks>
@@ -190,7 +203,8 @@ internal static class Program
     /// </remarks>
     private static void PrintHelp(Context context)
     {
-        context.WriteLine("Usage: buildmark [options]");
+        context.WriteLine($"Usage: {HelpCommand.ToolName} [options]");
+        context.WriteLine($"       {HelpCommand.ToolName} help [topic]");
         context.WriteLine("");
         context.WriteLine("Options:");
         context.WriteLine("  -v, --version                Display version information");
@@ -204,6 +218,8 @@ internal static class Program
         context.WriteLine("  --report <file>              Specify the report file name");
         context.WriteLine("  --depth <depth>              Specify the markdown heading depth (default: 1)");
         context.WriteLine("  --include-known-issues       Include known issues in the report");
+        context.WriteLine("");
+        context.WriteLine(HelpCommand.Default.Footer);
     }
 
     /// <summary>

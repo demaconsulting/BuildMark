@@ -23,4 +23,14 @@ package OtsDependencies {
             testFiles = ("test/DemaConsulting.BuildMark.Tests/OtsSoftwareTests/GraphQLClientTests.cs");
         }
     }
+
+    part def HelpCards {
+        doc /* OTS: DemaConsulting.HelpCards library that serves the built-in help command. */
+
+        metadata info : SoftwareInfo {
+            designFiles = ("docs/design/ots/help-cards.md");
+            verificationFiles = ("docs/verification/ots/help-cards.md");
+            requirementFiles = ("docs/reqstream/ots/help-cards.yaml");
+        }
+    }
 }

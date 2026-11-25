@@ -18,6 +18,16 @@ The `RepoConnectorsTests.cs` file exercises the full data pipeline, from connect
 through `GetBuildInformationAsync`, using mock data to cover GitHub, Azure DevOps, and Mock
 connector paths.
 
+The built-in `help` command is verified by running the compiled tool with `help` arguments. The
+command examples of the help cards are verified with the example runner of
+`DemaConsulting.HelpCards`: it gives each card a fresh scratch folder and calls a test delegate
+for each command example. BuildMark reads its configuration only from `.buildmark.yaml` in the
+current folder, so the delegate copies
+`test/DemaConsulting.BuildMark.Tests/TestData/HelpExamples/{card id}.buildmark.yaml`, when the
+card has one, into that folder as `.buildmark.yaml`, runs the compiled tool there with
+`Runner.RunInDirectory`, and the runner compares the exit code and the output with the `exit` and
+`expect` values of the example.
+
 Self-test (`--validate`) is covered by `BuildMark_ValidateFlag_RunsSelfValidation` in
 `IntegrationTests.cs`. The CI pipeline additionally runs the full build notes generation chain
 with live GitHub metadata to confirm end-to-end operation.
@@ -38,6 +48,8 @@ end-to-end CI validation of the report generation pipeline.
 
 - All automated tests in `ProgramTests.cs` and `RepoConnectorsTests.cs` pass with zero failures.
 - The CI pipeline executes the end-to-end build notes generation step without error.
+- The `help` command lists the topics with exit code 0, and exits with code 2 for an unknown topic.
+- Every command example in the help cards gives the exit code and output that its card states.
 - No unresolved anomalies of Error severity remain.
 
 ## Test Scenarios
@@ -85,6 +97,20 @@ This scenario is tested by `BuildMark_ResultsParameter_IsAccepted`.
 **BuildMark_LintFlag_IsAccepted**: Verifies that `--lint` is accepted without error and exits with
 code 0. This scenario is tested by `BuildMark_LintFlag_IsAccepted`.
 
+**BuildMark_HelpTopics_HelpVerb_ListsTopics**: Invoke the tool with `help` as the sole argument;
+assert exit code is 0, the output lists every topic with its command, and no banner is printed.
+This scenario is tested by `BuildMark_HelpTopics_HelpVerb_ListsTopics`.
+
+**BuildMark_HelpTopics_UnknownTopic_ReturnsUsageError**: Invoke the tool with `help no-such-topic`;
+assert exit code is 2 and the output names the topic.
+This scenario is tested by `BuildMark_HelpTopics_UnknownTopic_ReturnsUsageError`.
+
+**BuildMark_HelpExamples_AllCommandExamples_GiveStatedResults**: Build the catalog that the tool
+ships and run every command example of every card against the compiled tool in a scratch folder
+that holds the card's `.buildmark.yaml`, if any; assert at least one command example exists and
+each gives the exit code and output fragment that its card states.
+This scenario is tested by `BuildMark_HelpExamples_AllCommandExamples_GiveStatedResults`.
+
 **Program_Version_ReturnsValidVersion**: Verifies that `Program.Version` returns a non-null,
 non-empty version string in semver format, confirming version metadata is embedded in the assembly.
 This scenario is tested by `Program_Version_ReturnsValidVersion`.
@@ -93,8 +119,14 @@ This scenario is tested by `Program_Version_ReturnsValidVersion`.
 context having `Version = true` writes the version string to context output and exits with code 0.
 This scenario is tested by `Program_Run_VersionFlag_OutputsVersionToConsole`.
 
+**Program_Main_HelpVerb_PrintsHelpIndex**: Verifies that `Program.Main` invoked with `help`, which
+is not an option, exits with code 0, prints the help topic index, and prints no banner, confirming
+the help command is answered before the options are parsed.
+This scenario is tested by `Program_Main_HelpVerb_PrintsHelpIndex`.
+
 **Program_Run_HelpFlag_OutputsHelpMessage**: Verifies that calling `Program.Run` with `Help = true`
-writes help text to context output and exits with code 0. This scenario is tested by
+writes help text, including the `buildmark help [topic]` usage line and ending with the pointer to
+the help command, to context output and exits with code 0. This scenario is tested by
 `Program_Run_HelpFlag_OutputsHelpMessage`.
 
 **Program_Run_QuestionMarkFlag_OutputsHelpMessage**: Verifies that the `?` short flag produces the

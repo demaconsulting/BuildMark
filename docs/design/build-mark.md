@@ -29,8 +29,8 @@ flowchart TD
 ```
 
 - **Program** (Unit) — entry point; dispatches to handlers based on parsed CLI flags.
-- **Cli** (Subsystem) — command-line argument parsing, output channel control, and exit code
-  tracking.
+- **Cli** (Subsystem) — command-line argument parsing, output channel control, exit code
+  tracking, and the built-in help command.
 - **BuildNotes** (Subsystem) — output data model shared by all connectors and by `Program`;
   contains the markdown renderer.
 - **Configuration** (Subsystem) — parses the optional `.buildmark.yaml` configuration file.
@@ -46,11 +46,24 @@ flowchart TD
 
 - *Type*: CLI (POSIX-style flags and arguments)
 - *Role*: Consumer — BuildMark reads arguments provided by the calling process.
-- *Contract*: `Context.Create(string[] args)` parses flags including `--build-version`,
+- *Contract*: Accepts the `help` command as the first argument (see *Help Command* below);
+  otherwise `Context.Create(string[] args)` parses flags including `--build-version`,
   `--report`, `--depth`, `--validate`, `--lint`, `--include-known-issues`, `--silent`,
   `--log`, and `--results`.
 - *Constraints*: Unrecognized flags cause `ArgumentException`; missing value arguments cause
-  `ArgumentException`; depth must be an integer in the range 1–6.
+  `ArgumentException`; depth must be an integer in the range 1–6. Argument errors are found
+  before `--silent` and `--log` take effect, so they are always printed and never logged.
+
+**Help Command**: Built-in help, answered from help cards embedded in the tool assembly.
+
+- *Type*: CLI
+- *Role*: Provider — BuildMark answers the `help` command from the shell.
+- *Contract*: `buildmark help` prints the topic index and `buildmark help <topic>` prints a
+  topic card with its examples; HelpCards adds `--example`, `--search`, and `--json`. Returns
+  exit code 0 for success, 2 for a wrong help argument or an unknown topic, and 70 for a
+  defective card catalog.
+- *Constraints*: `help` must be the first argument. It is answered before the options are
+  parsed, so `--silent` and `--log` do not apply and no banner is printed.
 
 **`.buildmark.yaml`**: Optional YAML configuration file at the repository root.
 
@@ -118,7 +131,7 @@ flowchart TD
 - *Type*: Process exit code
 - *Role*: Provider
 - *Contract*: 0 = success; 1 = any error (invalid arguments, configuration errors, API
-  errors, or self-test failures).
+  errors, or self-test failures); 2 for the `help` command (see *Help Command*).
 - *Constraints*: None.
 
 ## Dependencies
@@ -127,6 +140,8 @@ flowchart TD
   representation model — see *YamlDotNet Integration Design*
 - **DemaConsulting.TestResults**: used for TRX and JUnit XML test results serialization in the
   SelfTest subsystem; no separate design document in this collection
+- **DemaConsulting.HelpCards**: used by `HelpCommand` to load, validate, and serve the built-in
+  help cards for the `help` command — see *DemaConsulting.HelpCards Integration Design*
 - **System.Net.Http** (.NET built-in): used by `GitHubGraphQLClient` and
   `AzureDevOpsRestClient` for HTTPS communication with the GitHub and Azure DevOps APIs; no
   separate design document
@@ -143,6 +158,8 @@ memory-boundary segregation is required.
 ```text
 [Command Line Args]
         │
+        ├─ help (first argument) →  HelpCommand (Cli)
+        │                             writes the help answer to stdout, returns its exit code
         ▼
   Context (Cli)          ← parses flags, opens log file
         │

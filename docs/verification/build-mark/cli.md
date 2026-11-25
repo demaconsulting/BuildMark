@@ -8,7 +8,8 @@ various argument combinations and asserting on the resulting property values. Ea
 specific flag or argument combination and validates correct parsing behavior, including error
 conditions and output behavior. `StringWriter` captures context output for assertion without console
 side effects, and arguments are passed directly to the `Context` constructor rather than through
-`args[]`.
+`args[]`. The help command is verified through `HelpCommand.Create`, which writes to in-memory
+writers.
 
 ### Test Environment
 
@@ -19,6 +20,7 @@ in-process `StringWriter` and temporary log files are required.
 ### Acceptance Criteria
 
 - All tests in `CliTests.cs` pass with zero failures.
+- The `help` command prints a requested topic from the built-in help cards.
 - All `BuildMark-Cli-*` and referenced `BuildMark-Program-*` requirements have at least one
   test in the subsystem test file.
 
@@ -89,3 +91,7 @@ property to true. This scenario is tested by `Cli_HelpShortFlags_SetProperty`.
 
 **Cli_LintFlag_SetsProperty**: Verifies that `--lint` sets the `Lint` property to true.
 This scenario is tested by `Cli_LintFlag_SetsProperty`.
+
+**Cli_HelpCommand_TopicRequested_PrintsTopic**: Verifies that `HelpCommand.TryRun` offered
+`["help", "command-line"]` answers with the command-line topic and exit code 0.
+This scenario is tested by `Cli_HelpCommand_TopicRequested_PrintsTopic`.

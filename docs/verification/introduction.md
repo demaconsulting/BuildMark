@@ -19,7 +19,8 @@ Local items verified in this document:
 
 - **BuildMark** system: all subsystems and units listed below.
   - **Program** unit — entry point and execution orchestrator.
-  - **Cli** subsystem — `Context` unit (command-line argument parser and I/O owner).
+  - **Cli** subsystem — `Context` unit (command-line argument parser and I/O owner) and
+    `HelpCommand` unit (built-in `help` command).
   - **BuildNotes** subsystem — `BuildInformation`, `ItemInfo`, and `WebLink` units.
   - **SelfTest** subsystem — `Validation` unit.
   - **Utilities** subsystem — `PathHelpers` and `ProcessRunner` units.
@@ -39,6 +40,7 @@ OTS items verified in this document:
 - **CanvasNet** — diagram drawing tool used as a Pandoc filter.
 - **FileAssert** — file content assertion tool.
 - **GraphQL.Client** — GraphQL client library.
+- **DemaConsulting.HelpCards** — help card library.
 - **LintMark** — Markdown formatting checker.
 - **Pandoc** — document conversion tool.
 - **ReqStream** — requirements traceability tool.

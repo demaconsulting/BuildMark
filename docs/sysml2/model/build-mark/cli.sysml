@@ -1,9 +1,10 @@
 package BuildMark_CliSubsystem {
     public import BuildMark_Context::*;
+    public import BuildMark_HelpCommand::*;
     private import SoftwareItemMetadata::*;
 
     part def CliSubsystem {
-        doc /* Command-line argument parsing and I/O ownership. */
+        doc /* Command-line argument parsing, I/O ownership, and the built-in help command. */
 
         metadata info : SoftwareInfo {
             testFiles = ("test/DemaConsulting.BuildMark.Tests/Cli/CliTests.cs");
@@ -13,5 +14,6 @@ package BuildMark_CliSubsystem {
         }
 
         part context : Context;
+        part helpCommand : HelpCommand;
     }
 }

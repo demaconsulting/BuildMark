@@ -174,3 +174,14 @@ sections:
               - Cli_WriteError_SetsExitCodeToOne
             children:
               - BuildMark-Context-ExitCode
+
+          - id: BuildMark-Cli-HelpTopics
+            title: The Cli subsystem shall answer the help command from built-in help cards.
+            justification: |
+              Users and AI agents need help topics with worked examples from the installed tool.
+            tests:
+              - Cli_HelpCommand_TopicRequested_PrintsTopic
+            children:
+              - BuildMark-HelpCommand-HelpVerb
+              - BuildMark-HelpCommand-ValidCards
+              - BuildMark-HelpCommand-LineWidth

@@ -4,7 +4,9 @@
 
 `Program` unit tests are in `ProgramTests.cs`. Each test constructs a `Context` object with
 controlled arguments and output capture, calls `Program.Run`, then asserts on the context output
-and exit code. The connector factory is injected via a context override to avoid live API calls
+and exit code. `Program_Main_HelpVerb_PrintsHelpIndex` calls `Program.Main` instead, with console
+output captured, because the `help` command is answered before a `Context` exists. The connector
+factory is injected via a context override to avoid live API calls
 where needed. No framework mocking library is used; a local `ThrowingConnector` stub simulates
 connector failure conditions.
 
@@ -18,6 +20,8 @@ directory used by report-generation tests.
 
 - All tests in `ProgramTests.cs` pass with zero failures.
 - Exit code assertions cover both success (0) and error (1) paths.
+- `Program.Main` answers the `help` command before the options are parsed, and the usage
+  information ends with the pointer to the help command.
 
 ### Test Scenarios
 
@@ -29,8 +33,14 @@ This scenario is tested by `Program_Version_ReturnsValidVersion`.
 context having `Version = true` writes the version string to standard output and exits with code 0.
 This scenario is tested by `Program_Run_VersionFlag_OutputsVersionToConsole`.
 
+**Program_Main_HelpVerb_PrintsHelpIndex**: Verifies that `Program.Main` invoked with `help`, which
+is not an option, exits with code 0, prints the help topic index, and prints no banner, confirming
+the help command is answered before the options are parsed.
+This scenario is tested by `Program_Main_HelpVerb_PrintsHelpIndex`.
+
 **Program_Run_HelpFlag_OutputsHelpMessage**: Verifies that calling `Program.Run` with `-h` writes
-usage text including "Usage: buildmark" and "Options:" to standard output and exits with code 0.
+usage text including "Usage: buildmark", "Options:", and the `buildmark help [topic]` usage line
+to standard output, ending with the pointer to the help command, and exits with code 0.
 This scenario is tested by `Program_Run_HelpFlag_OutputsHelpMessage`.
 
 **Program_Run_QuestionMarkFlag_OutputsHelpMessage**: Verifies that the `-?` short flag produces the
@@ -38,7 +48,8 @@ same help output as `-h`. This scenario is tested by
 `Program_Run_QuestionMarkFlag_OutputsHelpMessage`.
 
 **Program_Run_LongHelpFlag_OutputsHelpMessage**: Verifies that the `--help` long flag produces
-standard help output and exits with code 0. This scenario is tested by
+standard help output, ending with the pointer to the help command, and exits with code 0. This
+scenario is tested by
 `Program_Run_LongHelpFlag_OutputsHelpMessage`.
 
 **Program_Run_ValidateFlag_OutputsValidationMessage**: Verifies that calling `Program.Run` with

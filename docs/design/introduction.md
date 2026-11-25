@@ -25,6 +25,7 @@ OTS items (integration and usage design; see *OTS Integration Design*):
 
 - **YamlDotNet** — YAML parsing library used by the Configuration subsystem.
 - **GraphQL.Client** — GraphQL client library used by the GitHub subsystem.
+- **DemaConsulting.HelpCards** — help card library used by the Cli subsystem.
 - **xUnit** — unit testing framework.
 - **BuildMark** — build notes generation tool (previously released version).
 - **CanvasNet** — diagram drawing tool used as a Pandoc filter.
@@ -69,7 +70,8 @@ into a markdown build notes report](architecture.svg)
 
 - **src/** - source files and projects
   - **DemaConsulting.BuildMark/** - BuildMark system source
-    - **Cli/** - Cli subsystem
+    - **Cli/** - Cli subsystem, including the built-in `help` command
+    - **Help/** - built-in help cards (Markdown with front matter), embedded in the assembly
     - **BuildNotes/** - BuildNotes subsystem
     - **SelfTest/** - SelfTest subsystem
     - **Utilities/** - Utilities subsystem

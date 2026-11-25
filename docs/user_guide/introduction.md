@@ -32,7 +32,8 @@ Key capabilities include:
 
 This guide covers installation prerequisites and setup in *Installation*, first-run workflows and
 common command examples in *Getting Started*, the `.buildmark.yaml` configuration file reference in
-*Configuration*, command-line option reference in *Command-Line Options*, item visibility and
+*Configuration*, command-line option reference and the built-in `buildmark help` command in
+*Command-Line Options*, item visibility and
 version targeting controls in *Item Visibility and Version Controls*, and CI/CD integration,
 report format, version selection rules, best practices, and troubleshooting in *Common Use Cases*.
 It is intended for developers and CI/CD engineers who want to automate build notes generation as
