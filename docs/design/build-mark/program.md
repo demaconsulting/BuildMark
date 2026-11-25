@@ -34,10 +34,9 @@ tests can call it.
 First calls `HelpCommand.Default.TryRun(args, out exitCode)`. The `help` command is not an
 option, so `Context.Create` would reject it; when the help command answers, `Main` returns its
 exit code. Otherwise `Main` creates a `Context` from the supplied arguments and delegates to
-`Run`. `ArgumentException`
-and `InvalidOperationException` are caught, written to `Console.Error`, and yield exit code
-
-1. Any other exception is re-thrown after logging to generate runtime event logs.
+`Run`. `ArgumentException` and `InvalidOperationException` are caught, written to
+`Console.Error`, and yield exit code `1`. Any other exception is re-thrown after logging to
+generate runtime event logs.
 
 **Run(Context context) → void**: Executes program logic against an already-constructed
 `Context`.
