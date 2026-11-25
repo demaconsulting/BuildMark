@@ -43,10 +43,10 @@ current commit, so run {{tool}} in a clone that has an `origin` remote.
 **Choice.** The first of these that applies picks the connector:
 
 1. `connector.type: azure-devops` in `.buildmark.yaml` picks Azure DevOps
-2. the `TF_BUILD` environment variable (set in Azure Pipelines) picks Azure
-   DevOps
-3. the `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable picks
-   GitHub
+2. the `TF_BUILD` environment variable (set in Azure Pipelines) picks
+   Azure DevOps
+3. the `GITHUB_ACTIONS` or `GITHUB_WORKSPACE` environment variable
+   picks GitHub
 4. an `origin` URL that contains `dev.azure.com` or `visualstudio.com`
    picks Azure DevOps
 5. otherwise GitHub
@@ -65,8 +65,8 @@ variable that is not set or empty is an error. Otherwise the token comes
 from `GH_TOKEN`, then `GITHUB_TOKEN`, then `gh auth token`. The step that
 [[#github-step]] prints passes the token of the job.
 
-**Azure DevOps keys** go below `connector.azure-devops`; every key is
-optional:
+**Azure DevOps keys** go below `connector.azure-devops`;
+every key is optional:
 
 - `url` (the organization URL), `project`, and `repository`; by default
   taken from the `origin` URL

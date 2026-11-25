@@ -31,9 +31,9 @@ examples:
 ---
 A run without `--help`, `--validate`, or `--lint` writes build notes for
 the Git clone in the current folder. It first reads `.buildmark.yaml` and
-stops when the file has errors; see [[configuration]]. Then it asks GitHub
-or Azure DevOps for the history; see [[connectors]]. A typical run in a
-pipeline:
+stops when the file has errors; see [[configuration]]. Then it asks
+GitHub or Azure DevOps for the history; see [[connectors]]. A typical
+run in a pipeline:
 
 ```bash
 buildmark --build-version v1.2.3 --report build-notes.md --depth 2 --include-known-issues
@@ -48,13 +48,13 @@ newest release on the current branch when the current commit is its commit,
 and Azure DevOps uses the newest version tag on the current commit.
 Otherwise the run fails and asks for a version.
 
-**Previous version.** The notes cover the changes since the previous
-version:
+**Previous version.** The notes cover the changes since the
+previous version:
 
-- a release is compared with the newest earlier release, skipping
-  pre-releases
-- a pre-release is compared with the newest earlier version on a different
-  commit
+- a release is compared with the newest earlier release,
+  skipping pre-releases
+- a pre-release is compared with the newest earlier version
+  on a different commit
 - with no earlier version, the history starts at the first commit
 
 GitHub uses its releases on the current branch, and Azure DevOps its
@@ -79,8 +79,8 @@ folder of the file must exist.
   empty section shows `- N/A`
 - a `Known Issues` subsection with `--include-known-issues` or
   `report.include-known-issues: true`; see [[item-controls]]
-- a `Full Changelog` subsection with a link to the comparison, when one is
-  available
+- a `Full Changelog` subsection with a link to the comparison,
+  when one is available
 
-Each item is one line: a link labeled with the item number, a dash, and the
-title.
+Each item is one line: a link labeled with the item number, a dash,
+and the title.

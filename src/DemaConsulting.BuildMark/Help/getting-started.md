@@ -44,9 +44,9 @@ the previous version, and writes them as Markdown build notes.
    ```
 
 2. **Check it.** The command that [[#version]] prints shows the version.
-   The command from [[#validate]] runs the self-tests on built-in sample
-   data, without network access, and exits 0 when all pass; see
-   [[self-validation]].
+   The command from [[#validate]] runs the self-tests on built-in
+   sample data, without network access, and exits 0 when all
+   pass; see [[self-validation]].
 3. **Write build notes.** In a clone of the repository, with an `origin`
    remote and an access token (see [[connectors]]), run:
 

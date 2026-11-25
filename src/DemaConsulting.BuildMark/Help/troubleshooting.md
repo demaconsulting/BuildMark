@@ -61,15 +61,15 @@ always printed and never reach the log file. The command that
 
 - `Unsupported argument`: check the spelling against [[command-line]].
   `help` must come first.
-- `requires a filename argument` and similar: the option before it needs a
-  value.
+- `requires a filename argument` and similar: the option before it
+  needs a value.
 - `must be between 1 and 6` or `requires a positive integer`: fix the value
   of `--depth`.
 - `Failed to open log file`: the folder of `--log` does not exist or the
   file is locked ([[#bad-log]]).
-- `<file>:<line>: Error: ...`: a problem in `.buildmark.yaml`, such as an
-  unknown key, as the command that [[#bad-config]] prints shows; see
-  [[configuration]].
+- `<file>:<line>: Error: ...`: a problem in `.buildmark.yaml`, such
+  as an unknown key, as the command that [[#bad-config]] prints
+  shows; see [[configuration]].
 - `Invalid build version format`: `--build-version` needs three numbers,
   such as `v1.2.3`.
 - `Command 'git ...' failed`: the current folder is not a Git clone, or it
@@ -81,8 +81,8 @@ always printed and never reach the log file. The command that
   `current commit does not match`: add `--build-version`.
 - `Failed to write report`: the folder of `--report` does not exist or the
   file is locked.
-- `Unsupported results file format`: `--results` needs a `.trx` or `.xml`
-  file.
+- `Unsupported results file format`: `--results` needs a `.trx` or
+  `.xml` file.
 - `Unknown help card`: the topic does not exist. The message lists the
   topics. The command that [[#unknown-topic]] prints shows the error.
 - `Unexpected error: ...`: a failure that {{tool}} does not handle. It is
