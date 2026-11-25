@@ -34,6 +34,8 @@ For detailed documentation, see the [BuildMark releases page](https://github.com
 - 🌐 **Multi-Platform** - Windows, Linux, and macOS on .NET 10 and 11
 - ✅ **Self-Validation** - Built-in qualification tests
 - 📊 **Dependency Updates** - Track changes from Dependabot and Renovate
+- 💡 **Built-in Help** - `buildmark help` serves help topics with runnable examples, search, and JSON output for
+  AI agents
 
 ## Installation
 
@@ -106,6 +108,7 @@ This will display:
 
 ```text
 Usage: buildmark [options]
+       buildmark help [topic]
 
 Options:
   -v, --version                Display version information
@@ -119,6 +122,8 @@ Options:
   --report <file>              Specify the report file name
   --depth <depth>              Specify the markdown heading depth (default: 1)
   --include-known-issues       Include known issues in the report
+
+Run 'buildmark help' for topics and examples.
 ```
 
 ### Quick Start Examples
@@ -151,6 +156,13 @@ buildmark --validate
 
 ```bash
 buildmark --validate --results validation-results.trx
+```
+
+**List the built-in help topics, then read one:**
+
+```bash
+buildmark help
+buildmark help getting-started
 ```
 
 ## Building

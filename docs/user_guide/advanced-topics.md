@@ -349,6 +349,7 @@ BuildMark uses the following exit codes:
 
 - `0`: Success
 - `1`: Error occurred
+- `2`: Unknown help topic or wrong `help` argument
 
 Use these exit codes in scripts for error handling:
 

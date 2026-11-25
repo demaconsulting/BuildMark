@@ -32,6 +32,23 @@ Display help message with all available options.
 buildmark --help
 ```
 
+The usage text ends with a pointer to the built-in help.
+
+## Built-in Help
+
+The `help` command prints help topics that explain each task with worked examples, for people and
+for AI agents that have only the installed tool. List the topics, then print one with its examples:
+
+```bash
+buildmark help
+buildmark help getting-started
+```
+
+Add `--search <words>` to find a topic, `--example <name>` to print one example of a topic, and
+`--json` to get any help answer as JSON. `help` is a command, not an option: it must be the first
+argument, and `--silent` and `--log` do not apply to it. An unknown topic or a wrong help argument
+prints a hint and exits with code 2 (see *Exit Codes*).
+
 ## Output Control
 
 ### `--silent`
@@ -41,6 +58,9 @@ Suppress console output. Useful in automated scripts where only the exit code ma
 ```bash
 buildmark --build-version v1.2.3 --report build-notes.md --silent
 ```
+
+Argument errors are found before `--silent` and `--log` take effect, so they are always printed and
+never logged.
 
 ### `--log <file>`
 
