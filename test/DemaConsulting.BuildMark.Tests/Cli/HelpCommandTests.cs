@@ -18,10 +18,10 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
+using DemaConsulting.BuildMark.Cli;
 using DemaConsulting.HelpCards.Catalog;
 using DemaConsulting.HelpCards.Integration;
 using DemaConsulting.HelpCards.Testing;
-using DemaConsulting.BuildMark.Cli;
 
 namespace DemaConsulting.BuildMark.Tests.Cli;
 
