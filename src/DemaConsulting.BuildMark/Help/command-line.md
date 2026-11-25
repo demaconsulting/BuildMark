@@ -31,7 +31,8 @@ examples:
     exit: 1
     expect: "Error: Unsupported argument '--unknown'"
 ---
-Options start with `--` (or a single character after `-`) and may be given in any order.
+Options start with `--` (or a single character after `-`) and may be given
+in any order.
 
 | Option | Meaning |
 | --- | --- |
@@ -47,17 +48,19 @@ Options start with `--` (or a single character after `-`) and may be given in an
 | `--validate` | Run the self-tests; see [[self-validation]]. |
 | `--results <file>` | Write the self-test results as `.trx` or `.xml`. |
 
-`--report-depth` is an older name of `--depth`, and `--result` of `--results`; both still work.
+`--report-depth` is an older name of `--depth`, and `--result` of
+`--results`; both still work.
 
-**Order.** `--version` wins over everything and prints only the version. Otherwise the tool prints a
-banner, then handles the first of `--help`, `--validate`, `--lint`, or the build notes. The command
-that [[#silent-log]] prints writes the version to the log file
-only.
+**Order.** `--version` wins over everything and prints only the version.
+Otherwise the tool prints a banner, then handles the first of `--help`,
+`--validate`, `--lint`, or the build notes. The command that
+[[#silent-log]] prints writes the version to the log file only.
 
-**Errors.** An unknown argument, or an option without its value, prints `Error: ...` and exits 1.
-The command that [[#unknown-option]] prints shows this. These
-errors are found before `--silent` and `--log` take effect, so they are always printed and never
-logged.
+**Errors.** An unknown argument, or an option without its value, prints
+`Error: ...` and exits 1. The command that [[#unknown-option]] prints shows
+this. These errors are found before `--silent` and `--log` take effect, so
+they are always printed and never logged.
 
-**Help.** `help` is a command, not an option, and must be the first argument. `--silent` and `--log`
-do not apply to it, and an unknown topic exits 2.
+**Help.** `help` is a command, not an option, and must be the first
+argument. `--silent` and `--log` do not apply to it, and an unknown topic
+exits 2.

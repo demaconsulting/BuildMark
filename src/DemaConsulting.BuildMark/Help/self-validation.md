@@ -42,24 +42,27 @@ examples:
     exit: 1
     expect: 'Unsupported results file format'
 ---
-`--validate` runs a short set of tests of the tool itself, so a regulated project can show that the
-installed version works on its build machine. The tests write build notes from built-in sample data
-in a temporary folder, with no network access and no token.
+`--validate` runs a short set of tests of the tool itself, so a regulated
+project can show that the installed version works on its build machine. The
+tests write build notes from built-in sample data in a temporary folder,
+with no network access and no token.
 
 **Report.** The output is Markdown. It starts with the heading
-`DEMA Consulting BuildMark Self-validation` and a table of the tool version, machine name, operating
-system, .NET runtime, and time stamp. Each test prints one line, `✓ <name> - Passed` or
-`✗ <name> - Failed: <reason>`, and the report ends with `Total Tests`, `Passed`, and `Failed` lines.
-The exit code is 0 only when every test passes. `--depth` sets the level of the heading, as
-[[#depth]] shows.
+`DEMA Consulting BuildMark Self-validation` and a table of the tool
+version, machine name, operating system, .NET runtime, and time stamp. Each
+test prints one line, `✓ <name> - Passed` or `✗ <name> - Failed: <reason>`,
+and the report ends with `Total Tests`, `Passed`, and `Failed` lines. The
+exit code is 0 only when every test passes. `--depth` sets the level of the
+heading, as [[#depth]] shows.
 
-**Results files.** `--results <file>` also writes the outcome; the extension chooses the format.
-`.trx` writes a Visual Studio TRX file and `.xml` writes JUnit XML, both readable by CI test-report
-tasks. Any other extension is an error after the tests ran
-([[#bad-extension]]). The folder of the file must exist.
+**Results files.** `--results <file>` also writes the outcome; the
+extension chooses the format. `.trx` writes a Visual Studio TRX file and
+`.xml` writes JUnit XML, both readable by CI test-report tasks. Any other
+extension is an error after the tests ran ([[#bad-extension]]). The folder
+of the file must exist.
 
-**Evidence.** The tests have stable names, so a requirements file can list them as the tests that
-prove the tool works in its environment:
+**Evidence.** The tests have stable names, so a requirements file can list
+them as the tests that prove the tool works in its environment:
 
 - `BuildMark_MarkdownReportGeneration`
 - `BuildMark_GitIntegration`
