@@ -51,8 +51,9 @@ in any order.
 `--report-depth` is an older name of `--depth`, and `--result` of
 `--results`; both still work.
 
-**Order.** `--version` wins over everything and prints only the version.
-Otherwise the tool prints a banner, then handles the first of `--help`,
+**Order.** `--version`, when all arguments are valid, prints only the
+version and skips everything else. Without it, the tool prints a banner,
+then handles the first of `--help`,
 `--validate`, `--lint`, or the build notes. The command that
 [[#silent-log]] prints writes the version to the log file only.
 
