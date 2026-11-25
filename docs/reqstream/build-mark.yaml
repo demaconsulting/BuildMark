@@ -62,6 +62,46 @@ sections:
               - BuildMark-Cli-Help
               - BuildMark-Program-Help
 
+          - id: BuildMark-Command-HelpTopics
+            title: The tool shall list its help topics when run with the help command.
+            tags:
+              - system
+            justification: |
+              Users and AI agents that have only the installed tool must be able to learn how to
+              use it from the tool itself. The short --help usage text points to the topic list,
+              and each topic explains a task with worked examples.
+            tests:
+              - BuildMark_HelpTopics_HelpVerb_ListsTopics
+            children:
+              - BuildMark-Program-HelpCommand
+              - BuildMark-Program-HelpFooter
+              - BuildMark-Cli-HelpTopics
+
+          - id: BuildMark-Command-HelpUnknownTopic
+            title: The tool shall exit with code 2 when the help command names an unknown topic.
+            tags:
+              - system
+            justification: |
+              Scripts and AI agents must be able to tell a mistyped topic from a successful answer,
+              and from the exit code 1 of a failed tool run.
+            tests:
+              - BuildMark_HelpTopics_UnknownTopic_ReturnsUsageError
+            children:
+              - BuildMark-Program-HelpCommand
+
+          - id: BuildMark-Command-HelpExamples
+            title: The tool shall provide help examples that give the result each example states when run.
+            tags:
+              - system
+            justification: |
+              A worked example in the help is only useful when it works. Running every command
+              example against the built tool, and comparing the exit code and output with what the
+              example states, keeps the help in step with the tool.
+            tests:
+              - BuildMark_HelpExamples_AllCommandExamples_GiveStatedResults
+            children:
+              - BuildMark-OTS-HelpCards-Testing
+
           - id: BuildMark-Command-Silent
             title: The tool shall support silent mode to suppress console output.
             tags:

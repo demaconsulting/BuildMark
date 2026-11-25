@@ -6,11 +6,13 @@
 
 The Cli subsystem provides the command-line interface layer for BuildMark. It parses arguments
 supplied by the user, routes output to the console or a log file, and exposes the parsed state to
-the rest of the system via the `Context` object.
+the rest of the system via the `Context` object. It also answers the built-in `help` command.
 
-The subsystem contains one unit:
+The subsystem contains two units:
 
 - **`Context`** (`Cli/Context.cs`) — argument parsing, output routing, and exit-code tracking
+- **`HelpCommand`** (`Cli/HelpCommand.cs`) — the built-in `help` command, answered from embedded
+  help cards
 
 The Cli subsystem has no dependencies on other BuildMark subsystems. All other subsystems receive a
 `Context` from the caller rather than creating one themselves.
@@ -35,10 +37,32 @@ output and tracking errors.
   error and sets `ExitCode` to 1; `Dispose()` flushes and closes the log file.
 - *Constraints*: `Context` implements `IDisposable`; callers must dispose after use.
 
+**`HelpCommand.TryRun`**: Answers the `help` command from the built-in help cards.
+
+- *Type*: In-process .NET instance method (on the shared `HelpCommand.Default` instance)
+- *Role*: Provider
+- *Contract*: Returns `false`, writing nothing, when the first argument is not `help`. Otherwise
+  writes the answer to the console, returns `true`, and sets the exit code (see *Help Command* in
+  the system design).
+- *Constraints*: Does not throw for user input; does not use `Context`.
+
+**`HelpCommand.Footer`**: The sentence that points a reader of the usage text to the help command.
+
+- *Type*: In-process .NET instance property
+- *Role*: Provider
+- *Contract*: Returns the one-line pointer that HelpCards supplies.
+- *Constraints*: Reading it never builds the help catalog.
+
 ### Design
 
-The Cli subsystem contains a single unit (`Context`), so there is no inter-unit collaboration to
-describe. `Context.Create` parses the argument array using the private `ArgumentParser` nested class
+`Context` and `HelpCommand` do not call each other. `Program.Main` offers the arguments to
+`HelpCommand.TryRun` first; when the help command answers, the invocation ends with its exit code
+and no `Context` is created. `HelpCommand` writes its answers to the console itself. It is the one
+exception to `Context` owning all output, because the `help` command is answered before a `Context`
+exists.
+
+For every other invocation, `Context.Create` parses the argument array using the private
+`ArgumentParser` nested class
 and opens the optional log file. The resulting `Context` object is passed by `Program` to every other
 subsystem that needs to write output, read flags, or set the exit code. No other subsystem creates a
 `Context`; all output and exit-code management flows through the single instance created at startup.

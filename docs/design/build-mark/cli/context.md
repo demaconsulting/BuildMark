@@ -4,7 +4,7 @@
 
 #### Purpose
 
-`Context` is the sole unit in the Cli subsystem. It owns the lifecycle of command-line argument
+`Context` is the Cli subsystem unit that owns the lifecycle of command-line argument
 parsing, console and log-file output, and exit-code tracking. `Program` creates exactly one
 `Context` per invocation and passes it to all other units that need to write output or read
 configuration flags.

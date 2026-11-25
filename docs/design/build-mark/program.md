@@ -4,11 +4,11 @@
 
 ### Purpose
 
-`Program` is the top-level unit of BuildMark. It owns the application entry point, creates
-the `Context` object from command-line arguments, and dispatches execution to the appropriate
-handler based on the parsed flags.
+`Program` is the top-level unit of BuildMark. It owns the application entry point, hands the
+`help` command to `HelpCommand`, otherwise creates the `Context` object from command-line
+arguments, and dispatches execution to the appropriate handler based on the parsed flags.
 
-The unit exposes a private entry point `Main`, which is called by the .NET runtime, and a
+The unit exposes an internal entry point `Main`, which is called by the .NET runtime, and a
 public method `Run`, which accepts an existing `Context` and performs the main execution
 logic. `Run` is exposed separately so that integration tests can inject a pre-configured
 `Context` without repeating argument parsing.
@@ -22,14 +22,19 @@ is present.
 
 ### Key Methods
 
-**Main(string[] args) → int**: Application entry point, declared `private static`.
+**Main(string[] args) → int**: Application entry point, declared `internal static` so that
+tests can call it.
 
 - *Parameters*: `string[] args` — command-line arguments from the runtime.
-- *Returns*: `int` — exit code; 0 for success, 1 for failure.
+- *Returns*: `int` — exit code; 0 for success, 1 for failure; for the `help` command, the exit
+  code of `HelpCommand` (see *Help Command* in the system design).
 - *Preconditions*: Called by the .NET runtime on startup.
 - *Postconditions*: Returns an exit code and terminates the process.
 
-Creates a `Context` from the supplied arguments and delegates to `Run`. `ArgumentException`
+First calls `HelpCommand.Default.TryRun(args, out exitCode)`. The `help` command is not an
+option, so `Context.Create` would reject it; when the help command answers, `Main` returns its
+exit code. Otherwise `Main` creates a `Context` from the supplied arguments and delegates to
+`Run`. `ArgumentException`
 and `InvalidOperationException` are caught, written to `Console.Error`, and yield exit code
 
 1. Any other exception is re-thrown after logging to generate runtime event logs.
@@ -85,7 +90,9 @@ Called unconditionally after the version-flag check in `Run`.
 - *Preconditions*: None.
 - *Postconditions*: Usage message written to context output.
 
-Called when any of the `-?`, `-h`, or `--help` flags is set.
+Called when any of the `-?`, `-h`, or `--help` flags is set. The usage message is the usage
+synopsis (including `buildmark help [topic]`) and the options list, and it ends with
+`HelpCommand.Default.Footer`, the pointer to the help command.
 
 **LoadConfiguration() → ConfigurationLoadResult**: Synchronously loads the optional
 repository configuration.
@@ -112,6 +119,8 @@ and allows the exit code to reflect only semantic errors.
 
 ### Dependencies
 
+- **HelpCommand** — answers the `help` command before the options are parsed, and supplies the
+  footer that ends the usage text (Cli subsystem)
 - **Context** — provides parsed CLI flags, output methods, and exit code tracking
   (Cli subsystem)
 - **Validation** — executes self-validation when `--validate` flag is set (SelfTest

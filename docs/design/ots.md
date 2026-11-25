@@ -9,11 +9,12 @@ item's role.
 
 The OTS items used by this project fall into five functional groups:
 
-- **Production code libraries** — YamlDotNet and GraphQL.Client are referenced by the
-  `DemaConsulting.BuildMark` project. YamlDotNet is consumed only by the `BuildMarkConfigReader`
-  unit of the Configuration subsystem, and GraphQL.Client only by the `GitHubGraphQLClient` unit
-  of the GitHub subsystem. Neither library's types appear in any public signature, so an upgrade
-  or replacement affects only that unit.
+- **Production code libraries** — YamlDotNet, GraphQL.Client, and DemaConsulting.HelpCards are
+  referenced by the `DemaConsulting.BuildMark` project. YamlDotNet is consumed only by the
+  `BuildMarkConfigReader` unit of the Configuration subsystem, GraphQL.Client only by the
+  `GitHubGraphQLClient` unit of the GitHub subsystem, and DemaConsulting.HelpCards only by the
+  `HelpCommand` unit of the Cli subsystem. No library's types appear in any public signature, so
+  an upgrade or replacement affects only that unit.
 - **Test framework** — the xUnit packages referenced by the test project and consumed by
   `dotnet test`.
 - **Build pipeline tools** — BuildMark, VersionMark, SarifMark, SonarMark, ReviewMark, ReqStream,
@@ -32,6 +33,7 @@ The OTS items used by this project fall into five functional groups:
 | :--- | :--- |
 | BuildMark | Generates the build-notes report from repository metadata |
 | CanvasNet | Draws the Mermaid diagrams of the documents as a Pandoc filter |
+| DemaConsulting.HelpCards | Serves the built-in `help` command from embedded help cards |
 | FileAssert | Validates the generated HTML and PDF documents |
 | GraphQL.Client | Queries the GitHub GraphQL API for repository data |
 | LintMark | Checks the formatting of the Markdown files |
@@ -56,6 +58,7 @@ Detailed design for each OTS item is provided in the following sections of this 
 
 - See *BuildMark Integration Design* for the build-notes generation tool.
 - See *CanvasNet Integration Design* for the diagram drawing tool.
+- See *DemaConsulting.HelpCards Integration Design* for the help card library.
 - See *FileAssert Integration Design* for the document assertion tool.
 - See *GraphQL.Client Integration Design* for the GraphQL client library.
 - See *LintMark Integration Design* for the Markdown formatting checker.
@@ -95,10 +98,11 @@ published SBOM.
 
 ## General Integration Approach
 
-- **NuGet libraries** (YamlDotNet, GraphQL.Client) — restored with the main project and called
-  through their public APIs from one unit each: `BuildMarkConfigReader` converts every YamlDotNet
-  result and exception into BuildMark configuration types, and `GitHubGraphQLClient` converts
-  every GraphQL.Client response and exception into lists of BuildMark values.
+- **NuGet libraries** (YamlDotNet, GraphQL.Client, DemaConsulting.HelpCards) — restored with the
+  main project and called through their public APIs from one unit each: `BuildMarkConfigReader`
+  converts every YamlDotNet result and exception into BuildMark configuration types,
+  `GitHubGraphQLClient` converts every GraphQL.Client response and exception into lists of
+  BuildMark values, and `HelpCommand` answers the `help` command and returns its exit code.
 - **NuGet test framework** (xUnit) — referenced only by the test project; it never flows to the
   published package.
 - **Dotnet tools** (all other items) — invoked as `dotnet <tool>` with documented command-line
@@ -111,6 +115,9 @@ published SBOM.
   files through `BuildMarkConfigReader` (see *YamlDotNet Verification*), and GraphQL.Client by
   the `GitHubGraphQLClient` tests that query a mocked GitHub endpoint and by OTS tests that drive
   `GraphQLHttpClient` directly against it (see *GraphQL.Client Verification*).
+  DemaConsulting.HelpCards is qualified by the `HelpCommand` unit tests and by the integration
+  test that runs every help example against the built tool (see *DemaConsulting.HelpCards
+  Verification*).
 - **Self-validation**: BuildMark, VersionMark, SarifMark, SonarMark, ReviewMark, ReqStream,
   FileAssert, TextLint, LintMark, SysML2Tools, and CanvasNet run `--validate` in CI and write TRX
   results consumed by ReqStream.

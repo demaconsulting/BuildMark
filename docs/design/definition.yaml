@@ -29,6 +29,7 @@ input-files:
   - docs/design/build-mark/build-notes/web-link.md
   - docs/design/build-mark/cli.md
   - docs/design/build-mark/cli/context.md
+  - docs/design/build-mark/cli/help-command.md
   - docs/design/build-mark/configuration.md
   - docs/design/build-mark/configuration/build-mark-config.md
   - docs/design/build-mark/configuration/build-mark-config-reader.md
@@ -77,6 +78,7 @@ input-files:
   - docs/design/ots/canvasnet.md
   - docs/design/ots/fileassert.md
   - docs/design/ots/graphql-client.md
+  - docs/design/ots/help-cards.md
   - docs/design/ots/lintmark.md
   - docs/design/ots/pandoc.md
   - docs/design/ots/reqstream.md
