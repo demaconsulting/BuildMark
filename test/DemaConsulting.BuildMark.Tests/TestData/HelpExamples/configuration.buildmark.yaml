@@ -1,0 +1,25 @@
+---
+connector:
+  type: github
+  github:
+    repository: owner/repo
+
+sections:
+  - id: changes
+    title: Changes
+  - id: bugs-fixed
+    title: Bugs Fixed
+  - id: dependency-updates
+    title: Dependency Updates
+
+rules:
+  - match:
+      label: dependencies
+    route: dependency-updates
+  - match:
+      label: bug
+    route: bugs-fixed
+  - match:
+      label: internal
+    route: suppressed
+  - route: changes

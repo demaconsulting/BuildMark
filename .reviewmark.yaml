@@ -14,6 +14,7 @@ needs-review:
   - "docs/design/**/*.md"         # Design documentation files
   - "docs/verification/**/*.md"   # Verification documentation files
   - "docs/user_guide/**/*.md"     # User guide documentation
+  - "src/**/Help/**"              # Built-in help cards
   - "!**/obj/**"                  # Exclude build output
   - "!**/bin/**"                  # Exclude build output
   - "!node_modules/**"            # Exclude npm dependencies
@@ -136,6 +137,21 @@ reviews:
       - "docs/verification/build-mark/cli/context.md"
       - "src/**/Cli/Context.cs"
       - "test/**/Cli/ContextTests.cs"
+
+  - id: BuildMark-Cli-HelpCommand
+    title: Review that BuildMark Cli HelpCommand Implementation is Correct
+    context:
+      - "docs/design/build-mark.md"
+      - "docs/reqstream/build-mark.yaml"
+      - "docs/design/build-mark/cli.md"
+      - "docs/reqstream/build-mark/cli.yaml"
+    paths:
+      - "docs/reqstream/build-mark/cli/help-command.yaml"
+      - "docs/design/build-mark/cli/help-command.md"
+      - "docs/verification/build-mark/cli/help-command.md"
+      - "src/**/Cli/HelpCommand.cs"
+      - "src/**/Help/**"
+      - "test/**/Cli/HelpCommandTests.cs"
 
   # BuildMark - SelfTest
   - id: BuildMark-SelfTest
@@ -730,6 +746,13 @@ reviews:
       - "docs/design/ots/graphql-client.md"
       - "docs/verification/ots/graphql-client.md"
       - "test/**/OtsSoftwareTests/GraphQLClientTests.cs"
+
+  - id: OTS-HelpCards
+    title: Review that HelpCards Provides Required Functionality
+    paths:
+      - "docs/reqstream/ots/help-cards.yaml"
+      - "docs/design/ots/help-cards.md"
+      - "docs/verification/ots/help-cards.md"
 
   - id: OTS-CanvasNet
     title: Review that CanvasNet Provides Required Functionality
