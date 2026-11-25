@@ -253,8 +253,8 @@ uses the package.
   example-runner test copies it into `invocation.WorkingDirectory` as `.buildmark.yaml` before running the tool. A
   copy of a sample shown in a card must equal the sample.
 - **Width.** A printed card may not be wider than 120 characters. Links print as full commands (`[[#name]]` as
-  about 50 characters) and `{{version}}` of a development build as about 46, so wrap body lines so that each
-  printed line, with its links expanded, stays near 100 characters, and use at most one link per line.
+  about 50 characters) and `{{version}}` of a development build as about 46, so keep body lines near 75 characters
+  with at most one link each.
 - **Text.** Cards are linted and spell-checked like any Markdown file: no body line starting with `#`, no wide
   tables, and every fenced block names its language.
 

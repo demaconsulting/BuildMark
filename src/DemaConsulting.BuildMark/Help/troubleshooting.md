@@ -49,8 +49,9 @@ examples:
 | 1 | An error, a problem in `.buildmark.yaml`, or a failed self-test. |
 | 2 | A wrong `help` argument or an unknown help topic. |
 
-Errors are printed to standard error as `Error: ...` and set the exit code. Errors found during a
-run, such as a failed request to GitHub, are hidden by `--silent` and kept in the `--log` file.
+Errors are printed to standard error as `Error: ...` and set the exit code. Most errors found
+during a run, such as a missing token, a version that cannot be determined, or a problem in
+`.buildmark.yaml`, are hidden by `--silent` and kept in the `--log` file.
 Errors in the arguments, and a log file that cannot be opened, are found before the run starts: they
 are always printed and never reach the log file. The command that
 [[#silent-error]] prints shows one despite `--silent`.
@@ -77,3 +78,5 @@ are always printed and never reach the log file. The command that
 - `Unsupported results file format`: `--results` needs a `.trx` or `.xml` file.
 - `Unknown help card`: the topic does not exist. The message lists the topics. The command that
   [[#unknown-topic]] prints shows the error.
+- `Unexpected error: ...`: a failure that {{tool}} does not handle. It is always printed, never
+  logged, and ends the process with an exit code from the .NET runtime instead of 1.
